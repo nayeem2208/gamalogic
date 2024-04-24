@@ -98,7 +98,8 @@ function Signup() {
     }
   };
 
-  const recaptchaSiteKey = import.meta.env.VITE_RECAPTA_SITE_KEY;
+  // const recaptchaSiteKey = import.meta.env.VITE_RECAPTA_SITE_KEY;
+  const recaptchaSiteKey='aldfsjkj'
   console.log(recaptchaSiteKey, "recaptcha");
   function reCaptchaOnChange(value) {
     console.log("Captcha value:", value);
