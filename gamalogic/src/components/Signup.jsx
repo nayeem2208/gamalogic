@@ -1,5 +1,5 @@
 import { GoogleLogin } from "@react-oauth/google";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import axiosInstance from "../axios/axiosInstance";
@@ -10,7 +10,6 @@ function Login() {
   let [data, setData] = useState({ email: "", password: "" });
   let { setUserDetails ,setCreditBal} = useUserState();
   let [passwordVisible, setPasswordVisible] = useState(false);
-  const [previousLocation, setPreviousLocation] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

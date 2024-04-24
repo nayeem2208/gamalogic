@@ -4,7 +4,7 @@ function IntegrateGoogleSheet() {
   return (
     <div className=" px-20 py-8">
       <SubHeader SubHeader={"Tutorial"} />
-      <div class="dashboard-content-inner">
+      <div className="dashboard-content-inner">
         <div className="mt-14 subHeading">
           <h3>Email validation using google sheets add-on</h3>
           <p className="my-7 w-4/5 description">
@@ -28,11 +28,11 @@ function IntegrateGoogleSheet() {
             <a
               href="https://workspace.google.com/marketplace/app/gamalogic/231767028935"
               target="_blank"
-              class="dark"
+              className="dark"
             >
               <b>Click here for the link</b>
             </a>
-            . This won't take more than 1 miniute.
+            . This won&apos;t take more than 1 miniute.
           </p>
 
           <br />
@@ -55,7 +55,7 @@ function IntegrateGoogleSheet() {
             <a
               href="https://gamalogic.com/dashboard/apikey"
               target="_blank"
-              class="dark"
+              className="dark"
             >
               <b>Gamalogic dashboard</b>
             </a>
@@ -110,7 +110,7 @@ function IntegrateGoogleSheet() {
             width="100%"
             height="402"
             src="https://www.youtube.com/embed/1LV-2qmiE-E"
-            frameborder="0"
+            frameBorder="0" 
             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
           ></iframe>

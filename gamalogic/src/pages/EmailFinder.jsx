@@ -120,7 +120,8 @@ function EmailFinder() {
                   </tr>
                 </table>
               </div>
-            ):<p>Oops! Sorry, we couldn't help you.</p>}
+            ):<p>Oops! Sorry, we couldn&apos;t help you.</p>
+          }
           </div>
         )}
       </div>

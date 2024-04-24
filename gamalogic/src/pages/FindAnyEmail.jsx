@@ -4,9 +4,9 @@ function FindAnyEmail() {
   return (
     <div className=" px-20 py-8">
       <SubHeader SubHeader={"Tutorial"} />
-      <div class="dashboard-content-inner">
+      <div className="dashboard-content-inner">
         <div className="mt-14 subHeading">
-          <h3>How to Find Anyone's Email Address using Google Sheets</h3>
+          <h3>How to Find Anyone&apos;s Email Address using Google Sheets</h3>
           <p className="my-7 w-4/5 description">
           Let’s jump into the tutorial. 
           </p>
@@ -23,11 +23,11 @@ function FindAnyEmail() {
             <a
               // href="https://workspace.google.com/marketplace/app/gamalogic/231767028935"
               target="_blank"
-              class="dark"
+              className="dark"
             >
               <b>Click here for the link</b>
             </a>
-            . This won't take more than 1 miniute.
+            . This won&apos;t take more than 1 miniute.
           </p>
 
           <br />
@@ -48,7 +48,7 @@ function FindAnyEmail() {
             <a
               href="https://gamalogic.com/dashboard/apikey"
               target="_blank"
-              class="dark"
+              className="dark"
             >
               <b>Gamalogic dashboard</b>
             </a>
@@ -94,7 +94,7 @@ function FindAnyEmail() {
             width="100%"
             height="451"
             src="https://www.youtube.com/embed/z8o33Us2p8Y"
-            frameborder="0"
+            // frameBorder="0"
             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
           ></iframe>

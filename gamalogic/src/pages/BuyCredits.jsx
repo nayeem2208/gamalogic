@@ -7,14 +7,12 @@ import { toast } from "react-toastify";
 import { useUserState } from "../context/userContext";
 
 export default function BuyCredits() {
-  const [show, setShow] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [ErrorMessage, setErrorMessage] = useState("");
   const [orderID, setOrderID] = useState(false);
   const [selectedCredits, setSelectedCredits] = useState(2500);
   const [cost, setCost] = useState(10);
 
-  let { setUserDetails,setCreditBal,creditBal } = useUserState();
+  let { setCreditBal,creditBal } = useUserState();
   const creditCostMappings = [
     [2500, 10],
     [5000, 15],
@@ -58,11 +56,11 @@ export default function BuyCredits() {
   };
 
   const onApprove = (data, actions) => {
-    return actions.order.capture().then(function (details) {
-      const { payer } = details;
+    return actions.order.capture().then(function () {
+      
       try {
         const updateCreditFunction = async () => {
-          let updateCredit = await axiosInstance.post("/updateCredit", {
+          await axiosInstance.post("/updateCredit", {
             credits: selectedCredits,
           });
         };
@@ -74,8 +72,7 @@ export default function BuyCredits() {
       }
     });
   };
-  const onError = (data, actions) => {
-    setErrorMessage("An Error occured with your payment ");
+  const onError = () => {
     toast('Error occured with our payment ')
   };
 

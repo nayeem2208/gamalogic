@@ -62,7 +62,7 @@ function AccountSettings() {
         );
         return;
       }
-      let changePassword = await axiosInstance.post(
+      await axiosInstance.post(
         "/changePassword",
         passwordData
       );

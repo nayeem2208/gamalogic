@@ -7,7 +7,7 @@ export default function Support() {
     <div className=" px-20 py-8">
       <SubHeader SubHeader={"Support"} />
       <div className="mt-14 subHeading">
-        <h3>We're Here To Help</h3>
+        <h3>We&apos;re Here To Help</h3>
         <p className="my-7 w-4/5 description">
           We provide 24x7 support for our customers. Connect with us by sending
           a mail here -{" "}

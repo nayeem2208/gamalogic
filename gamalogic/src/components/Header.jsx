@@ -21,7 +21,7 @@ function Header() {
   let [dropDown, setDropDown] = useState(false);
   let [uploadfileDropDown, setUploadFileDropDown] = useState(false);
   let [tutorialDropDown, setTutorialDropDown] = useState(false);
-  let { setUserDetails, userDetails } = useUserState();
+  let { setUserDetails } = useUserState();
   let navigate = useNavigate();
 
   const dropDownToggle = () => {

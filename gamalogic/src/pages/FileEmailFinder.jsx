@@ -57,9 +57,9 @@ function FileEmailFinder() {
             results.fileName = file.name;
             results.data = results.data.map((item) => {
               if (
-                !item.hasOwnProperty("first_name") &&
-                !item.hasOwnProperty("last_name") &&
-                !item.hasOwnProperty("domain")
+                !Object.prototype.hasOwnProperty.call(item, "first_name") &&
+                !Object.prototype.hasOwnProperty.call(item, "last_name") &&
+                !Object.prototype.hasOwnProperty.call(item, "domain")
               ) {
                 item = {
                   first_name: item.firstname,

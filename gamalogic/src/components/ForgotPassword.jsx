@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import { Link } from 'react-router-dom'
 import axiosInstance from '../axios/axiosInstance'
 import { toast } from 'react-toastify'
@@ -30,7 +30,7 @@ function ForgotPassword() {
         </div>
         <h2 className="font-semibold text-4xl">Reset you password</h2>
         <p className="my-12 description">
-        We'll send you a link to reset your password
+        We will send you a link to reset your password
         </p>
       </div>
       <div

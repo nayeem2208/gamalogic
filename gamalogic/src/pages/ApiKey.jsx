@@ -16,7 +16,7 @@ function ApiKey() {
     fetchApikey()
   },[])
 
-  let resetApiKey=async(req,res)=>{
+  let resetApiKey=async()=>{
     try {
       let resetApiKey=await axiosInstance.get('/resetApiKey')
       setApi(resetApiKey.data.newApiKey)
