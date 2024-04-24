@@ -20,13 +20,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 app.use(cookieParser());
 
+
 app.use(
   cors({
     origin: "*",
   })
 );
 
-app.use('/',userRouter)
+
+app.use('/api',userRouter)
 
 app.listen(port, async () => {
   console.log(`Server started on port ${port}`);

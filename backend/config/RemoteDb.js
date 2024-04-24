@@ -1,7 +1,5 @@
 import mysql from "mysql2/promise";
-import dotenv from "dotenv";
 import { Client as SSHClient } from 'ssh2';
-dotenv.config();
 
 // SSH configuration
 const sshConfig = {
@@ -17,8 +15,8 @@ const dbConfig = {
     user: process.env.DB_USER,
     database: process.env.DB_DATABASE,
     password: process.env.DB_PASSWORD,
-    port: 3306,
 };
+
 
 
 
