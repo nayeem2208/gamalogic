@@ -11,6 +11,7 @@ const Authentication = {
   sample: async (req, res) => {
     ///its for checking purpose
     try {
+      res.send('hiii its working')
       // Simulating an error for demonstration purposes
       // console.log(req.route.path,'original url')
       // console.log(johnhoe)
