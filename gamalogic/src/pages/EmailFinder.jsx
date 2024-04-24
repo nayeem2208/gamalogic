@@ -88,7 +88,14 @@ function EmailFinder() {
             </p>
           </div>
         </div>
-        {loading&&<p className="my-4">Loading...</p>}
+        {loading&&<div
+        className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+        role="status"
+      >
+        <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+          Loading...
+        </span>
+      </div>}
         {result && (
           <div>
             <p className="font-medium text-lg mt-8 mb-4">Result</p>

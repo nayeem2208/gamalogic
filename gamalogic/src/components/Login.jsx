@@ -93,7 +93,7 @@ function Login() {
   return (
     <div
       className="w-full flex justify-center items-center "
-      style={{ marginTop: "36vw" }}
+      style={{ marginTop: "20vh" }}
     >
       <div className="w-3/5 flex flex-col justify-center items-center">
         <div className="text-center auth" style={{ position: "relative" }}>

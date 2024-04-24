@@ -107,7 +107,7 @@ function Signup() {
   return (
     <div
       className="w-full flex justify-center items-center "
-      style={{ marginTop: "40vw" }}
+      style={{ marginTop: "40vh" }}
     >
       <div className="w-3/5 flex flex-col justify-center items-center">
         <div className="text-center auth" style={{ position: "relative" }}>

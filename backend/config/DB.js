@@ -8,16 +8,12 @@ const mySqlPool=mysql.createPool({
     host:"localhost",
     user:"root",
     password:password,
-    database:"user"
+    database:"DB_Gamalogic"
 })
 
-// const mySqlPool=mysql.createPool({
-//     host:"localhost",
-//     user:"dbbetauser",
-//     password:password,
-//     database:"DB_GAMALOGIC"
-// })
-
 export default mySqlPool
+
+
+
 
 

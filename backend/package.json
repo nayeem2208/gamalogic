@@ -19,18 +19,15 @@
     "concurrently": "^8.2.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "csvtojson": "^2.0.10",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.9.3",
-    "node-passlib": "^1.1.1",
     "nodemailer": "^6.9.13",
     "nodemon": "^3.1.0",
-    "passlib": "^0.3.0",
+    "ssh2": "^1.15.0",
     "zeptomail": "^6.0.0"
   }
 }

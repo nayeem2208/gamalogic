@@ -5,8 +5,9 @@ dotenv.config();
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import morgan from "morgan";
-import mySqlPool from "./config/DB.js";
+import  mySqlPool from "./config/DB.js";
 import userRouter from "./routers/userRouter.js";
+import connectToMySQL from "./config/RemoteDb.js";
 
 
 
@@ -27,14 +28,23 @@ app.use(
 
 app.use('/',userRouter)
 
-mySqlPool
-  .query("SELECT 1")
-  .then(() => {
-    console.log("MySQL DB connected ");
-    app.listen(port, () => {
-      console.log(`Server started on port ${port}`);
-    });
-  })
-  .catch((error) => {
-    console.log(error);
-  });
+app.listen(port, async () => {
+  console.log(`Server started on port ${port}`);
+  try {
+      const connection = await connectToMySQL();
+  } catch (error) {
+      console.error('Error connecting to MySQL:', error);
+  }
+});
+
+// mySqlPool
+//   .query("SELECT 1")
+//   .then(() => {
+//     console.log("MySQL DB connected ");
+//     app.listen(port, () => {
+//       console.log(`Server started on port ${port}`);
+//     });
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//   });
