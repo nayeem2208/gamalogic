@@ -27,8 +27,14 @@ app.use(
   })
 );
 
+app.use(express.static(path.join(__dirname, '..', 'gamalogic', 'dist')));
+
 
 app.use('/api',userRouter)
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'gamalogic', 'dist', 'index.html'));
+});
 
 app.listen(port, async () => {
   console.log(`Server started on port ${port}`);
