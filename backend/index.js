@@ -25,7 +25,7 @@ app.use(cors({
   origin: 'https://beta.gamalogic.com'
 }));
 
-
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 app.use(express.static(path.join(__dirname, '..', 'gamalogic', 'dist')));
 
 
