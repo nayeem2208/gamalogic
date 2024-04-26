@@ -15,7 +15,7 @@ async function zeptomailsend(email,subject,content) {
       to: [
         {
           email_address: {
-            address: "nayeem670@gmail.com",
+            address: email,
             name: "test1",
           },
         },

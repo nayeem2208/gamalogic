@@ -1,10 +1,11 @@
 import jwt from "jsonwebtoken";
-import db from "../config/DB.js";
+import dbConnection from "../config/RemoteDb.js";
 
 const authcheck =  async (req, res, next) => {
   const token = req.headers.authorization;
   if (token) {
     try {
+      const db = await dbConnection();
       const tokenWithoutBearer = token.replace("Bearer ", "");
       let parsedTokenWithoutBearer=JSON.parse(tokenWithoutBearer)
       const decoded = jwt.verify(parsedTokenWithoutBearer.token, process.env.JWT_SECRET);
