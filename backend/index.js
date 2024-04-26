@@ -21,11 +21,9 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 
 
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+app.use(cors({
+  origin: 'https://beta.gamalogic.com'
+}));
 
 app.use(express.static(path.join(__dirname, '..', 'gamalogic', 'dist')));
 

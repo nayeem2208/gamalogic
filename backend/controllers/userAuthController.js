@@ -109,7 +109,7 @@ const Authentication = {
         sendEmail(
           email,
           "Please verify your account",
-          `<p>Hi ${email}, please click <a href="http://localhost:5173/signin?email=${email}&track=true">here</a> to verify your account </p>`
+          `<p>Hi ${email}, please click <a href="https://beta.gamalogic.com/signin?email=${email}&track=true">here</a> to verify your account </p>`
         );
         res.status(200).json("Please check your email for verification");
       }
@@ -252,7 +252,7 @@ const Authentication = {
           "Reset your password",
           "<p>hi " +
             req.body.email +
-            ',please click <a href="http://localhost:5173/resetPassword?email=' +
+            ',please click <a href="https://beta.gamalogic.com/resetPassword?email=' +
             req.body.email +
             '">here </a> to reset your password</p>  '
         );
