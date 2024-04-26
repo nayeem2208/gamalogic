@@ -1,4 +1,4 @@
-import db from "../config/DB.js";
+import dbConnection from "../config/RemoteDb.js"
 import generateToken from "../utils/jwt.js";
 import jwt from "jsonwebtoken";
 import generateUniqueApiKey from "../utils/generatePassword.js";
@@ -24,6 +24,7 @@ const Authentication = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
+      const db = await dbConnection();
       let user = await db.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
@@ -72,6 +73,7 @@ const Authentication = {
       const { fullname, email, password } = req.body.data;
       const userAgent = req.headers["user-agent"];
       const ip = req.ip;
+      const db = await dbConnection();
       // console.log(req.body.token,'token')
       // console.log(process.env.RECAPTCHA_SECRET_KEY,'key is getting ')
       // const response = await axios.post(
@@ -126,6 +128,7 @@ const Authentication = {
   },
   googleLogin: async (req, res) => {
     try {
+      const db = await dbConnection();
       const token = req.body.credentialResponse.credential;
       const decode = jwt.decode(token);
       const { email } = decode;
@@ -167,6 +170,7 @@ const Authentication = {
   },
   googleAuth: async (req, res) => {
     try {
+      const db = await dbConnection();
       const body_Token = req.body.credentialResponse.credential;
       const decode = jwt.decode(body_Token);
       const { name, email } = decode;
@@ -220,6 +224,7 @@ const Authentication = {
   },
   verifyEmail: async (req, res) => {
     try {
+      const db = await dbConnection();
       console.log("verifyi il etheetindtta");
       const userEmail = req.query.email;
       let confirmedDate = new Date();
@@ -243,6 +248,7 @@ const Authentication = {
   },
   forgotPassword: async (req, res) => {
     try {
+      const db = await dbConnection();
       let user = await db.query(
         `SELECT * FROM registration WHERE emailid='${req.body.email}'`
       );
@@ -270,6 +276,7 @@ const Authentication = {
   },
   resetPassword: async (req, res) => {
     try {
+      const db = await dbConnection();
       let user = await db.query(
         `SELECT * FROM registration WHERE emailid='${req.body.email}'`
       );

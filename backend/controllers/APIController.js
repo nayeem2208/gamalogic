@@ -1,5 +1,5 @@
 import axios from "axios";
-import db from "../config/DB.js";
+import dbConnection from "../config/RemoteDb.js";
 import generateUniqueApiKey from "../utils/generatePassword.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import { passwordHash, verifyPassword } from "../utils/passwordHash.js";
@@ -7,6 +7,7 @@ import { passwordHash, verifyPassword } from "../utils/passwordHash.js";
 let APIControllers = {
   getCreditBalance:async(req,res)=>{
     try {
+      const db = await dbConnection();
       let credit=await db.query( `SELECT credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
       let creditBal=credit[0][0].credits
       res.status(200).json(creditBal)
@@ -18,6 +19,7 @@ let APIControllers = {
   },
   getApi: async (req, res) => {
     try {
+      const db = await dbConnection();
       let apiKey = await db.query(
         `SELECT api_key FROM registration WHERE emailid='${req.user[0][0].emailid}'`
       );
@@ -30,6 +32,7 @@ let APIControllers = {
   },
   resetApiKey: async (req, res) => {
     try {
+      const db = await dbConnection();
       let newApiKey = await generateUniqueApiKey();
       console.log(newApiKey, "new api key ");
       let user = await db.query(
@@ -47,6 +50,7 @@ let APIControllers = {
   },
   emailValidation: async (req, res) => {
     try {
+      const db = await dbConnection();
       let user = await db.query(
         `SELECT api_key from registration WHERE emailid='${req.user[0][0].emailid}'`
       );
@@ -63,6 +67,7 @@ let APIControllers = {
   },
   FindSingleEmail: async (req, res) => {
     try {
+      const db = await dbConnection();
       let user = await db.query(
         `SELECT api_key from registration WHERE emailid='${req.user[0][0].emailid}'`
       );
@@ -83,8 +88,8 @@ let APIControllers = {
   },
   changePassword: async (req, res) => {
     try {
+      const db = await dbConnection();
       let { old, newPassword, confirm } = req.body;
-      console.log(old, "old", newPassword, "new", confirm);
       let user = await db.query(
         `SELECT * from registration WHERE emailid='${req.user[0][0].emailid}'`
       );
@@ -110,6 +115,7 @@ let APIControllers = {
   },
   getAlreadyCheckedBatchEmailFiles:async(req,res)=>{
     try {
+      const db = await dbConnection();
       let user = await db.query(
         `SELECT * from registration WHERE emailid='${req.user[0][0].emailid}'`
       );
@@ -124,7 +130,7 @@ let APIControllers = {
   },
   batchEmailValidation: async (req, res) => {
     try {
-      console.log(req.body.data,'req.body is here')
+      const db = await dbConnection();
       let user = await db.query(
         `SELECT * from registration WHERE emailid='${req.user[0][0].emailid}'`
       );
@@ -160,6 +166,7 @@ let APIControllers = {
   },
   batchEmailStatus: async (req, res) => {
     try {
+      const db = await dbConnection();
       let user = await db.query(
         `SELECT api_key from registration WHERE emailid='${req.user[0][0].emailid}'`
       );
@@ -177,7 +184,7 @@ let APIControllers = {
   },
   downloadEmailVerificationFile: async (req, res) => {
     try {
-      console.log(req.query.batchId, "query");
+      const db = await dbConnection();
       let user = await db.query(
         `SELECT api_key from registration WHERE emailid='${req.user[0][0].emailid}'`
       );
@@ -196,6 +203,7 @@ let APIControllers = {
 
   getAlreadyCheckedBatchEmailFinderFiles:async(req,res)=>{
     try {
+      const db = await dbConnection();
       let user = await db.query(
         `SELECT * from registration WHERE emailid='${req.user[0][0].emailid}'`
       );
@@ -209,7 +217,7 @@ let APIControllers = {
   },
   batchEmailFinder:async(req,res)=>{
     try {
-      console.log(req.body.data,'req body')
+      const db = await dbConnection();
       let user = await db.query(
         `SELECT * from registration WHERE emailid='${req.user[0][0].emailid}'`
       );
@@ -243,7 +251,7 @@ let APIControllers = {
   },
   batchEmailFinderStatus: async (req, res) => {
     try {
-      console.log('hiiiiii')
+      const db = await dbConnection();
       let user = await db.query(
         `SELECT api_key from registration WHERE emailid='${req.user[0][0].emailid}'`
       );
@@ -261,7 +269,7 @@ let APIControllers = {
   },
   downloadEmailFinderResultFile: async (req, res) => {
     try {
-      console.log(req.query.batchId, "query");
+      const db = await dbConnection();
       let user = await db.query(
         `SELECT api_key from registration WHERE emailid='${req.user[0][0].emailid}'`
       );
@@ -280,7 +288,7 @@ let APIControllers = {
 
   updateCredit:async(req,res)=>{
     try {
-      console.log(req.body ,'body of credit change is here')
+      const db = await dbConnection();
       let credit=await db.query( `SELECT credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
       let newBalance=credit[0][0].credits+req.body.credits
       await db.query(`UPDATE registration SET credits='${newBalance}' WHERE emailid='${req.user[0][0].emailid}'`)
