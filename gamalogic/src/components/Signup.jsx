@@ -90,7 +90,7 @@ function Signup() {
       });
       let token = res.data;
       setUserDetails(token);
-      localStorage.setItem("token", JSON.stringify(token));
+      localStorage.setItem("Gamalogic_token", JSON.stringify(token));
       navigate("/");
     } catch (err) {
       console.log(err);

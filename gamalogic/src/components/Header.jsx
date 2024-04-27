@@ -37,7 +37,7 @@ function Header() {
   };
 
   function logoutHandler() {
-    localStorage.removeItem("token");
+    localStorage.removeItem("Gamalogic_token");
     setUserDetails(null);
     navigate("/signin");
   }

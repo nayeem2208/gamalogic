@@ -8,7 +8,7 @@ function Body() {
   let { setUserDetails, userDetails,setCreditBal } = useUserState();
   useEffect(() => {
     if (!userDetails) {
-      const storedToken = localStorage.getItem("token");
+      const storedToken = localStorage.getItem("Gamalogic_token");
       if (storedToken) {
         let parsedToken;
         try {

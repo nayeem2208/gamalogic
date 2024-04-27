@@ -7,7 +7,7 @@ function Authentication() {
   let navigate = useNavigate();
   let { setUserDetails,userDetails} = useUserState();
   useEffect(() => {
-      const storedToken = localStorage.getItem("token");
+      const storedToken = localStorage.getItem("Gamalogic_token");
       if (storedToken) {
           let parsedToken;
           try {

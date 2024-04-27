@@ -7,7 +7,7 @@ function SubHeader(props) {
   let { setUserDetails, userDetails,creditBal } = useUserState();
   let navigate = useNavigate();
     function logoutHandler() {
-      localStorage.removeItem("token");
+      localStorage.removeItem("Gamalogic_token");
       setUserDetails(null);
       navigate("/signin");
     }
