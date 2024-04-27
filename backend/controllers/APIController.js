@@ -65,7 +65,7 @@ const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace('T',
       );
       let apiKey = user[0][0].api_key;
       let validate = await axios.get(
-        `https://gamalogic.com/emailvrf/?emailid=${req.body.email}&apikey=${apiKey}&speed_rank=0`
+        `https://gamalogic.com/emailvrf/?emailid=${req.body.email}&apikey=${process.env.API_KEY}&speed_rank=0`
       );
       res.status(200).json(validate.data.gamalogic_emailid_vrfy[0]);
     } catch (error) {
@@ -85,7 +85,7 @@ const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace('T',
       let lastname = nameArray[nameArray.length - 1];
       let apiKey = user[0][0].api_key;
       let find = await axios.get(
-        `https://gamalogic.com/email-discovery/?firstname=${firstname}&lastname=${lastname}&domain=${req.body.domain}&apikey=${apiKey}&speed_rank=0`
+        `https://gamalogic.com/email-discovery/?firstname=${firstname}&lastname=${lastname}&domain=${req.body.domain}&apikey=${process.env.API_KEY}&speed_rank=0`
       );
       console.log(find.data, "find result");
       res.status(200).json(find.data);
@@ -149,7 +149,7 @@ const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace('T',
       };
       console.log(data)
       let response = await axios.post(
-        `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0`,
+        `https://gamalogic.com/batchemailvrf?apikey=${process.env.API_KEY}&speed_rank=0`,
         data
       );
       console.log(response, "response is here ");
@@ -162,7 +162,7 @@ const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace('T',
       const userAgent = req.headers["user-agent"];
       const ip = req.ip;
       let fileAdded = await db.query(
-        `INSERT INTO useractivity_batch_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${user[0][0].rowid}','${apiKey}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${req.body.fileName}','${req.body.fileName}',1,0,0)`
+        `INSERT INTO useractivity_batch_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${req.body.fileName}','${req.body.fileName}',1,0,0)`
       );
       let files=await db.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
         console.log(files[0],'fiels')
@@ -181,7 +181,7 @@ const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace('T',
       );
       let apiKey = user[0][0].api_key;
       let emailStatus = await axios.get(
-        `https://gamalogic.com/batchstatus/?apikey=${apiKey}&batchid=${req.query.id}`
+        `https://gamalogic.com/batchstatus/?apikey=${process.env.API_KEY}&batchid=${req.query.id}`
       );
       console.log(emailStatus.data, "status");
       res.status(200).json({ emailStatus: emailStatus.data });
@@ -199,7 +199,7 @@ const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace('T',
       );
       let apiKey = user[0][0].api_key;
       let download = await axios.get(
-        `https://gamalogic.com/batchresult/?apikey=${apiKey}&batchid=${req.query.batchId}`
+        `https://gamalogic.com/batchresult/?apikey=${process.env.API_KEY}&batchid=${req.query.batchId}`
       );
       res.status(200).json(download.data);
     } catch (error) {
@@ -235,7 +235,7 @@ const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace('T',
         gamalogic_emailid_finder: req.body.data,
       };
       let response = await axios.post(
-        `https://gamalogic.com/batch-email-discovery/?apikey=${apiKey}`,
+        `https://gamalogic.com/batch-email-discovery/?apikey=${process.env.API_KEY}`,
         data
       ); 
       console.log(response,'response is here')
@@ -248,7 +248,7 @@ const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace('T',
       const userAgent = req.headers["user-agent"];
       const ip = req.ip;
       let fileAdded = await db.query(
-        `INSERT INTO useractivity_batch_finder_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${user[0][0].rowid}','${apiKey}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${req.body.fileName}','${req.body.fileName}',1,0,0)`
+        `INSERT INTO useractivity_batch_finder_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${req.body.fileName}','${req.body.fileName}',1,0,0)`
       );
       let files=await db.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
         console.log(files[0],'fiels')
@@ -266,7 +266,7 @@ const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace('T',
       );
       let apiKey = user[0][0].api_key;
       let emailStatus = await axios.get(
-        `https://gamalogic.com/batch-email-discovery-status/?apikey=${apiKey}&batchid=${req.query.id}`
+        `https://gamalogic.com/batch-email-discovery-status/?apikey=${process.env.API_KEY}&batchid=${req.query.id}`
       );
       console.log(emailStatus.data, "status");
       res.status(200).json({ emailStatus: emailStatus.data });
@@ -284,7 +284,7 @@ const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace('T',
       );
       let apiKey = user[0][0].api_key;
       let download = await axios.get(
-        `https://gamalogic.com/batch-email-discovery-result/?apikey=${apiKey}&batchid=${req.query.batchId}`
+        `https://gamalogic.com/batch-email-discovery-result/?apikey=${process.env.API_KEY}&batchid=${req.query.batchId}`
       );
       console.log(download,'download file')
       res.status(200).json(download.data);
