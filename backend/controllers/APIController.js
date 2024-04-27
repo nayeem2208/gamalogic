@@ -8,7 +8,7 @@ let APIControllers = {
   getCreditBalance:async(req,res)=>{
     try {
       const db = await dbConnection();
-      let credit=await db.query( `SELECT credits,credits_free,free_final from registration WHERE emailid='${req.user[0][0].emailid}'`)
+      let creditQueryResult=await db.query( `SELECT credits,credits_free,free_final from registration WHERE emailid='${req.user[0][0].emailid}'`)
       const { credits, credits_free, free_final } = creditQueryResult[0][0];
       const currentDate = new Date();
 const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
