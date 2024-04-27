@@ -4,10 +4,13 @@ import axiosInstance from "../axios/axiosInstance";
 
 function ApiKey() {
   let [api,setApi]=useState('')
+  let [loading,setLoading]=useState(false)
   useEffect(()=>{
     async function fetchApikey(){
       try {
+        setLoading(true)
         let res=await axiosInstance.get('/getApiKey')
+        setLoading(false)
         setApi(res.data.apiKey)
       } catch (error) {
         console.log(error)
@@ -18,7 +21,9 @@ function ApiKey() {
 
   let resetApiKey=async()=>{
     try {
+      setLoading(true)
       let resetApiKey=await axiosInstance.get('/resetApiKey')
+      setLoading(false)
       setApi(resetApiKey.data.newApiKey)
     } catch (error) {
       console.log(error)

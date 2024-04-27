@@ -1,49 +1,50 @@
-import { Route, Routes } from 'react-router-dom'
-import QuickValidation from '../pages/QuickValidation'
-import Body from '../components/Body'
-import EmailFinder from '../pages/EmailFinder'
-import ApiKey from '../pages/ApiKey'
-import EmailVerification from '../pages/EmailVerification'
-import FileEmailFinder from '../pages/FileEmailFinder'
-import ApiDocs from '../pages/ApiDocs'
-import FindAnyEmail from '../pages/FindAnyEmail'
-import IntegrateGoogleSheet from '../pages/IntegrateGoogleSheet'
-import AccountSettings from '../pages/AccountSettings'
-import BuyCredits from '../pages/BuyCredits'
-import Support from '../pages/Support'
-import Authentication from '../pages/Authentication'
-import Login from '../components/Login'
-import Signup from '../components/Signup'
-import ForgotPassword from '../components/ForgotPassword'
-import ResetPassword from '../components/ResetPassword'
-import PostSignupPage from '../components/PostSignupPage'
+import { Route, Routes } from 'react-router-dom';
+import { Suspense, lazy } from 'react';
 
+const QuickValidation = lazy(() => import('../pages/QuickValidation'));
+const Body = lazy(() => import('../components/Body'));
+const EmailFinder = lazy(() => import('../pages/EmailFinder'));
+const ApiKey = lazy(() => import('../pages/ApiKey'));
+const EmailVerification = lazy(() => import('../pages/EmailVerification'));
+const FileEmailFinder = lazy(() => import('../pages/FileEmailFinder'));
+const ApiDocs = lazy(() => import('../pages/ApiDocs'));
+const FindAnyEmail = lazy(() => import('../pages/FindAnyEmail'));
+const IntegrateGoogleSheet = lazy(() => import('../pages/IntegrateGoogleSheet'));
+const AccountSettings = lazy(() => import('../pages/AccountSettings'));
+const BuyCredits = lazy(() => import('../pages/BuyCredits'));
+const Support = lazy(() => import('../pages/Support'));
+const Authentication = lazy(() => import('../pages/Authentication'));
+const Login = lazy(() => import('../components/Login'));
+const Signup = lazy(() => import('../components/Signup'));
+const ForgotPassword = lazy(() => import('../components/ForgotPassword'));
+const ResetPassword = lazy(() => import('../components/ResetPassword'));
+const PostSignupPage = lazy(() => import('../components/PostSignupPage'));
 
 function Router() {
   return (
     <Routes>
-        <Route path='/' element={<Body/>}>
-            <Route index element={<QuickValidation/>} />
-            <Route path='/email-finder' element={<EmailFinder />} />
-            <Route path='/api-Key' element={<ApiKey />} />
-            <Route path='/email-verification-bulk' element={<EmailVerification/>} />
-            <Route path='/email-finder-bulk' element={<FileEmailFinder/>} />
-            <Route path='/api-docs' element={<ApiDocs/>} />
-            <Route path='/find-any-email' element={<FindAnyEmail/>} />
-            <Route path='/googleSheet-integration' element={<IntegrateGoogleSheet/>} />
-            <Route path='/account-settings' element={<AccountSettings/>} />
-            <Route path='/buyCredits' element={<BuyCredits/>} />
-            <Route path='/support' element={<Support/>} />
-        </Route>
-        <Route path='/' element={<Authentication/>}>
-            <Route index path='signin' element={<Login/>}/>
-            <Route path='signup' element={<Signup/>}/>
-            <Route path='forgotPassword' element={<ForgotPassword/>}/>
-            <Route path='resetPassword' element={<ResetPassword/>}/>
-            <Route path='VerifyYourEmail' element={<PostSignupPage/>}/>
-        </Route>
+      <Route path="/" element={<Body />}>
+        <Route index element={<Suspense fallback={<div>Loading...</div>}><QuickValidation /></Suspense>} />
+        <Route path="/email-finder" element={<Suspense fallback={<div>Loading...</div>}><EmailFinder /></Suspense>} />
+        <Route path="/api-Key" element={<Suspense fallback={<div>Loading...</div>}><ApiKey /></Suspense>} />
+        <Route path="/email-verification-bulk" element={<Suspense fallback={<div>Loading...</div>}><EmailVerification /></Suspense>} />
+        <Route path="/email-finder-bulk" element={<Suspense fallback={<div>Loading...</div>}><FileEmailFinder /></Suspense>} />
+        <Route path="/api-docs" element={<Suspense fallback={<div>Loading...</div>}><ApiDocs /></Suspense>} />
+        <Route path="/find-any-email" element={<Suspense fallback={<div>Loading...</div>}><FindAnyEmail /></Suspense>} />
+        <Route path="/googleSheet-integration" element={<Suspense fallback={<div>Loading...</div>}><IntegrateGoogleSheet /></Suspense>} />
+        <Route path="/account-settings" element={<Suspense fallback={<div>Loading...</div>}><AccountSettings /></Suspense>} />
+        <Route path="/buyCredits" element={<Suspense fallback={<div>Loading...</div>}><BuyCredits /></Suspense>} />
+        <Route path="/support" element={<Suspense fallback={<div>Loading...</div>}><Support /></Suspense>} />
+      </Route>
+      <Route path="/" element={<Authentication />}>
+        <Route index path="signin" element={<Suspense fallback={<div>Loading...</div>}><Login /></Suspense>} />
+        <Route path="signup" element={<Suspense fallback={<div>Loading...</div>}><Signup /></Suspense>} />
+        <Route path="forgotPassword" element={<Suspense fallback={<div>Loading...</div>}><ForgotPassword /></Suspense>} />
+        <Route path="resetPassword" element={<Suspense fallback={<div>Loading...</div>}><ResetPassword /></Suspense>} />
+        <Route path="VerifyYourEmail" element={<Suspense fallback={<div>Loading...</div>}><PostSignupPage /></Suspense>} />
+      </Route>
     </Routes>
-  )
+  );
 }
 
-export default Router
+export default Router;
