@@ -8,8 +8,17 @@ let APIControllers = {
   getCreditBalance:async(req,res)=>{
     try {
       const db = await dbConnection();
-      let credit=await db.query( `SELECT credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
-      let creditBal=credit[0][0].credits
+      let credit=await db.query( `SELECT credits,credits_free,free_final from registration WHERE emailid='${req.user[0][0].emailid}'`)
+      const { credits, credits_free, free_final } = creditQueryResult[0][0];
+      const currentDate = new Date();
+const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+      let creditBal=0
+      if(credits_free>0&& free_final > formattedCurrentDate){
+        creditBal=credit+credits_free
+      }
+      else{
+        creditBal=credit
+      }
       res.status(200).json(creditBal)
     } catch (error) {
       console.log(error);
@@ -56,7 +65,7 @@ let APIControllers = {
       );
       let apiKey = user[0][0].api_key;
       let validate = await axios.get(
-        `https://gamalogic.com/emailvrf/?emailid=${req.body.email}&apikey=${process.env.API_KEY}&speed_rank=0`
+        `https://gamalogic.com/emailvrf/?emailid=${req.body.email}&apikey=${apiKey}&speed_rank=0`
       );
       res.status(200).json(validate.data.gamalogic_emailid_vrfy[0]);
     } catch (error) {
@@ -76,7 +85,7 @@ let APIControllers = {
       let lastname = nameArray[nameArray.length - 1];
       let apiKey = user[0][0].api_key;
       let find = await axios.get(
-        `https://gamalogic.com/email-discovery/?firstname=${firstname}&lastname=${lastname}&domain=${req.body.domain}&apikey=${process.env.API_KEY}&speed_rank=0`
+        `https://gamalogic.com/email-discovery/?firstname=${firstname}&lastname=${lastname}&domain=${req.body.domain}&apikey=${apiKey}&speed_rank=0`
       );
       console.log(find.data, "find result");
       res.status(200).json(find.data);
@@ -140,7 +149,7 @@ let APIControllers = {
       };
       console.log(data)
       let response = await axios.post(
-        `https://gamalogic.com/batchemailvrf?apikey=${process.env.API_KEY}&speed_rank=0`,
+        `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0`,
         data
       );
       console.log(response, "response is here ");
@@ -172,7 +181,7 @@ let APIControllers = {
       );
       let apiKey = user[0][0].api_key;
       let emailStatus = await axios.get(
-        `https://gamalogic.com/batchstatus/?apikey=${process.env.API_KEY}&batchid=${req.query.id}`
+        `https://gamalogic.com/batchstatus/?apikey=${apiKey}&batchid=${req.query.id}`
       );
       console.log(emailStatus.data, "status");
       res.status(200).json({ emailStatus: emailStatus.data });
@@ -190,7 +199,7 @@ let APIControllers = {
       );
       let apiKey = user[0][0].api_key;
       let download = await axios.get(
-        `https://gamalogic.com/batchresult/?apikey=${process.env.API_KEY}&batchid=${req.query.batchId}`
+        `https://gamalogic.com/batchresult/?apikey=${apiKey}&batchid=${req.query.batchId}`
       );
       res.status(200).json(download.data);
     } catch (error) {
@@ -226,7 +235,7 @@ let APIControllers = {
         gamalogic_emailid_finder: req.body.data,
       };
       let response = await axios.post(
-        `https://gamalogic.com/batch-email-discovery/?apikey=${process.env.API_KEY}`,
+        `https://gamalogic.com/batch-email-discovery/?apikey=${apiKey}`,
         data
       ); 
       console.log(response,'response is here')
@@ -257,7 +266,7 @@ let APIControllers = {
       );
       let apiKey = user[0][0].api_key;
       let emailStatus = await axios.get(
-        `https://gamalogic.com/batch-email-discovery-status/?apikey=${process.env.API_KEY}&batchid=${req.query.id}`
+        `https://gamalogic.com/batch-email-discovery-status/?apikey=${apiKey}&batchid=${req.query.id}`
       );
       console.log(emailStatus.data, "status");
       res.status(200).json({ emailStatus: emailStatus.data });
@@ -275,7 +284,7 @@ let APIControllers = {
       );
       let apiKey = user[0][0].api_key;
       let download = await axios.get(
-        `https://gamalogic.com/batch-email-discovery-result/?apikey=${process.env.API_KEY}&batchid=${req.query.batchId}`
+        `https://gamalogic.com/batch-email-discovery-result/?apikey=${apiKey}&batchid=${req.query.batchId}`
       );
       console.log(download,'download file')
       res.status(200).json(download.data);
