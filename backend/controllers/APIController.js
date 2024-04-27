@@ -14,10 +14,10 @@ let APIControllers = {
 const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
       let creditBal=0
       if(credits_free>0&& free_final > formattedCurrentDate){
-        creditBal=credit+credits_free
+        creditBal=credits+credits_free
       }
       else{
-        creditBal=credit
+        creditBal=credits
       }
       res.status(200).json(creditBal)
     } catch (error) {
