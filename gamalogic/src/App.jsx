@@ -6,16 +6,17 @@ import SideBar from "./components/SideBar";
 import Footer from "./components/Footer";
 import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useUserState } from "./context/userContext";
 
 function App() {
+  let {userDetails}=useUserState()
   const location = useLocation();
-  console.log(location, "location");
   return (
     <div>
         <ToastContainer/>
       <div
         className="lg:flex h-full"
-        style={{ fontFamily: "Raleway,sans-serif;" }}
+        style={{ fontFamily: "Montserrat, sans-serif" }}
       >
         {location.pathname !== "/login" && location.pathname !== "/signup" && (
           <>
@@ -26,7 +27,7 @@ function App() {
 
         <Router />
       </div>
-      <Footer/>
+      {userDetails&&<Footer/>}
     </div>
   );
 }
