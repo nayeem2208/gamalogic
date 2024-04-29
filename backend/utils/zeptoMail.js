@@ -1,6 +1,6 @@
 import { SendMailClient } from "zeptomail";
 
-async function zeptomailsend(email,subject,content) {
+async function zeptomailsend(name,email,subject,content) {
     const url =  "api.zeptomail.com/"; 
   const token =process.env.ZEPTOMAIL_TOKEN
 
@@ -9,14 +9,14 @@ async function zeptomailsend(email,subject,content) {
   try {
     const resp = await client.sendMail({
       from: {
-        address: "nayeem@gamalogic.com",
-        name: "test",
+        address: "info@gamalogic.com",
+        name: "Gamalogic",
       },
       to: [
         {
           email_address: {
             address: email,
-            name: "test1",
+            name: name,
           },
         },
       ],

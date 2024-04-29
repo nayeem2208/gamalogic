@@ -99,8 +99,8 @@ function Signup() {
   };
 
   // const recaptchaSiteKey = import.meta.env.VITE_RECAPTA_SITE_KEY;
-  const recaptchaSiteKey='aldfsjkj'
-  console.log(recaptchaSiteKey, "recaptcha");
+  // const recaptchaSiteKey='aldfsjkj'
+  // console.log(recaptchaSiteKey, "recaptcha");
   function reCaptchaOnChange(value) {
     console.log("Captcha value:", value);
   }
@@ -191,11 +191,11 @@ function Signup() {
                 onClick={() => passwordVisibilityHandler("confirm")}
               />
             </div>
-            <ReCAPTCHA
+            {/* <ReCAPTCHA
               sitekey={recaptchaSiteKey}
               onChange={reCaptchaOnChange}
               className="my-2 flex justify-center"
-            />
+            /> */}
             <p className="text-xs text-center text-gray-400">
               By signing up, you agree to our{" "}
               <a

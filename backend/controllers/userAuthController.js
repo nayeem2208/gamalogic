@@ -109,6 +109,7 @@ const Authentication = {
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',0,0)`
         );
         sendEmail(
+          fullname,
           email,
           "Please verify your account",
           `<p>Hi ${email}, please click <a href="https://beta.gamalogic.com/signin?email=${email}&track=true">here</a> to verify your account </p>`
@@ -254,6 +255,7 @@ const Authentication = {
       );
       if (user[0].length > 0) {
         sendEmail(
+          user[0][0].username,
           req.body.email,
           "Reset your password",
           "<p>hi " +
