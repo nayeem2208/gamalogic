@@ -14,6 +14,7 @@ import { RiProfileLine } from "react-icons/ri";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserState } from "../context/userContext";
+import { startTransition } from 'react';
 
 function SideBar() {
   let [uploadfileDropDown, setUploadFileDropDown] = useState(false);
@@ -30,9 +31,11 @@ function SideBar() {
   };
 
   function logoutHandler() {
+    startTransition(() => {
     localStorage.removeItem("Gamalogic_token");
     setUserDetails(null);
     navigate("/signin");
+  });
 }
 
 
