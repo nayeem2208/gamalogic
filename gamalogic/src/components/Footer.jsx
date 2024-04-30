@@ -1,4 +1,4 @@
-import { FaFacebookF, FaLinkedinIn } from "react-icons/fa";
+import { FaFacebookF, FaLinkedinIn, FaYoutube } from "react-icons/fa";
 import { IoLogoInstagram, IoLogoTwitter, IoMail } from "react-icons/io5";
 import { AiOutlineHome } from "react-icons/ai";
 import { Link } from "react-router-dom";
