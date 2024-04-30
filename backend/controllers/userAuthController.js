@@ -43,7 +43,7 @@ const Authentication = {
               let finalFreeDate = new Date(finalFree);
               let currentDate = new Date();
               if (finalFreeDate > currentDate) {
-                creditBal = user[0][0].credits_free;
+                creditBal = user[0][0].credits_free+user[0][0].credits
               } else creditBal = 0;
             } else {
               creditBal = 0;
