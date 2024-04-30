@@ -16,7 +16,7 @@ let APIControllers = {
               let finalFree = new Date(user[0][0].free_final);
               let finalFreeDate = new Date(finalFree);
               let currentDate = new Date();
-              if (finalFreeDate < currentDate) {
+              if (finalFreeDate > currentDate) {
                 creditBal = user[0][0].credits_free;
               } else creditBal = 0;
             } else {

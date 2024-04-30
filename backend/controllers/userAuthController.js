@@ -42,7 +42,7 @@ const Authentication = {
               let finalFree = new Date(user[0][0].free_final);
               let finalFreeDate = new Date(finalFree);
               let currentDate = new Date();
-              if (finalFreeDate < currentDate) {
+              if (finalFreeDate > currentDate) {
                 creditBal = user[0][0].credits_free;
               } else creditBal = 0;
             } else {
@@ -309,6 +309,7 @@ const Authentication = {
         "Please verify your account",
         `<p>Hi ${req.query.email}, please click <a href="https://beta.gamalogic.com/signin?email=${req.query.email}&track=true">here</a> to verify your account </p>`
       );
+      res.status(200)
     } catch (error) {
       console.log(error);
       ErrorHandler("sendVerifyEmail Controller", error, req);
