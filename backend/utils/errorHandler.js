@@ -11,12 +11,36 @@ const ErrorHandler = async (controller, error, req) => {
       "UnknownLine";
     const url = req.route.path;
     let err = error;
-    const errorMessage = `
-        Error occurred in file ${controller},
-        line ${lineNumber},
-        userId:0
-        URL: '${url}'. 
-        Error message: ${err}`;
+    let errorMessage;
+    if(controller=='Login Controller'){
+       errorMessage = `
+          Error occurred in file ${controller},
+          line ${lineNumber},
+          userId:0
+          URL: '${url}'. 
+          Error message: ${err}
+          email:${req.body.email}
+          `;
+    }
+    else if(controller=='registerUser Controller'){
+       errorMessage = `
+          Error occurred in file ${controller},
+          line ${lineNumber},
+          userId:0
+          URL: '${url}'. 
+          Error message: ${err}
+          email:${req.body.data.email}
+          username:${req.body.data.fullname}
+          `;
+    }
+    else{
+       errorMessage = `
+      Error occurred in file ${controller},
+      line ${lineNumber},
+      userId:0
+      URL: '${url}'. 
+      Error message: ${err}`;
+    }
     let res = await clickUp(errorName, errorMessage, filename, url);
   };
 
