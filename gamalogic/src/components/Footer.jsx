@@ -1,6 +1,7 @@
 import { FaFacebookF, FaLinkedinIn } from "react-icons/fa";
 import { IoLogoInstagram, IoLogoTwitter, IoMail } from "react-icons/io5";
 import { AiOutlineHome } from "react-icons/ai";
+import { Link } from "react-router-dom";
 
 function Footer() {
   return (
@@ -8,7 +9,7 @@ function Footer() {
       <div>© Gamalogic 2019-2024</div>
       <div className="w-2/12">
         <ul className="flex justify-between items-center text-sm">
-          <li className="flex items-center justify-center"><AiOutlineHome className="mr-1"/>Home</li>
+          <li className="flex items-center justify-center"><Link to="/" className="flex"><AiOutlineHome className="mr-1"/>Home </Link></li>
           <li className="my-2">
             <a
               className="flex items-center font-light"
@@ -19,8 +20,8 @@ function Footer() {
             </a>
           </li>
           <li className="my-2">
-            <a href="https://www.instagram.com/gamalogicapp/" target="_blank"  className="flex items-center font-light">
-          <IoLogoInstagram /></a>
+            <a href="https://www.youtube.com/@Gamalogic" target="_blank"  className="flex items-center font-light">
+          <FaYoutube /></a>
           </li>
           <li>
             <a

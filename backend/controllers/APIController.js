@@ -8,17 +8,20 @@ let APIControllers = {
   getCreditBalance:async(req,res)=>{
     try {
       const db = await dbConnection();
-      let creditQueryResult=await db.query( `SELECT credits,credits_free,free_final from registration WHERE emailid='${req.user[0][0].emailid}'`)
-      const { credits, credits_free, free_final } = creditQueryResult[0][0];
-      const currentDate = new Date();
-const formattedCurrentDate = currentDate.toISOString().slice(0, 19).replace('T', ' ');
-      let creditBal=0
-      if(credits_free>0&& free_final < formattedCurrentDate){
-        creditBal=credits+credits_free
-      }
-      else{
-        creditBal=credits
-      }
+      let user=await db.query( `SELECT * from registration WHERE emailid='${req.user[0][0].emailid}'`)
+      let creditBal;
+            if (user[0][0].credits > 0) {
+              creditBal = user[0][0].credits;
+            } else if (user[0][0].credits_free > 0) {
+              let finalFree = new Date(user[0][0].free_final);
+              let finalFreeDate = new Date(finalFree);
+              let currentDate = new Date();
+              if (finalFreeDate > currentDate) {
+                creditBal = user[0][0].credits_free;
+              } else creditBal = 0;
+            } else {
+              creditBal = 0;
+            }
       res.status(200).json(creditBal)
     } catch (error) {
       console.log(error);

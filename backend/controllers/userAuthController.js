@@ -53,9 +53,10 @@ const Authentication = {
               name: user[0][0].username,
               credit: creditBal,
               token,
+              confirm:1
             });
           } else {
-            res.status(401).json({ error: "Please verify your email" });
+            res.status(201).json({confirm:0})
           }
         } else {
           res.status(401).json({ error: "Incorrect password" });
@@ -299,5 +300,20 @@ const Authentication = {
       res.status(400).json({ error });
     }
   },
+  sendVerifyEmail:async(req,res)=>{
+    try {
+      const username = req.query.email.split('@')[0]; 
+      sendEmail(
+        username,
+        req.query.email,
+        "Please verify your account",
+        `<p>Hi ${req.query.email}, please click <a href="https://beta.gamalogic.com/signin?email=${req.query.email}&track=true">here</a> to verify your account </p>`
+      );
+    } catch (error) {
+      console.log(error);
+      ErrorHandler("sendVerifyEmail Controller", error, req);
+      res.status(400).json({ error });
+    }
+  }
 };
 export default Authentication;

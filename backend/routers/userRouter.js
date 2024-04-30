@@ -13,6 +13,7 @@ router.post('/googleSignup',Authentication.googleAuth)
 router.post('/googleLogin',Authentication.googleLogin)
 router.post('/forgotPassword',Authentication.forgotPassword)
 router.post('/resetPassword',Authentication.resetPassword)
+router.get('/SendVerifyEmail',Authentication.sendVerifyEmail)
 
 router.get('/getCreditBalance',authcheck,APIControllers.getCreditBalance)
 router.post('/singleEmailValidator',authcheck,APIControllers.emailValidation)

@@ -44,11 +44,16 @@ function Login() {
     e.preventDefault();
     try {
       let userData = await axiosInstance.post("login", data);
-      toast.dark("Authentication success", 2000);
-      let token = userData.data;
-      setUserDetails(token);
+      if(userData.data?.confirm==0){
+        navigate('/VerifyYourEmail',{ state:data})
+      }
+      else{
+        toast.dark("Authentication success", 2000);
+        let token = userData.data;
+        setUserDetails(token);
       localStorage.setItem("Gamalogic_token", JSON.stringify(token));
       navigate("/");
+      }
     } catch (error) {
       console.log(error.response, "error");
       toast.error(error.response.data.error);

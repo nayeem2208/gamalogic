@@ -1,6 +1,21 @@
 import { IoMailOutline } from "react-icons/io5";
+import { useLocation } from "react-router-dom";
+import axiosInstance from "../axios/axiosInstance";
+import { toast } from "react-toastify";
 
 function PostSignupPage() {
+  
+  const location = useLocation();
+  const data = location.state 
+  const HandleSendVerifyLink=async()=>{
+    try {
+      let response=await axiosInstance.get(`/SendVerifyEmail?email=${data.email}`)
+      toast.success('New verification link sent successfully')
+    } catch (error) {
+      console.log(error)
+    }
+    
+  }
   return (
     <div
     className="w-full flex justify-center items-center "
@@ -22,7 +37,7 @@ function PostSignupPage() {
         <div className="verify-foot-p description">
             <p>We have sent a verification link to your email address.</p>
             <p>Follow the link in the email to validate and complete your registration.</p>
-            <p>To resend your verification link, <a className='text-white' href="/resend1">click here</a></p>
+            <p>To resend your verification link,  <button className='text-white' onClick={HandleSendVerifyLink}>click here</button></p>
             <p>If you are having any trouble, contact us at, <a className='text-white'
                     href="mailto:support@gamalogic.com">support@gamalogic.com</a></p>
         </div>

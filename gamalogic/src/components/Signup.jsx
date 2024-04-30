@@ -43,7 +43,7 @@ function Signup() {
   console.log(nameOfUser.length, "length");
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = await window.grecaptcha.getResponse();
+    // const token = await window.grecaptcha.getResponse();
     try {
       if (
         (data.fullname, data.email, data.password, data.confirmPassword) &&
@@ -54,7 +54,7 @@ function Signup() {
             if (passwordPattern.test(data.password)) {
               let userData = await axiosInstance.post("signup", {
                 data,
-                token,
+                // token,
               });
               console.log(userData, "userdata");
               toast.dark(userData?.data);
