@@ -19,6 +19,7 @@ function Signup() {
     new: false,
     confirm: false,
   });
+  let [loading, setLoading] = useState(false);
   let navigate = useNavigate();
   let { setUserDetails } = useUserState();
 
@@ -43,6 +44,7 @@ function Signup() {
   console.log(nameOfUser.length, "length");
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); 
     // const token = await window.grecaptcha.getResponse();
     try {
       if (
@@ -79,6 +81,8 @@ function Signup() {
     } catch (error) {
       console.log(error);
       toast.error(error.response?.data?.error);
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -217,6 +221,7 @@ function Signup() {
               <button
                 className="bg-red-500 w-2/6 p-2 rounded-3xl"
                 type="submit"
+                disabled={loading}
               >
                 SIGN UP
               </button>

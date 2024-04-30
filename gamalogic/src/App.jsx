@@ -15,8 +15,8 @@ function App() {
     <div>
         <ToastContainer/>
       <div
-        className="lg:flex h-full"
-        style={{ fontFamily: "Montserrat, sans-serif" }}
+        className="mainBody lg:flex h-full"
+
       >
         {location.pathname !== "/login" && location.pathname !== "/signup" && (
           <>

@@ -10,6 +10,7 @@ function Login() {
   let [data, setData] = useState({ email: "", password: "" });
   let { setUserDetails ,setCreditBal} = useUserState();
   let [passwordVisible, setPasswordVisible] = useState(false);
+  let [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -42,6 +43,7 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); 
     try {
       let userData = await axiosInstance.post("login", data);
       if(userData.data?.confirm==0){
@@ -57,6 +59,8 @@ function Login() {
     } catch (error) {
       console.log(error.response, "error");
       toast.error(error.response.data.error);
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -156,6 +160,7 @@ function Login() {
               <button
                 className="bg-red-500 w-2/6 p-2 rounded-3xl"
                 type="submit"
+                disabled={loading}
               >
                 SIGN IN
               </button>

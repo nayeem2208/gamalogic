@@ -35,18 +35,13 @@ const Authentication = {
           if (user[0][0].confirmed == 1) {
             let token = generateToken(res, user[0][0].rowid);
             let creditBal;
-
-            if (user[0][0].credits > 0) {
-              creditBal = user[0][0].credits;
-            } else if (user[0][0].credits_free > 0) {
-              let finalFree = new Date(user[0][0].free_final);
-              let finalFreeDate = new Date(finalFree);
-              let currentDate = new Date();
-              if (finalFreeDate > currentDate) {
+            let finalFree = new Date(user[0][0].free_final);
+            let finalFreeDate = new Date(finalFree);
+            let currentDate = new Date();
+            if (user[0][0].credits_free > 0&&finalFreeDate > currentDate) {
                 creditBal = user[0][0].credits_free+user[0][0].credits
-              } else creditBal = 0;
             } else {
-              creditBal = 0;
+              creditBal =user[0][0].credits;
             }
 
             res.json({

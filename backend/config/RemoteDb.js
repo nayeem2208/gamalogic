@@ -6,7 +6,8 @@ const sshConfig = {
     host: process.env.SSH_HOST,
     port: 22,
     username: process.env.SSH_USERNAME,
-    password: process.env.SSH_PASSWORD
+    password: process.env.SSH_PASSWORD,
+    timeout: 20000, 
 };
 
 // // MySQL server configuration

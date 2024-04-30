@@ -5,31 +5,33 @@ import axiosInstance from "../axios/axiosInstance";
 
 function Body() {
   let navigate = useNavigate();
-  let { setUserDetails, userDetails,setCreditBal } = useUserState();
+  let { setUserDetails, userDetails,setCreditBal,creditBal } = useUserState();
   useEffect(() => {
-    if (!userDetails) {
-      const storedToken = localStorage.getItem("Gamalogic_token");
-      if (storedToken) {
-        let parsedToken;
-        try {
-          parsedToken = JSON.parse(storedToken);
-        } catch (error) {
-          parsedToken = storedToken;
-        }
-        setUserDetails(parsedToken);
-      } else {
-        navigate("/signin");
+    const storedToken = localStorage.getItem("Gamalogic_token");
+    if (storedToken) {
+      let parsedToken;
+      try {
+        parsedToken = JSON.parse(storedToken);
+      } catch (error) {
+        parsedToken = storedToken;
       }
+      setUserDetails(parsedToken);
+    } else {
+      setUserDetails(null)
+      navigate("/signin");
     }
-  }, []);
+}, [navigate]);
   useEffect(()=>{
     const fetchData=async()=>{
-      let creditBal=await axiosInstance.get('/getCreditBalance')
-      console.log(creditBal.data,'creditbal data')
-      setCreditBal(creditBal.data)
+      try {
+        const response = await axiosInstance.get('/getCreditBalance');
+        setCreditBal(response.data);
+      } catch (error) {
+        console.error("Error fetching credit balance:", error);
+      }
     }
     fetchData()
-  },[])
+  },[creditBal])
   return (
     <div className="w-full h-screen overflow-y-auto pb-12">
       {userDetails && <Outlet />}
