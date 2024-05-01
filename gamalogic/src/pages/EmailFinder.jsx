@@ -71,7 +71,7 @@ function EmailFinder() {
               onChange={(e) => onInputChange(e, "domain")}
             />
             <button
-              className="bg-bgblue text-white py-1 px-4 rounded-md  w-32 h-9 mt-8"
+              className="bg-bgblue text-white py-1 px-4 rounded-md  w-44 h-9 mt-8"
               type="submit"
             >
               FIND EMAIL
