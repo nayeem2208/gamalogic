@@ -68,10 +68,10 @@ const Authentication = {
     try {
       const { fullname, email, password } = req.body.data;
       const userAgent = req.headers["user-agent"];
-      let ip=request.headers['cf-connecting-ip'] ||  
-      request.headers['x-real-ip'] ||
-      request.headers['x-forwarded-for'] ||
-      request.socket.remoteAddress || '';
+      let ip=req.headers['cf-connecting-ip'] ||  
+      req.headers['x-real-ip'] ||
+      req.headers['x-forwarded-for'] ||
+      req.socket.remoteAddress || '';
 
       const db = await dbConnection();
       // console.log(req.body.token,'token')
@@ -183,10 +183,10 @@ const Authentication = {
         res.status(400).json({ error: "User already exists" });
       } else {
         const userAgent = req.headers["user-agent"];
-        let ip=request.headers['cf-connecting-ip'] ||  
-        request.headers['x-real-ip'] ||
-        request.headers['x-forwarded-for'] ||
-        request.socket.remoteAddress || '';  
+        let ip=req.headers['cf-connecting-ip'] ||  
+        req.headers['x-real-ip'] ||
+        req.headers['x-forwarded-for'] ||
+        req.socket.remoteAddress || '';  
         const currentDate = new Date();
         const futureDate = new Date(currentDate);
         futureDate.setDate(currentDate.getDate() + 7);
