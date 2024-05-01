@@ -68,7 +68,11 @@ const Authentication = {
     try {
       const { fullname, email, password } = req.body.data;
       const userAgent = req.headers["user-agent"];
-      const ip = req.ip;
+      let ip=request.headers['cf-connecting-ip'] ||  
+      request.headers['x-real-ip'] ||
+      request.headers['x-forwarded-for'] ||
+      request.socket.remoteAddress || '';
+
       const db = await dbConnection();
       // console.log(req.body.token,'token')
       // console.log(process.env.RECAPTCHA_SECRET_KEY,'key is getting ')
@@ -179,7 +183,10 @@ const Authentication = {
         res.status(400).json({ error: "User already exists" });
       } else {
         const userAgent = req.headers["user-agent"];
-        const ip = req.ip;
+        let ip=request.headers['cf-connecting-ip'] ||  
+        request.headers['x-real-ip'] ||
+        request.headers['x-forwarded-for'] ||
+        request.socket.remoteAddress || '';  
         const currentDate = new Date();
         const futureDate = new Date(currentDate);
         futureDate.setDate(currentDate.getDate() + 7);
