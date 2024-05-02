@@ -7,9 +7,11 @@ function SubHeader(props) {
   let { setUserDetails, userDetails,creditBal } = useUserState();
   let navigate = useNavigate();
     function logoutHandler() {
+      startTransition(() => {
       localStorage.removeItem("Gamalogic_token");
       setUserDetails(null);
       navigate("/signin");
+    });
     }
   return (
     <div className="flex justify-between mt-1 ">
