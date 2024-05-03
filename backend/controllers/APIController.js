@@ -150,32 +150,37 @@ let APIControllers = {
     }
 
   },
-  getAlreadyCheckedBatchEmailFiles:async(req,res)=>{
+  getAlreadyCheckedBatchEmailFiles: async (req, res) => {
     let dbConnection;
     try {
-        dbConnection = req.dbConnection;
+      dbConnection = req.dbConnection;
+      console.log('first');
       let user = await dbConnection.query(
-        `SELECT * from registration WHERE emailid='${req.user[0][0].emailid}'`
+        `SELECT * FROM registration WHERE emailid='${req.user[0][0].emailid}'`
       );
-      let files=await dbConnection.query(`SELECT * FROM useractivity_batch_link where userid='${user[0][0].rowid}'`)
-      console.log(files[0],'files')
-      res.status(200).json(files[0])
+      console.log('second');
+      let files = await dbConnection.query(
+        `SELECT * FROM useractivity_batch_link WHERE userid='${user[0][0].rowid}'`
+      );
+      console.log('third');
+      res.status(200).json(files[0]);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       ErrorHandler("getAlreadyCheckedBatchEmailFiles Controller", error, req);
       res.status(400).json(error);
-    }finally {  
+    } finally {  
+      console.log('fifth');
       if (dbConnection) {
         try {
-          await dbConnection.end(); 
+          await dbConnection.end(); // Close the connection after all operations are completed
+          console.log('sixth');
         } catch (endError) {
           console.error("Error closing database connection:", endError);
         }
       }
     }
-    }
-
   },
+  
   batchEmailValidation: async (req, res) => {
     try {
        const dbConnection = req.dbConnection;
