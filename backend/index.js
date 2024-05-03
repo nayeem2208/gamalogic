@@ -8,7 +8,7 @@ import morgan from "morgan";
 import  mySqlPool from "./config/DB.js";
 import userRouter from "./routers/userRouter.js";
 import connectToMySQL from "./config/RemoteDb.js";
-import { releaseDbConnection } from "./middlewares/dbMiddleware.js";
+// import { releaseDbConnection } from "./middlewares/dbMiddleware.js";
 
 
 
@@ -31,7 +31,7 @@ app.use(express.static(path.join(__dirname, '..', 'gamalogic', 'dist')));
 
 
 app.use('/api',userRouter)
-app.use(releaseDbConnection);
+// app.use(releaseDbConnection);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'gamalogic', 'dist', 'index.html'));

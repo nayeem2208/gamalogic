@@ -15,9 +15,3 @@ const dbMiddleware = async (req, res, next) => {
 export default dbMiddleware;
 
 
-export const releaseDbConnection = (req, res, next) => {
-    if (req.dbConnection) {
-      req.dbConnection.release(); // Release the connection
-    }
-    next();
-  };
