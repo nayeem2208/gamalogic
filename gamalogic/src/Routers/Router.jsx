@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useState } from 'react';
+import TopLoader from '../components/TopLoader';
 
 const QuickValidation = lazy(() => import('../pages/QuickValidation'));
 const Body = lazy(() => import('../components/Body'));
@@ -21,27 +22,28 @@ const ResetPassword = lazy(() => import('../components/ResetPassword'));
 const PostSignupPage = lazy(() => import('../components/PostSignupPage'));
 
 function Router() {
+  const [loading, setLoading] = useState(true);
   return (
     <Routes>
       <Route path="/" element={<Body />}>
-        <Route index element={<Suspense fallback={<div>Loading...</div>}><QuickValidation /></Suspense>} />
-        <Route path="/email-finder" element={<Suspense fallback={<div>Loading...</div>}><EmailFinder /></Suspense>} />
-        <Route path="/api-Key" element={<Suspense fallback={<div>Loading...</div>}><ApiKey /></Suspense>} />
-        <Route path="/email-verification-bulk" element={<Suspense fallback={<div>Loading...</div>}><EmailVerification /></Suspense>} />
-        <Route path="/email-finder-bulk" element={<Suspense fallback={<div>Loading...</div>}><FileEmailFinder /></Suspense>} />
-        <Route path="/api-docs" element={<Suspense fallback={<div>Loading...</div>}><ApiDocs /></Suspense>} />
-        <Route path="/find-any-email" element={<Suspense fallback={<div>Loading...</div>}><FindAnyEmail /></Suspense>} />
-        <Route path="/googleSheet-integration" element={<Suspense fallback={<div>Loading...</div>}><IntegrateGoogleSheet /></Suspense>} />
-        <Route path="/account-settings" element={<Suspense fallback={<div>Loading...</div>}><AccountSettings /></Suspense>} />
-        <Route path="/buyCredits" element={<Suspense fallback={<div>Loading...</div>}><BuyCredits /></Suspense>} />
-        <Route path="/support" element={<Suspense fallback={<div>Loading...</div>}><Support /></Suspense>} />
+        <Route index element={<Suspense fallback={<TopLoader loading={loading} />}><QuickValidation setLoading={setLoading}/></Suspense>} />
+        <Route path="/email-finder" element={<Suspense fallback={<TopLoader loading={loading} />}><EmailFinder setLoading={setLoading}/></Suspense>} />
+        <Route path="/api-Key" element={<Suspense fallback={<TopLoader loading={loading} />}><ApiKey setLoading={setLoading}/></Suspense>} />
+        <Route path="/email-verification-bulk" element={<Suspense fallback={<TopLoader loading={loading} />}><EmailVerification setLoading={setLoading}/></Suspense>} />
+        <Route path="/email-finder-bulk" element={<Suspense fallback={<TopLoader loading={loading} />}><FileEmailFinder setLoading={setLoading}/></Suspense>} />
+        <Route path="/api-docs" element={<Suspense fallback={<TopLoader loading={loading} />}><ApiDocs setLoading={setLoading}/></Suspense>} />
+        <Route path="/find-any-email" element={<Suspense fallback={<TopLoader loading={loading} />}><FindAnyEmail setLoading={setLoading}/></Suspense>} />
+        <Route path="/googleSheet-integration" element={<Suspense fallback={<TopLoader loading={loading} />}><IntegrateGoogleSheet setLoading={setLoading}/></Suspense>} />
+        <Route path="/account-settings" element={<Suspense fallback={<TopLoader loading={loading} />}><AccountSettings setLoading={setLoading}/></Suspense>} />
+        <Route path="/buyCredits" element={<Suspense fallback={<TopLoader loading={loading} />}><BuyCredits setLoading={setLoading}/></Suspense>} />
+        <Route path="/support" element={<Suspense fallback={<TopLoader loading={loading} />}><Support setLoading={setLoading}/></Suspense>} />
       </Route>
       <Route path="/" element={<Authentication />}>
-        <Route index path="signin" element={<Suspense fallback={<div>Loading...</div>}><Login /></Suspense>} />
-        <Route path="signup" element={<Suspense fallback={<div>Loading...</div>}><Signup /></Suspense>} />
-        <Route path="forgotPassword" element={<Suspense fallback={<div>Loading...</div>}><ForgotPassword /></Suspense>} />
-        <Route path="resetPassword" element={<Suspense fallback={<div>Loading...</div>}><ResetPassword /></Suspense>} />
-        <Route path="VerifyYourEmail" element={<Suspense fallback={<div>Loading...</div>}><PostSignupPage /></Suspense>} />
+        <Route index path="signin" element={<Suspense fallback={<TopLoader loading={loading} />}><Login setLoading={setLoading}/></Suspense>} />
+        <Route path="signup" element={<Suspense fallback={<TopLoader loading={loading} />}><Signup setLoading={setLoading}/></Suspense>} />
+        <Route path="forgotPassword" element={<Suspense fallback={<TopLoader loading={loading} />}><ForgotPassword setLoading={setLoading}/></Suspense>} />
+        <Route path="resetPassword" element={<Suspense fallback={<TopLoader loading={loading} />}><ResetPassword setLoading={setLoading}/></Suspense>} />
+        <Route path="VerifyYourEmail" element={<Suspense fallback={<TopLoader loading={loading} />}><PostSignupPage setLoading={setLoading}/></Suspense>} />
       </Route>
     </Routes>
   );

@@ -7,18 +7,20 @@ import Footer from "./components/Footer";
 import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useUserState } from "./context/userContext";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
+import TopLoader from "./components/TopLoader";
 
 function App() {
   let {userDetails}=useUserState()
   const location = useLocation();
+  const [loading, setLoading] = useState(true);
   return (
     <div>
         <ToastContainer/>
-        <Suspense  fallback={<div>Loading...</div>}>
+        <Suspense  fallback={<TopLoader loading={loading} />}>
       <div
         className="mainBody lg:flex h-full"
-
+        setLoading={setLoading}
       >
         {location.pathname !== "/login" && location.pathname !== "/signup" && (
           <>
