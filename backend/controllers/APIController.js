@@ -164,21 +164,24 @@ let APIControllers = {
       );
       console.log('third');
       res.status(200).json(files[0]);
+      await dbConnection.end()
     } catch (error) {
       console.error(error);
       ErrorHandler("getAlreadyCheckedBatchEmailFiles Controller", error, req);
       res.status(400).json(error);
-    } finally {  
-      console.log('fifth');
-      if (dbConnection) {
-        try {
-          await dbConnection.end(); // Close the connection after all operations are completed
-          console.log('sixth');
-        } catch (endError) {
-          console.error("Error closing database connection:", endError);
-        }
-      }
+      await dbConnection.end()
     }
+    //  finally {  
+    //   console.log('fifth');
+    //   if (dbConnection) {
+    //     try {
+    //       await dbConnection.end(); // Close the connection after all operations are completed
+    //       console.log('sixth');
+    //     } catch (endError) {
+    //       console.error("Error closing database connection:", endError);
+    //     }
+    //   }
+    // }
   },
   
   batchEmailValidation: async (req, res) => {
