@@ -1,4 +1,4 @@
-import dbConnection from "../config/RemoteDb.js";
+// import dbConnection from "../config/RemoteDb.js";
 function generateApiKey() {
     const characters =
         'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -11,8 +11,8 @@ function generateApiKey() {
 }
 
 const isApiKeyUnique = async (apiKey) => {
-    const db = await dbConnection();
-    const userWithApiKey = await db.query(`SELECT * FROM registration WHERE api_key='${apiKey}'`);
+    const dbConnection = req.dbConnection;
+    const userWithApiKey = await dbConnection.query(`SELECT * FROM registration WHERE api_key='${apiKey}'`);
     return userWithApiKey[0].length === 0;
 };
 

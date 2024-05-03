@@ -1,15 +1,15 @@
 import jwt from "jsonwebtoken";
-import dbConnection from "../config/RemoteDb.js";
+// import dbConnection from "../config/RemoteDb.js";
 
 const authcheck =  async (req, res, next) => {
   const token = req.headers.authorization;
   if (token) {
     try {
-      const db = await dbConnection();
+      const dbConnection = req.dbConnection;
       const tokenWithoutBearer = token.replace("Bearer ", "");
       let parsedTokenWithoutBearer=JSON.parse(tokenWithoutBearer)
       const decoded = jwt.verify(parsedTokenWithoutBearer.token, process.env.JWT_SECRET);
-      req.user = await db.query(`SELECT emailid FROM registration WHERE rowid='${decoded.userId}'`);
+      req.user = await dbConnection.query(`SELECT emailid FROM registration WHERE rowid='${decoded.userId}'`);
       next();
     } catch (error) {
       console.error(error);

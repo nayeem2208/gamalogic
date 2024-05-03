@@ -1,4 +1,4 @@
-import dbConnection from "../config/RemoteDb.js"
+// import dbConnection from "../config/RemoteDb.js"
 import generateToken from "../utils/jwt.js";
 import jwt from "jsonwebtoken";
 import generateUniqueApiKey from "../utils/generatePassword.js";
@@ -24,8 +24,8 @@ const Authentication = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
-      const db = await dbConnection();
-      let user = await db.query(
+       const dbConnection = req.dbConnection;
+      let user = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
       if (user[0].length > 0) {
@@ -73,7 +73,7 @@ const Authentication = {
       req.headers['x-forwarded-for'] ||
       req.socket.remoteAddress || '';
 
-      const db = await dbConnection();
+       const dbConnection = req.dbConnection;
       // console.log(req.body.token,'token')
       // console.log(process.env.RECAPTCHA_SECRET_KEY,'key is getting ')
       // const response = await axios.post(
@@ -85,7 +85,7 @@ const Authentication = {
       // );
       // console.log(response,'data')
       // if(response.data.success){
-      let userExists = await db.query(
+      let userExists = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
       if (userExists[0].length > 0) {
@@ -105,7 +105,7 @@ const Authentication = {
           .slice(0, 19)
           .replace("T", " ");
         let apiKey = await generateUniqueApiKey();
-        await db.query(
+        await dbConnection.query(
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',0,0)`
         );
         sendEmail(
@@ -129,11 +129,11 @@ const Authentication = {
   },
   googleLogin: async (req, res) => {
     try {
-      const db = await dbConnection();
+       const dbConnection = req.dbConnection;
       const token = req.body.credentialResponse.credential;
       const decode = jwt.decode(token);
       const { email } = decode;
-      let user = await db.query(
+      let user = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
       if (user[0].length > 0) {
@@ -171,12 +171,12 @@ const Authentication = {
   },
   googleAuth: async (req, res) => {
     try {
-      const db = await dbConnection();
+       const dbConnection = req.dbConnection;
       const body_Token = req.body.credentialResponse.credential;
       const decode = jwt.decode(body_Token);
       const { name, email } = decode;
 
-      const userExists = await db.query(
+      const userExists = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
       if (userExists[0].length > 0) {
@@ -201,10 +201,10 @@ const Authentication = {
 
         let apiKey = await generateUniqueApiKey();
 
-        await db.query(
+        await dbConnection.query(
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0)`
         );
-        let user = await db.query(
+        let user = await dbConnection.query(
           `SELECT * FROM registration WHERE emailid='${email}'`
         );
         if (user[0].length > 0) {
@@ -228,13 +228,13 @@ const Authentication = {
   },
   verifyEmail: async (req, res) => {
     try {
-      const db = await dbConnection();
+       const dbConnection = req.dbConnection;
       console.log("verifyi il etheetindtta");
       const userEmail = req.query.email;
       let confirmedDate = new Date();
       const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,referer=? WHERE emailid = ?`;
-      await db.query(query, [confirmedDate, req.headers.origin, userEmail]);
-      let verifiedUser = await db.query(
+      await dbConnection.query(query, [confirmedDate, req.headers.origin, userEmail]);
+      let verifiedUser = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
       );
       if (verifiedUser.length > 0) {
@@ -252,8 +252,8 @@ const Authentication = {
   },
   forgotPassword: async (req, res) => {
     try {
-      const db = await dbConnection();
-      let user = await db.query(
+       const dbConnection = req.dbConnection;
+      let user = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${req.body.email}'`
       );
       if (user[0].length > 0) {
@@ -281,15 +281,15 @@ const Authentication = {
   },
   resetPassword: async (req, res) => {
     try {
-      const db = await dbConnection();
-      let user = await db.query(
+       const dbConnection = req.dbConnection;
+      let user = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${req.body.email}'`
       );
       if (user[0].length > 0) {
         // let hash = generateSHA256Hash(req.body.password);
         let hashedPassword = await passwordHash(req.body.password);
         console.log(hashedPassword, "hashed password");
-        await db.query(
+        await dbConnection.query(
           `UPDATE registration SET password='${hashedPassword}' WHERE emailid='${req.body.email}'`
         );
         res.status(200).json({ message: "password succesfully updated" });
