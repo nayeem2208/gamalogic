@@ -11,9 +11,18 @@ function generateApiKey() {
 }
 
 const isApiKeyUnique = async (apiKey) => {
-    const dbConnection = req.dbConnection;
-    const userWithApiKey = await dbConnection.query(`SELECT * FROM registration WHERE api_key='${apiKey}'`);
-    return userWithApiKey[0].length === 0;
+    try {
+        let dbConnection = req.dbConnection;
+        const userWithApiKey = await dbConnection.query(`SELECT * FROM registration WHERE api_key='${apiKey}'`);
+        return userWithApiKey[0].length === 0;
+    } catch (error) {
+        console.error("Error in isApiKeyUnique:", error);
+        throw error;
+    } finally {
+        if (req.dbConnection) {
+            req.dbConnection.end();
+          }
+    }
 };
 
 const generateUniqueApiKey = async () => {

@@ -62,7 +62,12 @@ const Authentication = {
     } catch (error) {
       ErrorHandler("Login Controller", error, req);
       res.status(400).json(error);
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   registerUser: async (req, res) => {
     try {
@@ -125,7 +130,12 @@ const Authentication = {
       res
         .status(500)
         .json({ message: "Registration failed", error: error.message });
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   googleLogin: async (req, res) => {
     try {
@@ -167,7 +177,12 @@ const Authentication = {
     } catch (error) {
       ErrorHandler("googleLogin Controller", error, req);
       res.status(400).json(error);
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   googleAuth: async (req, res) => {
     try {
@@ -224,7 +239,12 @@ const Authentication = {
       console.log(error);
       ErrorHandler("googleAuth Controller", error, req);
       res.status(400).json({ error });
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   verifyEmail: async (req, res) => {
     try {
@@ -248,7 +268,12 @@ const Authentication = {
       console.log(error);
       ErrorHandler("verifyEmail Controller", error, req);
       res.status(400).json({ error });
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   forgotPassword: async (req, res) => {
     try {
@@ -277,7 +302,12 @@ const Authentication = {
       console.log(error);
       ErrorHandler("forgotPassword Controller", error, req);
       res.status(400).json(error);
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   resetPassword: async (req, res) => {
     try {
@@ -300,7 +330,12 @@ const Authentication = {
       console.log(error);
       ErrorHandler("resetPassword Controller", error, req);
       res.status(400).json({ error });
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   sendVerifyEmail:async(req,res)=>{
     try {

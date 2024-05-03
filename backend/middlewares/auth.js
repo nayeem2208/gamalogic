@@ -14,7 +14,12 @@ const authcheck =  async (req, res, next) => {
     } catch (error) {
       console.error(error);
       res.status(401).json({ error: "Unauthorized" }); 
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   } else {
     res.status(401).json({ error: "Unauthorized" }); 
   }

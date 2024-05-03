@@ -23,6 +23,10 @@ let APIControllers = {
       console.log(error);
       // ErrorHandler("getApi Controller", error, req);
       res.status(400).json(error);
+    }finally {
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
   },
   getApi: async (req, res) => {
@@ -36,7 +40,12 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("getApi Controller", error, req);
       res.status(400).json(error);
+    }finally {
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   resetApiKey: async (req, res) => {
     try {
@@ -54,7 +63,12 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("resetApiKey Controller", error, req);
       res.status(400).json(error);
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   emailValidation: async (req, res) => {
     try {
@@ -71,7 +85,12 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("emailValidation Controller", error, req);
       res.status(400).json(error);
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   FindSingleEmail: async (req, res) => {
     try {
@@ -92,7 +111,12 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("FindSingleEmail Controller", error, req);
       res.status(400).json(error);
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   changePassword: async (req, res) => {
     try {
@@ -119,7 +143,12 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("changePassword Controller", error, req);
       res.status(400).json(error);
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   getAlreadyCheckedBatchEmailFiles:async(req,res)=>{
     try {
@@ -134,7 +163,12 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("getAlreadyCheckedBatchEmailFiles Controller", error, req);
       res.status(400).json(error);
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   batchEmailValidation: async (req, res) => {
     try {
@@ -170,7 +204,12 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("batchEmailValidation Controller", error, req);
       res.status(400).json(error);
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   batchEmailStatus: async (req, res) => {
     try {
@@ -188,7 +227,12 @@ let APIControllers = {
       console.log(error);
       // ErrorHandler("batchEmailStatus Controller", error, req);
       res.status(400).json(error);
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   downloadEmailVerificationFile: async (req, res) => {
     try {
@@ -205,7 +249,12 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
       res.status(400).json(error);
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
 
 
@@ -221,7 +270,12 @@ let APIControllers = {
       console.log(error);
       // ErrorHandler("getAlreadyCheckedBatchEmailFinderFiles Controller", error, req);
       res.status(400).json(error);
+    }finally {
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   batchEmailFinder:async(req,res)=>{
     try {
@@ -255,7 +309,12 @@ let APIControllers = {
     } catch (error) {
       console.log(error)
       res.status(400).json(error)
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   batchEmailFinderStatus: async (req, res) => {
     try {
@@ -273,7 +332,12 @@ let APIControllers = {
       console.log(error);
       // ErrorHandler("batchEmailStatus Controller", error, req);
       res.status(400).json(error);
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
   downloadEmailFinderResultFile: async (req, res) => {
     try {
@@ -291,7 +355,12 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
       res.status(400).json(error);
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   },
 
   updateCredit:async(req,res)=>{
@@ -305,7 +374,12 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("updateCredit Controller", error, req);
       res.status(400).json(error);
+    }finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
     }
+
   }
 };
 export default APIControllers;
