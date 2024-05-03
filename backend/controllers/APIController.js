@@ -241,11 +241,12 @@ let APIControllers = {
       console.log(error);
       // ErrorHandler("batchEmailStatus Controller", error, req);
       res.status(400).json(error);
-    }finally {  
-      if (req.dbConnection) {
-        req.dbConnection.end();
-      }
     }
+    // finally {  
+    //   if (req.dbConnection) {
+    //     req.dbConnection.end();
+    //   }
+    // }
 
   },
   downloadEmailVerificationFile: async (req, res) => {
