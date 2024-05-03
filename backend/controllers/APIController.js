@@ -151,8 +151,9 @@ let APIControllers = {
 
   },
   getAlreadyCheckedBatchEmailFiles:async(req,res)=>{
+    let dbConnection;
     try {
-       const dbConnection = req.dbConnection;
+        dbConnection = req.dbConnection;
       let user = await dbConnection.query(
         `SELECT * from registration WHERE emailid='${req.user[0][0].emailid}'`
       );
@@ -164,9 +165,14 @@ let APIControllers = {
       ErrorHandler("getAlreadyCheckedBatchEmailFiles Controller", error, req);
       res.status(400).json(error);
     }finally {  
-      if (req.dbConnection) {
-        req.dbConnection.end();
+      if (dbConnection) {
+        try {
+          await dbConnection.end(); 
+        } catch (endError) {
+          console.error("Error closing database connection:", endError);
+        }
       }
+    }
     }
 
   },
