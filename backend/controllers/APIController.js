@@ -23,11 +23,13 @@ let APIControllers = {
       console.log(error);
       // ErrorHandler("getApi Controller", error, req);
       res.status(400).json(error);
-    }finally {
-      if (req.dbConnection) {
-        req.dbConnection.end();
-      }
     }
+    // finally {
+    //   console.log('credit bal api')
+    //   if (req.dbConnection) {
+    //     req.dbConnection.end();
+    //   }
+    // }
   },
   getApi: async (req, res) => {
     try {
@@ -41,6 +43,7 @@ let APIControllers = {
       ErrorHandler("getApi Controller", error, req);
       res.status(400).json(error);
     }finally {
+      console.log('getApi end')
       if (req.dbConnection) {
         req.dbConnection.end();
       }
@@ -64,6 +67,7 @@ let APIControllers = {
       ErrorHandler("resetApiKey Controller", error, req);
       res.status(400).json(error);
     }finally {  
+      console.log('getApi end')
       if (req.dbConnection) {
         req.dbConnection.end();
       }
@@ -164,12 +168,12 @@ let APIControllers = {
       );
       console.log('third');
       res.status(200).json(files[0]);
-      await dbConnection.end()
+      // await dbConnection.end()
     } catch (error) {
       console.error(error);
-      ErrorHandler("getAlreadyCheckedBatchEmailFiles Controller", error, req);
+      // ErrorHandler("getAlreadyCheckedBatchEmailFiles Controller", error, req);
       res.status(400).json(error);
-      await dbConnection.end()
+      // await dbConnection.end()
     }
     //  finally {  
     //   console.log('fifth');
