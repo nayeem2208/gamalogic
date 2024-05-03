@@ -24,12 +24,12 @@ let APIControllers = {
       // ErrorHandler("getApi Controller", error, req);
       res.status(400).json(error);
     }
-    // finally {
-    //   console.log('credit bal api')
-    //   if (req.dbConnection) {
-    //     req.dbConnection.end();
-    //   }
-    // }
+    finally {
+      console.log('credit bal api')
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
+    }
   },
   getApi: async (req, res) => {
     try {
@@ -158,34 +158,27 @@ let APIControllers = {
     let dbConnection;
     try {
       dbConnection = req.dbConnection;
-      console.log('first');
       let user = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${req.user[0][0].emailid}'`
       );
-      console.log('second');
       let files = await dbConnection.query(
         `SELECT * FROM useractivity_batch_link WHERE userid='${user[0][0].rowid}'`
       );
-      console.log('third');
       res.status(200).json(files[0]);
-      // await dbConnection.end()
     } catch (error) {
       console.error(error);
-      // ErrorHandler("getAlreadyCheckedBatchEmailFiles Controller", error, req);
+      ErrorHandler("getAlreadyCheckedBatchEmailFiles Controller", error, req);
       res.status(400).json(error);
-      // await dbConnection.end()
     }
-    //  finally {  
-    //   console.log('fifth');
-    //   if (dbConnection) {
-    //     try {
-    //       await dbConnection.end(); // Close the connection after all operations are completed
-    //       console.log('sixth');
-    //     } catch (endError) {
-    //       console.error("Error closing database connection:", endError);
-    //     }
-    //   }
-    // }
+     finally {  
+      if (dbConnection) {
+        try {
+          await dbConnection.end();
+        } catch (endError) {
+          console.error("Error closing database connection:", endError);
+        }
+      }
+    }
   },
   
   batchEmailValidation: async (req, res) => {
@@ -246,11 +239,11 @@ let APIControllers = {
       // ErrorHandler("batchEmailStatus Controller", error, req);
       res.status(400).json(error);
     }
-    // finally {  
-    //   if (req.dbConnection) {
-    //     req.dbConnection.end();
-    //   }
-    // }
+    finally {  
+      if (req.dbConnection) {
+        req.dbConnection.end();
+      }
+    }
 
   },
   downloadEmailVerificationFile: async (req, res) => {
@@ -287,7 +280,7 @@ let APIControllers = {
       res.status(200).json(files[0])
     } catch (error) {
       console.log(error);
-      // ErrorHandler("getAlreadyCheckedBatchEmailFinderFiles Controller", error, req);
+      ErrorHandler("getAlreadyCheckedBatchEmailFinderFiles Controller", error, req);
       res.status(400).json(error);
     }finally {
       if (req.dbConnection) {
