@@ -214,7 +214,7 @@ const Authentication = {
           .slice(0, 19)
           .replace("T", " ");
 
-        let apiKey = await generateUniqueApiKey();
+        let apiKey = await generateUniqueApiKey(req);
 
         await dbConnection.query(
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0)`

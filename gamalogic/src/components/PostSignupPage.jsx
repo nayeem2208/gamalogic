@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 
-function PostSignupPage() {
+function PostSignupPage({ setLoading }) {
   
   const location = useLocation();
   const data = location.state 

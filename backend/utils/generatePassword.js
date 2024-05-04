@@ -18,10 +18,6 @@ const isApiKeyUnique = async (apiKey,req) => {
     } catch (error) {
         console.error("Error in isApiKeyUnique:", error);
         throw error;
-    } finally {
-        if (req.dbConnection) {
-            req.dbConnection.end();
-          }
     }
 };
 
