@@ -18,8 +18,9 @@
 }
 
 .subHeading h3{
-    font-size: 4vh;
-    
+    font-size: 24px;
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 400;
 }
 
 .subHeading .description{
@@ -28,7 +29,7 @@
 }
 
 .auth .description{
-    font-size: large;
+    font-size: 16px;
     font-weight: 200;
     color: rgb(194, 192, 192);
 }

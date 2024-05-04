@@ -42,11 +42,11 @@ function SideBar() {
   return (
     <>
     {userDetails&&<div
-      style={{ backgroundColor: "#0A0E2B" }}
+      style={{ backgroundColor: "#0A0E2B",fontFamily: "Raleway, sans-serif" }}
       className="w-96 text-white hidden  lg:flex flex-col h-screen  p-4 pt-8 overflow-y-auto pb-12 mr-32"
     >
       <Link to="/">
-        <p className="font-semibold text-2xl text-center mt-2">GAMALOGIC</p>
+        <p className="font-semibold text-2xl text-center mt-2" style={{fontFamily: "Montserrat, sans-serif"}}>GAMALOGIC</p>
       </Link>
       <ul className="mt-14 text-lg font-semibold text-left">
         <Link to="/">

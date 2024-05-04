@@ -73,8 +73,8 @@ function ApiKey() {
               color: "rgba(247, 76, 65 , 0.6)",
             }}
           >
-            <p className="font-semibold mb-4">Note:</p>
-            <ol className="font-light text-lg">
+            <p className="font-semibold mb-4 text-sm">Note:</p>
+            <ol className="font-light text-base">
               <li><span className="font-semibold">1.</span>Don’t share the API key with anyone</li>
               <li>
               <span className="font-semibold">2.</span>In case you feel any unauthorized access, change the key

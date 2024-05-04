@@ -37,7 +37,7 @@ function PostSignupPage({ setLoading }) {
         <div className="verify-foot-p description">
             <p>We have sent a verification link to your email address.</p>
             <p>Follow the link in the email to validate and complete your registration.</p>
-            <p>To resend your verification link,  <button className='text-white' onClick={HandleSendVerifyLink}>click here</button></p>
+            <p>To resend your verification link,  <button className='text-white font-semibold' onClick={HandleSendVerifyLink}>click here</button></p>
             <p>If you are having any trouble, contact us at, <a className='text-white'
                     href="mailto:support@gamalogic.com">support@gamalogic.com</a></p>
         </div>

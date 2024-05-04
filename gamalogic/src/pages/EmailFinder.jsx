@@ -78,7 +78,7 @@ function EmailFinder() {
             </button>
           </form>
           <div className=" flex justify-end w-3/6 ">
-            <p className="bg-gray-100 rounded h-2/5 p-2 mt-6 font-semibold">
+            <p className="bg-gray-100 rounded h-2/5 text-base p-2 mt-6 font-semibold">
               Note:
               <br />
               <span className="font-light">
