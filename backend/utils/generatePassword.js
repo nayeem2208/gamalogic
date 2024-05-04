@@ -10,7 +10,7 @@ function generateApiKey() {
     return apiKey;
 }
 
-const isApiKeyUnique = async (apiKey) => {
+const isApiKeyUnique = async (apiKey,req) => {
     try {
         let dbConnection = req.dbConnection;
         const userWithApiKey = await dbConnection.query(`SELECT * FROM registration WHERE api_key='${apiKey}'`);
@@ -25,9 +25,9 @@ const isApiKeyUnique = async (apiKey) => {
     }
 };
 
-const generateUniqueApiKey = async () => {
+const generateUniqueApiKey = async (req) => {
     let apiKey = generateApiKey();
-    while (!(await isApiKeyUnique(apiKey))) {
+    while (!(await isApiKeyUnique(apiKey,req))) {
         apiKey = generateApiKey();
     }
     return apiKey;

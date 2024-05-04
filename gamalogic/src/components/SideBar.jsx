@@ -43,7 +43,7 @@ function SideBar() {
     <>
     {userDetails&&<div
       style={{ backgroundColor: "#0A0E2B" }}
-      className="w-96 text-white hidden  lg:flex flex-col h-screen  p-4 pt-8 overflow-y-auto pb-12"
+      className="w-96 text-white hidden  lg:flex flex-col h-screen  p-4 pt-8 overflow-y-auto pb-12 mr-32"
     >
       <Link to="/">
         <p className="font-semibold text-2xl text-center mt-2">GAMALOGIC</p>
