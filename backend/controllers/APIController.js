@@ -46,6 +46,7 @@ let APIControllers = {
   },
   resetApiKey: async (req, res) => {
     try {
+      const dbConnection = req.dbConnection;
       let newApiKey = await generateUniqueApiKey(req);
       let user = await dbConnection.query(
         `UPDATE registration SET api_key='${newApiKey}' WHERE emailid='${req.user[0][0].emailid}'`
