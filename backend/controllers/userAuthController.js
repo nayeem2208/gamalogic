@@ -48,7 +48,6 @@ const Authentication = {
               name: user[0][0].username,
               credit: creditBal,
               token,
-              rowId:user[0][0].rowid,
               confirm:1
             });
           } else {
@@ -167,8 +166,7 @@ const Authentication = {
         res.status(200).json({
           name: user[0][0].username,
           credit: creditBal,
-          token,
-          rowId:user[0][0].rowid,
+          token
         });
       } else {
         res.status(400).json({
@@ -230,7 +228,6 @@ const Authentication = {
             name: user[0][0].username,
             credit: 500,
             token,
-            rowId:user[0][0].rowid,
           });
         } else {
           res
@@ -274,8 +271,7 @@ const Authentication = {
         res.json({
           name: verifiedUser[0][0].username,
           token,
-          credit: creditBal,
-          rowId:user[0][0].rowid,
+          credit: creditBal
         });
       }
     } catch (error) {
