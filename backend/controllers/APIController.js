@@ -58,7 +58,6 @@ let APIControllers = {
       let user = await dbConnection.query(
         `UPDATE registration SET api_key='${newApiKey}' WHERE emailid='${req.user[0][0].emailid}'`
       );
-      console.log(user[0].affectedRows, "user");
       if (user[0].affectedRows === 1) {
         res.status(200).json({ newApiKey });
       }
@@ -109,7 +108,6 @@ let APIControllers = {
       let find = await axios.get(
         `https://gamalogic.com/email-discovery/?firstname=${firstname}&lastname=${lastname}&domain=${req.body.domain}&apikey=${process.env.API_KEY}&speed_rank=0`
       );
-      console.log(find.data, "find result");
       res.status(200).json(find.data);
     } catch (error) {
       console.log(error);
@@ -132,15 +130,12 @@ let APIControllers = {
       const hashedPassword = user[0][0].password;
       let passwordMatch = await verifyPassword(old, hashedPassword);
       if (!passwordMatch) {
-        console.log("password match aayilla");
         res.status(400).json({ message: "Old password is not correct" });
       } else {
         let hashedPasswordForDatabase = await passwordHash(newPassword);
-        console.log("ivda vare ok");
         await dbConnection.query(
           `UPDATE registration SET password='${hashedPasswordForDatabase}' WHERE emailid='${req.user[0][0].emailid}'`
         );
-        console.log("add um aayi ");
         res.status(200).json({ message: "Password successfully changed" });
       }
     } catch (error) {
@@ -191,12 +186,10 @@ let APIControllers = {
       const data = {
         gamalogic_emailid_vrfy: req.body.data,
       };
-      console.log(data)
       let response = await axios.post(
         `https://gamalogic.com/batchemailvrf?apikey=${process.env.API_KEY}&speed_rank=0`,
         data
       );
-      console.log(response, "response is here ");
 
       let currenttime = new Date();
       const formattedDate = currenttime
@@ -204,12 +197,14 @@ let APIControllers = {
         .slice(0, 19)
         .replace("T", " ");
       const userAgent = req.headers["user-agent"];
-      const ip = req.ip;
+      const ip = req.headers['cf-connecting-ip'] ||  
+      req.headers['x-real-ip'] ||
+      req.headers['x-forwarded-for'] ||
+      req.socket.remoteAddress || '';
       let fileAdded = await dbConnection.query(
         `INSERT INTO useractivity_batch_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${req.body.fileName}','${req.body.fileName}',1,0,0)`
       );
       let files=await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
-        console.log(files[0],'fiels')
       res.status(200).json({message:response.data.message,files:files[0][0]});
     } catch (error) {
       console.log(error);
@@ -303,7 +298,6 @@ let APIControllers = {
         `https://gamalogic.com/batch-email-discovery/?apikey=${process.env.API_KEY}`,
         data
       ); 
-      console.log(response,'response is here')
       
       let currenttime = new Date();
       const formattedDate = currenttime
@@ -311,12 +305,14 @@ let APIControllers = {
         .slice(0, 19)
         .replace("T", " ");
       const userAgent = req.headers["user-agent"];
-      const ip = req.ip;
+      const ip = req.headers['cf-connecting-ip'] ||  
+      req.headers['x-real-ip'] ||
+      req.headers['x-forwarded-for'] ||
+      req.socket.remoteAddress || '';
       let fileAdded = await dbConnection.query(
         `INSERT INTO useractivity_batch_finder_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${req.body.fileName}','${req.body.fileName}',1,0,0)`
       );
       let files=await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
-        console.log(files[0],'fiels')
       res.status(200).json({message:response.data.message,files:files[0][0]});
     } catch (error) {
       console.log(error)
@@ -361,7 +357,6 @@ let APIControllers = {
       let download = await axios.get(
         `https://gamalogic.com/batch-email-discovery-result/?apikey=${process.env.API_KEY}&batchid=${req.query.batchId}`
       );
-      console.log(download,'download file')
       res.status(200).json(download.data);
     } catch (error) {
       console.log(error);
