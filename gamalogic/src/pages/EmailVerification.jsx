@@ -10,6 +10,7 @@ function EmailVerification() {
   let [message, setMessage] = useState("");
   let [resultFile, setResultFile] = useState([]);
   let [loading,setLoading]=useState(false)
+  const [filesStatus, setFilesStatus] = useState([]);
 
   useEffect(() => {
     const fetchAllFiles = async () => {
@@ -43,6 +44,11 @@ function EmailVerification() {
             ...filesWithProcessedField,
           ]);
         }
+        setFilesStatus((prevResultFiles) => [
+          ...prevResultFiles,
+          ...filesWithProcessedField,
+        ]); 
+
       } catch (error) {
         console.log(error);
       }
@@ -86,6 +92,16 @@ function EmailVerification() {
               },
               ...prevResultFiles,
             ]);
+            setFilesStatus((prevResultFiles) => [
+              {
+                ...response.data.files,
+                processed: 0,
+                formattedDate: new Date(
+                  response.data.files.date_time
+                ).toLocaleString("en-US", options),
+              },
+              ...prevResultFiles,
+            ]);
           },
         });
       } catch (error) {
@@ -96,21 +112,25 @@ function EmailVerification() {
       alert("Please select a CSV file.");
     }
   };
-  console.log(resultFile, "resultfile");
   useEffect(() => {
     const checkCompletion = async () => {
       try {
-        for (const [index, file] of resultFile.entries()) {
+        if (filesStatus.length > 0) {
+        for (const [index, file] of filesStatus.entries()) {
           if (file.id && file.processed !== 100) {
             const res = await axiosInstance.get(
               `/getBatchStatus?id=${file.id}`
             );
-            if (res.data.emailStatus.processed === res.data.emailStatus.total) {
-              setResultFile((prevResultFiles) => [
+            if (res.data.emailStatus.status =='completed') {
+              setFilesStatus((prevResultFiles) => [
                 ...prevResultFiles.slice(0, index),
-                { ...file, processed: 100 },
                 ...prevResultFiles.slice(index + 1),
               ]);
+              setResultFile((prevResultFiles) => [
+                             ...prevResultFiles.slice(0, index),
+                               { ...file, processed: 100 },
+                              ...prevResultFiles.slice(index + 1),
+                            ]);
               setMessage("");
             } else {
               const progress = Math.round(
@@ -122,17 +142,62 @@ function EmailVerification() {
                 { ...file, processed: progress },
                 ...prevResultFiles.slice(index + 1),
               ]);
+              setFilesStatus((prevResultFiles) => [
+                ...prevResultFiles.slice(0, index),
+                { ...file, processed: progress },
+                ...prevResultFiles.slice(index + 1),
+              ]);
+              await new Promise(resolve => setTimeout(resolve, 5000));
             }
           }
         }
+      }
       } catch (error) {
         console.error(error);
       }
     };
 
     checkCompletion();
-  }, [resultFile]);
+  }, [resultFile,filesStatus]);
 
+  // useEffect(() => {
+  //   const checkCompletion = async () => {
+  //     try {
+  //       for (const [index, file] of resultFile.entries()) {
+  //         console.log(processedIds,'processed idssssssss')
+  //         if (file.id && file.processed !== 100 && !processedIds.includes(file.id)) {
+  //           console.log('api call is happening........................')
+  //           const res = await axiosInstance.get(
+  //             `/getBatchStatus?id=${file.id}`
+  //           );
+  //           if (res.data.emailStatus.status =='completed') {
+  //             setResultFile((prevResultFiles) => [
+  //               ...prevResultFiles.slice(0, index),
+  //               { ...file, processed: 100 },
+  //               ...prevResultFiles.slice(index + 1),
+  //             ]);
+  //             setProcessedIds([...processedIds, file.id]);
+  //             setMessage("");
+  //           } else {
+  //             const progress = Math.round(
+  //               (res.data.emailStatus.processed / res.data.emailStatus.total) *
+  //                 100
+  //             );
+  //             setResultFile((prevResultFiles) => [
+  //               ...prevResultFiles.slice(0, index),
+  //               { ...file, processed: progress },
+  //               ...prevResultFiles.slice(index + 1),
+  //             ]);
+  //           }
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
+
+  //   checkCompletion();
+  // }, [resultFile,processedIds]);
   const DownloadFile = async (data) => {
     try {
       console.log(data, "data is here");

@@ -32,7 +32,6 @@ function Body() {
     }
     fetchData()
   },[creditBal])
-  console.log(userDetails,'userDetails')
   return (
     <div className="w-full h-screen overflow-y-auto pb-12">
       {userDetails && <Outlet />}

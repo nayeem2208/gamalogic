@@ -10,6 +10,7 @@ function FileEmailFinder() {
   let [message, setMessage] = useState("");
   let [resultFile, setResultFile] = useState([]);
   let [loading,setLoading]=useState(false)
+  const [filesStatus, setFilesStatus] = useState([]);
 
   useEffect(() => {
     const fetchAllFiles = async () => {
@@ -34,10 +35,19 @@ function FileEmailFinder() {
             options
           ),
         }));
-        setResultFile((prevResultFiles) => [
+        const allProcessed = filesWithProcessedField.every(
+          (file) => file.processed === 100
+        );
+        if (!allProcessed) {
+          setResultFile((prevResultFiles) => [
+            ...prevResultFiles,
+            ...filesWithProcessedField,
+          ]);
+        }
+        setFilesStatus((prevResultFiles) => [
           ...prevResultFiles,
           ...filesWithProcessedField,
-        ]);
+        ]); 
       } catch (error) {
         console.log(error);
       }
@@ -95,6 +105,16 @@ function FileEmailFinder() {
               },
               ...prevResultFiles,
             ]);
+            setFilesStatus((prevResultFiles) => [
+              {
+                ...response.data.files,
+                processed: 0,
+                formattedDate: new Date(
+                  response.data.files.date_time
+                ).toLocaleString("en-US", options),
+              },
+              ...prevResultFiles,
+            ]);
           },
         });
       } catch (error) {
@@ -109,31 +129,46 @@ function FileEmailFinder() {
   useEffect(() => {
     const checkCompletion = async () => {
       try {
-        for (const [index, file] of resultFile.entries()) {
-          if (file.id && file.processed !== 100) {
-            const res = await axiosInstance.get(
-              `/getBatchFinderStatus?id=${file.id}`
-            );
-            if (res.data.emailStatus.processed === res.data.emailStatus.total) {
-              setResultFile((prevResultFiles) => [
-                ...prevResultFiles.slice(0, index),
-                { ...file, processed: 100 },
-                ...prevResultFiles.slice(index + 1),
-              ]);
-              setMessage("");
-            } else {
-              const progress = Math.round(
-                (res.data.emailStatus.processed / res.data.emailStatus.total) *
-                  100
+        if (filesStatus.length > 0) {
+          for (const [index, file] of filesStatus.entries()) {
+            if (file.id && file.processed !== 100) {
+              const res = await axiosInstance.get(
+                `/getBatchFinderStatus?id=${file.id}`
               );
-              if (progress != resultFile[index].processed) {
-                setResultFile((prevResultFiles) => [
+              if (res.data.emailStatus.processed === res.data.emailStatus.total) {
+                // File completed, update filesStatus and resultFile
+                setFilesStatus(prevFilesStatus => {
+                  const updatedFilesStatus = [...prevFilesStatus];
+                  updatedFilesStatus.splice(index, 1);
+                  return updatedFilesStatus;
+                });
+  
+                setResultFile(prevResultFiles => [
+                  ...prevResultFiles.slice(0, index),
+                  { ...file, processed: 100 },
+                  ...prevResultFiles.slice(index + 1),
+                ]);
+  
+                setMessage("");
+              } else {
+                const progress = Math.round(
+                  (res.data.emailStatus.processed / res.data.emailStatus.total) * 100
+                );
+                // Update progress in filesStatus and resultFile
+                setFilesStatus(prevFilesStatus => [
+                  ...prevFilesStatus.slice(0, index),
+                  { ...file, processed: progress },
+                  ...prevFilesStatus.slice(index + 1),
+                ]);
+  
+                setResultFile(prevResultFiles => [
                   ...prevResultFiles.slice(0, index),
                   { ...file, processed: progress },
                   ...prevResultFiles.slice(index + 1),
                 ]);
+                await new Promise(resolve => setTimeout(resolve, 10000));
+
               }
-              setTimeout(checkCompletion, 5000);
             }
           }
         }
@@ -141,9 +176,10 @@ function FileEmailFinder() {
         console.error(error);
       }
     };
-
+  
     checkCompletion();
-  }, [resultFile]);
+  }, [resultFile,filesStatus]);
+  
 
   const DownloadFile = async (data) => {
     try {
