@@ -21,7 +21,7 @@ function Signup() {
   });
   let [loading, setLoading] = useState(false);
   let navigate = useNavigate();
-  let { setUserDetails } = useUserState();
+  let { setUserDetails,setCreditBal } = useUserState();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -94,6 +94,7 @@ function Signup() {
       });
       let token = res.data;
       setUserDetails(token);
+      setCreditBal(token.credit)
       localStorage.setItem("Gamalogic_token", JSON.stringify(token));
       navigate("/");
     } catch (err) {

@@ -122,7 +122,6 @@ function EmailVerification() {
                 { ...file, processed: progress },
                 ...prevResultFiles.slice(index + 1),
               ]);
-              setTimeout(checkCompletion, 5000);
             }
           }
         }

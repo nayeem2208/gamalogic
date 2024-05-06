@@ -48,6 +48,7 @@ const Authentication = {
               name: user[0][0].username,
               credit: creditBal,
               token,
+              rowId:user[0][0].rowid,
               confirm:1
             });
           } else {
@@ -167,6 +168,7 @@ const Authentication = {
           name: user[0][0].username,
           credit: creditBal,
           token,
+          rowId:user[0][0].rowid,
         });
       } else {
         res.status(400).json({
@@ -228,6 +230,7 @@ const Authentication = {
             name: user[0][0].username,
             credit: 500,
             token,
+            rowId:user[0][0].rowid,
           });
         } else {
           res
@@ -259,9 +262,20 @@ const Authentication = {
       );
       if (verifiedUser.length > 0) {
         let token = generateToken(res, verifiedUser[0][0].rowid);
+        let creditBal;
+        let finalFree = new Date(user[0][0].free_final);
+        let finalFreeDate = new Date(finalFree);
+        let currentDate = new Date();
+        if (user[0][0].credits_free > 0&&finalFreeDate > currentDate) {
+            creditBal = user[0][0].credits_free+user[0][0].credits
+        } else {
+          creditBal =user[0][0].credits;
+        }
         res.json({
           name: verifiedUser[0][0].username,
           token,
+          credit: creditBal,
+          rowId:user[0][0].rowid,
         });
       }
     } catch (error) {
