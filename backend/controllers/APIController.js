@@ -34,6 +34,7 @@ let APIControllers = {
   getApi: async (req, res) => {
     try {
        const dbConnection = req.dbConnection;
+       console.log(req.user[0][0],'req user')
       let apiKey = await dbConnection.query(
         `SELECT api_key FROM registration WHERE emailid='${req.user[0][0].emailid}'`
       );
@@ -220,6 +221,7 @@ let APIControllers = {
   batchEmailStatus: async (req, res) => {
     try {
        const dbConnection = req.dbConnection;
+       console.log(req.user[0][0],'req user')
       let user = await dbConnection.query(
         `SELECT api_key from registration WHERE emailid='${req.user[0][0].emailid}'`
       );

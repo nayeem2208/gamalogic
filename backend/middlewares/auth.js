@@ -9,7 +9,7 @@ const authcheck =  async (req, res, next) => {
       const tokenWithoutBearer = token.replace("Bearer ", "");
       let parsedTokenWithoutBearer=JSON.parse(tokenWithoutBearer)
       const decoded = jwt.verify(parsedTokenWithoutBearer.token, process.env.JWT_SECRET);
-      req.user = await dbConnection.query(`SELECT emailid FROM registration WHERE rowid='${decoded.userId}'`);
+      req.user = await dbConnection.query(`SELECT * FROM registration WHERE rowid='${decoded.userId}'`);
       next();
     } catch (error) {
       console.error(error);
