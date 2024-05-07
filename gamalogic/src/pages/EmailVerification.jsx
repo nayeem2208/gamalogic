@@ -9,7 +9,7 @@ import ProgressBar from "@ramonak/react-progress-bar";
 function EmailVerification() {
   let [message, setMessage] = useState("");
   let [resultFile, setResultFile] = useState([]);
-  let [loading,setLoading]=useState(false)
+  let [loading, setLoading] = useState(false);
   const [filesStatus, setFilesStatus] = useState([]);
   const isCheckingCompletion = useRef(false);
 
@@ -48,8 +48,7 @@ function EmailVerification() {
         setFilesStatus((prevResultFiles) => [
           ...prevResultFiles,
           ...filesWithProcessedField,
-        ]); 
-
+        ]);
       } catch (error) {
         console.log(error);
       }
@@ -64,15 +63,19 @@ function EmailVerification() {
     if (file && file.type === "text/csv") {
       try {
         Papa.parse(file, {
-          header: true,
+          // header: true,
           complete: async function (results) {
-            results.fileName = file.name;
-            setLoading(true)
+            const emails = results.data.map((emailArray) => {
+              return { emailid: emailArray[0] };
+            });
+            emails.fileName = file.name;
+            setLoading(true);
+            console.log(emails, "emailsssssss");
             const response = await axiosInstance.post(
               "/batchEmailVerification",
-              results
+              emails
             );
-            setLoading(false)
+            setLoading(false);
             setMessage(response.data.message);
             const options = {
               year: "numeric",
@@ -106,44 +109,54 @@ function EmailVerification() {
           },
         });
       } catch (error) {
-        setLoading(false)
+        setLoading(false);
         console.error("Error uploading file:", error);
       }
     } else {
       alert("Please select a CSV file.");
     }
   };
+
   useEffect(() => {
     if (filesStatus.length === 0 || isCheckingCompletion.current) return;
     isCheckingCompletion.current = true;
-  
+
     const checkCompletion = async () => {
       try {
         for (const file of filesStatus) {
           if (file.id && file.processed !== 100) {
-            const res = await axiosInstance.get(`/getBatchStatus?id=${file.id}`);
-            if (res.data.emailStatus.status === 'completed') {
-              setFilesStatus(prevFilesStatus =>
-                prevFilesStatus.filter(prevFile => prevFile.id !== file.id)
+            const res = await axiosInstance.get(
+              `/getBatchStatus?id=${file.id}`
+            );
+            if (res.data.emailStatus.status === "completed") {
+              setFilesStatus((prevFilesStatus) =>
+                prevFilesStatus.filter((prevFile) => prevFile.id !== file.id)
               );
-              setResultFile(prevResultFiles =>
-                prevResultFiles.map(prevFile =>
-                  prevFile.id === file.id ? { ...prevFile, processed: 100 } : prevFile
+              setResultFile((prevResultFiles) =>
+                prevResultFiles.map((prevFile) =>
+                  prevFile.id === file.id
+                    ? { ...prevFile, processed: 100 }
+                    : prevFile
                 )
               );
               setMessage("");
             } else {
               const progress = Math.round(
-                (res.data.emailStatus.processed / res.data.emailStatus.total) * 100
+                (res.data.emailStatus.processed / res.data.emailStatus.total) *
+                  100
               );
-              setFilesStatus(prevFilesStatus =>
-                prevFilesStatus.map(prevFile =>
-                  prevFile.id === file.id ? { ...prevFile, processed: progress } : prevFile
+              setFilesStatus((prevFilesStatus) =>
+                prevFilesStatus.map((prevFile) =>
+                  prevFile.id === file.id
+                    ? { ...prevFile, processed: progress }
+                    : prevFile
                 )
               );
-              setResultFile(prevResultFiles =>
-                prevResultFiles.map(prevFile =>
-                  prevFile.id === file.id ? { ...prevFile, processed: progress } : prevFile
+              setResultFile((prevResultFiles) =>
+                prevResultFiles.map((prevFile) =>
+                  prevFile.id === file.id
+                    ? { ...prevFile, processed: progress }
+                    : prevFile
                 )
               );
             }
@@ -155,12 +168,9 @@ function EmailVerification() {
         isCheckingCompletion.current = false;
       }
     };
-  
+
     checkCompletion();
   }, [filesStatus]);
-  
-  
-  
 
   // useEffect(() => {
   //   const checkCompletion = async () => {
@@ -238,14 +248,16 @@ function EmailVerification() {
           onChange={handleFileChange}
         />
       </form>
-      {loading&&<div
-        className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-        role="status"
-      >
-        <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-          Loading...
-        </span>
-      </div>}
+      {loading && (
+        <div
+          className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+          role="status"
+        >
+          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+            Loading...
+          </span>
+        </div>
+      )}
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       <table className="text-bgblue w-full lg:w-4/5 mt-14 ">
         <tr className="text-left">

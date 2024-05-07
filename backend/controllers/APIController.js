@@ -160,7 +160,7 @@ let APIControllers = {
        const dbConnection = req.dbConnection;
       let apiKey = req.user[0][0].api_key;
       const data = {
-        gamalogic_emailid_vrfy: req.body.data,
+        gamalogic_emailid_vrfy: req.body,
       };
       let response = await axios.post(
         `https://gamalogic.com/batchemailvrf?apikey=${process.env.API_KEY}&speed_rank=0`,

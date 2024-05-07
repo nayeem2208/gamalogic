@@ -9,7 +9,7 @@ import ProgressBar from "@ramonak/react-progress-bar";
 function FileEmailFinder() {
   let [message, setMessage] = useState("");
   let [resultFile, setResultFile] = useState([]);
-  let [loading,setLoading]=useState(false)
+  let [loading, setLoading] = useState(false);
   const [filesStatus, setFilesStatus] = useState([]);
   const isCheckingCompletion = useRef(false);
   useEffect(() => {
@@ -47,7 +47,7 @@ function FileEmailFinder() {
         setFilesStatus((prevResultFiles) => [
           ...prevResultFiles,
           ...filesWithProcessedField,
-        ]); 
+        ]);
       } catch (error) {
         console.log(error);
       }
@@ -79,12 +79,12 @@ function FileEmailFinder() {
               }
               return item;
             });
-            setLoading(true)
+            setLoading(true);
             const response = await axiosInstance.post(
               "/batchEmailFinder",
               results
             );
-            setLoading(false)
+            setLoading(false);
             setMessage(response.data.message);
             const options = {
               year: "numeric",
@@ -118,7 +118,7 @@ function FileEmailFinder() {
           },
         });
       } catch (error) {
-        setLoading(false)
+        setLoading(false);
         console.error("Error uploading file:", error);
       }
     } else {
@@ -142,13 +142,13 @@ function FileEmailFinder() {
   //                 updatedFilesStatus.splice(index, 1);
   //                 return updatedFilesStatus;
   //               });
-  
+
   //               setResultFile(prevResultFiles => [
   //                 ...prevResultFiles.slice(0, index),
   //                 { ...file, processed: 100 },
   //                 ...prevResultFiles.slice(index + 1),
   //               ]);
-  
+
   //               setMessage("");
   //             } else {
   //               const progress = Math.round(
@@ -160,7 +160,7 @@ function FileEmailFinder() {
   //                 { ...file, processed: progress },
   //                 ...prevFilesStatus.slice(index + 1),
   //               ]);
-  
+
   //               setResultFile(prevResultFiles => [
   //                 ...prevResultFiles.slice(0, index),
   //                 { ...file, processed: progress },
@@ -176,13 +176,13 @@ function FileEmailFinder() {
   //       console.error(error);
   //     }
   //   };
-  
+
   //   checkCompletion();
   // }, [resultFile,filesStatus]);
   useEffect(() => {
     if (filesStatus.length === 0 || isCheckingCompletion.current) return;
     isCheckingCompletion.current = true;
-  
+
     const checkCompletion = async () => {
       try {
         for (const file of filesStatus) {
@@ -190,28 +190,35 @@ function FileEmailFinder() {
             const res = await axiosInstance.get(
               `/getBatchFinderStatus?id=${file.id}`
             );
-            if (res.data.emailStatus.status === 'completed') {
-              setFilesStatus(prevFilesStatus =>
-                prevFilesStatus.filter(prevFile => prevFile.id !== file.id)
+            if (res.data.emailStatus.status === "completed") {
+              setFilesStatus((prevFilesStatus) =>
+                prevFilesStatus.filter((prevFile) => prevFile.id !== file.id)
               );
-              setResultFile(prevResultFiles =>
-                prevResultFiles.map(prevFile =>
-                  prevFile.id === file.id ? { ...prevFile, processed: 100 } : prevFile
+              setResultFile((prevResultFiles) =>
+                prevResultFiles.map((prevFile) =>
+                  prevFile.id === file.id
+                    ? { ...prevFile, processed: 100 }
+                    : prevFile
                 )
               );
               setMessage("");
             } else {
               const progress = Math.round(
-                (res.data.emailStatus.processed / res.data.emailStatus.total) * 100
+                (res.data.emailStatus.processed / res.data.emailStatus.total) *
+                  100
               );
-              setFilesStatus(prevFilesStatus =>
-                prevFilesStatus.map(prevFile =>
-                  prevFile.id === file.id ? { ...prevFile, processed: progress } : prevFile
+              setFilesStatus((prevFilesStatus) =>
+                prevFilesStatus.map((prevFile) =>
+                  prevFile.id === file.id
+                    ? { ...prevFile, processed: progress }
+                    : prevFile
                 )
               );
-              setResultFile(prevResultFiles =>
-                prevResultFiles.map(prevFile =>
-                  prevFile.id === file.id ? { ...prevFile, processed: progress } : prevFile
+              setResultFile((prevResultFiles) =>
+                prevResultFiles.map((prevFile) =>
+                  prevFile.id === file.id
+                    ? { ...prevFile, processed: progress }
+                    : prevFile
                 )
               );
             }
@@ -224,7 +231,7 @@ function FileEmailFinder() {
         isCheckingCompletion.current = false;
       }
     };
-  
+
     // Invoke the checkCompletion function
     checkCompletion();
   }, [filesStatus]);
@@ -267,14 +274,16 @@ function FileEmailFinder() {
           accept=".csv"
         />
       </div>
-      {loading&&<div
-        className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-        role="status"
-      >
-        <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-          Loading...
-        </span>
-      </div>}
+      {loading && (
+        <div
+          className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+          role="status"
+        >
+          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+            Loading...
+          </span>
+        </div>
+      )}
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       {resultFile.length > 0 && (
         <table className="text-bgblue w-full  mt-14 lg:w-5/6">
