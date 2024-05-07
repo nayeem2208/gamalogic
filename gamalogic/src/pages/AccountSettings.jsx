@@ -66,7 +66,7 @@ function AccountSettings() {
         "/changePassword",
         passwordData
       );
-      toast.dark("Password succesfully updated");
+      toast.success("Password succesfully updated");
       setPasswordData({
         old: "",
         newPassword: "",

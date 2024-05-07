@@ -83,6 +83,7 @@ function Login() {
       let res = await axiosInstance.post("/googleLogin", {
         credentialResponse,
       });
+      toast.dark("Authentication success", 2000);
       let token = res.data;
       setUserDetails(token);
       setCreditBal(token.credit)

@@ -8,9 +8,6 @@ const EmailFinder = lazy(() => import('../pages/EmailFinder'));
 const ApiKey = lazy(() => import('../pages/ApiKey'));
 const EmailVerification = lazy(() => import('../pages/EmailVerification'));
 const FileEmailFinder = lazy(() => import('../pages/FileEmailFinder'));
-const ApiDocs = lazy(() => import('../pages/ApiDocs'));
-const FindAnyEmail = lazy(() => import('../pages/FindAnyEmail'));
-const IntegrateGoogleSheet = lazy(() => import('../pages/IntegrateGoogleSheet'));
 const AccountSettings = lazy(() => import('../pages/AccountSettings'));
 const BuyCredits = lazy(() => import('../pages/BuyCredits'));
 const Support = lazy(() => import('../pages/Support'));
@@ -31,9 +28,6 @@ function Router() {
         <Route path="/api-Key" element={<Suspense fallback={<TopLoader loading={loading} />}><ApiKey setLoading={setLoading}/></Suspense>} />
         <Route path="/email-verification-bulk" element={<Suspense fallback={<TopLoader loading={loading} />}><EmailVerification setLoading={setLoading}/></Suspense>} />
         <Route path="/email-finder-bulk" element={<Suspense fallback={<TopLoader loading={loading} />}><FileEmailFinder setLoading={setLoading}/></Suspense>} />
-        <Route path="/api-docs" element={<Suspense fallback={<TopLoader loading={loading} />}><ApiDocs setLoading={setLoading}/></Suspense>} />
-        <Route path="/find-any-email" element={<Suspense fallback={<TopLoader loading={loading} />}><FindAnyEmail setLoading={setLoading}/></Suspense>} />
-        <Route path="/googleSheet-integration" element={<Suspense fallback={<TopLoader loading={loading} />}><IntegrateGoogleSheet setLoading={setLoading}/></Suspense>} />
         <Route path="/account-settings" element={<Suspense fallback={<TopLoader loading={loading} />}><AccountSettings setLoading={setLoading}/></Suspense>} />
         <Route path="/buyCredits" element={<Suspense fallback={<TopLoader loading={loading} />}><BuyCredits setLoading={setLoading}/></Suspense>} />
         <Route path="/support" element={<Suspense fallback={<TopLoader loading={loading} />}><Support setLoading={setLoading}/></Suspense>} />
