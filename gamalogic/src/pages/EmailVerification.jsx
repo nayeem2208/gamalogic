@@ -1,6 +1,6 @@
 import SubHeader from "../components/SubHeader";
 import axiosInstance from "../axios/axiosInstance";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import exportFromJSON from "export-from-json";
 import Papa from "papaparse";
@@ -11,6 +11,7 @@ function EmailVerification() {
   let [resultFile, setResultFile] = useState([]);
   let [loading,setLoading]=useState(false)
   const [filesStatus, setFilesStatus] = useState([]);
+  const isCheckingCompletion = useRef(false);
 
   useEffect(() => {
     const fetchAllFiles = async () => {
@@ -113,52 +114,53 @@ function EmailVerification() {
     }
   };
   useEffect(() => {
+    if (filesStatus.length === 0 || isCheckingCompletion.current) return;
+    isCheckingCompletion.current = true;
+  
     const checkCompletion = async () => {
       try {
-        if (filesStatus.length > 0) {
-        for (const [index, file] of filesStatus.entries()) {
+        for (const file of filesStatus) {
           if (file.id && file.processed !== 100) {
-            const res = await axiosInstance.get(
-              `/getBatchStatus?id=${file.id}`
-            );
-            if (res.data.emailStatus.status =='completed') {
-              setFilesStatus((prevResultFiles) => [
-                ...prevResultFiles.slice(0, index),
-                ...prevResultFiles.slice(index + 1),
-              ]);
-              setResultFile((prevResultFiles) => [
-                             ...prevResultFiles.slice(0, index),
-                               { ...file, processed: 100 },
-                              ...prevResultFiles.slice(index + 1),
-                            ]);
+            const res = await axiosInstance.get(`/getBatchStatus?id=${file.id}`);
+            if (res.data.emailStatus.status === 'completed') {
+              setFilesStatus(prevFilesStatus =>
+                prevFilesStatus.filter(prevFile => prevFile.id !== file.id)
+              );
+              setResultFile(prevResultFiles =>
+                prevResultFiles.map(prevFile =>
+                  prevFile.id === file.id ? { ...prevFile, processed: 100 } : prevFile
+                )
+              );
               setMessage("");
             } else {
               const progress = Math.round(
-                (res.data.emailStatus.processed / res.data.emailStatus.total) *
-                  100
+                (res.data.emailStatus.processed / res.data.emailStatus.total) * 100
               );
-              setResultFile((prevResultFiles) => [
-                ...prevResultFiles.slice(0, index),
-                { ...file, processed: progress },
-                ...prevResultFiles.slice(index + 1),
-              ]);
-              setFilesStatus((prevResultFiles) => [
-                ...prevResultFiles.slice(0, index),
-                { ...file, processed: progress },
-                ...prevResultFiles.slice(index + 1),
-              ]);
-              await new Promise(resolve => setTimeout(resolve, 5000));
+              setFilesStatus(prevFilesStatus =>
+                prevFilesStatus.map(prevFile =>
+                  prevFile.id === file.id ? { ...prevFile, processed: progress } : prevFile
+                )
+              );
+              setResultFile(prevResultFiles =>
+                prevResultFiles.map(prevFile =>
+                  prevFile.id === file.id ? { ...prevFile, processed: progress } : prevFile
+                )
+              );
             }
           }
         }
-      }
       } catch (error) {
         console.error(error);
+      } finally {
+        isCheckingCompletion.current = false;
       }
     };
-
+  
     checkCompletion();
-  }, [resultFile,filesStatus]);
+  }, [filesStatus]);
+  
+  
+  
 
   // useEffect(() => {
   //   const checkCompletion = async () => {
