@@ -5,6 +5,7 @@ import exportFromJSON from "export-from-json";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import ProgressBar from "@ramonak/react-progress-bar";
+import Alert from "../components/Alert";
 
 function FileEmailFinder() {
   let [message, setMessage] = useState("");
@@ -12,6 +13,10 @@ function FileEmailFinder() {
   let [loading, setLoading] = useState(false);
   const [filesStatus, setFilesStatus] = useState([]);
   const isCheckingCompletion = useRef(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [Selection, SetSelection] = useState(null);
+  const [JsonToServer,setJsonToServer]=useState([])
+
   useEffect(() => {
     const fetchAllFiles = async () => {
       try {
@@ -58,7 +63,6 @@ function FileEmailFinder() {
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
-
     if (file && file.type === "text/csv") {
       try {
         Papa.parse(file, {
@@ -79,42 +83,8 @@ function FileEmailFinder() {
               }
               return item;
             });
-            setLoading(true);
-            const response = await axiosInstance.post(
-              "/batchEmailFinder",
-              results
-            );
-            setLoading(false);
-            setMessage(response.data.message);
-            const options = {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-              hour12: false,
-            };
-            setResultFile((prevResultFiles) => [
-              {
-                ...response.data.files,
-                processed: 0,
-                formattedDate: new Date(
-                  response.data.files.date_time
-                ).toLocaleString("en-US", options),
-              },
-              ...prevResultFiles,
-            ]);
-            setFilesStatus((prevResultFiles) => [
-              {
-                ...response.data.files,
-                processed: 0,
-                formattedDate: new Date(
-                  response.data.files.date_time
-                ).toLocaleString("en-US", options),
-              },
-              ...prevResultFiles,
-            ]);
+            setJsonToServer(results)
+            setShowAlert(true);
           },
         });
       } catch (error) {
@@ -125,6 +95,58 @@ function FileEmailFinder() {
       alert("Please select a CSV file.");
     }
   };
+
+  useEffect(() => {
+    if (showAlert && Selection !== null) {
+      if (Selection === true) {
+        setShowAlert(false)
+        setLoading(true);
+        let results=JsonToServer
+        async function BatchFileFinder() {
+          const response = await axiosInstance.post(
+            "/batchEmailFinder",
+            results
+          );
+          setLoading(false);
+          setMessage(response.data.message);
+          const options = {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+          };
+          setResultFile((prevResultFiles) => [
+            {
+              ...response.data.files,
+              processed: 0,
+              formattedDate: new Date(
+                response.data.files.date_time
+              ).toLocaleString("en-US", options),
+            },
+            ...prevResultFiles,
+          ]);
+          setFilesStatus((prevResultFiles) => [
+            {
+              ...response.data.files,
+              processed: 0,
+              formattedDate: new Date(
+                response.data.files.date_time
+              ).toLocaleString("en-US", options),
+            },
+            ...prevResultFiles,
+          ]);
+        }
+        BatchFileFinder()
+      } else {
+        setShowAlert(false);
+        setJsonToServer([])
+        SetSelection(null);
+      }
+    }
+  }, [Selection]);
 
   // useEffect(() => {
   //   const checkCompletion = async () => {
@@ -257,10 +279,20 @@ function FileEmailFinder() {
       console.log(error);
     }
   };
+
+  const handleAccept = (value) => {
+    SetSelection(value);
+  };
+
+  const handleDismiss = (value) => {
+    SetSelection(value);
+    showAlert(false)
+  };
   console.log(resultFile, "resultFile");
   return (
     <div className=" px-20 py-8">
       <SubHeader SubHeader={"Upload your file"} />
+      {showAlert && <Alert sizeOfData={JsonToServer} onAccept={handleAccept} onDismiss={handleDismiss} />}
       <div className="mt-14 subHeading">
         <h3>Upload Your File Here | Email Finder</h3>
         <p className="my-7 w-4/5 description">
