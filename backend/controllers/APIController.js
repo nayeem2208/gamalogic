@@ -159,8 +159,9 @@ let APIControllers = {
     try {
        const dbConnection = req.dbConnection;
       let apiKey = req.user[0][0].api_key;
+      const { emails, fileName } = req.body;
       const data = {
-        gamalogic_emailid_vrfy: req.body,
+        gamalogic_emailid_vrfy: emails,
       };
       let response = await axios.post(
         `https://gamalogic.com/batchemailvrf?apikey=${process.env.API_KEY}&speed_rank=0`,
@@ -178,7 +179,7 @@ let APIControllers = {
       req.headers['x-forwarded-for'] ||
       req.socket.remoteAddress || '';
       let fileAdded = await dbConnection.query(
-        `INSERT INTO useractivity_batch_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${req.body.fileName}','${req.body.fileName}',1,0,0)`
+        `INSERT INTO useractivity_batch_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${fileName}','${fileName}',1,0,0)`
       );
       let files=await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
       res.status(200).json({message:response.data.message,files:files[0][0]});

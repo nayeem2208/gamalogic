@@ -9,7 +9,7 @@ function Footer() {
       <div>© Gamalogic 2019-2024</div>
       <div className="w-2/12">
         <ul className="flex justify-between items-center text-sm">
-          <li className="flex items-center justify-center"><Link to="/" className="flex font-semibold"><AiOutlineHome className="mr-1"/>Home </Link></li>
+          {/* <li className="flex items-center justify-center"><Link to="/" className="flex font-semibold"><AiOutlineHome className="mr-1"/>Home </Link></li> */}
           <li className="my-2">
             <a
               className="flex items-center font-light"

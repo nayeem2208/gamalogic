@@ -68,12 +68,13 @@ function EmailVerification() {
             const emails = results.data.map((emailArray) => {
               return { emailid: emailArray[0] };
             });
-            emails.fileName = file.name;
+            const fileName = file.name;
             setLoading(true);
             console.log(emails, "emailsssssss");
             const response = await axiosInstance.post(
               "/batchEmailVerification",
-              emails
+              {emails: emails,
+              fileName: fileName,}
             );
             setLoading(false);
             setMessage(response.data.message);

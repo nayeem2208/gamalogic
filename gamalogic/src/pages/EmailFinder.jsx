@@ -24,16 +24,11 @@ function EmailFinder() {
       let fullname = data.fullname.trim();
       if (domain && fullname) {
         let fullnameArray = fullname.split(" ");
-        console.log(fullnameArray, fullnameArray.length, "fullnamearray");
-        if (fullnameArray.length >= 2) {
           setLoading(true)
           let res = await axiosInstance.post("/singleEmailFinder", data);
           setLoading(false)
           setResult(res.data);
           setData({ fullname: "", domain: "" });
-        } else {
-          toast.error("Please provide a fullname");
-        }
       } else {
         toast.error("Please provide valid fullname and domain");
       }
