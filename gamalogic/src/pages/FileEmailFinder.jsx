@@ -254,8 +254,10 @@ function FileEmailFinder() {
       }
     };
 
-    // Invoke the checkCompletion function
     checkCompletion();
+
+    const intervalId = setInterval(checkCompletion, 10000);
+    return () => clearInterval(intervalId);
   }, [filesStatus]);
 
   const DownloadFile = async (data) => {

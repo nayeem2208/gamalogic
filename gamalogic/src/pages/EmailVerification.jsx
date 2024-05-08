@@ -73,8 +73,7 @@ function EmailVerification() {
             console.log(emails, "emailsssssss");
             const response = await axiosInstance.post(
               "/batchEmailVerification",
-              {emails: emails,
-              fileName: fileName,}
+              { emails: emails, fileName: fileName }
             );
             setLoading(false);
             setMessage(response.data.message);
@@ -171,6 +170,9 @@ function EmailVerification() {
     };
 
     checkCompletion();
+
+  const intervalId = setInterval(checkCompletion, 10000);
+  return () => clearInterval(intervalId);
   }, [filesStatus]);
 
   // useEffect(() => {
