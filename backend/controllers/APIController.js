@@ -5,16 +5,16 @@ import ErrorHandler from "../utils/errorHandler.js";
 import { passwordHash, verifyPassword } from "../utils/passwordHash.js";
 
 let APIControllers = {
-  getCreditBalance:async(req,res)=>{
+  getCreditBalance: async (req, res) => {
     try {
       let creditBal;
       let finalFree = new Date(req.user[0][0].free_final);
       let finalFreeDate = new Date(finalFree);
       let currentDate = new Date();
-      if (req.user[0][0].credits_free > 0&&finalFreeDate > currentDate) {
-          creditBal = req.user[0][0].credits_free+req.user[0][0].credits
+      if (req.user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
+        creditBal = req.user[0][0].credits_free + req.user[0][0].credits
       } else {
-        creditBal =req.user[0][0].credits;
+        creditBal = req.user[0][0].credits;
       }
       res.status(200).json(creditBal)
     } catch (error) {
@@ -36,7 +36,7 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("getApi Controller", error, req);
       res.status(400).json(error);
-    }finally {
+    } finally {
       console.log('getApi end')
       if (req.dbConnection) {
         req.dbConnection.end();
@@ -58,7 +58,7 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("resetApiKey Controller", error, req);
       res.status(400).json(error);
-    }finally {  
+    } finally {
       console.log('getApi end')
       if (req.dbConnection) {
         req.dbConnection.end();
@@ -77,7 +77,7 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("emailValidation Controller", error, req);
       res.status(400).json(error);
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         req.dbConnection.end();
       }
@@ -98,7 +98,7 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("FindSingleEmail Controller", error, req);
       res.status(400).json(error);
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         req.dbConnection.end();
       }
@@ -107,7 +107,7 @@ let APIControllers = {
   },
   changePassword: async (req, res) => {
     try {
-       const dbConnection = req.dbConnection;
+      const dbConnection = req.dbConnection;
       let { old, newPassword, confirm } = req.body;
       const hashedPassword = req.user[0][0].password;
       let passwordMatch = await verifyPassword(old, hashedPassword);
@@ -124,7 +124,7 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("changePassword Controller", error, req);
       res.status(400).json(error);
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         req.dbConnection.end();
       }
@@ -144,7 +144,7 @@ let APIControllers = {
       ErrorHandler("getAlreadyCheckedBatchEmailFiles Controller", error, req);
       res.status(400).json(error);
     }
-     finally {  
+    finally {
       if (dbConnection) {
         try {
           await dbConnection.end();
@@ -154,10 +154,10 @@ let APIControllers = {
       }
     }
   },
-  
+
   batchEmailValidation: async (req, res) => {
     try {
-       const dbConnection = req.dbConnection;
+      const dbConnection = req.dbConnection;
       let apiKey = req.user[0][0].api_key;
       const { emails, fileName } = req.body;
       const data = {
@@ -167,27 +167,31 @@ let APIControllers = {
         `https://gamalogic.com/batchemailvrf?apikey=${process.env.API_KEY}&speed_rank=0`,
         data
       );
-
-      let currenttime = new Date();
-      const formattedDate = currenttime
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ");
-      const userAgent = req.headers["user-agent"];
-      const ip = req.headers['cf-connecting-ip'] ||  
-      req.headers['x-real-ip'] ||
-      req.headers['x-forwarded-for'] ||
-      req.socket.remoteAddress || '';
-      let fileAdded = await dbConnection.query(
-        `INSERT INTO useractivity_batch_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${fileName}','${fileName}',1,0,0)`
-      );
-      let files=await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
-      res.status(200).json({message:response.data.message,files:files[0][0]});
+      if (response.data.error !== undefined && response.data.error == false) {
+        let currenttime = new Date();
+        const formattedDate = currenttime
+          .toISOString()
+          .slice(0, 19)
+          .replace("T", " ");
+        const userAgent = req.headers["user-agent"];
+        const ip = req.headers['cf-connecting-ip'] ||
+          req.headers['x-real-ip'] ||
+          req.headers['x-forwarded-for'] ||
+          req.socket.remoteAddress || '';
+        let fileAdded = await dbConnection.query(
+          `INSERT INTO useractivity_batch_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${fileName}','${fileName}',1,0,0)`
+        );
+        let files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
+        res.status(200).json({ message: response.data.message, files: files[0][0] });
+      } else {
+        const errorMessage = Object.values(response.data)[0];
+        res.status(400).json({ error: errorMessage });
+      }
     } catch (error) {
       console.log(error);
       ErrorHandler("batchEmailValidation Controller", error, req);
       res.status(400).json(error);
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         req.dbConnection.end();
       }
@@ -207,7 +211,7 @@ let APIControllers = {
       // ErrorHandler("batchEmailStatus Controller", error, req);
       res.status(400).json(error);
     }
-    finally {  
+    finally {
       if (req.dbConnection) {
         req.dbConnection.end();
       }
@@ -225,7 +229,7 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
       res.status(400).json(error);
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         req.dbConnection.end();
       }
@@ -234,23 +238,23 @@ let APIControllers = {
   },
 
 
-  getAlreadyCheckedBatchEmailFinderFiles:async(req,res)=>{
+  getAlreadyCheckedBatchEmailFinderFiles: async (req, res) => {
     try {
-       const dbConnection = req.dbConnection;
-      let files=await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}' ORDER BY date_time DESC`)
+      const dbConnection = req.dbConnection;
+      let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}' ORDER BY date_time DESC`)
       res.status(200).json(files[0])
     } catch (error) {
       console.log(error);
       ErrorHandler("getAlreadyCheckedBatchEmailFinderFiles Controller", error, req);
       res.status(400).json(error);
-    }finally {
+    } finally {
       if (req.dbConnection) {
         req.dbConnection.end();
       }
     }
 
   },
-  batchEmailFinder:async(req,res)=>{
+  batchEmailFinder: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
       let apiKey = req.user[0][0].api_key;
@@ -260,27 +264,27 @@ let APIControllers = {
       let response = await axios.post(
         `https://gamalogic.com/batch-email-discovery/?apikey=${process.env.API_KEY}`,
         data
-      ); 
-      
+      );
+
       let currenttime = new Date();
       const formattedDate = currenttime
         .toISOString()
         .slice(0, 19)
         .replace("T", " ");
       const userAgent = req.headers["user-agent"];
-      const ip = req.headers['cf-connecting-ip'] ||  
-      req.headers['x-real-ip'] ||
-      req.headers['x-forwarded-for'] ||
-      req.socket.remoteAddress || '';
+      const ip = req.headers['cf-connecting-ip'] ||
+        req.headers['x-real-ip'] ||
+        req.headers['x-forwarded-for'] ||
+        req.socket.remoteAddress || '';
       let fileAdded = await dbConnection.query(
         `INSERT INTO useractivity_batch_finder_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${req.body.fileName}','${req.body.fileName}',1,0,0)`
       );
-      let files=await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
-      res.status(200).json({message:response.data.message,files:files[0][0]});
+      let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
+      res.status(200).json({ message: response.data.message, files: files[0][0] });
     } catch (error) {
       console.log(error)
       res.status(400).json(error)
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         req.dbConnection.end();
       }
@@ -299,7 +303,7 @@ let APIControllers = {
       console.log(error);
       // ErrorHandler("batchEmailStatus Controller", error, req);
       res.status(400).json(error);
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         req.dbConnection.end();
       }
@@ -317,7 +321,7 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
       res.status(400).json(error);
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         req.dbConnection.end();
       }
@@ -325,18 +329,18 @@ let APIControllers = {
 
   },
 
-  updateCredit:async(req,res)=>{
+  updateCredit: async (req, res) => {
     try {
-       const dbConnection = req.dbConnection;
-      let credit=await dbConnection.query( `SELECT credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
-      let newBalance=credit[0][0].credits+req.body.credits
+      const dbConnection = req.dbConnection;
+      let credit = await dbConnection.query(`SELECT credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
+      let newBalance = credit[0][0].credits + req.body.credits
       await dbConnection.query(`UPDATE registration SET credits='${newBalance}' WHERE emailid='${req.user[0][0].emailid}'`)
       res.status(200).json('successfull')
     } catch (error) {
       console.log(error);
       ErrorHandler("updateCredit Controller", error, req);
       res.status(400).json(error);
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         req.dbConnection.end();
       }

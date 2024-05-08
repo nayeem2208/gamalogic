@@ -70,42 +70,46 @@ function EmailVerification() {
             });
             const fileName = file.name;
             setLoading(true);
-            console.log(emails, "emailsssssss");
-            const response = await axiosInstance.post(
-              "/batchEmailVerification",
-              { emails: emails, fileName: fileName }
-            );
-            setLoading(false);
-            setMessage(response.data.message);
-            const options = {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-              hour12: false,
-            };
-            setResultFile((prevResultFiles) => [
-              {
-                ...response.data.files,
-                processed: 0,
-                formattedDate: new Date(
-                  response.data.files.date_time
-                ).toLocaleString("en-US", options),
-              },
-              ...prevResultFiles,
-            ]);
-            setFilesStatus((prevResultFiles) => [
-              {
-                ...response.data.files,
-                processed: 0,
-                formattedDate: new Date(
-                  response.data.files.date_time
-                ).toLocaleString("en-US", options),
-              },
-              ...prevResultFiles,
-            ]);
+            try {
+              const response = await axiosInstance.post(
+                "/batchEmailVerification",
+                { emails: emails, fileName: fileName }
+              );
+              setLoading(false);
+              setMessage(response.data.message);
+              const options = {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+              };
+              setResultFile((prevResultFiles) => [
+                {
+                  ...response.data.files,
+                  processed: 0,
+                  formattedDate: new Date(
+                    response.data.files.date_time
+                  ).toLocaleString("en-US", options),
+                },
+                ...prevResultFiles,
+              ]);
+              setFilesStatus((prevResultFiles) => [
+                {
+                  ...response.data.files,
+                  processed: 0,
+                  formattedDate: new Date(
+                    response.data.files.date_time
+                  ).toLocaleString("en-US", options),
+                },
+                ...prevResultFiles,
+              ]);
+            } catch (error) {
+              toast.error(error.response.data?.error);
+              setLoading(false);
+            }
           },
         });
       } catch (error) {
@@ -171,8 +175,8 @@ function EmailVerification() {
 
     checkCompletion();
 
-  const intervalId = setInterval(checkCompletion, 10000);
-  return () => clearInterval(intervalId);
+    const intervalId = setInterval(checkCompletion, 10000);
+    return () => clearInterval(intervalId);
   }, [filesStatus]);
 
   // useEffect(() => {
