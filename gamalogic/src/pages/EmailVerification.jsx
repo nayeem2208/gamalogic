@@ -149,20 +149,22 @@ function EmailVerification() {
                 (res.data.emailStatus.processed / res.data.emailStatus.total) *
                   100
               );
-              setFilesStatus((prevFilesStatus) =>
-                prevFilesStatus.map((prevFile) =>
-                  prevFile.id === file.id
-                    ? { ...prevFile, processed: progress }
-                    : prevFile
-                )
-              );
-              setResultFile((prevResultFiles) =>
-                prevResultFiles.map((prevFile) =>
-                  prevFile.id === file.id
-                    ? { ...prevFile, processed: progress }
-                    : prevFile
-                )
-              );
+              if (file.processed !== progress) {
+                setFilesStatus((prevFilesStatus) =>
+                  prevFilesStatus.map((prevFile) =>
+                    prevFile.id === file.id
+                      ? { ...prevFile, processed: progress }
+                      : prevFile
+                  )
+                );
+                setResultFile((prevResultFiles) =>
+                  prevResultFiles.map((prevFile) =>
+                    prevFile.id === file.id
+                      ? { ...prevFile, processed: progress }
+                      : prevFile
+                  )
+                );
+              }
             }
           }
         }

@@ -15,7 +15,7 @@ function FileEmailFinder() {
   const isCheckingCompletion = useRef(false);
   const [showAlert, setShowAlert] = useState(false);
   const [Selection, SetSelection] = useState(null);
-  const [JsonToServer,setJsonToServer]=useState([])
+  const [JsonToServer, setJsonToServer] = useState([]);
 
   useEffect(() => {
     const fetchAllFiles = async () => {
@@ -83,7 +83,7 @@ function FileEmailFinder() {
               }
               return item;
             });
-            setJsonToServer(results)
+            setJsonToServer(results);
             setShowAlert(true);
           },
         });
@@ -234,20 +234,22 @@ function FileEmailFinder() {
                 (res.data.emailStatus.processed / res.data.emailStatus.total) *
                   100
               );
-              setFilesStatus((prevFilesStatus) =>
-                prevFilesStatus.map((prevFile) =>
-                  prevFile.id === file.id
-                    ? { ...prevFile, processed: progress }
-                    : prevFile
-                )
-              );
-              setResultFile((prevResultFiles) =>
-                prevResultFiles.map((prevFile) =>
-                  prevFile.id === file.id
-                    ? { ...prevFile, processed: progress }
-                    : prevFile
-                )
-              );
+              if (file.processed !== progress) {
+                setFilesStatus((prevFilesStatus) =>
+                  prevFilesStatus.map((prevFile) =>
+                    prevFile.id === file.id
+                      ? { ...prevFile, processed: progress }
+                      : prevFile
+                  )
+                );
+                setResultFile((prevResultFiles) =>
+                  prevResultFiles.map((prevFile) =>
+                    prevFile.id === file.id
+                      ? { ...prevFile, processed: progress }
+                      : prevFile
+                  )
+                );
+              }
             }
           }
         }
@@ -293,13 +295,19 @@ function FileEmailFinder() {
 
   const handleDismiss = (value) => {
     SetSelection(value);
-    showAlert(false)
+    showAlert(false);
   };
   console.log(resultFile, "resultFile");
   return (
     <div className=" px-20 py-8">
       <SubHeader SubHeader={"Upload your file"} />
-      {showAlert && <Alert sizeOfData={JsonToServer} onAccept={handleAccept} onDismiss={handleDismiss} />}
+      {showAlert && (
+        <Alert
+          sizeOfData={JsonToServer}
+          onAccept={handleAccept}
+          onDismiss={handleDismiss}
+        />
+      )}
       <div className="mt-14 subHeading">
         <h3>Upload Your File Here | Email Finder</h3>
         <p className="my-7 w-4/5 description">
