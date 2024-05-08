@@ -265,7 +265,7 @@ let APIControllers = {
         `https://gamalogic.com/batch-email-discovery/?apikey=${process.env.API_KEY}`,
         data
       );
-
+      if (response.data.error !== undefined && response.data.error == false) {
       let currenttime = new Date();
       const formattedDate = currenttime
         .toISOString()
@@ -281,6 +281,12 @@ let APIControllers = {
       );
       let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
       res.status(200).json({ message: response.data.message, files: files[0][0] });
+    }
+    else {
+      const errorMessage = Object.values(response.data)[0];
+      console.log(errorMessage, 'errorMessage')
+      res.status(400).json({ error: errorMessage });
+    }
     } catch (error) {
       console.log(error)
       res.status(400).json(error)

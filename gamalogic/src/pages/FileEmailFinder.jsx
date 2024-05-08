@@ -99,50 +99,55 @@ function FileEmailFinder() {
   useEffect(() => {
     if (showAlert && Selection !== null) {
       if (Selection === true) {
-        setShowAlert(false)
+        setShowAlert(false);
         setLoading(true);
-        let results=JsonToServer
+        let results = JsonToServer;
         async function BatchFileFinder() {
-          const response = await axiosInstance.post(
-            "/batchEmailFinder",
-            results
-          );
-          setLoading(false);
-          setMessage(response.data.message);
-          const options = {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false,
-          };
-          setResultFile((prevResultFiles) => [
-            {
-              ...response.data.files,
-              processed: 0,
-              formattedDate: new Date(
-                response.data.files.date_time
-              ).toLocaleString("en-US", options),
-            },
-            ...prevResultFiles,
-          ]);
-          setFilesStatus((prevResultFiles) => [
-            {
-              ...response.data.files,
-              processed: 0,
-              formattedDate: new Date(
-                response.data.files.date_time
-              ).toLocaleString("en-US", options),
-            },
-            ...prevResultFiles,
-          ]);
+          try {
+            const response = await axiosInstance.post(
+              "/batchEmailFinder",
+              results
+            );
+            setLoading(false);
+            setMessage(response.data.message);
+            const options = {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              hour12: false,
+            };
+            setResultFile((prevResultFiles) => [
+              {
+                ...response.data.files,
+                processed: 0,
+                formattedDate: new Date(
+                  response.data.files.date_time
+                ).toLocaleString("en-US", options),
+              },
+              ...prevResultFiles,
+            ]);
+            setFilesStatus((prevResultFiles) => [
+              {
+                ...response.data.files,
+                processed: 0,
+                formattedDate: new Date(
+                  response.data.files.date_time
+                ).toLocaleString("en-US", options),
+              },
+              ...prevResultFiles,
+            ]);
+          } catch (error) {
+            toast.error(error.response.data?.error);
+            setLoading(false);
+          }
         }
-        BatchFileFinder()
+        BatchFileFinder();
       } else {
         setShowAlert(false);
-        setJsonToServer([])
+        setJsonToServer([]);
         SetSelection(null);
       }
     }
