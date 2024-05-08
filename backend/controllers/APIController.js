@@ -136,7 +136,7 @@ let APIControllers = {
     try {
       dbConnection = req.dbConnection;
       let files = await dbConnection.query(
-        `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}'`
+        `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}' ORDER BY date_time DESC`
       );
       res.status(200).json(files[0]);
     } catch (error) {
@@ -237,7 +237,7 @@ let APIControllers = {
   getAlreadyCheckedBatchEmailFinderFiles:async(req,res)=>{
     try {
        const dbConnection = req.dbConnection;
-      let files=await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}'`)
+      let files=await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}' ORDER BY date_time DESC`)
       res.status(200).json(files[0])
     } catch (error) {
       console.log(error);
