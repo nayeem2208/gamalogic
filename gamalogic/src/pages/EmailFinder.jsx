@@ -2,11 +2,13 @@ import { useState } from "react";
 import SubHeader from "../components/SubHeader";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
+import LoadingBar from "react-top-loading-bar";
 
 function EmailFinder() {
   let [data, setData] = useState({ fullname: "", domain: "" });
   let [result, setResult] = useState("");
   let [loading,setLoading]=useState(false)
+  let [load, setLoad] = useState(30);
 
   function onInputChange(event, inputType) {
     const value = event.target.value;
@@ -26,7 +28,7 @@ function EmailFinder() {
         let fullnameArray = fullname.split(" ");
           setLoading(true)
           let res = await axiosInstance.post("/singleEmailFinder", data);
-          setLoading(false)
+          setLoad(100);
           setResult(res.data);
           setData({ fullname: "", domain: "" });
       } else {
@@ -83,14 +85,13 @@ function EmailFinder() {
             </p>
           </div>
         </div>
-        {loading&&<div
-        className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-        role="status"
-      >
-        <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-          Loading...
-        </span>
-      </div>}
+        {loading && (
+          <LoadingBar
+            color="#f74c41"
+            progress={load}
+            onLoaderFinished={() => {}}
+          />
+        )}
         {result && (
           <div>
             <p className="font-medium text-lg mt-8 mb-4">Result</p>
@@ -100,6 +101,7 @@ function EmailFinder() {
                   We found 1 email addresses.
                 </p>
                 <table className="description QucikValidationtable my-4  w-2/6">
+                  <tbody>
                   <tr>
                     <td className="mr-5 py-2">{result.email}</td>
                     <td className="mr-5 py-2 flex justify-center items-center">
@@ -113,6 +115,7 @@ function EmailFinder() {
                       </button>
                     </td>
                   </tr>
+                  </tbody>
                 </table>
               </div>
             ):<p>Oops! Sorry, we couldn&apos;t help you.</p>

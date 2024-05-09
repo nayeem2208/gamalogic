@@ -85,12 +85,12 @@ function FileEmailFinder() {
               return item;
             });
             if (results.data.length  <= 100000) {
-              if (creditBal > results.data.length * 10) {
+              // if (creditBal >= (results.data.length-1 )* 10) {
                 setJsonToServer(results);
                 setShowAlert(true);
-              } else {
-                toast.error("You dont have enough credits to do this");
-              }
+              // } else {
+              //   toast.error("You dont have enough credits to do this");
+              // }
             } else {
               toast.error("Please select a file with less than 1 lakh data");
             }
@@ -242,18 +242,19 @@ function FileEmailFinder() {
                 (res.data.emailStatus.processed / res.data.emailStatus.total) *
                   100
               );
-              if (file.processed !== progress) {
+              const adjustedProgress = Math.floor(progress / 10) * 10;
+              if (file.processed !== adjustedProgress) {
                 setFilesStatus((prevFilesStatus) =>
                   prevFilesStatus.map((prevFile) =>
                     prevFile.id === file.id
-                      ? { ...prevFile, processed: progress }
+                      ? { ...prevFile, processed: adjustedProgress }
                       : prevFile
                   )
                 );
                 setResultFile((prevResultFiles) =>
                   prevResultFiles.map((prevFile) =>
                     prevFile.id === file.id
-                      ? { ...prevFile, processed: progress }
+                      ? { ...prevFile, processed: adjustedProgress }
                       : prevFile
                   )
                 );
@@ -341,7 +342,7 @@ function FileEmailFinder() {
       )}
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       {resultFile.length > 0 && (
-        <table className="text-bgblue w-full  mt-14 lg:w-5/6">
+        <table className="text-bgblue w-full  mt-14 ">
           <tbody>
           <tr className="text-left">
             <th className="font-normal w-1/5">File Name</th>

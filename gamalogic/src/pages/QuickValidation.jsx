@@ -2,11 +2,13 @@ import { useState } from "react";
 import SubHeader from "../components/SubHeader";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
+import LoadingBar from "react-top-loading-bar";
 
 function QuickValidation() {
   let [email, setEmail] = useState("");
   let [result, setResult] = useState("");
   let [loading,setLoading]=useState(false)
+  let [load, setLoad] = useState(30);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -15,7 +17,7 @@ function QuickValidation() {
       if(trimmedEmail.length>0){
         setLoading(true)
       let res = await axiosInstance.post("/singleEmailValidator", { email });
-      setLoading(false)
+      setLoad(100);
       setResult(res.data);
       setEmail("");
       }
@@ -53,14 +55,13 @@ function QuickValidation() {
             </button>
           </div>
         </form>
-        {loading&&<div
-        className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-        role="status"
-      >
-        <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-          Loading...
-        </span>
-      </div>}
+        {loading && (
+          <LoadingBar
+            color="#f74c41"
+            progress={load}
+            onLoaderFinished={() => {}}
+          />
+        )}
         {result && (
           <div>
             <p className="font-medium text-lg mt-8 mb-4">Result</p>
@@ -73,6 +74,7 @@ function QuickValidation() {
               )}
             </p>
             <table className="description QucikValidationtable my-4  w-2/6">
+              <tbody>
               <tr>
                 <td className="mr-5 py-2">catchall</td>
                 <td className="mr-5 py-2 flex justify-center items-center">
@@ -135,6 +137,7 @@ function QuickValidation() {
                   )}
                   </td>
               </tr>
+              </tbody>
             </table>
           </div>
         )}

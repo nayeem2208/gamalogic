@@ -13,6 +13,8 @@ function EmailVerification() {
   let [loading, setLoading] = useState(false);
   const [filesStatus, setFilesStatus] = useState([]);
   const isCheckingCompletion = useRef(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [JsonToServer, setJsonToServer] = useState({});
   let { creditBal } = useUserState();
   useEffect(() => {
     const fetchAllFiles = async () => {
@@ -85,18 +87,19 @@ function EmailVerification() {
                 (res.data.emailStatus.processed / res.data.emailStatus.total) *
                   100
               );
-              if (file.processed !== progress) {
+              const adjustedProgress = Math.floor(progress / 10) * 10;
+              if (file.processed !== adjustedProgress) {
                 setFilesStatus((prevFilesStatus) =>
                   prevFilesStatus.map((prevFile) =>
                     prevFile.id === file.id
-                      ? { ...prevFile, processed: progress }
+                      ? { ...prevFile, processed: adjustedProgress }
                       : prevFile
                   )
                 );
                 setResultFile((prevResultFiles) =>
                   prevResultFiles.map((prevFile) =>
                     prevFile.id === file.id
-                      ? { ...prevFile, processed: progress }
+                      ? { ...prevFile, processed: adjustedProgress }
                       : prevFile
                   )
                 );
@@ -138,7 +141,7 @@ function EmailVerification() {
       console.log(error);
     }
   };
-  
+
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
 
@@ -152,12 +155,12 @@ function EmailVerification() {
             });
             const fileName = file.name;
             if (emails.length <= 100000) {
-              if (creditBal > emails.length) {
+              // if (creditBal >= emails.length-1) {
                 setJsonToServer({ emails: emails, fileName: fileName });
                 setShowAlert(true);
-              } else {
-                toast.error("You dont have enough credits to do this");
-              }
+              // } else {
+              //   toast.error("You dont have enough credits to do this");
+              // }
             } else {
               toast.error("Please select a file with less than 1 lakh data");
             }
@@ -184,7 +187,7 @@ function EmailVerification() {
       );
       console.log(response, "responseeeeeeeeeeee");
       setLoading(false);
-      // setMessage(response.data.message);
+      setMessage(response.data.message);
       const options = {
         year: "numeric",
         month: "2-digit",
@@ -217,7 +220,7 @@ function EmailVerification() {
       ]);
     } catch (error) {
       console.log(error, "error is here");
-      // toast.error(error.response.data?.error);
+      toast.error(error.response.data?.error);
       setLoading(false);
     }
   };
@@ -302,7 +305,7 @@ function EmailVerification() {
         </div>
       )}
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
-      <table className="text-bgblue w-full lg:w-4/5 mt-14 ">
+      <table className="text-bgblue w-full  mt-14 ">
         <tbody>
           <tr className="text-left">
             <th className="font-normal w-1/5">File Name</th>
