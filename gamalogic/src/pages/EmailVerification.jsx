@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import exportFromJSON from "export-from-json";
 import Papa from "papaparse";
 import ProgressBar from "@ramonak/react-progress-bar";
+import { useUserState } from "../context/userContext";
 
 function EmailVerification() {
   let [message, setMessage] = useState("");
@@ -12,7 +13,7 @@ function EmailVerification() {
   let [loading, setLoading] = useState(false);
   const [filesStatus, setFilesStatus] = useState([]);
   const isCheckingCompletion = useRef(false);
-
+  let { creditBal } = useUserState();
   useEffect(() => {
     const fetchAllFiles = async () => {
       try {
@@ -25,7 +26,6 @@ function EmailVerification() {
           day: "2-digit",
           hour: "2-digit",
           minute: "2-digit",
-          second: "2-digit",
           hour12: false,
         };
         const filesWithProcessedField = allFiles.data.map((file) => ({
@@ -56,70 +56,6 @@ function EmailVerification() {
 
     fetchAllFiles();
   }, []);
-
-  const handleFileChange = async (event) => {
-    const file = event.target.files[0];
-
-    if (file && file.type === "text/csv") {
-      try {
-        Papa.parse(file, {
-          // header: true,
-          complete: async function (results) {
-            const emails = results.data.map((emailArray) => {
-              return { emailid: emailArray[0] };
-            });
-            const fileName = file.name;
-            setLoading(true);
-            try {
-              const response = await axiosInstance.post(
-                "/batchEmailVerification",
-                { emails: emails, fileName: fileName }
-              );
-              setLoading(false);
-              setMessage(response.data.message);
-              const options = {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: false,
-              };
-              setResultFile((prevResultFiles) => [
-                {
-                  ...response.data.files,
-                  processed: 0,
-                  formattedDate: new Date(
-                    response.data.files.date_time
-                  ).toLocaleString("en-US", options),
-                },
-                ...prevResultFiles,
-              ]);
-              setFilesStatus((prevResultFiles) => [
-                {
-                  ...response.data.files,
-                  processed: 0,
-                  formattedDate: new Date(
-                    response.data.files.date_time
-                  ).toLocaleString("en-US", options),
-                },
-                ...prevResultFiles,
-              ]);
-            } catch (error) {
-              toast.error(error.response.data?.error);
-              setLoading(false);
-            }
-          },
-        });
-      } catch (error) {
-        setLoading(false);
-        console.error("Error uploading file:", error);
-      }
-    } else {
-      alert("Please select a CSV file.");
-    }
-  };
 
   useEffect(() => {
     if (filesStatus.length === 0 || isCheckingCompletion.current) return;
@@ -181,44 +117,6 @@ function EmailVerification() {
     return () => clearInterval(intervalId);
   }, [filesStatus]);
 
-  // useEffect(() => {
-  //   const checkCompletion = async () => {
-  //     try {
-  //       for (const [index, file] of resultFile.entries()) {
-  //         console.log(processedIds,'processed idssssssss')
-  //         if (file.id && file.processed !== 100 && !processedIds.includes(file.id)) {
-  //           console.log('api call is happening........................')
-  //           const res = await axiosInstance.get(
-  //             `/getBatchStatus?id=${file.id}`
-  //           );
-  //           if (res.data.emailStatus.status =='completed') {
-  //             setResultFile((prevResultFiles) => [
-  //               ...prevResultFiles.slice(0, index),
-  //               { ...file, processed: 100 },
-  //               ...prevResultFiles.slice(index + 1),
-  //             ]);
-  //             setProcessedIds([...processedIds, file.id]);
-  //             setMessage("");
-  //           } else {
-  //             const progress = Math.round(
-  //               (res.data.emailStatus.processed / res.data.emailStatus.total) *
-  //                 100
-  //             );
-  //             setResultFile((prevResultFiles) => [
-  //               ...prevResultFiles.slice(0, index),
-  //               { ...file, processed: progress },
-  //               ...prevResultFiles.slice(index + 1),
-  //             ]);
-  //           }
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-
-  //   checkCompletion();
-  // }, [resultFile,processedIds]);
   const DownloadFile = async (data) => {
     try {
       console.log(data, "data is here");
@@ -240,6 +138,93 @@ function EmailVerification() {
       console.log(error);
     }
   };
+  
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+
+    if (file && file.type === "text/csv") {
+      try {
+        Papa.parse(file, {
+          // header: true,
+          complete: async function (results) {
+            const emails = results.data.map((emailArray) => {
+              return { emailid: emailArray[0] };
+            });
+            const fileName = file.name;
+            if (emails.length <= 100000) {
+              if (creditBal > emails.length) {
+                setJsonToServer({ emails: emails, fileName: fileName });
+                setShowAlert(true);
+              } else {
+                toast.error("You dont have enough credits to do this");
+              }
+            } else {
+              toast.error("Please select a file with less than 1 lakh data");
+            }
+          },
+        });
+      } catch (error) {
+        setLoading(false);
+        console.error("Error uploading file:", error);
+      }
+    } else {
+      alert("Please select a CSV file.");
+    }
+  };
+
+  const handleAccept = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      setShowAlert(false);
+      let results = JsonToServer;
+      const response = await axiosInstance.post(
+        "/batchEmailVerification",
+        results
+      );
+      console.log(response, "responseeeeeeeeeeee");
+      setLoading(false);
+      // setMessage(response.data.message);
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      };
+      setResultFile((prevResultFiles) => [
+        {
+          ...response.data.files,
+          processed: 0,
+          formattedDate: new Date(response.data.files.date_time).toLocaleString(
+            "en-US",
+            options
+          ),
+        },
+        ...prevResultFiles,
+      ]);
+      setFilesStatus((prevResultFiles) => [
+        {
+          ...response.data.files,
+          processed: 0,
+          formattedDate: new Date(response.data.files.date_time).toLocaleString(
+            "en-US",
+            options
+          ),
+        },
+        ...prevResultFiles,
+      ]);
+    } catch (error) {
+      console.log(error, "error is here");
+      // toast.error(error.response.data?.error);
+      setLoading(false);
+    }
+  };
+
+  const handleDismiss = () => {
+    setShowAlert(false);
+  };
 
   return (
     <div className=" px-20 py-8">
@@ -250,6 +235,55 @@ function EmailVerification() {
           You can upload the email address list in csv file and get results in
           csv. Select a file to upload.
         </p>
+        {showAlert && (
+          <div
+            role="alert"
+            className="mx-auto max-w-lg rounded-lg border border-stone bg-slate-200 p-4 shadow-xl sm:p-6 lg:p-8 absolute"
+          >
+            <div className="flex items-center gap-4">
+              <span className="shrink-0 rounded-full bg-bgblue p-2 text-white">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="h-4 w-4"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z"
+                    clipRule="evenodd"
+                  ></path>
+                </svg>
+              </span>
+
+              <p className="font-medium sm:text-lg text-red-500">
+                New notification!
+              </p>
+            </div>
+
+            <p className="mt-4 text-gray-600">
+              Generating the data might take some time due to its size (
+              {JsonToServer.emails.length} records). Are you sure you want to
+              proceed?{" "}
+            </p>
+
+            <div className="mt-6 sm:flex sm:gap-4">
+              <button
+                className="inline-block w-full rounded-lg bg-bgblue px-5 py-3 text-center text-sm font-semibold text-white sm:w-auto"
+                onClick={handleAccept}
+              >
+                Accept
+              </button>
+
+              <button
+                className="mt-2 inline-block w-full rounded-lg bg-stone-300 px-5 py-3 text-center text-sm font-semibold text-gray-800 sm:mt-0 sm:w-auto"
+                onClick={handleDismiss}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
         <input
           type="file"
           className="text-sm"
@@ -269,37 +303,39 @@ function EmailVerification() {
       )}
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       <table className="text-bgblue w-full lg:w-4/5 mt-14 ">
-        <tr className="text-left">
-          <th className="font-normal w-1/5">File Name</th>
-          <th className="font-normal  w-2/5">Status</th>
-          <th className="font-normal  w-1/5">Upload Time</th>
-          <th></th>
-        </tr>
-        {resultFile.map((data, index) => (
-          <tr key={index} className="text-sm">
-            <td className="">{data.file}</td>
-            <td className="flex ">
-              <ProgressBar
-                isLabelVisible={false}
-                completed={data.processed}
-                bgColor="#181e4a"
-                labelSize="13px"
-                className="w-2/5 mr-2"
-                maxCompleted={100}
-              />
-              {data.processed}%
-            </td>
-            <td>{data.formattedDate}</td>
-            <td className="flex justify-center items-center ">
-              <button
-                className="bg-bgblue text-white py-1 px-4 rounded-md ml-2   h-9 mt-8 text-xs"
-                onClick={() => DownloadFile(data)}
-              >
-                DOWNLOAD
-              </button>
-            </td>
+        <tbody>
+          <tr className="text-left">
+            <th className="font-normal w-1/5">File Name</th>
+            <th className="font-normal  w-2/5">Status</th>
+            <th className="font-normal  w-1/5">Upload Time</th>
+            <th></th>
           </tr>
-        ))}
+          {resultFile.map((data, index) => (
+            <tr key={index} className="text-sm">
+              <td className="">{data.file}</td>
+              <td className="flex ">
+                <ProgressBar
+                  isLabelVisible={false}
+                  completed={data.processed}
+                  bgColor="#181e4a"
+                  labelSize="13px"
+                  className="w-2/5 mr-2"
+                  maxCompleted={100}
+                />
+                {data.processed}%
+              </td>
+              <td>{data.formattedDate}</td>
+              <td className="flex justify-center items-center ">
+                <button
+                  className="bg-bgblue text-white py-1 px-4 rounded-md ml-2   h-9 mt-8 text-xs"
+                  onClick={() => DownloadFile(data)}
+                >
+                  DOWNLOAD
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
       </table>
     </div>
   );

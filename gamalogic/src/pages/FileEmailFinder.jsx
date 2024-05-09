@@ -6,6 +6,7 @@ import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import ProgressBar from "@ramonak/react-progress-bar";
 import Alert from "../components/Alert";
+import { useUserState } from "../context/userContext";
 
 function FileEmailFinder() {
   let [message, setMessage] = useState("");
@@ -16,6 +17,7 @@ function FileEmailFinder() {
   const [showAlert, setShowAlert] = useState(false);
   const [Selection, SetSelection] = useState(null);
   const [JsonToServer, setJsonToServer] = useState([]);
+  let { creditBal } = useUserState();
 
   useEffect(() => {
     const fetchAllFiles = async () => {
@@ -29,7 +31,6 @@ function FileEmailFinder() {
           day: "2-digit",
           hour: "2-digit",
           minute: "2-digit",
-          second: "2-digit",
           hour12: false,
         };
         const filesWithProcessedField = allFiles.data.map((file) => ({
@@ -83,8 +84,16 @@ function FileEmailFinder() {
               }
               return item;
             });
-            setJsonToServer(results);
-            setShowAlert(true);
+            if (results.data.length  <= 100000) {
+              if (creditBal > results.data.length * 10) {
+                setJsonToServer(results);
+                setShowAlert(true);
+              } else {
+                toast.error("You dont have enough credits to do this");
+              }
+            } else {
+              toast.error("Please select a file with less than 1 lakh data");
+            }
           },
         });
       } catch (error) {
@@ -116,7 +125,6 @@ function FileEmailFinder() {
               day: "2-digit",
               hour: "2-digit",
               minute: "2-digit",
-              second: "2-digit",
               hour12: false,
             };
             setResultFile((prevResultFiles) => [
@@ -334,6 +342,7 @@ function FileEmailFinder() {
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       {resultFile.length > 0 && (
         <table className="text-bgblue w-full  mt-14 lg:w-5/6">
+          <tbody>
           <tr className="text-left">
             <th className="font-normal w-1/5">File Name</th>
             <th className="font-normal  w-2/5">Status</th>
@@ -365,6 +374,7 @@ function FileEmailFinder() {
               </td>
             </tr>
           ))}
+          </tbody>
         </table>
       )}
     </div>
