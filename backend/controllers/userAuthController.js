@@ -33,7 +33,7 @@ const Authentication = {
         let passwordMatch = await verifyPassword(password, hashedPassword);
         if (passwordMatch) {
           if (user[0][0].confirmed == 1) {
-            let token = generateToken(res, user[0][0].rowid);
+            let token = generateToken(res, user[0][0].rowid,user[0][0].api_key);
             let creditBal;
             let finalFree = new Date(user[0][0].free_final);
             let finalFreeDate = new Date(finalFree);
@@ -65,7 +65,7 @@ const Authentication = {
       res.status(400).json(error);
     }finally {  
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await jreq.dbConnection.end();
       }
     }
 
@@ -134,7 +134,7 @@ const Authentication = {
         .json({ message: "Registration failed", error: error.message });
     }finally {  
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await jreq.dbConnection.end();
       }
     }
 
@@ -149,7 +149,7 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
       if (user[0].length > 0) {
-        const token = generateToken(res, user[0][0].rowid);
+        const token = generateToken(res, user[0][0].rowid,user[0][0].api_key);
         let creditBal;
 
         if (user[0][0].credits > 0) {
@@ -182,7 +182,7 @@ const Authentication = {
       res.status(400).json(error);
     }finally {  
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await jreq.dbConnection.end();
       }
     }
 
@@ -226,7 +226,7 @@ const Authentication = {
           `SELECT * FROM registration WHERE emailid='${email}'`
         );
         if (user[0].length > 0) {
-          const token = generateToken(res, user[0][0].rowid);
+          const token = generateToken(res, user[0][0].rowid,user[0][0].api_key);
           res.json({
             name: user[0][0].username,
             credit: 500,
@@ -245,7 +245,7 @@ const Authentication = {
       res.status(400).json({ error });
     }finally {  
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await jreq.dbConnection.end();
       }
     }
 
@@ -262,7 +262,7 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
       );
       if (verifiedUser.length > 0) {
-        let token = generateToken(res, verifiedUser[0][0].rowid);
+        let token = generateToken(res, verifiedUser[0][0].rowid,user[0][0].api_key);
         let creditBal;
         let finalFree = new Date(user[0][0].free_final);
         let finalFreeDate = new Date(finalFree);
@@ -285,7 +285,7 @@ const Authentication = {
       res.status(400).json({ error });
     }finally {  
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await jreq.dbConnection.end();
       }
     }
 
@@ -320,7 +320,7 @@ const Authentication = {
       res.status(400).json(error);
     }finally {  
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await jreq.dbConnection.end();
       }
     }
 
@@ -349,7 +349,7 @@ const Authentication = {
       res.status(400).json({ error });
     }finally {  
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await jreq.dbConnection.end();
       }
     }
 

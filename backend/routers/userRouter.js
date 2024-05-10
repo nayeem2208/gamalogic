@@ -3,6 +3,7 @@ import Authentication from '../controllers/userAuthController.js';
 import APIControllers from '../controllers/APIController.js';
 import authcheck from '../middlewares/auth.js';
 import dbMiddleware from '../middlewares/dbMiddleware.js';
+import APIDecode from '../middlewares/apiDecode.js';
 
 const router=express.Router()
 
@@ -23,13 +24,13 @@ router.post('/singleEmailFinder',dbMiddleware,authcheck,APIControllers.FindSingl
 //file based email validation
 router.get('/getAllUploadedEmailValidationFiles',dbMiddleware,authcheck,APIControllers.getAlreadyCheckedBatchEmailFiles)
 router.post('/batchEmailVerification',dbMiddleware,authcheck,APIControllers.batchEmailValidation)
-router.get('/getBatchStatus',dbMiddleware,authcheck,APIControllers.batchEmailStatus)
+router.get('/getBatchStatus',APIDecode,APIControllers.batchEmailStatus)
 router.get('/downloadEmailVerificationFile',dbMiddleware,authcheck,APIControllers.downloadEmailVerificationFile)
 
 //file based email finder 
 router.get('/getAllUploadedEmailFinderFiles',dbMiddleware,authcheck,APIControllers.getAlreadyCheckedBatchEmailFinderFiles)
 router.post('/batchEmailFinder',dbMiddleware,authcheck,APIControllers.batchEmailFinder)
-router.get('/getBatchFinderStatus',dbMiddleware,authcheck,APIControllers.batchEmailFinderStatus)
+router.get('/getBatchFinderStatus',APIDecode,APIControllers.batchEmailFinderStatus)
 router.get('/downloadEmailFinderFile',dbMiddleware,authcheck,APIControllers.downloadEmailFinderResultFile)
 
 router.get('/getApiKey',dbMiddleware,authcheck,APIControllers.getApi)

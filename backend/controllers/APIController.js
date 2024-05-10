@@ -220,23 +220,21 @@ let APIControllers = {
   },
   batchEmailStatus: async (req, res) => {
     try {
-      let apiKey = req.user[0][0].api_key;
+      let apiKey = req.user.api_key;
       let emailStatus = await axios.get(
         `https://gamalogic.com/batchstatus/?apikey=${process.env.API_KEY}&batchid=${req.query.id}`
       );
-      console.log(emailStatus.data, "status");
       res.status(200).json({ emailStatus: emailStatus.data });await req.dbConnection.end();
-      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       // ErrorHandler("batchEmailStatus Controller", error, req);
       res.status(400).json(error);
     }
-    finally {
-      if (req.dbConnection) {
-        await req.dbConnection.end();
-      }
-    }
+    // finally {
+    //   if (req.dbConnection) {
+    //     await req.dbConnection.end();
+    //   }
+    // }
 
   },
   downloadEmailVerificationFile: async (req, res) => {
@@ -323,22 +321,16 @@ let APIControllers = {
   },
   batchEmailFinderStatus: async (req, res) => {
     try {
-      let apiKey = req.user[0][0].api_key;
+      let apiKey = req.user.api_key;
       let emailStatus = await axios.get(
         `https://gamalogic.com/batch-email-discovery-status/?apikey=${process.env.API_KEY}&batchid=${req.query.id}`
       );
-      console.log(emailStatus.data, "status");
       res.status(200).json({ emailStatus: emailStatus.data });
-      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       // ErrorHandler("batchEmailStatus Controller", error, req);
       res.status(400).json(error);
-    } finally {
-      if (req.dbConnection) {
-        await req.dbConnection.end();
-      }
-    }
+    } 
 
   },
   downloadEmailFinderResultFile: async (req, res) => {
