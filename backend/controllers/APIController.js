@@ -18,7 +18,7 @@ let APIControllers = {
         creditBal = req.user[0][0].credits;
       }
       res.status(200).json(creditBal)
-      req.dbConnection.end();
+      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       // ErrorHandler("getApi Controller", error, req);
@@ -27,14 +27,14 @@ let APIControllers = {
     finally {
       console.log('credit bal api')
       if (req.dbConnection) {
-        req.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
   },
   getApi: async (req, res) => {
     try {
       res.status(200).json({ apiKey: req.user[0][0].api_key });
-      req.dbConnection.end();
+      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("getApi Controller", error, req);
@@ -42,7 +42,7 @@ let APIControllers = {
     } finally {
       console.log('getApi end')
       if (req.dbConnection) {
-        req.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -57,7 +57,7 @@ let APIControllers = {
       if (user[0].affectedRows === 1) {
         res.status(200).json({ newApiKey });
       }
-      dbConnection.end()
+    await dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("resetApiKey Controller", error, req);
@@ -65,7 +65,7 @@ let APIControllers = {
     } finally {
       console.log('getApi end')
       if (req.dbConnection) {
-        req.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -77,14 +77,14 @@ let APIControllers = {
         `https://gamalogic.com/emailvrf/?emailid=${req.body.email}&apikey=${process.env.API_KEY}&speed_rank=0`
       );
       res.status(200).json(validate.data.gamalogic_emailid_vrfy[0]);
-      req.dbConnection.end();
+      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("emailValidation Controller", error, req);
       res.status(400).json(error);
     } finally {
       if (req.dbConnection) {
-        req.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -99,14 +99,14 @@ let APIControllers = {
         `https://gamalogic.com/email-discovery/?firstname=${firstname}&lastname=${lastname}&domain=${req.body.domain}&apikey=${process.env.API_KEY}&speed_rank=0`
       );
       res.status(200).json(find.data);
-      req.dbConnection.end();
+      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("FindSingleEmail Controller", error, req);
       res.status(400).json(error);
     } finally {
       if (req.dbConnection) {
-        req.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -126,14 +126,14 @@ let APIControllers = {
         );
         res.status(200).json({ message: "Password successfully changed" });
       }
-      dbConnection.end();
+    await dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("changePassword Controller", error, req);
       res.status(400).json(error);
     } finally {
       if (req.dbConnection) {
-        req.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -146,7 +146,7 @@ let APIControllers = {
         `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}' ORDER BY date_time DESC`
       );
       res.status(200).json(files[0]);
-      dbConnection.end()
+    await dbConnection.end()
     } catch (error) {
       console.error(error);
       ErrorHandler("getAlreadyCheckedBatchEmailFiles Controller", error, req);
@@ -202,7 +202,7 @@ let APIControllers = {
           <p>Gamalogic</p>`
         );
         res.status(200).json({ message: response.data.message, files: files[0][0] });
-        dbConnection.end()
+      await dbConnection.end()
       } else {
         const errorMessage = Object.values(response.data)[0];
         res.status(400).json({ error: errorMessage });
@@ -213,7 +213,7 @@ let APIControllers = {
       res.status(400).json(error);
     } finally {
       if (req.dbConnection) {
-        req.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -225,8 +225,8 @@ let APIControllers = {
         `https://gamalogic.com/batchstatus/?apikey=${process.env.API_KEY}&batchid=${req.query.id}`
       );
       console.log(emailStatus.data, "status");
-      res.status(200).json({ emailStatus: emailStatus.data });req.dbConnection.end();
-      req.dbConnection.end();
+      res.status(200).json({ emailStatus: emailStatus.data });await req.dbConnection.end();
+      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       // ErrorHandler("batchEmailStatus Controller", error, req);
@@ -234,7 +234,7 @@ let APIControllers = {
     }
     finally {
       if (req.dbConnection) {
-        req.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -246,14 +246,14 @@ let APIControllers = {
         `https://gamalogic.com/batchresult/?apikey=${process.env.API_KEY}&batchid=${req.query.batchId}`
       );
       res.status(200).json(download.data);
-      req.dbConnection.end();
+      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
       res.status(400).json(error);
     } finally {
       if (req.dbConnection) {
-        req.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -265,14 +265,14 @@ let APIControllers = {
       const dbConnection = req.dbConnection;
       let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}' ORDER BY date_time DESC`)
       res.status(200).json(files[0])
-      dbConnection.end();
+    await dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("getAlreadyCheckedBatchEmailFinderFiles Controller", error, req);
       res.status(400).json(error);
     } finally {
       if (req.dbConnection) {
-        req.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -310,13 +310,13 @@ let APIControllers = {
         console.log(errorMessage, 'errorMessage')
         res.status(400).json({ error: errorMessage });
       }
-      dbConnection.end()
+    await dbConnection.end()
     } catch (error) {
       console.log(error)
       res.status(400).json(error)
     } finally {
       if (req.dbConnection) {
-        req.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -329,14 +329,14 @@ let APIControllers = {
       );
       console.log(emailStatus.data, "status");
       res.status(200).json({ emailStatus: emailStatus.data });
-      req.dbConnection.end();
+      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       // ErrorHandler("batchEmailStatus Controller", error, req);
       res.status(400).json(error);
     } finally {
       if (req.dbConnection) {
-        req.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -348,14 +348,14 @@ let APIControllers = {
         `https://gamalogic.com/batch-email-discovery-result/?apikey=${process.env.API_KEY}&batchid=${req.query.batchId}`
       );
       res.status(200).json(download.data);
-      req.dbConnection.end();
+      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
       res.status(400).json(error);
     } finally {
       if (req.dbConnection) {
-        req.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -368,14 +368,14 @@ let APIControllers = {
       let newBalance = credit[0][0].credits + req.body.credits
       await dbConnection.query(`UPDATE registration SET credits='${newBalance}' WHERE emailid='${req.user[0][0].emailid}'`)
       res.status(200).json('successfull')
-      dbConnection.end()
+    await dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("updateCredit Controller", error, req);
       res.status(400).json(error);
     } finally {
       if (req.dbConnection) {
-        req.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
