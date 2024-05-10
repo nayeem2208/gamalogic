@@ -59,6 +59,7 @@ const Authentication = {
       } else {
         res.status(401).json({ error: "Invalid User" });
       }
+      dbConnection.end()
     } catch (error) {
       ErrorHandler("Login Controller", error, req);
       res.status(400).json(error);
@@ -125,6 +126,7 @@ const Authentication = {
       // else{
       //   res.status(400).json({error:'Failed in human verification'})
       // }
+      dbConnection.end()
     } catch (error) {
       ErrorHandler("registerUser Controller", error, req);
       res
@@ -174,6 +176,7 @@ const Authentication = {
             "Invalid User , Please Sign up with google to use this Sign in",
         });
       }
+      dbConnection.end()
     } catch (error) {
       ErrorHandler("googleLogin Controller", error, req);
       res.status(400).json(error);
@@ -235,6 +238,7 @@ const Authentication = {
             .json({ error: "Error while adding user with google" });
         }
       }
+      dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("googleAuth Controller", error, req);
@@ -274,6 +278,7 @@ const Authentication = {
           credit: creditBal
         });
       }
+      dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("verifyEmail Controller", error, req);
@@ -308,6 +313,7 @@ const Authentication = {
       } else {
         res.status(400).json({ error: "Invalid email Id" });
       }
+      dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("forgotPassword Controller", error, req);
@@ -336,6 +342,7 @@ const Authentication = {
       } else {
         res.status(400).json({ error: "Invalid user" });
       }
+      dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("resetPassword Controller", error, req);
