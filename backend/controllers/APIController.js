@@ -55,6 +55,7 @@ let APIControllers = {
       if (user[0].affectedRows === 1) {
         res.status(200).json({ newApiKey });
       }
+      dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("resetApiKey Controller", error, req);
@@ -194,6 +195,7 @@ let APIControllers = {
           <p>Best regards,</p>
           <p>Gamalogic</p>`
         );
+        dbConnection.end()
         res.status(200).json({ message: response.data.message, files: files[0][0] });
       } else {
         const errorMessage = Object.values(response.data)[0];
@@ -217,7 +219,7 @@ let APIControllers = {
         `https://gamalogic.com/batchstatus/?apikey=${process.env.API_KEY}&batchid=${req.query.id}`
       );
       console.log(emailStatus.data, "status");
-      req.dbConnection.end();
+      req.dbConnection.destroy();
       res.status(200).json({ emailStatus: emailStatus.data });
     } catch (error) {
       console.log(error);
