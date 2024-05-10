@@ -217,6 +217,7 @@ let APIControllers = {
         `https://gamalogic.com/batchstatus/?apikey=${process.env.API_KEY}&batchid=${req.query.id}`
       );
       console.log(emailStatus.data, "status");
+      req.dbConnection.end();
       res.status(200).json({ emailStatus: emailStatus.data });
     } catch (error) {
       console.log(error);
@@ -316,6 +317,7 @@ let APIControllers = {
         `https://gamalogic.com/batch-email-discovery-status/?apikey=${process.env.API_KEY}&batchid=${req.query.id}`
       );
       console.log(emailStatus.data, "status");
+      req.dbConnection.end();
       res.status(200).json({ emailStatus: emailStatus.data });
     } catch (error) {
       console.log(error);
