@@ -25,6 +25,8 @@ function ApiKey() {
   let resetApiKey=async()=>{
     try {
       setLoading(true)
+      setLoad(30)
+      await new Promise(resolve => setTimeout(resolve, 2000));
       let resetApiKey=await axiosInstance.get('/resetApiKey')
       setLoad(100);
       setApi(resetApiKey.data.newApiKey)
@@ -56,7 +58,7 @@ function ApiKey() {
               value={api}
               cols="40"
               rows="5"
-              style={{fontFamily:'Railway, sans-serif'}}
+              style={{fontFamily: "Raleway, sans-serif" }}
               className=" border border-gray-400 rounded-md py-2 px-4 mr-3 font-semibold"
             ></textarea>
             <div className="flex pr-2">

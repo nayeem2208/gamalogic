@@ -100,11 +100,11 @@ export default function BuyCredits() {
         <div className="bg-gray-100 rounded h-96 shadow flex flex-col justify-center items-center">
           <div className="flex w-full text-center">
             <div className="w-3/6 border-r-4 border-gray-400">
-              <p className="text-3xl font-semibold">{selectedCredits}</p>
+              <p className="buyCreditsCost text-3xl font-medium">{selectedCredits.toLocaleString()}</p>
               <p>Credits</p>
             </div>
             <div className="w-3/6">
-              <p className="text-3xl font-semibold">${cost}</p>
+              <p className="buyCreditsCost text-3xl font-medium">${cost}</p>
               <p>Cost</p>
             </div>
           </div>

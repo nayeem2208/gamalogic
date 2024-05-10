@@ -3,6 +3,7 @@ import axios from "axios";
 import generateUniqueApiKey from "../utils/generatePassword.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import { passwordHash, verifyPassword } from "../utils/passwordHash.js";
+import sendEmail from "../utils/zeptoMail.js";
 
 let APIControllers = {
   getCreditBalance: async (req, res) => {
@@ -182,6 +183,17 @@ let APIControllers = {
           `INSERT INTO useractivity_batch_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${fileName}','${fileName}',1,0,0)`
         );
         let files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
+        sendEmail(
+          req.user[0][0].username,
+          req.user[0][0].emailid,
+          "Bulk Email Verification Started",
+          `<p>Hi ${req.user[0][0].username},</p>
+          <p>This is to inform you that the bulk email verification process for the file you uploaded has been started.</p>
+          <p>Please note that the verification process may take some time depending on the size of the file and the number of emails to be verified.</p>
+          <p>Thank you for using our service.</p>
+          <p>Best regards,</p>
+          <p>Gamalogic</p>`
+        );
         res.status(200).json({ message: response.data.message, files: files[0][0] });
       } else {
         const errorMessage = Object.values(response.data)[0];
@@ -266,27 +278,27 @@ let APIControllers = {
         data
       );
       if (response.data.error !== undefined && response.data.error == false) {
-      let currenttime = new Date();
-      const formattedDate = currenttime
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ");
-      const userAgent = req.headers["user-agent"];
-      const ip = req.headers['cf-connecting-ip'] ||
-        req.headers['x-real-ip'] ||
-        req.headers['x-forwarded-for'] ||
-        req.socket.remoteAddress || '';
-      let fileAdded = await dbConnection.query(
-        `INSERT INTO useractivity_batch_finder_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${req.body.fileName}','${req.body.fileName}',1,0,0)`
-      );
-      let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
-      res.status(200).json({ message: response.data.message, files: files[0][0] });
-    }
-    else {
-      const errorMessage = Object.values(response.data)[0];
-      console.log(errorMessage, 'errorMessage')
-      res.status(400).json({ error: errorMessage });
-    }
+        let currenttime = new Date();
+        const formattedDate = currenttime
+          .toISOString()
+          .slice(0, 19)
+          .replace("T", " ");
+        const userAgent = req.headers["user-agent"];
+        const ip = req.headers['cf-connecting-ip'] ||
+          req.headers['x-real-ip'] ||
+          req.headers['x-forwarded-for'] ||
+          req.socket.remoteAddress || '';
+        let fileAdded = await dbConnection.query(
+          `INSERT INTO useractivity_batch_finder_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${req.body.fileName}','${req.body.fileName}',1,0,0)`
+        );
+        let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
+        res.status(200).json({ message: response.data.message, files: files[0][0] });
+      }
+      else {
+        const errorMessage = Object.values(response.data)[0];
+        console.log(errorMessage, 'errorMessage')
+        res.status(400).json({ error: errorMessage });
+      }
     } catch (error) {
       console.log(error)
       res.status(400).json(error)

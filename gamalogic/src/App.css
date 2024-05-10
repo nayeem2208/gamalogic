@@ -65,4 +65,7 @@
 .QucikValidationtable tr {
     border-bottom: 0.5px solid #e4e2e2; /* Adjust the color and thickness as needed */
 }
+.buyCreditsCost {
+    font-family: 'Ubuntu', sans-serif;
+}
 
