@@ -52,11 +52,6 @@ app.get('*', (req, res) => {
 
 app.listen(port, async () => {
   console.log(`Server started on port ${port}`);
-  try {
-      const connection = await connectToMySQL();
-  } catch (error) {
-      console.error('Error connecting to MySQL:', error);
-  }
 });
 
 // mySqlPool

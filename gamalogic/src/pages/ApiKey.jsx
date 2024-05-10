@@ -50,13 +50,14 @@ function ApiKey() {
         )}
         <div className="flex justify-between">
           <div className="flex flex-col">
-            <textarea
+          <textarea
               name=""
               id=""
               value={api}
               cols="40"
               rows="5"
-              className="border border-gray-400 rounded-md py-2 px-4 mr-3 font-semibold"
+              style={{fontFamily:'Railway, sans-serif'}}
+              className=" border border-gray-400 rounded-md py-2 px-4 mr-3 font-semibold"
             ></textarea>
             <div className="flex pr-2">
               {" "}
