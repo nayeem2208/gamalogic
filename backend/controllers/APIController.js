@@ -224,7 +224,7 @@ let APIControllers = {
       let emailStatus = await axios.get(
         `https://gamalogic.com/batchstatus/?apikey=${process.env.API_KEY}&batchid=${req.query.id}`
       );
-      res.status(200).json({ emailStatus: emailStatus.data });await req.dbConnection.end();
+      res.status(200).json({ emailStatus: emailStatus.data })
     } catch (error) {
       console.log(error);
       // ErrorHandler("batchEmailStatus Controller", error, req);
