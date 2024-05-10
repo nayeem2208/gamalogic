@@ -16,6 +16,7 @@ function EmailVerification() {
   const [showAlert, setShowAlert] = useState(false);
   const [JsonToServer, setJsonToServer] = useState({});
   let { creditBal } = useUserState();
+
   useEffect(() => {
     const fetchAllFiles = async () => {
       try {
@@ -59,66 +60,66 @@ function EmailVerification() {
     fetchAllFiles();
   }, []);
 
-  useEffect(() => {
-    if (filesStatus.length === 0 || isCheckingCompletion.current) return;
-    isCheckingCompletion.current = true;
+  // useEffect(() => {
+  //   if (filesStatus.length === 0 || isCheckingCompletion.current) return;
+  //   isCheckingCompletion.current = true;
 
-    const checkCompletion = async () => {
-      try {
-        for (const file of filesStatus) {
-          if (file.id && file.processed !== 100) {
-            const res = await axiosInstance.get(
-              `/getBatchStatus?id=${file.id}`
-            );
-            if (res.data.emailStatus.status === "completed") {
-              setFilesStatus((prevFilesStatus) =>
-                prevFilesStatus.filter((prevFile) => prevFile.id !== file.id)
-              );
-              setResultFile((prevResultFiles) =>
-                prevResultFiles.map((prevFile) =>
-                  prevFile.id === file.id
-                    ? { ...prevFile, processed: 100 }
-                    : prevFile
-                )
-              );
-              setMessage("");
-            } else {
-              const progress = Math.round(
-                (res.data.emailStatus.processed / res.data.emailStatus.total) *
-                  100
-              );
-              const adjustedProgress = Math.floor(progress / 10) * 10;
-              if (file.processed !== adjustedProgress) {
-                setFilesStatus((prevFilesStatus) =>
-                  prevFilesStatus.map((prevFile) =>
-                    prevFile.id === file.id
-                      ? { ...prevFile, processed: adjustedProgress }
-                      : prevFile
-                  )
-                );
-                setResultFile((prevResultFiles) =>
-                  prevResultFiles.map((prevFile) =>
-                    prevFile.id === file.id
-                      ? { ...prevFile, processed: adjustedProgress }
-                      : prevFile
-                  )
-                );
-              }
-            }
-          }
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        isCheckingCompletion.current = false;
-      }
-    };
+  //   const checkCompletion = async () => {
+  //     try {
+  //       for (const file of filesStatus) {
+  //         if (file.id && file.processed !== 100) {
+  //           const res = await axiosInstance.get(
+  //             `/getBatchStatus?id=${file.id}`
+  //           );
+  //           if (res.data.emailStatus.status === "completed") {
+  //             setFilesStatus((prevFilesStatus) =>
+  //               prevFilesStatus.filter((prevFile) => prevFile.id !== file.id)
+  //             );
+  //             setResultFile((prevResultFiles) =>
+  //               prevResultFiles.map((prevFile) =>
+  //                 prevFile.id === file.id
+  //                   ? { ...prevFile, processed: 100 }
+  //                   : prevFile
+  //               )
+  //             );
+  //             setMessage("");
+  //           } else {
+  //             const progress = Math.round(
+  //               (res.data.emailStatus.processed / res.data.emailStatus.total) *
+  //                 100
+  //             );
+  //             const adjustedProgress = Math.floor(progress / 10) * 10;
+  //             if (file.processed !== adjustedProgress) {
+  //               setFilesStatus((prevFilesStatus) =>
+  //                 prevFilesStatus.map((prevFile) =>
+  //                   prevFile.id === file.id
+  //                     ? { ...prevFile, processed: adjustedProgress }
+  //                     : prevFile
+  //                 )
+  //               );
+  //               setResultFile((prevResultFiles) =>
+  //                 prevResultFiles.map((prevFile) =>
+  //                   prevFile.id === file.id
+  //                     ? { ...prevFile, processed: adjustedProgress }
+  //                     : prevFile
+  //                 )
+  //               );
+  //             }
+  //           }
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //     } finally {
+  //       isCheckingCompletion.current = false;
+  //     }
+  //   };
 
-    checkCompletion();
+  //   checkCompletion();
 
-    const intervalId = setInterval(checkCompletion, 10000);
-    return () => clearInterval(intervalId);
-  }, [filesStatus]);
+  //   const intervalId = setInterval(checkCompletion, 20000);
+  //   return () => clearInterval(intervalId);
+  // }, [filesStatus]);
 
   const DownloadFile = async (data) => {
     try {

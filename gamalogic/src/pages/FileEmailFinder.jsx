@@ -272,7 +272,7 @@ function FileEmailFinder() {
 
     checkCompletion();
 
-    const intervalId = setInterval(checkCompletion, 10000);
+    const intervalId = setInterval(checkCompletion, 20000);
     return () => clearInterval(intervalId);
   }, [filesStatus]);
 

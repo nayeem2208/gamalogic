@@ -32,10 +32,23 @@ app.use(express.static(path.join(__dirname, '..', 'gamalogic', 'dist')));
 
 app.use('/api',userRouter)
 // app.use(releaseDbConnection);
+app.use((req, res, next) => {
+  req.dbConnection = null;
+  if (req.dbConnection) {
+    req.dbConnection.end((err) => {
+      if (err) {
+        console.error('Error closing DB connection:', err);
+      }
+    });
+  }
+  next();
+});
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'gamalogic', 'dist', 'index.html'));
 });
+
+
 
 app.listen(port, async () => {
   console.log(`Server started on port ${port}`);
