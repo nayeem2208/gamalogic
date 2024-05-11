@@ -78,6 +78,7 @@ export default function BuyCredits() {
         const updateCreditFunction = async () => {
           await axiosInstance.post("/updateCredit", {
             credits: selectedCredits,
+            cost
           });
         };
         updateCreditFunction();
@@ -88,9 +89,10 @@ export default function BuyCredits() {
       }
     });
   };
-  const onError = () => {
-    toast("Error occured with our payment ");
+  const onError = async() => {
+    toast.error("Error occured with our payment ");
     setFailure(true);
+    await axiosInstance.post('/paymentFailedEmail',{cost})
   };
 
   useEffect(() => {

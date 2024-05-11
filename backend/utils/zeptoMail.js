@@ -30,7 +30,6 @@ async function zeptomailsend(name,email,subject,content) {
       //   "X-Zylker-User": "test-xxxx",
       // },
     });
-    console.log("Success:", resp);
   } catch (error) {
     console.log("Error:", error);
   }

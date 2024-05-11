@@ -206,13 +206,14 @@ function Signup() {
               <a
                 href="https://gamalogic.com/terms-of-service"
                 className="hover:text-white"
+                target="_blank"
               >
-                Terms of Service{" "}
-              </a>
-              ,
+                Terms of Service
+              </a>,
               <a
                 href="https://gamalogic.com/privacy-policy"
                 className="hover:text-white"
+                target="_blank"
               >
                 {" "}
                 Privacy Policy and subscribe to our mailing list

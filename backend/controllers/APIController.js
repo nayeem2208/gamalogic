@@ -57,7 +57,7 @@ let APIControllers = {
       if (user[0].affectedRows === 1) {
         res.status(200).json({ newApiKey });
       }
-    await dbConnection.end()
+      await dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("resetApiKey Controller", error, req);
@@ -124,9 +124,23 @@ let APIControllers = {
         await dbConnection.query(
           `UPDATE registration SET password='${hashedPasswordForDatabase}' WHERE emailid='${req.user[0][0].emailid}'`
         );
+        sendEmail(
+          req.user[0][0].username,
+          req.user[0][0].emailid,
+          "Password successfully updated",
+          `<p>Hi ${req.user[0][0].username},</p>
+
+          <p>Your password has been successfully updated.</p>
+          
+          <p>If you did not initiate this action, please contact us immediately.</p>
+          
+          <p>Best regards,</p>
+            <p>Gamalogic</p>
+          `
+        );
         res.status(200).json({ message: "Password successfully changed" });
       }
-    await dbConnection.end();
+      await dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("changePassword Controller", error, req);
@@ -146,7 +160,7 @@ let APIControllers = {
         `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}' ORDER BY date_time DESC`
       );
       res.status(200).json(files[0]);
-    await dbConnection.end()
+      await dbConnection.end()
     } catch (error) {
       console.error(error);
       ErrorHandler("getAlreadyCheckedBatchEmailFiles Controller", error, req);
@@ -202,7 +216,7 @@ let APIControllers = {
           <p>Gamalogic</p>`
         );
         res.status(200).json({ message: response.data.message, files: files[0][0] });
-      await dbConnection.end()
+        await dbConnection.end()
       } else {
         const errorMessage = Object.values(response.data)[0];
         res.status(400).json({ error: errorMessage });
@@ -263,7 +277,7 @@ let APIControllers = {
       const dbConnection = req.dbConnection;
       let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}' ORDER BY date_time DESC`)
       res.status(200).json(files[0])
-    await dbConnection.end();
+      await dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("getAlreadyCheckedBatchEmailFinderFiles Controller", error, req);
@@ -308,7 +322,7 @@ let APIControllers = {
         console.log(errorMessage, 'errorMessage')
         res.status(400).json({ error: errorMessage });
       }
-    await dbConnection.end()
+      await dbConnection.end()
     } catch (error) {
       console.log(error)
       res.status(400).json(error)
@@ -330,7 +344,7 @@ let APIControllers = {
       console.log(error);
       // ErrorHandler("batchEmailStatus Controller", error, req);
       res.status(400).json(error);
-    } 
+    }
 
   },
   downloadEmailFinderResultFile: async (req, res) => {
@@ -359,8 +373,22 @@ let APIControllers = {
       let credit = await dbConnection.query(`SELECT credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
       let newBalance = credit[0][0].credits + req.body.credits
       await dbConnection.query(`UPDATE registration SET credits='${newBalance}' WHERE emailid='${req.user[0][0].emailid}'`)
+      sendEmail(
+        req.user[0][0].username,
+        req.user[0][0].emailid,
+        "Payment successfull",
+        `<p>Hi ${req.user[0][0].username},</p>
+
+        <p>Your payment for ${req.body.cost} has been successfully processed.</p>
+        
+        <p>If you have any questions or concerns regarding this payment, please feel free to contact us.</p>
+        
+        <p>Best regards,</p>
+          <p>Gamalogic</p>
+        `
+      );
       res.status(200).json('successfull')
-    await dbConnection.end()
+      await dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("updateCredit Controller", error, req);
@@ -371,6 +399,30 @@ let APIControllers = {
       }
     }
 
+  },
+  creditFailureEmail:async(req,res)=>{
+    try {
+      sendEmail(
+        req.user[0][0].username,
+        req.user[0][0].emailid,
+        "Payment Unsuccessful",
+        `<p>Hi ${req.user[0][0].username},</p>
+        <p>We regret to inform you that your payment for ${req.body.cost} was unsuccessful.</p>
+        <p>If you have any questions or concerns regarding this issue, please feel free to contact us.</p>
+        <p>Best regards,</p>
+        <p>Gamalogic</p>`
+    );  
+    
+    res.status(200)
+    } catch (error) {
+      console.log(error);
+      ErrorHandler("creditFailureEmail Controller", error, req);
+      res.status(400).json(error);
+    } finally {
+      if (req.dbConnection) {
+        await req.dbConnection.end();
+      }
+    }
   }
 };
 export default APIControllers;

@@ -37,6 +37,7 @@ router.get('/getApiKey',dbMiddleware,authcheck,APIControllers.getApi)
 router.get('/resetApiKey',dbMiddleware,authcheck,APIControllers.resetApiKey)
 router.post('/changePassword',dbMiddleware,authcheck,APIControllers.changePassword)
 router.post('/updateCredit',dbMiddleware,authcheck,APIControllers.updateCredit)
+router.post('/paymentFailedEmail',dbMiddleware,authcheck,APIControllers.creditFailureEmail)
 
 
 export default router;

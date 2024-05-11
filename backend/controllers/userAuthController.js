@@ -24,7 +24,7 @@ const Authentication = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
-       const dbConnection = req.dbConnection;
+      const dbConnection = req.dbConnection;
       let user = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
@@ -33,25 +33,25 @@ const Authentication = {
         let passwordMatch = await verifyPassword(password, hashedPassword);
         if (passwordMatch) {
           if (user[0][0].confirmed == 1) {
-            let token = generateToken(res, user[0][0].rowid,user[0][0].api_key);
+            let token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
             let creditBal;
             let finalFree = new Date(user[0][0].free_final);
             let finalFreeDate = new Date(finalFree);
             let currentDate = new Date();
-            if (user[0][0].credits_free > 0&&finalFreeDate > currentDate) {
-                creditBal = user[0][0].credits_free+user[0][0].credits
+            if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
+              creditBal = user[0][0].credits_free + user[0][0].credits
             } else {
-              creditBal =user[0][0].credits;
+              creditBal = user[0][0].credits;
             }
 
             res.json({
               name: user[0][0].username,
               credit: creditBal,
               token,
-              confirm:1
+              confirm: 1
             });
           } else {
-            res.status(201).json({confirm:0})
+            res.status(201).json({ confirm: 0 })
           }
         } else {
           res.status(401).json({ error: "Incorrect password" });
@@ -63,7 +63,7 @@ const Authentication = {
     } catch (error) {
       ErrorHandler("Login Controller", error, req);
       res.status(400).json(error);
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
       }
@@ -74,12 +74,12 @@ const Authentication = {
     try {
       const { fullname, email, password } = req.body.data;
       const userAgent = req.headers["user-agent"];
-      let ip=req.headers['cf-connecting-ip'] ||  
-      req.headers['x-real-ip'] ||
-      req.headers['x-forwarded-for'] ||
-      req.socket.remoteAddress || '';
+      let ip = req.headers['cf-connecting-ip'] ||
+        req.headers['x-real-ip'] ||
+        req.headers['x-forwarded-for'] ||
+        req.socket.remoteAddress || '';
 
-       const dbConnection = req.dbConnection;
+      const dbConnection = req.dbConnection;
       // console.log(req.body.token,'token')
       // console.log(process.env.RECAPTCHA_SECRET_KEY,'key is getting ')
       // const response = await axios.post(
@@ -132,7 +132,7 @@ const Authentication = {
       res
         .status(500)
         .json({ message: "Registration failed", error: error.message });
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
       }
@@ -141,7 +141,7 @@ const Authentication = {
   },
   googleLogin: async (req, res) => {
     try {
-       const dbConnection = req.dbConnection;
+      const dbConnection = req.dbConnection;
       const token = req.body.credentialResponse.credential;
       const decode = jwt.decode(token);
       const { email } = decode;
@@ -149,7 +149,7 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
       if (user[0].length > 0) {
-        const token = generateToken(res, user[0][0].rowid,user[0][0].api_key);
+        const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
         let creditBal;
 
         if (user[0][0].credits > 0) {
@@ -180,7 +180,7 @@ const Authentication = {
     } catch (error) {
       ErrorHandler("googleLogin Controller", error, req);
       res.status(400).json(error);
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
       }
@@ -189,7 +189,7 @@ const Authentication = {
   },
   googleAuth: async (req, res) => {
     try {
-       const dbConnection = req.dbConnection;
+      const dbConnection = req.dbConnection;
       const body_Token = req.body.credentialResponse.credential;
       const decode = jwt.decode(body_Token);
       const { name, email } = decode;
@@ -201,10 +201,10 @@ const Authentication = {
         res.status(400).json({ error: "User already exists" });
       } else {
         const userAgent = req.headers["user-agent"];
-        let ip=req.headers['cf-connecting-ip'] ||  
-        req.headers['x-real-ip'] ||
-        req.headers['x-forwarded-for'] ||
-        req.socket.remoteAddress || '';  
+        let ip = req.headers['cf-connecting-ip'] ||
+          req.headers['x-real-ip'] ||
+          req.headers['x-forwarded-for'] ||
+          req.socket.remoteAddress || '';
         const currentDate = new Date();
         const futureDate = new Date(currentDate);
         futureDate.setDate(currentDate.getDate() + 7);
@@ -226,7 +226,7 @@ const Authentication = {
           `SELECT * FROM registration WHERE emailid='${email}'`
         );
         if (user[0].length > 0) {
-          const token = generateToken(res, user[0][0].rowid,user[0][0].api_key);
+          const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
           res.json({
             name: user[0][0].username,
             credit: 500,
@@ -243,7 +243,7 @@ const Authentication = {
       console.log(error);
       ErrorHandler("googleAuth Controller", error, req);
       res.status(400).json({ error });
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
       }
@@ -252,8 +252,7 @@ const Authentication = {
   },
   verifyEmail: async (req, res) => {
     try {
-       const dbConnection = req.dbConnection;
-      console.log("verifyi il etheetindtta");
+      const dbConnection = req.dbConnection;
       const userEmail = req.query.email;
       let confirmedDate = new Date();
       const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,referer=? WHERE emailid = ?`;
@@ -262,15 +261,15 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
       );
       if (verifiedUser.length > 0) {
-        let token = generateToken(res, verifiedUser[0][0].rowid,verifiedUser[0][0].api_key);
+        let token = generateToken(res, verifiedUser[0][0].rowid, verifiedUser[0][0].api_key);
         let creditBal;
         let finalFree = new Date(verifiedUser[0][0].free_final);
         let finalFreeDate = new Date(finalFree);
         let currentDate = new Date();
-        if (verifiedUser[0][0].credits_free > 0&&finalFreeDate > currentDate) {
-            creditBal = verifiedUser[0][0].credits_free+verifiedUser[0][0].credits
+        if (verifiedUser[0][0].credits_free > 0 && finalFreeDate > currentDate) {
+          creditBal = verifiedUser[0][0].credits_free + verifiedUser[0][0].credits
         } else {
-          creditBal =verifiedUser[0][0].credits;
+          creditBal = verifiedUser[0][0].credits;
         }
         res.json({
           name: verifiedUser[0][0].username,
@@ -283,7 +282,7 @@ const Authentication = {
       console.log(error);
       ErrorHandler("verifyEmail Controller", error, req);
       res.status(400).json({ error });
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
       }
@@ -292,7 +291,7 @@ const Authentication = {
   },
   forgotPassword: async (req, res) => {
     try {
-       const dbConnection = req.dbConnection;
+      const dbConnection = req.dbConnection;
       let user = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${req.body.email}'`
       );
@@ -302,10 +301,10 @@ const Authentication = {
           req.body.email,
           "Reset your password",
           "<p>hi " +
-            req.body.email +
-            ',please click <a href="https://beta.gamalogic.com/resetPassword?email=' +
-            req.body.email +
-            '">here </a> to reset your password</p>  '
+          req.body.email +
+          ',please click <a href="https://beta.gamalogic.com/resetPassword?email=' +
+          req.body.email +
+          '">here </a> to reset your password</p>  '
         );
         res
           .status(200)
@@ -318,7 +317,7 @@ const Authentication = {
       console.log(error);
       ErrorHandler("forgotPassword Controller", error, req);
       res.status(400).json(error);
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
       }
@@ -327,16 +326,29 @@ const Authentication = {
   },
   resetPassword: async (req, res) => {
     try {
-       const dbConnection = req.dbConnection;
+      const dbConnection = req.dbConnection;
       let user = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${req.body.email}'`
       );
       if (user[0].length > 0) {
         // let hash = generateSHA256Hash(req.body.password);
         let hashedPassword = await passwordHash(req.body.password);
-        console.log(hashedPassword, "hashed password");
         await dbConnection.query(
           `UPDATE registration SET password='${hashedPassword}' WHERE emailid='${req.body.email}'`
+        );
+        sendEmail(
+          user[0][0].username,
+          req.body.email,
+          "Password successfully updated",
+          `<p>Hi ${user[0][0].username},</p>
+
+          <p>Your password has been successfully updated.</p>
+          
+          <p>If you did not initiate this action, please contact us immediately.</p>
+          
+          <p>Best regards,</p>
+            <p>Gamalogic</p>
+          `
         );
         res.status(200).json({ message: "password succesfully updated" });
       } else {
@@ -347,21 +359,24 @@ const Authentication = {
       console.log(error);
       ErrorHandler("resetPassword Controller", error, req);
       res.status(400).json({ error });
-    }finally {  
+    } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
       }
     }
 
   },
-  sendVerifyEmail:async(req,res)=>{
+  sendVerifyEmail: async (req, res) => {
     try {
-      const username = req.query.email.split('@')[0]; 
+      const username = req.query.email.split('@')[0];
       sendEmail(
         username,
         req.query.email,
         "Please verify your account",
-        `<p>Hi ${req.query.email}, please click <a href="https://beta.gamalogic.com/signin?email=${req.query.email}&track=true">here</a> to verify your account </p>`
+        `<p>Hi ${req.query.email}, please click <a href="https://beta.gamalogic.com/signin?email=${req.query.email}&track=true">here</a> to verify your account </p>
+        <p>Best regards,</p>
+          <p>Gamalogic</p>
+        `
       );
       res.status(200)
     } catch (error) {
