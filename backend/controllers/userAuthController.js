@@ -65,7 +65,7 @@ const Authentication = {
       res.status(400).json(error);
     }finally {  
       if (req.dbConnection) {
-        await jreq.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -134,7 +134,7 @@ const Authentication = {
         .json({ message: "Registration failed", error: error.message });
     }finally {  
       if (req.dbConnection) {
-        await jreq.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -182,7 +182,7 @@ const Authentication = {
       res.status(400).json(error);
     }finally {  
       if (req.dbConnection) {
-        await jreq.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -245,7 +245,7 @@ const Authentication = {
       res.status(400).json({ error });
     }finally {  
       if (req.dbConnection) {
-        await jreq.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -285,7 +285,7 @@ const Authentication = {
       res.status(400).json({ error });
     }finally {  
       if (req.dbConnection) {
-        await jreq.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -320,7 +320,7 @@ const Authentication = {
       res.status(400).json(error);
     }finally {  
       if (req.dbConnection) {
-        await jreq.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
@@ -349,7 +349,7 @@ const Authentication = {
       res.status(400).json({ error });
     }finally {  
       if (req.dbConnection) {
-        await jreq.dbConnection.end();
+        await req.dbConnection.end();
       }
     }
 
