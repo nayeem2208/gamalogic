@@ -69,63 +69,11 @@
     font-family: 'Ubuntu', sans-serif;
 }
 
-.custom-range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    background-color: #0A0E2B; /* Change the thumb color */
-    cursor: pointer;
-  }
 
-  .custom-range::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background-color: #0A0E2B; /* Change the thumb color */
-    cursor: pointer;
-  }
 
-  .custom-range::-webkit-slider-runnable-track {
-    background-color: #0A0E2B; /* Change the track color */
-  }
 
-  .custom-range::-moz-range-track {
-    background-color: #0A0E2B; /* Change the track color */
-  }
 
-  .custom-range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 10px;
-    height: 10px;
-    background-color: #0A0E2B; 
-    cursor: pointer;
-  }
-
-  .custom-range::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
-    background-color: #0A0E2B; 
-    cursor: pointer;
-  }
-
-  .custom-range::-webkit-slider-runnable-track {
-    background-color: #0A0E2B; 
-    height: 4px; 
-    border-radius: 15px;
-  }
-  .custom-range::-moz-range-track {
-    background-color: gray; /* Set background color to gray for Firefox */
-    height: 4px;
-    border-radius: 15px;
-  }
-  
-
-  .custom-range::-moz-range-progress {
-    background-color: #0A0E2B; 
-    height: 6px;
-    border-radius: 15px;
-  }
+ 
 
 
 
