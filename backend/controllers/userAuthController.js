@@ -46,6 +46,7 @@ const Authentication = {
 
             res.json({
               name: user[0][0].username,
+              email:user[0][0].emailid,
               credit: creditBal,
               token,
               confirm: 1
@@ -173,6 +174,7 @@ const Authentication = {
 
         res.status(200).json({
           name: user[0][0].username,
+          email:user[0][0].emailid,
           credit: creditBal,
           token
         });
@@ -235,6 +237,7 @@ const Authentication = {
           const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
           res.json({
             name: user[0][0].username,
+            email:user[0][0].emailid,
             credit: 500,
             token,
           });
@@ -279,6 +282,7 @@ const Authentication = {
         }
         res.json({
           name: verifiedUser[0][0].username,
+          email:verifiedUser[0][0].emailid,
           token,
           credit: creditBal
         });

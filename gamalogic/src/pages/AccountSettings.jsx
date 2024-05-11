@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import axiosInstance from "../axios/axiosInstance";
 import { IoInformationCircleOutline } from "react-icons/io5";
+import { useUserState } from "../context/userContext";
 
 function AccountSettings() {
   let [passwordVisible, setPasswordVisible] = useState({
@@ -16,7 +17,7 @@ function AccountSettings() {
     newPassword: "",
     confirm: "",
   });
-
+  let { userDetails } = useUserState();
   const passwordVisibilityHandler = (field) => {
     setPasswordVisible((prevState) => ({
       ...prevState,
@@ -88,7 +89,7 @@ function AccountSettings() {
           type="text"
           placeholder="enter your name here"
           className="w-3/6 border border-gray-100 rounded py-2 px-4 mr-3"
-          value="NAYEEM"
+          value={userDetails.name}
           readOnly
         />{" "}
         <p className="mt-6 mb-1">Your Email</p>
@@ -96,7 +97,7 @@ function AccountSettings() {
           type="email"
           placeholder="enter the email here"
           className="w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 selection:border-gray-400"
-          value="nayeem2281998@gmail.com"
+          value={userDetails.email}
           readOnly
         />{" "}
         <h3 className="mt-6 mb-1">Change Your Password</h3>
