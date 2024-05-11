@@ -117,9 +117,15 @@ const Authentication = {
         sendEmail(
           fullname,
           email,
-          "Please verify your account",
-          `<p>Hi ${email}, please click <a href="https://beta.gamalogic.com/signin?email=${email}&track=true">here</a> to verify your account </p>`
+          "Please Verify Your Account",
+          `<p>Hi ${fullname},</p>
+    <p>Welcome to Gamalogic! To start using your account, please click the link below to verify your email address:</p>
+    <p><a href="https://beta.gamalogic.com/signin?email=${email}&track=true">Verify Your Account</a></p>
+    <p>Thank you for joining us. If you have any questions, feel free to contact our support team.</p>
+    <p>Best regards,</p>
+    <p>Gamalogic</p>`
         );
+
         res.status(200).json("Please check your email for verification");
       }
       // }
@@ -300,11 +306,12 @@ const Authentication = {
           user[0][0].username,
           req.body.email,
           "Reset your password",
-          "<p>hi " +
-          req.body.email +
-          ',please click <a href="https://beta.gamalogic.com/resetPassword?email=' +
-          req.body.email +
-          '">here </a> to reset your password</p>  '
+          `<p>Hi ${user[0][0].username},</p>
+          <p>We received a request to reset your password. To proceed with resetting your password, please click the link below:</p>
+          <p><a href="https://beta.gamalogic.com/resetPassword?email=${req.body.email}">Reset Password</a></p>
+          <p>If you didn't request this change, you can ignore this email. Your account security is important to us.</p>
+          <p>Best regards,</p>
+          <p>Gamalogic </p>`
         );
         res
           .status(200)
