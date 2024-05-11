@@ -262,15 +262,15 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
       );
       if (verifiedUser.length > 0) {
-        let token = generateToken(res, verifiedUser[0][0].rowid,user[0][0].api_key);
+        let token = generateToken(res, verifiedUser[0][0].rowid,verifiedUser[0][0].api_key);
         let creditBal;
-        let finalFree = new Date(user[0][0].free_final);
+        let finalFree = new Date(verifiedUser[0][0].free_final);
         let finalFreeDate = new Date(finalFree);
         let currentDate = new Date();
-        if (user[0][0].credits_free > 0&&finalFreeDate > currentDate) {
-            creditBal = user[0][0].credits_free+user[0][0].credits
+        if (verifiedUser[0][0].credits_free > 0&&finalFreeDate > currentDate) {
+            creditBal = verifiedUser[0][0].credits_free+verifiedUser[0][0].credits
         } else {
-          creditBal =user[0][0].credits;
+          creditBal =verifiedUser[0][0].credits;
         }
         res.json({
           name: verifiedUser[0][0].username,

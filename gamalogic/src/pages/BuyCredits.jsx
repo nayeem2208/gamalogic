@@ -134,7 +134,7 @@ export default function BuyCredits() {
             <div className=" w-3/5 mt-12">
               <input
                 type="range"
-                className="w-full"
+                className="w-full custom-range"
                 min="0"
                 max={creditCostMappings.length - 1}
                 step="1"
