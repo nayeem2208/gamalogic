@@ -379,11 +379,13 @@ const Authentication = {
       sendEmail(
         username,
         req.query.email,
-        "Please verify your account",
-        `<p>Hi ${req.query.email}, please click <a href="https://beta.gamalogic.com/signin?email=${req.query.email}&track=true">here</a> to verify your account </p>
-        <p>Best regards,</p>
-          <p>Gamalogic</p>
-        `
+        "Please Verify Your Account",
+        `<p>Hi ${username},</p>
+  <p>Welcome to Gamalogic! To start using your account, please click the link below to verify your email address:</p>
+  <p><a href="https://beta.gamalogic.com/signin?email=${req.query.email}&track=true">Verify Your Account</a></p>
+  <p>Thank you for joining us. If you have any questions, feel free to contact our support team.</p>
+  <p>Best regards,</p>
+  <p>Gamalogic</p>`
       );
       res.status(200)
     } catch (error) {
