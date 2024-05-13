@@ -8,7 +8,7 @@ import { FaEye } from "react-icons/fa";
 
 function Login() {
   let [data, setData] = useState({ email: "", password: "" });
-  let { setUserDetails ,setCreditBal} = useUserState();
+  let { setUserDetails, setCreditBal } = useUserState();
   let [passwordVisible, setPasswordVisible] = useState(false);
   let [loading, setLoading] = useState(false);
 
@@ -22,7 +22,6 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-
   useEffect(() => {
     async function verifyEmail() {
       const queryParams = new URLSearchParams(location.search);
@@ -30,11 +29,17 @@ function Login() {
         const email = queryParams.get("email");
         if (email) {
           let res = await axiosInstance.get(`/verifyEmail?email=${email}`);
-          toast.success("Your account has been successfully verified. Welcome to Gamalogic!"
-        )
+          if (res.data.message === "User is already verified.") {
+            toast.info("Email is already verified");
+            navigate("/");
+            return;
+          }
+          toast.success(
+            "Your account has been successfully verified. Welcome to Gamalogic!"
+          );
           let token = res.data;
           setUserDetails(token);
-          setCreditBal(token.credit)
+          setCreditBal(token.credit);
           localStorage.setItem("Gamalogic_token", JSON.stringify(token));
           navigate("/");
         }
@@ -43,28 +48,26 @@ function Login() {
     verifyEmail();
   }, [location.search]);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); 
+    setLoading(true);
     try {
       let userData = await axiosInstance.post("login", data);
-      if(userData.data?.confirm==0){
-        toast.error('Please confirm your email to login.')
-        navigate('/VerifyYourEmail',{ state:data})
-      }
-      else{
+      if (userData.data?.confirm == 0) {
+        toast.error("Please confirm your email to login.");
+        navigate("/VerifyYourEmail", { state: data });
+      } else {
         toast.success("Welcome back! You've successfully logged in.");
         let token = userData.data;
         setUserDetails(token);
-        setCreditBal(token.credit)
-      localStorage.setItem("Gamalogic_token", JSON.stringify(token));
-      navigate("/");
+        setCreditBal(token.credit);
+        localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+        navigate("/");
       }
     } catch (error) {
       console.log(error.response, "error");
       toast.error(error.response.data.error);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -89,7 +92,7 @@ function Login() {
       toast.success("Welcome back! You've successfully logged in with Google.");
       let token = res.data;
       setUserDetails(token);
-      setCreditBal(token.credit)
+      setCreditBal(token.credit);
       localStorage.setItem("Gamalogic_token", JSON.stringify(token));
       navigate("/");
     } catch (err) {

@@ -275,6 +275,12 @@ const Authentication = {
     try {
       const dbConnection = req.dbConnection;
       const userEmail = req.query.email;
+      const alreadyVerifiedUser = await dbConnection.query(
+        `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
+      );
+      if (alreadyVerifiedUser[0].length > 0) {
+        return res.status(200).json({ message: "User is already verified." });
+      }
       let confirmedDate = new Date();
       const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,referer=? WHERE emailid = ?`;
       await dbConnection.query(query, [confirmedDate, req.headers.origin, userEmail]);
