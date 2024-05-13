@@ -6,6 +6,7 @@ import { passwordHash, verifyPassword } from "../utils/passwordHash.js";
 import sendEmail from "../utils/zeptoMail.js";
 import axios from "axios";
 import ErrorHandler from "../utils/errorHandler.js";
+import generateConfirmationToken from "../utils/confirmationToken.js";
 
 const Authentication = {
   sample: async (req, res) => {
