@@ -29,6 +29,11 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
       if (user[0].length > 0) {
+        if (user[0][0].session_google == 1) {
+          res.status(401).json({
+            error: `Please use "Continue with Google" to sign in with your linked account.
+          ` });
+        }
         const hashedPassword = user[0][0].password;
         let passwordMatch = await verifyPassword(password, hashedPassword);
         if (passwordMatch) {
@@ -46,7 +51,7 @@ const Authentication = {
 
             res.json({
               name: user[0][0].username,
-              email:user[0][0].emailid,
+              email: user[0][0].emailid,
               credit: creditBal,
               token,
               confirm: 1
@@ -158,23 +163,19 @@ const Authentication = {
       if (user[0].length > 0) {
         const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
         let creditBal;
-
-        if (user[0][0].credits > 0) {
-          creditBal = user[0][0].credits;
-        } else if (user[0][0].credits_free > 0) {
-          let finalFree = new Date(user[0][0].free_final);
-          let finalFreeDate = new Date(finalFree);
-          let currentDate = new Date();
-          if (finalFreeDate > currentDate) {
-            creditBal = user[0][0].credits_free;
-          } else creditBal = 0;
+        let finalFree = new Date(user[0][0].free_final);
+        let finalFreeDate = new Date(finalFree);
+        let currentDate = new Date();
+        if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
+          creditBal = user[0][0].credits_free + user[0][0].credits
         } else {
-          creditBal = 0;
+          creditBal = user[0][0].credits;
         }
+
 
         res.status(200).json({
           name: user[0][0].username,
-          email:user[0][0].emailid,
+          email: user[0][0].emailid,
           credit: creditBal,
           token
         });
@@ -235,9 +236,20 @@ const Authentication = {
         );
         if (user[0].length > 0) {
           const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
+          sendEmail(
+            user[0][0].username,
+            user[0][0].emailid,
+            "Welcome to Gamalogic!",
+            `<p>Hi ${user[0][0].username},</p>
+            <p>Welcome to Gamalogic! We're thrilled to have you on board.</p>
+            <p>Your registration is now complete, and you're all set to explore our platform.</p>
+            <p>If you have any questions or need assistance getting started, feel free to reach out to us.</p>
+            <p>Best regards,</p>
+            <p>The Gamalogic Team</p>`
+          );
           res.json({
             name: user[0][0].username,
-            email:user[0][0].emailid,
+            email: user[0][0].emailid,
             credit: 500,
             token,
           });
@@ -280,9 +292,20 @@ const Authentication = {
         } else {
           creditBal = verifiedUser[0][0].credits;
         }
+        sendEmail(
+          user[0][0].username,
+          user[0][0].emailid,
+          "Welcome to Gamalogic!",
+          `<p>Hi ${user[0][0].username},</p>
+          <p>Welcome to Gamalogic! We're thrilled to have you on board.</p>
+          <p>Your registration is now complete, and your account has been successfully verified.</p>
+          <p>You're all set to explore our platform. If you have any questions or need assistance getting started, feel free to reach out to us.</p>
+          <p>Best regards,</p>
+          <p>The Gamalogic Team</p>`
+        );
         res.json({
           name: verifiedUser[0][0].username,
-          email:verifiedUser[0][0].emailid,
+          email: verifiedUser[0][0].emailid,
           token,
           credit: creditBal
         });

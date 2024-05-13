@@ -6,6 +6,7 @@ import exportFromJSON from "export-from-json";
 import Papa from "papaparse";
 import ProgressBar from "@ramonak/react-progress-bar";
 import { useUserState } from "../context/userContext";
+import LoadingBar from "react-top-loading-bar";
 
 function EmailVerification() {
   let [message, setMessage] = useState("");
@@ -15,14 +16,17 @@ function EmailVerification() {
   const isCheckingCompletion = useRef(false);
   const [showAlert, setShowAlert] = useState(false);
   const [JsonToServer, setJsonToServer] = useState({});
+  let [load, setLoad] = useState(30);
   let { creditBal } = useUserState();
 
   useEffect(() => {
     const fetchAllFiles = async () => {
       try {
+        setLoading(true)
         let allFiles = await axiosInstance.get(
           "/getAllUploadedEmailValidationFiles"
         );
+        setLoad(100);
         const options = {
           year: "numeric",
           month: "2-digit",
@@ -125,9 +129,12 @@ function EmailVerification() {
     try {
       console.log(data, "data is here");
       if (data.processed == 100) {
+        setLoading(true);
+        setLoad(30)
         let res = await axiosInstance.get(
           `/downloadEmailVerificationFile?batchId=${data.id}`
         );
+        setLoad(100);
         console.log(res.data.gamalogic_emailid_vrfy, "ressssssssssss");
         const csvData = res.data.gamalogic_emailid_vrfy;
         const fileName = "Verified Emails";
@@ -180,6 +187,7 @@ function EmailVerification() {
     e.preventDefault();
     try {
       setLoading(true);
+      setLoad(30)
       setShowAlert(false);
       let results = JsonToServer;
       const response = await axiosInstance.post(
@@ -187,7 +195,7 @@ function EmailVerification() {
         results
       );
       console.log(response, "responseeeeeeeeeeee");
-      setLoading(false);
+      setLoad(100);
       setMessage(response.data.message);
       const options = {
         year: "numeric",
@@ -290,21 +298,18 @@ function EmailVerification() {
         )}
         <input
           type="file"
-          className="text-sm"
+          className="flex h-9 shadow-lg text-white  rounded-md border border-input bg-slate-500 hover:bg-slate-700 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-lg file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
           accept=".csv"
           onChange={handleFileChange}
         />
       </form>
       {loading && (
-        <div
-          className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-          role="status"
-        >
-          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-            Loading...
-          </span>
-        </div>
-      )}
+          <LoadingBar
+            color="#f74c41"
+            progress={load}
+            onLoaderFinished={() => {}}
+          />
+        )}
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       <table className="text-bgblue w-full  mt-14 ">
         <tbody>

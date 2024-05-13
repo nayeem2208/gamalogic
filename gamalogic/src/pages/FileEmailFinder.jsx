@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import ProgressBar from "@ramonak/react-progress-bar";
 import Alert from "../components/Alert";
 import { useUserState } from "../context/userContext";
+import LoadingBar from "react-top-loading-bar";
 
 function FileEmailFinder() {
   let [message, setMessage] = useState("");
@@ -17,14 +18,17 @@ function FileEmailFinder() {
   const [showAlert, setShowAlert] = useState(false);
   const [Selection, SetSelection] = useState(null);
   const [JsonToServer, setJsonToServer] = useState([]);
+  let [load, setLoad] = useState(30);
   let { creditBal } = useUserState();
 
   useEffect(() => {
     const fetchAllFiles = async () => {
       try {
+        setLoading(true);
         let allFiles = await axiosInstance.get(
           "/getAllUploadedEmailFinderFiles"
         );
+        setLoad(100);
         const options = {
           year: "numeric",
           month: "2-digit",
@@ -56,6 +60,7 @@ function FileEmailFinder() {
         ]);
       } catch (error) {
         console.log(error);
+        setLoad(100);
       }
     };
 
@@ -84,10 +89,10 @@ function FileEmailFinder() {
               }
               return item;
             });
-            if (results.data.length  <= 100000) {
+            if (results.data.length <= 100000) {
               // if (creditBal >= (results.data.length-1 )* 10) {
-                setJsonToServer(results);
-                setShowAlert(true);
+              setJsonToServer(results);
+              setShowAlert(true);
               // } else {
               //   toast.error("You dont have enough credits to do this");
               // }
@@ -110,6 +115,7 @@ function FileEmailFinder() {
       if (Selection === true) {
         setShowAlert(false);
         setLoading(true);
+        setLoad(30)
         let results = JsonToServer;
         async function BatchFileFinder() {
           try {
@@ -117,7 +123,7 @@ function FileEmailFinder() {
               "/batchEmailFinder",
               results
             );
-            setLoading(false);
+            setLoad(100);
             setMessage(response.data.message);
             const options = {
               year: "numeric",
@@ -280,9 +286,12 @@ function FileEmailFinder() {
     try {
       console.log(data, "data is here");
       if (data.processed == 100) {
+        setLoading(true);
+        setLoad(30)
         let res = await axiosInstance.get(
           `/downloadEmailFinderFile?batchId=${data.id}`
         );
+        setLoad(100);
         console.log(res.data.gamalogic_emailid_vrfy, "ressssssssssss");
         const csvData = res.data.gamalogic_discovery;
         const fileName = "Emails Finder results";
@@ -295,6 +304,7 @@ function FileEmailFinder() {
       }
     } catch (error) {
       console.log(error);
+      setLoading(false)
     }
   };
 
@@ -325,56 +335,53 @@ function FileEmailFinder() {
         </p>
         <input
           type="file"
-          className="text-sm"
+          className="flex h-9 shadow-lg text-white  rounded-md border border-input bg-slate-500 hover:bg-slate-700 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-lg file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
           onChange={handleFileChange}
           accept=".csv"
         />
       </div>
       {loading && (
-        <div
-          className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-          role="status"
-        >
-          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-            Loading...
-          </span>
-        </div>
+        <LoadingBar
+          color="#f74c41"
+          progress={load}
+          onLoaderFinished={() => {}}
+        />
       )}
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       {resultFile.length > 0 && (
         <table className="text-bgblue w-full  mt-14 ">
           <tbody>
-          <tr className="text-left">
-            <th className="font-normal w-1/5">File Name</th>
-            <th className="font-normal  w-2/5">Status</th>
-            <th className="font-normal  w-1/5">Upload Time</th>
-            <th className=""></th>
-          </tr>
-          {resultFile.map((data, index) => (
-            <tr key={index} className="text-sm ">
-              <td>{data.file}</td>
-              <td className="flex ">
-                <ProgressBar
-                  isLabelVisible={false}
-                  completed={data.processed}
-                  bgColor="#181e4a"
-                  labelSize="13px"
-                  className="w-2/5 mr-2"
-                  maxCompleted={100}
-                />
-                {data.processed}%
-              </td>
-              <td>{data.formattedDate}</td>
-              <td className="flex justify-center items-center ">
-                <button
-                  className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 mt-4  h-9  text-xs"
-                  onClick={() => DownloadFile(data)}
-                >
-                  DOWNLOAD
-                </button>
-              </td>
+            <tr className="text-left">
+              <th className="font-normal w-1/5">File Name</th>
+              <th className="font-normal  w-2/5">Status</th>
+              <th className="font-normal  w-1/5">Upload Time</th>
+              <th className=""></th>
             </tr>
-          ))}
+            {resultFile.map((data, index) => (
+              <tr key={index} className="text-sm ">
+                <td>{data.file}</td>
+                <td className="flex ">
+                  <ProgressBar
+                    isLabelVisible={false}
+                    completed={data.processed}
+                    bgColor="#181e4a"
+                    labelSize="13px"
+                    className="w-2/5 mr-2"
+                    maxCompleted={100}
+                  />
+                  {data.processed}%
+                </td>
+                <td>{data.formattedDate}</td>
+                <td className="flex justify-center items-center ">
+                  <button
+                    className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 mt-4  h-9  text-xs"
+                    onClick={() => DownloadFile(data)}
+                  >
+                    DOWNLOAD
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       )}

@@ -11,8 +11,7 @@ export default function Support() {
         <p className="my-7 w-4/5 description">
           We provide 24x7 support for our customers. Connect with us by sending
           a mail here -{" "}
-          <a href="mailto:support@gamalogic.com" className="underline font-medium" target="_blank">support@gamalogic.com</a> or
-          through any of our social media accounts.
+          <a href="mailto:support@gamalogic.com" className="underline font-medium" target="_blank">support@gamalogic.com</a> 
         </p>
         <ul className="mt-36">
           <li className="my-2">
