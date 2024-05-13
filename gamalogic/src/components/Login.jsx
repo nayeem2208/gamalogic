@@ -51,7 +51,7 @@ function Login() {
         navigate('/VerifyYourEmail',{ state:data})
       }
       else{
-        toast.dark("Authentication success", 2000);
+        toast.dark("Welcome back! You've successfully logged in.");
         let token = userData.data;
         setUserDetails(token);
         setCreditBal(token.credit)
@@ -83,7 +83,7 @@ function Login() {
       let res = await axiosInstance.post("/googleLogin", {
         credentialResponse,
       });
-      toast.dark("Authentication success", 2000);
+      toast.dark("Welcome back! You've successfully logged in with Google.");
       let token = res.data;
       setUserDetails(token);
       setCreditBal(token.credit)

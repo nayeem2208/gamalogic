@@ -92,6 +92,7 @@ function Signup() {
       let res = await axiosInstance.post("/googleSignup", {
         credentialResponse,
       });
+      toast.success("Welcome to Gamalogic! You've successfully registered with Google.")
       let token = res.data;
       setUserDetails(token);
       setCreditBal(token.credit)
