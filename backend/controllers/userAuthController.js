@@ -120,13 +120,14 @@ const Authentication = {
         await dbConnection.query(
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',0,0)`
         );
+        let token=generateConfirmationToken(email)
         sendEmail(
           fullname,
           email,
           "Please Verify Your Account",
           `<p>Hi ${fullname},</p>
     <p>Welcome to Gamalogic! To start using your account, please click the link below to verify your email address:</p>
-    <p><a href="https://beta.gamalogic.com/signin?email=${email}&track=true">Verify Your Account</a></p>
+    <p><a href="https://beta.gamalogic.com/signin?email=${token}&track=true">Verify Your Account</a></p>
     <p>Thank you for joining us. If you have any questions, feel free to contact our support team.</p>
     <p>Best regards,</p>
     <p>Gamalogic</p>`
@@ -274,7 +275,8 @@ const Authentication = {
   verifyEmail: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      const userEmail = req.query.email;
+      const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
+      const userEmail = decoded.email;
       const alreadyVerifiedUser = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
       );
@@ -409,13 +411,14 @@ const Authentication = {
   sendVerifyEmail: async (req, res) => {
     try {
       const username = req.query.email.split('@')[0];
+      let token=generateConfirmationToken(req.query.email)
       sendEmail(
         username,
         req.query.email,
         "Please Verify Your Account",
         `<p>Hi ${username},</p>
   <p>Welcome to Gamalogic! To start using your account, please click the link below to verify your email address:</p>
-  <p><a href="https://beta.gamalogic.com/signin?email=${req.query.email}&track=true">Verify Your Account</a></p>
+  <p><a href="https://beta.gamalogic.com/signin?email=${token}&track=true">Verify Your Account</a></p>
   <p>Thank you for joining us. If you have any questions, feel free to contact our support team.</p>
   <p>Best regards,</p>
   <p>Gamalogic</p>`
