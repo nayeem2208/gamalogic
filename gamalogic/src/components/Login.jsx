@@ -50,6 +50,7 @@ function Login() {
     try {
       let userData = await axiosInstance.post("login", data);
       if(userData.data?.confirm==0){
+        toast.error('Please confirm your email to login.')
         navigate('/VerifyYourEmail',{ state:data})
       }
       else{
