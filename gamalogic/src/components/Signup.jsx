@@ -59,7 +59,7 @@ function Signup() {
                 // token,
               });
               console.log(userData, "userdata");
-              toast.dark(userData?.data);
+              toast.success(userData?.data);
               navigate("/VerifyYourEmail");
             } else {
               toast.error(

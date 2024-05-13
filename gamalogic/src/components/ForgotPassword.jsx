@@ -10,7 +10,7 @@ function ForgotPassword() {
     try {
       console.log('ivda vare ok')
       let res=await axiosInstance.post('/forgotPassword',{email})
-      toast.dark(res.data?.message)
+      toast.success(res.data?.message,)
       setEmail('')
     } catch (error) {
       console.log(error)

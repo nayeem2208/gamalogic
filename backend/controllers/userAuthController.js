@@ -384,7 +384,7 @@ const Authentication = {
             <p>Gamalogic</p>
           `
         );
-        res.status(200).json({ message: "password succesfully updated" });
+        res.status(200).json({ message: "Password succesfully updated" });
       } else {
         res.status(400).json({ error: "Invalid user" });
       }

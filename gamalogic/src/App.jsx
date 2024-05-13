@@ -16,7 +16,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   return (
     <div>
-        <ToastContainer/>
+        <ToastContainer position="top-center"/>
         <Suspense  fallback={<TopLoader loading={loading} />}>
       <div
         className="mainBody lg:flex h-full"

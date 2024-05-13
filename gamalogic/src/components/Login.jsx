@@ -30,6 +30,8 @@ function Login() {
         const email = queryParams.get("email");
         if (email) {
           let res = await axiosInstance.get(`/verifyEmail?email=${email}`);
+          toast.success("Your account has been successfully verified. Welcome to Gamalogic!"
+        )
           let token = res.data;
           setUserDetails(token);
           setCreditBal(token.credit)
@@ -51,7 +53,7 @@ function Login() {
         navigate('/VerifyYourEmail',{ state:data})
       }
       else{
-        toast.dark("Welcome back! You've successfully logged in.");
+        toast.success("Welcome back! You've successfully logged in.");
         let token = userData.data;
         setUserDetails(token);
         setCreditBal(token.credit)
@@ -83,7 +85,7 @@ function Login() {
       let res = await axiosInstance.post("/googleLogin", {
         credentialResponse,
       });
-      toast.dark("Welcome back! You've successfully logged in with Google.");
+      toast.success("Welcome back! You've successfully logged in with Google.");
       let token = res.data;
       setUserDetails(token);
       setCreditBal(token.credit)

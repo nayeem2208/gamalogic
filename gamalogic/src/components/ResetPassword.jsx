@@ -43,7 +43,7 @@ function ResetPassword() {
           });
           console.log(reset,'reset')
           if(reset.status==200){
-            toast.dark(reset.data?.message)
+            toast.success(reset.data?.message)
             navigate('/signin')
           }
         } else {

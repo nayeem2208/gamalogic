@@ -387,7 +387,7 @@ let APIControllers = {
           <p>Gamalogic</p>
         `
       );
-      res.status(200).json('successfull')
+      res.status(200).json('Successfull')
       await dbConnection.end()
     } catch (error) {
       console.log(error);
