@@ -32,7 +32,7 @@ const Authentication = {
       if (user[0].length > 0) {
         if (user[0][0].session_google == 1) {
           return res.status(401).json({
-            error: `Please use "Continue with Google" to sign in with your linked account.
+            error: `Incorrect password
           ` });
           
         }
