@@ -167,10 +167,10 @@ function EmailVerification() {
                 setJsonToServer({ emails: emails, fileName: fileName });
                 setShowAlert(true);
               // } else {
-              //   toast.error("You dont have enough credits to do this");
+              //   toast.error("You dont have enough credits");
               // }
             } else {
-              toast.error("Please select a file with less than 1 lakh data");
+              toast.error("Please select a file with not more than 100,000 email address");
             }
           },
         });

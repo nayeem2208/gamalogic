@@ -49,7 +49,7 @@ function Signup() {
     try {
       if (
         (data.fullname, data.email, data.password, data.confirmPassword) &&
-        nameOfUser.length > 2
+        nameOfUser.length > 3
       ) {
         if (data.password == data.confirmPassword) {
           if (emailPattern.test(data.email)) {

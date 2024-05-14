@@ -35,7 +35,7 @@ function Login() {
             return;
           }
           toast.success(
-            "Your account has been successfully verified. Welcome to Gamalogic!"
+            "Your email has been successfully verified. Welcome to Gamalogic!"
           );
           let token = res.data;
           setUserDetails(token);
@@ -54,7 +54,8 @@ function Login() {
     try {
       let userData = await axiosInstance.post("login", data);
       if (userData.data?.confirm == 0) {
-        toast.error("Please confirm your email to login.");
+        toast.error(`We have sent a verification link to your email address.
+        Follow the link in the email to validate and complete your registration.`);
         navigate("/VerifyYourEmail", { state: data });
       } else {
         toast.success("Welcome back! You've successfully logged in.");
@@ -89,7 +90,7 @@ function Login() {
       let res = await axiosInstance.post("/googleLogin", {
         credentialResponse,
       });
-      toast.success("Welcome back! You've successfully logged in with Google.");
+      toast.success("Welcome back! You've successfully logged in");
       let token = res.data;
       setUserDetails(token);
       setCreditBal(token.credit);

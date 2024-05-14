@@ -118,7 +118,7 @@ let APIControllers = {
       const hashedPassword = req.user[0][0].password;
       let passwordMatch = await verifyPassword(old, hashedPassword);
       if (!passwordMatch) {
-        res.status(400).json({ message: "Old password is not correct" });
+        res.status(400).json({ message: "Previous password is invalid" });
       } else {
         let hashedPasswordForDatabase = await passwordHash(newPassword);
         await dbConnection.query(

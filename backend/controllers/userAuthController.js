@@ -135,7 +135,7 @@ const Authentication = {
     <p>Gamalogic</p>`
         );
 
-        res.status(200).json("Please check your email for verification");
+        res.status(200).json("Please check your email for verification link");
       }
       // }
       // else{
@@ -185,7 +185,7 @@ const Authentication = {
       } else {
         res.status(400).json({
           error:
-            "Unauthorised Access, Please register with google login button",
+            "Unauthorised Access, Please register with google login",
         });
       }
       await dbConnection.end()
@@ -259,7 +259,7 @@ const Authentication = {
         } else {
           res
             .status(400)
-            .json({ error: "Error while adding user with google" });
+            .json({ error: "Error while adding user with google login" });
         }
       }
       await dbConnection.end()
@@ -341,7 +341,7 @@ const Authentication = {
       if (user[0].length > 0) {
         if (user[0][0].session_google == 1) {
           res.status(401).json({
-            error: `Password reset isn't available for Google Sign-In accounts.Please use your Google account to sign in.
+            error: `Unauthorised access
           ` });
           return
         }
