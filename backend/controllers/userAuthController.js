@@ -338,13 +338,14 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${req.body.email}'`
       );
       if (user[0].length > 0) {
+        let token=generateConfirmationToken(req.body.email)
         sendEmail(
           user[0][0].username,
           req.body.email,
           "Reset your password",
           `<p>Hi ${user[0][0].username},</p>
           <p>We received a request to reset your password. To proceed with resetting your password, please click the link below:</p>
-          <p><a href="https://beta.gamalogic.com/resetPassword?email=${req.body.email}">Reset Password</a></p>
+          <p><a href="https://beta.gamalogic.com/resetPassword?email=${token}">Reset Password</a></p>
           <p>If you didn't request this change, you can ignore this email. Your account security is important to us.</p>
           <p>Best regards,</p>
           <p>Gamalogic </p>`
@@ -370,18 +371,20 @@ const Authentication = {
   resetPassword: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
+      const decoded = jwt.verify(req.body.email, process.env.JWT_SECRET);
+      const userEmail = decoded.email;
       let user = await dbConnection.query(
-        `SELECT * FROM registration WHERE emailid='${req.body.email}'`
+        `SELECT * FROM registration WHERE emailid='${userEmail}'`
       );
       if (user[0].length > 0) {
         // let hash = generateSHA256Hash(req.body.password);
         let hashedPassword = await passwordHash(req.body.password);
         await dbConnection.query(
-          `UPDATE registration SET password='${hashedPassword}' WHERE emailid='${req.body.email}'`
+          `UPDATE registration SET password='${hashedPassword}' WHERE emailid='${userEmail}'`
         );
         sendEmail(
           user[0][0].username,
-          req.body.email,
+          userEmail,
           "Password successfully updated",
           `<p>Hi ${user[0][0].username},</p>
 
