@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import SubHeader from "../components/SubHeader";
 import axiosInstance from "../axios/axiosInstance";
 import LoadingBar from "react-top-loading-bar";
+import { toast } from "react-toastify";
 
 function ApiKey() {
   let [api,setApi]=useState('')
@@ -29,6 +30,7 @@ function ApiKey() {
       await new Promise(resolve => setTimeout(resolve, 2000));
       let resetApiKey=await axiosInstance.get('/resetApiKey')
       setLoad(100);
+      toast.success('Your api key has been updated')
       setApi(resetApiKey.data.newApiKey)
     } catch (error) {
       console.log(error)

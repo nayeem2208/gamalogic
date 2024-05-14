@@ -69,6 +69,58 @@
     font-family: 'Ubuntu', sans-serif;
 }
 
+.section-button:hover,
+.notfound a:hover {
+    border-color: rgba(22, 109, 110, 0.7);
+}
+
+.notfound h1 {
+    font-size: 11.4rem !important;
+    margin-left: -12px !important;
+}
+
+.notfound h2 {
+    font-size: 1.5rem !important;
+}
+
+.notfound h1 {
+    color: #0A0E2B;
+    text-shadow: -1px -1px 0px #F74C41, 1px 1px 0px #3AFAFE;
+    font-family: 'Montserrat', sans-serif;
+
+    /* position: absolute; */
+    /* left: 50%;
+    top: 50%; */
+    /* -webkit-transform: translate(-50% , -50%);
+    -ms-transform: translate(-50% , -50%);
+    transform: translate(-50% , -50%); */
+    font-size: 14rem;
+    font-weight: 900;
+    /* margin-top: 0px; */
+    /* margin-bottom: 0px; */
+    margin-left: -30px;
+    letter-spacing: -20px;
+}
+
+.notfound h2 {
+    letter-spacing: 15px;
+    margin-top: -110px;
+    margin-bottom: 3rem;
+    font-size: 2.7rem;
+    font-weight: 700;
+}
+
+.notfound a {
+    border: 2px solid #3AFAFE;
+    padding: 0.6rem 2rem;
+    border-radius: 44px;
+    transition: all 0.3s ease 0s;
+}
+
+.notfound {
+    margin: 7rem 0 12rem;
+}
+
 
 
 
