@@ -338,6 +338,11 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${req.body.email}'`
       );
       if (user[0].length > 0) {
+        if (user[0][0].session_google == 1) {
+          res.status(401).json({
+            error: `Password reset isn't available for Google Sign-In accounts.Please use your Google account to sign in.
+          ` });
+        }
         let token=generateConfirmationToken(req.body.email)
         sendEmail(
           user[0][0].username,

@@ -8,7 +8,6 @@ function ForgotPassword() {
   const handleSubmit=async(e)=>{
     e.preventDefault()
     try {
-      console.log('ivda vare ok')
       let res=await axiosInstance.post('/forgotPassword',{email})
       toast.success(res.data?.message,)
       setEmail('')
