@@ -185,7 +185,7 @@ const Authentication = {
       } else {
         res.status(400).json({
           error:
-            "Invalid User , Please Sign up with google to use this Sign in",
+            "Unauthorised Access, Please register with google login button",
         });
       }
       await dbConnection.end()
