@@ -342,6 +342,7 @@ const Authentication = {
           res.status(401).json({
             error: `Password reset isn't available for Google Sign-In accounts.Please use your Google account to sign in.
           ` });
+          return
         }
         let token=generateConfirmationToken(req.body.email)
         sendEmail(
