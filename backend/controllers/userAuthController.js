@@ -31,9 +31,10 @@ const Authentication = {
       );
       if (user[0].length > 0) {
         if (user[0][0].session_google == 1) {
-          res.status(401).json({
+          return res.status(401).json({
             error: `Please use "Continue with Google" to sign in with your linked account.
           ` });
+          
         }
         const hashedPassword = user[0][0].password;
         let passwordMatch = await verifyPassword(password, hashedPassword);
