@@ -12,6 +12,9 @@ const Authentication = {
   sample: async (req, res) => {
     ///its for checking purpose
     try {
+      console.log(req,'req is here')
+      const referrer = req.headers.referer || req.headers.referrer;
+      console.log(referrer,'referrrrrrrrrrrrrrrrrrrrrrr')
       res.send('hiii its working')
       // Simulating an error for demonstration purposes
       // console.log(req.route.path,'original url')
@@ -120,7 +123,7 @@ const Authentication = {
           .replace("T", " ");
         let apiKey = await generateUniqueApiKey(req);
         await dbConnection.query(
-          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',0,0)`
+          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${apiKey}','${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0)`
         );
         let token=generateConfirmationToken(email)
         sendEmail(
@@ -286,7 +289,7 @@ const Authentication = {
         return res.status(200).json({ message: "User is already verified." });
       }
       let confirmedDate = new Date();
-      const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,referer=? WHERE emailid = ?`;
+      const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,referer=?, credits_free=500  WHERE emailid = ?`;
       await dbConnection.query(query, [confirmedDate, req.headers.origin, userEmail]);
       let verifiedUser = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`

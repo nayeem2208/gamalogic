@@ -75,12 +75,12 @@
 }
 
 .notfound h1 {
-    font-size: 11.4rem !important;
+    font-size: 20rem !important;
     margin-left: -12px !important;
 }
 
 .notfound h2 {
-    font-size: 1.5rem !important;
+    font-size: 3rem !important;
 }
 
 .notfound h1 {
@@ -110,7 +110,7 @@
     font-weight: 700;
 }
 
-.notfound a {
+.notfound Link{
     border: 2px solid #3AFAFE;
     padding: 0.6rem 2rem;
     border-radius: 44px;

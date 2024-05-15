@@ -9,12 +9,12 @@ function NotFound() {
         </Link>
       </div>
       <div className="flex flex-col justify-center items-center">
-            <div className="notfound">
+            <div className="notfound flex flex-col justify-center items-center">
           <h1 className=" text-9xl font-bold">404</h1>
           <h2 className="text-4xl font-semibold">PAGE NOT FOUND</h2>
           <Link
           to="/"
-          className="border rounded-xl px-4 mt-4 py-1 border-cyan-500 text-xl"
+          className="border rounded-xl px-4 mt-4 py-1 border-cyan-500 text-2xl"
         >
           Home
         </Link>
