@@ -284,11 +284,12 @@ const Authentication = {
       let referer = req.headers.referer || null
       const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
       const userEmail = decoded.email;
-      let disposibleEmail = isDisposableURL(referer)
-      console.log(disposibleEmail,'disposible emial is hereeeee')
-      if (disposibleEmail) {
-        res.redirect('https://beta.gamalogic.com/blocked')
-        return
+      if (referer) {
+        let disposibleEmail = isDisposableURL(referer)
+        if (disposibleEmail) {
+          res.redirect('https://beta.gamalogic.com/blocked')
+          return
+        }
       }
       const alreadyVerifiedUser = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
