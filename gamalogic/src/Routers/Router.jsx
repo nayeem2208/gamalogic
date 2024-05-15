@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import { Suspense, lazy, useState } from 'react';
 import TopLoader from '../components/TopLoader';
 import NotFound from '../pages/Notfound';
+import BlockePage from '../pages/BlockePage';
 
 const QuickValidation = lazy(() => import('../pages/QuickValidation'));
 const Body = lazy(() => import('../components/Body'));
@@ -41,6 +42,7 @@ function Router() {
         <Route path="VerifyYourEmail" element={<Suspense fallback={<TopLoader loading={loading} />}><PostSignupPage setLoading={setLoading}/></Suspense>} />
       </Route>
       <Route path="*" element={<NotFound />} />
+      <Route path='/blocked' element={<BlockePage/>}/>
     </Routes>
   );
 }

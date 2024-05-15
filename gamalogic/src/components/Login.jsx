@@ -23,25 +23,14 @@ function Login() {
   const location = useLocation();
 
   useEffect(() => {
-    async function verifyEmail() {
+    function verifyEmail() {
       const queryParams = new URLSearchParams(location.search);
       if (queryParams) {
-        const email = queryParams.get("email");
-        if (email) {
-          let res = await axiosInstance.get(`/verifyEmail?email=${email}`);
-          if (res.data.message === "User is already verified.") {
-            toast.info("Email is already verified");
-            navigate("/");
-            return;
-          }
+        const verified = queryParams.get("verified");
+        if (verified === "true") {
           toast.success(
             "Your email has been successfully verified. Welcome to Gamalogic!"
           );
-          let token = res.data;
-          setUserDetails(token);
-          setCreditBal(token.credit);
-          localStorage.setItem("Gamalogic_token", JSON.stringify(token));
-          navigate("/");
         }
       }
     }

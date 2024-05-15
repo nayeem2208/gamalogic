@@ -7,6 +7,7 @@ import sendEmail from "../utils/zeptoMail.js";
 import axios from "axios";
 import ErrorHandler from "../utils/errorHandler.js";
 import generateConfirmationToken from "../utils/confirmationToken.js";
+import isDisposableURL from "../utils/disposibleEmailList.js";
 
 const Authentication = {
   sample: async (req, res) => {
@@ -283,6 +284,11 @@ const Authentication = {
       let referer = req.headers.referer || null
       const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
       const userEmail = decoded.email;
+      let disposibleEmail = isDisposableURL(referer)
+      if (disposibleEmail) {
+        res.redirect('https://beta.gamalogic.com/blocked')
+        return
+      }
       const alreadyVerifiedUser = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
       );
@@ -324,7 +330,8 @@ const Authentication = {
         //   token,
         //   credit: creditBal
         // });
-        res.redirect('https://beta.gamalogic.com/')
+        res.redirect('https://beta.gamalogic.com/?verified=true');
+
       }
       await dbConnection.end()
     } catch (error) {
