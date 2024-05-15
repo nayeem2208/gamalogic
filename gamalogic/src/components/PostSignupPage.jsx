@@ -7,9 +7,10 @@ function PostSignupPage({ setLoading }) {
   
   const location = useLocation();
   const data = location.state 
-  const HandleSendVerifyLink=async()=>{
+  const HandleSendVerifyLink=async(e)=>{
     try {
-      let response=await axiosInstance.get(`/SendVerifyEmail?email=${data.email}`)
+      e.preventDefault()
+      await axiosInstance.get(`/SendVerifyEmail?email=${data.email}`)
       toast.success('New verification link sent successfully')
     } catch (error) {
       console.log(error)

@@ -43,7 +43,6 @@ const Authentication = {
         const hashedPassword = user[0][0].password;
         let passwordMatch = await verifyPassword(password, hashedPassword);
         if (passwordMatch) {
-          if (user[0][0].confirmed == 1) {
             let token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
             let creditBal;
             let finalFree = new Date(user[0][0].free_final);
@@ -60,11 +59,9 @@ const Authentication = {
               email: user[0][0].emailid,
               credit: creditBal,
               token,
-              confirm: 1
+              confirm: user[0][0].confirmed
             });
-          } else {
-            res.status(201).json({ confirm: 0 })
-          }
+
         } else {
           res.status(401).json({ error: "Incorrect password" });
         }

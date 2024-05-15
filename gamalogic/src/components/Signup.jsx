@@ -63,7 +63,7 @@ function Signup() {
                 });
                 console.log(userData, "userdata");
                 toast.success(userData?.data);
-                navigate("/VerifyYourEmail");
+                navigate("/VerifyYourEmail", { state: { email: data.email } });
               } else {
                 toast.error(
                   "Please ensure your password contains at least 6 characters, including both letters and numbers.",

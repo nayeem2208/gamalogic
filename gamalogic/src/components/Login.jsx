@@ -22,38 +22,19 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    function verifyEmail() {
-      const queryParams = new URLSearchParams(location.search);
-      if (queryParams) {
-        const verified = queryParams.get("verified");
-        if (verified === "true") {
-          toast.success(
-            "Your email has been successfully verified. Welcome to Gamalogic!"
-          );
-        }
-      }
-    }
-    verifyEmail();
-  }, [location.search]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       let userData = await axiosInstance.post("login", data);
-      if (userData.data?.confirm == 0) {
-        toast.error(`We have sent a verification link to your email address.
-        Follow the link in the email to validate and complete your registration.`);
-        navigate("/VerifyYourEmail", { state: data });
-      } else {
         toast.success("Welcome back! You've successfully logged in.");
         let token = userData.data;
         setUserDetails(token);
         setCreditBal(token.credit);
         localStorage.setItem("Gamalogic_token", JSON.stringify(token));
         navigate("/");
-      }
+      
     } catch (error) {
       console.log(error.response, "error");
       toast.error(error.response.data.error);
