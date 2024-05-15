@@ -285,6 +285,7 @@ const Authentication = {
       const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
       const userEmail = decoded.email;
       let disposibleEmail = isDisposableURL(referer)
+      console.log(disposibleEmail,'disposible emial is hereeeee')
       if (disposibleEmail) {
         res.redirect('https://beta.gamalogic.com/blocked')
         return
