@@ -12,9 +12,9 @@ const Authentication = {
   sample: async (req, res) => {
     ///its for checking purpose
     try {
-      console.log(req,'req is here')
+      console.log(req, 'req is here')
       const referrer = req.headers.referer || req.headers.referrer;
-      console.log(referrer,'referrrrrrrrrrrrrrrrrrrrrrr')
+      console.log(referrer, 'referrrrrrrrrrrrrrrrrrrrrrr')
       res.send('hiii its working')
       // Simulating an error for demonstration purposes
       // console.log(req.route.path,'original url')
@@ -37,7 +37,7 @@ const Authentication = {
           return res.status(401).json({
             error: `Incorrect password
           ` });
-          
+
         }
         const hashedPassword = user[0][0].password;
         let passwordMatch = await verifyPassword(password, hashedPassword);
@@ -123,9 +123,9 @@ const Authentication = {
           .replace("T", " ");
         let apiKey = await generateUniqueApiKey(req);
         await dbConnection.query(
-          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${apiKey}','${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0)`
+          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0)`
         );
-        let token=generateConfirmationToken(email)
+        let token = generateConfirmationToken(email)
         sendEmail(
           fullname,
           email,
@@ -280,7 +280,7 @@ const Authentication = {
   verifyEmail: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      let referer=req.headers.referer || null
+      let referer = req.headers.referer || null
       const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
       const userEmail = decoded.email;
       const alreadyVerifiedUser = await dbConnection.query(
@@ -289,9 +289,10 @@ const Authentication = {
       if (alreadyVerifiedUser[0].length > 0) {
         return res.status(200).json({ message: "User is already verified." });
       }
+      let apiKey = await generateUniqueApiKey(req);
       let confirmedDate = new Date();
-      const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,referer=?, credits_free=500  WHERE emailid = ?`;
-      await dbConnection.query(query, [confirmedDate, referer, userEmail]);
+      const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,api_key=?,referer=?, credits_free=500  WHERE emailid = ?`;
+      await dbConnection.query(query, [confirmedDate, apiKey, referer, userEmail]);
       let verifiedUser = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
       );
@@ -350,7 +351,7 @@ const Authentication = {
           ` });
           return
         }
-        let token=generateConfirmationToken(req.body.email)
+        let token = generateConfirmationToken(req.body.email)
         sendEmail(
           user[0][0].username,
           req.body.email,
@@ -427,7 +428,7 @@ const Authentication = {
   sendVerifyEmail: async (req, res) => {
     try {
       const username = req.query.email.split('@')[0];
-      let token=generateConfirmationToken(req.query.email)
+      let token = generateConfirmationToken(req.query.email)
       sendEmail(
         username,
         req.query.email,

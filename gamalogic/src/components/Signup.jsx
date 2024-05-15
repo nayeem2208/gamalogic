@@ -21,7 +21,7 @@ function Signup() {
   });
   let [loading, setLoading] = useState(false);
   let navigate = useNavigate();
-  let { setUserDetails,setCreditBal } = useUserState();
+  let { setUserDetails, setCreditBal } = useUserState();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -44,36 +44,42 @@ function Signup() {
   console.log(nameOfUser.length, "length");
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); 
+    setLoading(true);
     // const token = await window.grecaptcha.getResponse();
     try {
       if (
-        (data.fullname, data.email, data.password, data.confirmPassword) &&
-        nameOfUser.length > 3
+        data.fullname &&
+        data.email &&
+        data.password &&
+        data.confirmPassword
       ) {
-        if (data.password == data.confirmPassword) {
-          if (emailPattern.test(data.email)) {
-            if (passwordPattern.test(data.password)) {
-              let userData = await axiosInstance.post("signup", {
-                data,
-                // token,
-              });
-              console.log(userData, "userdata");
-              toast.success(userData?.data);
-              navigate("/VerifyYourEmail");
+        if (nameOfUser.length > 2) {
+          if (data.password == data.confirmPassword) {
+            if (emailPattern.test(data.email)) {
+              if (passwordPattern.test(data.password)) {
+                let userData = await axiosInstance.post("signup", {
+                  data,
+                  // token,
+                });
+                console.log(userData, "userdata");
+                toast.success(userData?.data);
+                navigate("/VerifyYourEmail");
+              } else {
+                toast.error(
+                  "Please ensure your password contains at least 6 characters, including both letters and numbers.",
+                  4000
+                );
+              }
             } else {
-              toast.error(
-                "Please ensure your password contains at least 6 characters, including both letters and numbers.",
-                4000
-              );
+              toast.error("Please enter a valid email address.");
             }
           } else {
-            toast.error("Please enter a valid email address.");
+            toast.error(
+              "The password and confirm password do not match. Please ensure they are identical."
+            );
           }
-        } else {
-          toast.error(
-            "The password and confirm password do not match. Please ensure they are identical."
-          );
+        }else{
+          toast.error('Name must be at least 3 characters long.')
         }
       } else {
         toast.error("Please provide all required information.");
@@ -81,7 +87,7 @@ function Signup() {
     } catch (error) {
       console.log(error);
       toast.error(error.response?.data?.error);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -92,10 +98,12 @@ function Signup() {
       let res = await axiosInstance.post("/googleSignup", {
         credentialResponse,
       });
-      toast.success("Welcome to Gamalogic! You've successfully registered with us.")
+      toast.success(
+        "Welcome to Gamalogic! You've successfully registered with us."
+      );
       let token = res.data;
       setUserDetails(token);
-      setCreditBal(token.credit)
+      setCreditBal(token.credit);
       localStorage.setItem("Gamalogic_token", JSON.stringify(token));
       navigate("/");
     } catch (err) {
@@ -168,7 +176,11 @@ function Signup() {
                 <div className="ease-in duration-300 opacity-0 group-hover:block group-hover:opacity-100 transition-all">
                   <div className="ease-in-out duration-500 -translate-y-4 pointer-events-none transition-all group-hover:-translate-y-16 absolute left-1/2 z-50 flex -translate-x-1/2 flex-col items-center rounded-sm text-center text-sm text-slate-300 before:-top-2">
                     <div className="rounded-sm bg-black py-1 px-2">
-                      <p className="whitespace-nowrap">Please ensure your password <br /> contains at least 6 characters,<br /> including both letters and numbers. </p>
+                      <p className="whitespace-nowrap">
+                        Please ensure your password <br /> contains at least 6
+                        characters,
+                        <br /> including both letters and numbers.{" "}
+                      </p>
                     </div>
                     <div className="h-0 w-fit border-l-8 border-r-8 border-t-8 border-transparent border-t-black"></div>
                   </div>
@@ -210,7 +222,8 @@ function Signup() {
                 target="_blank"
               >
                 Terms of Service
-              </a>,
+              </a>
+              ,
               <a
                 href="https://gamalogic.com/privacy-policy"
                 className="hover:text-white"
