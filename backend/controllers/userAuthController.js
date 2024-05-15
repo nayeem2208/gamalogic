@@ -280,7 +280,7 @@ const Authentication = {
   verifyEmail: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      console.log(req,'req is here')
+      let referer=req.headers.referer || null
       const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
       const userEmail = decoded.email;
       const alreadyVerifiedUser = await dbConnection.query(
@@ -291,7 +291,7 @@ const Authentication = {
       }
       let confirmedDate = new Date();
       const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,referer=?, credits_free=500  WHERE emailid = ?`;
-      await dbConnection.query(query, [confirmedDate, req.headers.origin, userEmail]);
+      await dbConnection.query(query, [confirmedDate, referer, userEmail]);
       let verifiedUser = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
       );
@@ -434,7 +434,7 @@ const Authentication = {
         "Please Verify Your Account",
         `<p>Hi ${username},</p>
   <p>Welcome to Gamalogic! To start using your account, please click the link below to verify your email address:</p>
-  <p><a href="https://beta.gamalogic.com/signin?email=${token}&track=true">Verify Your Account</a></p>
+  <p><a href="https://beta.gamalogic.com/api/verifyEmail?email=${token}">Verify Your Account</a></p>
   <p>Thank you for joining us. If you have any questions, feel free to contact our support team.</p>
   <p>Best regards,</p>
   <p>Gamalogic</p>`
