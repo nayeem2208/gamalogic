@@ -83,7 +83,35 @@
     font-size: 3rem !important;
 }
 
+
+.notfound h3 {
+    font-size: 16rem !important;
+    margin-left: -12px !important;
+}
+.notfound h4 {
+    font-size: 1.2rem !important;
+}
+
 .notfound h1 {
+    color: #0A0E2B;
+    text-shadow: -1px -1px 0px #F74C41, 1px 1px 0px #3AFAFE;
+    font-family: 'Montserrat', sans-serif;
+
+    /* position: absolute; */
+    /* left: 50%;
+    top: 50%; */
+    /* -webkit-transform: translate(-50% , -50%);
+    -ms-transform: translate(-50% , -50%);
+    transform: translate(-50% , -50%); */
+    font-size: 14rem;
+    font-weight: 900;
+    /* margin-top: 0px; */
+    /* margin-bottom: 0px; */
+    margin-left: -30px;
+    letter-spacing: -20px;
+}
+
+.notfound h3 {
     color: #0A0E2B;
     text-shadow: -1px -1px 0px #F74C41, 1px 1px 0px #3AFAFE;
     font-family: 'Montserrat', sans-serif;

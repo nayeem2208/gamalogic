@@ -331,7 +331,7 @@ const Authentication = {
         //   token,
         //   credit: creditBal
         // });
-        res.redirect('https://beta.gamalogic.com/?verified=true');
+        res.redirect('https://beta.gamalogic.com/EmailConfirmed');
 
       }
       await dbConnection.end()

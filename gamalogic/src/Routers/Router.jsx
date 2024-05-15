@@ -3,6 +3,7 @@ import { Suspense, lazy, useState } from 'react';
 import TopLoader from '../components/TopLoader';
 import NotFound from '../pages/Notfound';
 import BlockePage from '../pages/BlockePage';
+import EmailVerifiedPage from '../components/EmailVerifiedPage';
 
 const QuickValidation = lazy(() => import('../pages/QuickValidation'));
 const Body = lazy(() => import('../components/Body'));
@@ -43,6 +44,7 @@ function Router() {
       </Route>
       <Route path="*" element={<NotFound />} />
       <Route path='/blocked' element={<BlockePage/>}/>
+      <Route path='/EmailConfirmed' element={<EmailVerifiedPage/>}/>
     </Routes>
   );
 }

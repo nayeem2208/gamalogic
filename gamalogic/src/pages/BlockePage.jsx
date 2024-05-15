@@ -10,8 +10,8 @@ function BlockePage() {
       </div>
       <div className="flex flex-col justify-center items-center">
             <div className="notfound flex flex-col justify-center items-center">
-          <h1 className=" text-9xl font-bold">Blocked</h1>
-          <h2 className="text-4xl font-semibold">Disposible or temporary email address are not allowed to register with our service. We prefer to use real email address</h2>
+          <h3 className=" text-9xl font-bold">Blocked</h3>
+          <h4 className="text-4xl font-semibold">Disposible or temporary email address are not allowed to register with our service. We prefer to use real email address</h4>
           <Link
           to="/signup"
           className="border rounded-xl px-4 mt-4 py-1 border-cyan-500 text-2xl"
