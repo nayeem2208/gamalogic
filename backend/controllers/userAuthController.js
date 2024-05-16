@@ -183,7 +183,7 @@ const Authentication = {
           creditBal = user[0][0].credits;
         }
 
-        let password = user[0][0].password !== 0;
+        let password = user[0][0].password != 0;
         res.status(200).json({
           name: user[0][0].username,
           email: user[0][0].emailid,
@@ -260,7 +260,7 @@ const Authentication = {
             <p>Best regards,</p>
             <p>The Gamalogic Team</p>`
           );
-          let password=0
+          let password=false
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,

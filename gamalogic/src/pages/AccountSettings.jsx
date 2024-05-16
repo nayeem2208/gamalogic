@@ -1,6 +1,6 @@
 import { FaEye } from "react-icons/fa";
 import SubHeader from "../components/SubHeader";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axiosInstance from "../axios/axiosInstance";
 import { IoInformationCircleOutline } from "react-icons/io5";
@@ -22,7 +22,17 @@ function AccountSettings() {
   let [serverError, setServerError] = useState(false);
   let [loading, setLoading] = useState(false);
   let [load, setLoad] = useState(30);
-  let { userDetails } = useUserState();
+  let { setUserDetails, userDetails } = useUserState();
+
+  useEffect(() => {
+    if (userDetails.password == false) {
+      setPasswordData((prevState) => ({
+        ...prevState,
+        old: "PasswordForgoogleUsers",
+      }));
+    }
+  }, []);
+
   const passwordVisibilityHandler = (field) => {
     setPasswordVisible((prevState) => ({
       ...prevState,
@@ -37,6 +47,14 @@ function AccountSettings() {
       [name]: value,
     }));
   };
+  useEffect(()=>{
+    if(userDetails.password==false){
+      setPasswordData((prevState)=>({
+        ...prevState,
+        old: 'PasswordForgoogleUsers'
+      }))
+    }
+  },[])
 
   const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?!\s).{6,}$/;
   let changaePassword = async (e) => {
@@ -74,6 +92,20 @@ function AccountSettings() {
         "/changePassword",
         passwordData
       );
+      if (response.data.googleUser == 1) {
+        const storedToken = localStorage.getItem("Gamalogic_token");
+        if (storedToken) {
+          let token;
+          try {
+            token = JSON.parse(storedToken);
+          } catch (error) {
+            token = storedToken;
+          }
+          token.password = true;
+          localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+          setUserDetails(token);
+        }
+      }
       setLoad(100);
       toast.success("Password succesfully updated");
       setPasswordData({
@@ -85,7 +117,7 @@ function AccountSettings() {
       if (error.response.status === 500) {
         setServerError(true); 
       } else {
-        toast.error(error.response?.data?.error);
+        toast.error(error.response?.data?.message);
       }
     }
   };
@@ -127,22 +159,26 @@ function AccountSettings() {
           know and that no one else can guess protects your private information
           from unauthorized access.
         </p>
-        <p className="mt-6 mb-1 text-sm">Old Password</p>
-        <div className="flex bg-transparent  justify-between items-center  w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 text-gray-400 my-1">
-          <input
-            className="bg-transparent w-5/6  outline-none"
-            type={passwordVisible.old ? "text" : "password"}
-            name="old"
-            id="password"
-            placeholder="Enter your old password"
-            onChange={handleInputChange}
-            value={passwordData.old}
-          />
-          <FaEye
-            className="w-4 h-4 text-slate-900 ml-2"
-            onClick={() => passwordVisibilityHandler("old")}
-          />
-        </div>
+        {userDetails.password == true && (
+            <p className="mt-6 mb-1 text-sm">Old Password</p>
+          )}
+          {userDetails.password == true && (
+            <div className="flex bg-transparent  justify-between items-center  w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 text-gray-400 my-1">
+              <input
+                className="bg-transparent w-5/6  outline-none"
+                type={passwordVisible.old ? "text" : "password"}
+                name="old"
+                id="password"
+                placeholder="Enter your old password"
+                onChange={handleInputChange}
+                value={passwordData.old}
+              />
+              <FaEye
+                className="w-4 h-4 text-slate-900 ml-2"
+                onClick={() => passwordVisibilityHandler("old")}
+              />
+            </div>
+          )}
         <p className="mt-6 mb-1 text-sm">New Password</p>
         <div className="flex bg-transparent  justify-between items-center w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 text-gray-400 my-1">
           <input

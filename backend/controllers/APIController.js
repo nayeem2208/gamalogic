@@ -115,8 +115,17 @@ let APIControllers = {
     try {
       const dbConnection = req.dbConnection;
       let { old, newPassword, confirm } = req.body;
+      let passwordMatch
+      let googleUser
+      if(old!='PasswordForgoogleUsers'){
       const hashedPassword = req.user[0][0].password;
-      let passwordMatch = await verifyPassword(old, hashedPassword);
+       passwordMatch = await verifyPassword(old, hashedPassword);
+       googleUser = 0
+      }
+      else{
+         passwordMatch=true
+         googleUser = 1
+      }
       if (!passwordMatch) {
         res.status(400).json({ message: "Previous password is invalid" });
       } else {
@@ -138,7 +147,7 @@ let APIControllers = {
             <p>Gamalogic</p>
           `
         );
-        res.status(200).json({ message: "Password successfully changed" });
+        res.status(200).json({ message: "Password successfully changed", googleUser});
       }
       await dbConnection.end();
     } catch (error) {
