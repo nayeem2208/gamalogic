@@ -137,7 +137,7 @@ function Signup() {
           className="flex flex-col p-10 w-3/6 mb-16"
           style={{ backgroundColor: "#161736" }}
         >
-          <form className="flex flex-col" onSubmit={handleSubmit}>
+          <form className="flex flex-col text-sm" onSubmit={handleSubmit}>
             <label htmlFor="">Full Name</label>
             <input
               type="text"

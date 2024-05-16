@@ -12,6 +12,11 @@
     border-bottom: 2px solid #F74C41;
     color: #161736;
 }
+.subHeaderCredits{
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 450;
+    color: #0A0E2B;
+}
 
 .subHeading{
     color: #0A0E2B;
@@ -24,10 +29,12 @@
 }
 
 .subHeading .description{
-    font-size: large;
+    font-size: 16px;
     font-weight: 200;
 }
-
+.auth{
+    font-family: 'Ubuntu', sans-serif;
+}
 .auth .description{
     font-size: 16px;
     font-weight: 200;
@@ -60,6 +67,10 @@
 .h2-background .red {
     background-color: #F74C41;
     margin-bottom: .3rem;
+}
+
+.accountSettings input{
+    font-family: 'Montserrat', sans-serif;
 }
 
 .QucikValidationtable tr {

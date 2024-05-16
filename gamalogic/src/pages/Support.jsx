@@ -13,23 +13,23 @@ export default function Support() {
           a mail here -{" "}
           <a href="mailto:support@gamalogic.com" className="underline font-medium" target="_blank">support@gamalogic.com</a> 
         </p>
-        <ul className="mt-36">
-          <li className="my-2">
+        <ul className="mt-48 text-sm">
+          <li className="my-4">
             <a className="flex items-center font-light" href="mailto:support@gamalogic.com" target="_blank"><IoMail className="mr-3"/>
               Email
             </a>
           </li>
-          <li className="my-2">
+          <li className="my-4">
             <a className="flex items-center font-light" href="https://twitter.com/Gamalogicapp" target="_blank"><IoLogoTwitter className="mr-3"/>
               Twitter
             </a>
           </li>
-          <li className="my-2">
+          <li className="my-4">
             <a className="flex items-center font-light" href="https://www.facebook.com/gamalogicapp" target="_blank"><FaFacebookF className="mr-3"/>
               Facebook
             </a>
           </li>
-          <li className="my-2">
+          <li className="my-4">
             <a className="flex items-center font-light"
               href="https://www.linkedin.com/company/gamalogic"
               target="_blank"

@@ -40,6 +40,13 @@ const Authentication = {
           ` });
 
         }
+        if (user[0][0].referer !== null) {
+          let disposibleEmail = isDisposableURL(user[0][0].referer)
+          if (disposibleEmail) {
+            res.redirect('https://beta.gamalogic.com/blocked')
+            return
+          }
+        }
         const hashedPassword = user[0][0].password;
         let passwordMatch = await verifyPassword(password, hashedPassword);
         if (passwordMatch) {
@@ -284,6 +291,8 @@ const Authentication = {
       if (referer) {
         let disposibleEmail = isDisposableURL(referer)
         if (disposibleEmail) {
+          const query = `UPDATE registration SET referer=? WHERE emailid = ?`;
+          await dbConnection.query(query, [referer, userEmail]);
           res.redirect('https://beta.gamalogic.com/blocked')
           return
         }

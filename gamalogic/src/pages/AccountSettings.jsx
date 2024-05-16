@@ -80,11 +80,11 @@ function AccountSettings() {
   };
 
   return (
-    <div className=" px-20 py-8 ">
+    <div className=" px-20 py-8 accountSettings">
       <SubHeader SubHeader={"Account Settings"} />
       <form className="mt-14 text-bgblue subHeading" onSubmit={changaePassword}>
         <h3>Your Profile</h3>
-        <p className="mt-6 mb-1">Your Name</p>
+        <p className="mt-6 mb-1 text-sm">Your Name</p>
         <input
           type="text"
           placeholder="enter your name here"
@@ -92,7 +92,7 @@ function AccountSettings() {
           value={userDetails.name}
           readOnly
         />{" "}
-        <p className="mt-6 mb-1">Your Email</p>
+        <p className="mt-6 mb-1 text-sm">Your Email</p>
         <input
           type="email"
           placeholder="enter the email here"
@@ -106,7 +106,7 @@ function AccountSettings() {
           know and that no one else can guess protects your private information
           from unauthorized access.
         </p>
-        <p className="mt-6 mb-1">Old Password</p>
+        <p className="mt-6 mb-1 text-sm">Old Password</p>
         <div className="flex bg-transparent  justify-between items-center  w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 text-gray-400 my-1">
           <input
             className="bg-transparent w-5/6  outline-none"
@@ -122,7 +122,7 @@ function AccountSettings() {
             onClick={() => passwordVisibilityHandler("old")}
           />
         </div>
-        <p className="mt-6 mb-1">New Password</p>
+        <p className="mt-6 mb-1 text-sm">New Password</p>
         <div className="flex bg-transparent  justify-between items-center w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 text-gray-400 my-1">
           <input
             className="bg-transparent w-5/6  outline-none"
@@ -153,7 +153,7 @@ function AccountSettings() {
             onClick={() => passwordVisibilityHandler("newPassword")}
           />
         </div>
-        <p className="mt-6 mb-1 ">Confirm Password</p>
+        <p className="mt-6 mb-1 text-sm">Confirm Password</p>
         <div className="flex bg-transparent  justify-between items-center w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 text-gray-400 my-1">
           <input
             className="bg-transparent w-5/6  outline-none"
@@ -171,7 +171,7 @@ function AccountSettings() {
         </div>
         <br />
         <button
-          className="bg-bgblue text-white py-1  px-4 rounded-md mt-6"
+          className="bg-bgblue text-white py-2  px-4 rounded-md mt-6 text-sm font-medium"
           type="submit"
         >
           CHANGE PASSWORD

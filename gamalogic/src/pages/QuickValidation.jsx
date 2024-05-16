@@ -44,11 +44,11 @@ function QuickValidation() {
               type="email"
               value={email}
               placeholder="enter the email here"
-              className="w-2/6 border border-gray-400 rounded-md py-2 px-4 mr-3"
+              className="w-2/6 border border-gray-400 text-md rounded-md py-2 px-4 mr-3"
               onChange={(e) => setEmail(e.target.value)}
             />{" "}
             <button
-              className="bg-bgblue text-white py-2 px-4 rounded-md "
+              className="bg-bgblue text-white py-2 px-4 rounded-md text-sm font-medium"
               type="submit"
             >
               VALIDATE

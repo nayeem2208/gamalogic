@@ -50,7 +50,7 @@ function EmailFinder() {
           tool.
         </p>
         <div className="flex w-4/5 justify-between">
-          <form className="flex flex-col w-5/12 " onSubmit={HandleSubmit}>
+          <form className="flex flex-col w-5/12 text-sm" onSubmit={HandleSubmit}>
             <p>Full Name</p>
             <input
               type="text"
@@ -68,17 +68,17 @@ function EmailFinder() {
               onChange={(e) => onInputChange(e, "domain")}
             />
             <button
-              className="bg-bgblue text-white py-1 px-4 rounded-md  w-44 h-9 mt-8"
+              className="bg-bgblue text-white py-2 px-2 rounded-md text-sm font-medium w-2/5 mt-8"
               type="submit"
             >
               FIND EMAIL
             </button>
           </form>
-          <div className=" flex justify-end w-3/6 ">
+          <div className=" flex justify-end w-3/6 text-sm">
             <p className="bg-gray-100 rounded h-2/5 text-base p-2 mt-6 font-semibold">
               Note:
               <br />
-              <span className="font-light">
+              <span className="font-light text-sm">
                 {" "}
                 Each check will cost you 10 credits!
               </span>

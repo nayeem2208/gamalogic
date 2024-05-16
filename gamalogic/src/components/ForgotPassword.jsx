@@ -36,7 +36,7 @@ function ForgotPassword() {
         className="flex flex-col p-10 w-3/6 mb-16"
         style={{ backgroundColor: "#161736" }}
       >
-        <form onSubmit={handleSubmit} className="flex flex-col">
+        <form onSubmit={handleSubmit} className="flex flex-col text-sm">
           <label htmlFor="">Email</label>
           <input
             type="email"

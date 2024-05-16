@@ -26,7 +26,7 @@ function Authentication() {
       {!userDetails&&
     <div className='bg-bgblue w-full h-screen text-white overflow-y-auto'>
       <div className="px-12 py-4 flex justify-between items-center underlineLi h-20 fixed top-0 left-0 right-0 z-10 bg-bgblue ">
-       <Link to='/'><p className="font-semibold text-2xl text-center">GAMALOGIC</p></Link> 
+       <Link to='/'><p className="font-semibold text-xl text-center">GAMALOGIC</p></Link> 
       </div>
      
       <div className='flex justify-center items-center h-screen' ><Outlet/></div>

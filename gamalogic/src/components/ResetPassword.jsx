@@ -79,7 +79,7 @@ function ResetPassword() {
           className="flex flex-col p-10 w-3/6 mb-16"
           style={{ backgroundColor: "#161736" }}
         >
-          <form onSubmit={handleSubmit} className="flex flex-col">
+          <form onSubmit={handleSubmit} className="flex flex-col text-sm">
             <label htmlFor="">Password</label>
             <div className="flex bg-transparent border justify-between items-center border-cyan-400 rounded-md py-1 px-1  text-gray-400 my-1">
               <input
