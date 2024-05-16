@@ -22,19 +22,21 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       let userData = await axiosInstance.post("login", data);
+      if (userData.data?.error == "Blocked") {
+        navigate("/blocked");
+      } else {
         toast.success("Welcome back! You've successfully logged in.");
         let token = userData.data;
         setUserDetails(token);
         setCreditBal(token.credit);
         localStorage.setItem("Gamalogic_token", JSON.stringify(token));
         navigate("/");
-      
+      }
     } catch (error) {
       console.log(error.response, "error");
       toast.error(error.response.data.error);

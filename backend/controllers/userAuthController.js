@@ -43,8 +43,7 @@ const Authentication = {
         if (user[0][0].referer !== null) {
           let disposibleEmail = isDisposableURL(user[0][0].referer)
           if (disposibleEmail) {
-            res.redirect('https://beta.gamalogic.com/blocked')
-            return
+            return res.status(202).json({error:'Blocked'})
           }
         }
         const hashedPassword = user[0][0].password;
