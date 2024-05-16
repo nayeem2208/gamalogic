@@ -22,7 +22,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       // ErrorHandler("getApi Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
     finally {
       console.log('credit bal api')
@@ -38,7 +38,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       ErrorHandler("getApi Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       console.log('getApi end')
       if (req.dbConnection) {
@@ -61,7 +61,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       ErrorHandler("resetApiKey Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       console.log('getApi end')
       if (req.dbConnection) {
@@ -81,7 +81,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       ErrorHandler("emailValidation Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
@@ -103,7 +103,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       ErrorHandler("FindSingleEmail Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
@@ -144,7 +144,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       ErrorHandler("changePassword Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
@@ -164,7 +164,7 @@ let APIControllers = {
     } catch (error) {
       console.error(error);
       ErrorHandler("getAlreadyCheckedBatchEmailFiles Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
     finally {
       if (dbConnection) {
@@ -224,7 +224,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       ErrorHandler("batchEmailValidation Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
@@ -242,7 +242,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       // ErrorHandler("batchEmailStatus Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
     // finally {
     //   if (req.dbConnection) {
@@ -262,7 +262,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
@@ -281,7 +281,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       ErrorHandler("getAlreadyCheckedBatchEmailFinderFiles Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
@@ -343,7 +343,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       // ErrorHandler("batchEmailStatus Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
 
   },
@@ -358,7 +358,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
@@ -392,7 +392,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       ErrorHandler("updateCredit Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
@@ -417,7 +417,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       ErrorHandler("creditFailureEmail Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();

@@ -7,6 +7,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import { useUserState } from "../context/userContext";
 import { FaEye } from "react-icons/fa";
 import { IoInformationCircleOutline } from "react-icons/io5";
+import ServerError from "../pages/ServerError";
 
 function Signup() {
   let [data, setData] = useState({
@@ -20,6 +21,7 @@ function Signup() {
     confirm: false,
   });
   let [loading, setLoading] = useState(false);
+  let [serverError, setServerError] = useState(false);
   let navigate = useNavigate();
   let { setUserDetails, setCreditBal } = useUserState();
 
@@ -86,7 +88,11 @@ function Signup() {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.error);
+      if (error.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(error.response?.data?.error);
+      }
     } finally {
       setLoading(false);
     }
@@ -108,7 +114,11 @@ function Signup() {
       navigate("/");
     } catch (err) {
       console.log(err);
-      toast.error(err.response?.data.error);
+      if (err.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(err.response?.data?.error);
+      }
     }
   };
 
@@ -117,6 +127,10 @@ function Signup() {
   // console.log(recaptchaSiteKey, "recaptcha");
   function reCaptchaOnChange(value) {
     console.log("Captcha value:", value);
+  }
+
+  if (serverError) {
+    return <ServerError />; 
   }
 
   return (

@@ -2,9 +2,11 @@ import { IoMailOutline } from "react-icons/io5";
 import { useLocation } from "react-router-dom";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
+import ServerError from "../pages/ServerError";
+import { useState } from "react";
 
 function PostSignupPage({ setLoading }) {
-  
+  let [serverError, setServerError] = useState(false);
   const location = useLocation();
   const data = location.state 
   const HandleSendVerifyLink=async(e)=>{
@@ -13,9 +15,16 @@ function PostSignupPage({ setLoading }) {
       await axiosInstance.get(`/SendVerifyEmail?email=${data.email}`)
       toast.success('New verification link sent successfully')
     } catch (error) {
-      console.log(error)
+      if (error.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(error.response?.data?.error);
+      }
     }
     
+  }
+  if (serverError) {
+    return <ServerError />; 
   }
   return (
     <div

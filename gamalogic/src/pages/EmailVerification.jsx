@@ -7,6 +7,7 @@ import Papa from "papaparse";
 import ProgressBar from "@ramonak/react-progress-bar";
 import { useUserState } from "../context/userContext";
 import LoadingBar from "react-top-loading-bar";
+import ServerError from "./ServerError";
 
 function EmailVerification() {
   let [message, setMessage] = useState("");
@@ -17,6 +18,8 @@ function EmailVerification() {
   const [showAlert, setShowAlert] = useState(false);
   const [JsonToServer, setJsonToServer] = useState({});
   let [load, setLoad] = useState(30);
+  let [serverError, setServerError] = useState(false);
+
   let { creditBal } = useUserState();
 
   useEffect(() => {
@@ -57,7 +60,11 @@ function EmailVerification() {
           ...filesWithProcessedField,
         ]);
       } catch (error) {
-        console.log(error);
+        if (error.response.status === 500) {
+          setServerError(true); 
+        } else {
+          toast.error(error.response?.data?.error);
+        }
       }
     };
 
@@ -146,7 +153,11 @@ function EmailVerification() {
         );
       }
     } catch (error) {
-      console.log(error);
+      if (error.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(error.response?.data?.error);
+      }
     }
   };
 
@@ -228,8 +239,11 @@ function EmailVerification() {
         ...prevResultFiles,
       ]);
     } catch (error) {
-      console.log(error, "error is here");
-      toast.error(error.response.data?.error);
+      if (error.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(error.response?.data?.error);
+      }
       setLoading(false);
     }
   };
@@ -237,7 +251,9 @@ function EmailVerification() {
   const handleDismiss = () => {
     setShowAlert(false);
   };
-
+  if (serverError) {
+    return <ServerError />; 
+  }
   return (
     <div className=" px-20 py-8">
       <SubHeader SubHeader={"Upload your file"} />

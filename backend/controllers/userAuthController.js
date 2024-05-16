@@ -77,7 +77,7 @@ const Authentication = {
       await dbConnection.end()
     } catch (error) {
       ErrorHandler("Login Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
@@ -198,7 +198,7 @@ const Authentication = {
       await dbConnection.end()
     } catch (error) {
       ErrorHandler("googleLogin Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
@@ -273,7 +273,7 @@ const Authentication = {
     } catch (error) {
       console.log(error);
       ErrorHandler("googleAuth Controller", error, req);
-      res.status(400).json({ error });
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
@@ -344,7 +344,7 @@ const Authentication = {
     } catch (error) {
       console.log(error);
       ErrorHandler("verifyEmail Controller", error, req);
-      res.status(400).json({ error });
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
@@ -387,7 +387,7 @@ const Authentication = {
     } catch (error) {
       console.log(error);
       ErrorHandler("forgotPassword Controller", error, req);
-      res.status(400).json(error);
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
@@ -431,7 +431,7 @@ const Authentication = {
     } catch (error) {
       console.log(error);
       ErrorHandler("resetPassword Controller", error, req);
-      res.status(400).json({ error });
+      res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.end();
@@ -458,7 +458,7 @@ const Authentication = {
     } catch (error) {
       console.log(error);
       ErrorHandler("sendVerifyEmail Controller", error, req);
-      res.status(400).json({ error });
+      res.status(500).json({ error: "Internal Server Error" });
     }
   }
 };

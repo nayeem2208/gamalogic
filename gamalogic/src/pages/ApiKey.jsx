@@ -4,12 +4,14 @@ import axiosInstance from "../axios/axiosInstance";
 import LoadingBar from "react-top-loading-bar";
 import { toast } from "react-toastify";
 import { useUserState } from "../context/userContext";
+import ServerError from "./ServerError";
 
 function ApiKey() {
   let [api, setApi] = useState("");
   let [loading, setLoading] = useState(false);
   let [load, setLoad] = useState(30);
   let { userDetails } = useUserState();
+  let [serverError, setServerError] = useState(false);
 
   useEffect(() => {
     async function fetchApikey() {
@@ -19,7 +21,11 @@ function ApiKey() {
         setLoad(100);
         setApi(res.data.apiKey);
       } catch (error) {
-        console.log(error);
+        if (error.response.status === 500) {
+          setServerError(true); 
+        } else {
+          toast.error(error.response?.data?.error);
+        }
       }
     }
     fetchApikey();
@@ -35,9 +41,16 @@ function ApiKey() {
       toast.success("Your api key has been updated");
       setApi(resetApiKey.data.newApiKey);
     } catch (error) {
-      console.log(error);
+      if (error.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(error.response?.data?.error);
+      }
     }
   };
+  if (serverError) {
+    return <ServerError />; 
+  }
   return (
     <div className=" px-20 py-8">
       <SubHeader SubHeader={"API Key"} />

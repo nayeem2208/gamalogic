@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import axiosInstance from "../axios/axiosInstance";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { useUserState } from "../context/userContext";
+import ServerError from "./ServerError";
 
 function AccountSettings() {
   let [passwordVisible, setPasswordVisible] = useState({
@@ -17,6 +18,7 @@ function AccountSettings() {
     newPassword: "",
     confirm: "",
   });
+  let [serverError, setServerError] = useState(false);
   let { userDetails } = useUserState();
   const passwordVisibilityHandler = (field) => {
     setPasswordVisible((prevState) => ({
@@ -74,14 +76,20 @@ function AccountSettings() {
         confirm: "",
       });
     } catch (error) {
-      console.log(error);
-      toast.error(error.response?.data?.message);
+      if (error.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(error.response?.data?.error);
+      }
     }
   };
-
+  if (serverError) {
+    return <ServerError />; 
+  }
   return (
     <div className=" px-20 py-8 accountSettings">
       <SubHeader SubHeader={"Account Settings"} />
+      {userDetails.confirm == 1 ? (
       <form className="mt-14 text-bgblue subHeading" onSubmit={changaePassword}>
         <h3>Your Profile</h3>
         <p className="mt-6 mb-1 text-sm">Your Name</p>
@@ -176,7 +184,9 @@ function AccountSettings() {
         >
           CHANGE PASSWORD
         </button>
-      </form>
+      </form>):( <p className="my-10 text-red-600 font-semibold text-lg">
+          You should verify your email to view account settings.
+        </p>)}
     </div>
   );
 }

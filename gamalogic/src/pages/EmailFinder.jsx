@@ -3,12 +3,14 @@ import SubHeader from "../components/SubHeader";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import LoadingBar from "react-top-loading-bar";
+import ServerError from "./ServerError";
 
 function EmailFinder() {
   let [data, setData] = useState({ fullname: "", domain: "" });
   let [result, setResult] = useState("");
   let [loading,setLoading]=useState(false)
   let [load, setLoad] = useState(30);
+  let [serverError, setServerError] = useState(false);
 
   function onInputChange(event, inputType) {
     const value = event.target.value;
@@ -35,10 +37,17 @@ function EmailFinder() {
         toast.error("Please provide valid fullname and domain");
       }
     } catch (error) {
-      console.log(error);
+      if (error.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(error.response?.data?.error);
+      }
     }
   };
-  console.log(result, "result");
+  
+  if (serverError) {
+    return <ServerError />; 
+  }
   return (
     <div className=" px-20 py-8">
       <SubHeader SubHeader={"Email Finder"} />

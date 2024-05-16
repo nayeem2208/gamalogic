@@ -5,12 +5,14 @@ import axiosInstance from "../axios/axiosInstance";
 import { useUserState } from "../context/userContext";
 import { toast } from "react-toastify";
 import { FaEye } from "react-icons/fa";
+import ServerError from "../pages/ServerError";
 
 function Login() {
   let [data, setData] = useState({ email: "", password: "" });
   let { setUserDetails, setCreditBal } = useUserState();
   let [passwordVisible, setPasswordVisible] = useState(false);
   let [loading, setLoading] = useState(false);
+  let [serverError, setServerError] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,8 +40,11 @@ function Login() {
         navigate("/");
       }
     } catch (error) {
-      console.log(error.response, "error");
-      toast.error(error.response.data.error);
+      if (error.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(error.response?.data.error);
+      }
     } finally {
       setLoading(false);
     }
@@ -69,8 +74,11 @@ function Login() {
       localStorage.setItem("Gamalogic_token", JSON.stringify(token));
       navigate("/");
     } catch (err) {
-      console.log(err);
-      toast.error(err.response?.data.error);
+      if (err.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(err.response?.data.error);
+      }
     }
   };
 
@@ -79,6 +87,10 @@ function Login() {
       setPasswordVisible(!passwordVisible);
     }
   };
+
+  if (serverError) {
+    return <ServerError />; 
+  }
 
   return (
     <div

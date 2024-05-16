@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { useUserState } from "../context/userContext";
 import PaymentSuccess from "../components/PaymentSuccess";
 import PaymentFailure from "../components/PaymentFailure";
+import ServerError from "./ServerError";
 
 function PayPalButton({ createOrder, onApprove, onError }) {
   const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
@@ -28,6 +29,7 @@ export default function BuyCredits() {
   const [orderID, setOrderID] = useState(false);
   const [selectedCredits, setSelectedCredits] = useState(2500);
   const [cost, setCost] = useState(10);
+  let [serverError, setServerError] = useState(false);
 
   let { setCreditBal, creditBal } = useUserState();
   const creditCostMappings = [
@@ -85,7 +87,11 @@ export default function BuyCredits() {
         setSuccess(true);
         setCreditBal(creditBal + selectedCredits);
       } catch (error) {
-        console.log(error);
+        if (error.response.status === 500) {
+          setServerError(true); 
+        } else {
+          toast.error(error.response?.data?.error);
+        }
       }
     });
   };
@@ -104,6 +110,10 @@ export default function BuyCredits() {
   const handleTryAgain = () => {
     setFailure(false);
   };
+
+  if (serverError) {
+    return <ServerError />; 
+  }
 
   const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
   return (

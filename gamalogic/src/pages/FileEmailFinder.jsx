@@ -8,6 +8,7 @@ import ProgressBar from "@ramonak/react-progress-bar";
 import Alert from "../components/Alert";
 import { useUserState } from "../context/userContext";
 import LoadingBar from "react-top-loading-bar";
+import ServerError from "./ServerError";
 
 function FileEmailFinder() {
   let [message, setMessage] = useState("");
@@ -19,6 +20,7 @@ function FileEmailFinder() {
   const [Selection, SetSelection] = useState(null);
   const [JsonToServer, setJsonToServer] = useState([]);
   let [load, setLoad] = useState(30);
+  let [serverError, setServerError] = useState(false);
   let { creditBal } = useUserState();
 
   useEffect(() => {
@@ -60,6 +62,11 @@ function FileEmailFinder() {
         ]);
       } catch (error) {
         console.log(error);
+        if (error.response.status === 500) {
+          setServerError(true); 
+        } else {
+          toast.error(error.response?.data?.error);
+        }
         setLoad(100);
       }
     };
@@ -154,7 +161,11 @@ function FileEmailFinder() {
               ...prevResultFiles,
             ]);
           } catch (error) {
-            toast.error(error.response.data?.error);
+            if (error.response.status === 500) {
+              setServerError(true); 
+            } else {
+              toast.error(error.response?.data?.error);
+            }
             setLoading(false);
           }
         }
@@ -303,7 +314,11 @@ function FileEmailFinder() {
         );
       }
     } catch (error) {
-      console.log(error);
+      if (error.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(error.response?.data?.error);
+      }
       setLoading(false)
     }
   };
@@ -317,6 +332,10 @@ function FileEmailFinder() {
     showAlert(false);
   };
   console.log(resultFile, "resultFile");
+
+  if (serverError) {
+    return <ServerError />; 
+  }
   return (
     <div className=" px-20 py-8">
       <SubHeader SubHeader={"Upload your file"} />

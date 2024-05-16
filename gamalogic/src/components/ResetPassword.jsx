@@ -3,6 +3,7 @@ import { FaEye } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
+import ServerError from "../pages/ServerError";
 
 function ResetPassword() {
   let [resetPassword, setResetPassword] = useState({
@@ -11,6 +12,7 @@ function ResetPassword() {
   });
   let [passwordVisible, setPasswordVisible] = useState(false);
   let [confirmpasswordVisible, setConfirmPasswordVisible] = useState(false);
+  let [serverError, setServerError] = useState(false);
   let location = useLocation();
   let navigate=useNavigate()
   const queryParams = new URLSearchParams(location.search);
@@ -55,9 +57,17 @@ function ResetPassword() {
         toast.error("Please check confirm password");
       }
     } catch (error) {
-      console.log(error);
+      if (error.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(error.response?.data?.error);
+      }
     }
   };
+
+  if (serverError) {
+    return <ServerError />; 
+  }
 
   return (
     <div

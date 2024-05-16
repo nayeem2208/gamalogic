@@ -2,9 +2,11 @@ import  { useState } from 'react'
 import { Link } from 'react-router-dom'
 import axiosInstance from '../axios/axiosInstance'
 import { toast } from 'react-toastify'
+import ServerError from '../pages/ServerError'
 
 function ForgotPassword() {
   let [email,setEmail]=useState('')
+  let [serverError, setServerError] = useState(false);
   const handleSubmit=async(e)=>{
     e.preventDefault()
     try {
@@ -12,9 +14,16 @@ function ForgotPassword() {
       toast.success(res.data?.message,)
       setEmail('')
     } catch (error) {
-      console.log(error)
-      toast.error(error.response?.data?.error)
+      if (error.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(error.response?.data?.error);
+      }
     }
+  }
+
+  if (serverError) {
+    return <ServerError />; 
   }
   return (
     <div

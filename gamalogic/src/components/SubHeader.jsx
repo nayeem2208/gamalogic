@@ -2,12 +2,14 @@ import { IoLogOutOutline } from "react-icons/io5";
 import { useUserState } from "../context/userContext";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import { startTransition } from "react";
+import { startTransition, useState } from "react";
 import { SlInfo } from "react-icons/sl";
 import axiosInstance from "../axios/axiosInstance";
+import ServerError from "../pages/ServerError";
 
 function SubHeader(props) {
   let { setUserDetails, userDetails, creditBal } = useUserState();
+  let [serverError, setServerError] = useState(false);
   let navigate = useNavigate();
   function logoutHandler() {
     startTransition(() => {
@@ -23,8 +25,17 @@ function SubHeader(props) {
       toast.success("New verification link sent successfully");
     } catch (error) {
       console.log(error);
+      if (error.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(error.response?.data?.error);
+      }
     }
   };
+
+  if (serverError) {
+    return <ServerError />; 
+  }
   return (
     <div>
       <div className="flex justify-between mt-1 ">
@@ -46,7 +57,7 @@ function SubHeader(props) {
             Your account is not verified! To begin using our services please
             click the link that was sent to you by email.
             <button
-              className="text-bgblue font-semibold"
+              className="text-bgblue font-semibold ml-1"
               onClick={HandleSendVerifyLink}
             >
               Resend Verification Email

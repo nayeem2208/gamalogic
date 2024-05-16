@@ -3,12 +3,14 @@ import SubHeader from "../components/SubHeader";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import LoadingBar from "react-top-loading-bar";
+import ServerError from "./ServerError";
 
 function QuickValidation() {
   let [email, setEmail] = useState("");
   let [result, setResult] = useState("");
   let [loading,setLoading]=useState(false)
   let [load, setLoad] = useState(30);
+  let [serverError, setServerError] = useState(false);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -25,11 +27,17 @@ function QuickValidation() {
         toast.error('Please provide a valid email address.')
       }
     } catch (error) {
-      console.log(error, "error");
+      if (error.response.status === 500) {
+        setServerError(true); 
+      } else {
+        toast.error(error.response?.data?.error);
+      }
     }
   };
   console.log(result, "res");
-
+  if (serverError) {
+    return <ServerError />; 
+  }
   return (
     <div className=" px-20 py-8">
       <SubHeader SubHeader={"Quick Validation"} />
