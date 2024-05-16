@@ -34,7 +34,7 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
       if (user[0].length > 0) {
-        if (user[0][0].session_google == 1) {
+        if (user[0][0].session_google == 1&&user[0][0].password==0) {
           return res.status(401).json({
             error: `Incorrect password
           ` });
@@ -59,13 +59,14 @@ const Authentication = {
             } else {
               creditBal = user[0][0].credits;
             }
-
+            let password = user[0][0].password !== 0;
             res.json({
               name: user[0][0].username,
               email: user[0][0].emailid,
               credit: creditBal,
               token,
-              confirm: user[0][0].confirmed
+              confirm: user[0][0].confirmed,
+              password
             });
 
         } else {
@@ -182,12 +183,14 @@ const Authentication = {
           creditBal = user[0][0].credits;
         }
 
-
+        let password = user[0][0].password !== 0;
         res.status(200).json({
           name: user[0][0].username,
           email: user[0][0].emailid,
           credit: creditBal,
-          token
+          token,
+          confirm:1,
+          password
         });
       } else {
         res.status(400).json({
@@ -257,11 +260,14 @@ const Authentication = {
             <p>Best regards,</p>
             <p>The Gamalogic Team</p>`
           );
+          let password=0
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
             credit: 500,
             token,
+            confirm:1,
+            password
           });
         } else {
           res

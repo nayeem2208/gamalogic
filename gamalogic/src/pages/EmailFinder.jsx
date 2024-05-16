@@ -29,6 +29,7 @@ function EmailFinder() {
       if (domain && fullname) {
         let fullnameArray = fullname.split(" ");
           setLoading(true)
+          setLoad(30)
           let res = await axiosInstance.post("/singleEmailFinder", data);
           setLoad(100);
           setResult(res.data);

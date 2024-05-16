@@ -6,6 +6,7 @@ import axiosInstance from "../axios/axiosInstance";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { useUserState } from "../context/userContext";
 import ServerError from "./ServerError";
+import LoadingBar from "react-top-loading-bar";
 
 function AccountSettings() {
   let [passwordVisible, setPasswordVisible] = useState({
@@ -19,6 +20,8 @@ function AccountSettings() {
     confirm: "",
   });
   let [serverError, setServerError] = useState(false);
+  let [loading, setLoading] = useState(false);
+  let [load, setLoad] = useState(30);
   let { userDetails } = useUserState();
   const passwordVisibilityHandler = (field) => {
     setPasswordVisible((prevState) => ({
@@ -65,10 +68,13 @@ function AccountSettings() {
         );
         return;
       }
+      setLoading(true);
+      setLoad(30);
       await axiosInstance.post(
         "/changePassword",
         passwordData
       );
+      setLoad(100);
       toast.success("Password succesfully updated");
       setPasswordData({
         old: "",
@@ -92,6 +98,13 @@ function AccountSettings() {
       {userDetails.confirm == 1 ? (
       <form className="mt-14 text-bgblue subHeading" onSubmit={changaePassword}>
         <h3>Your Profile</h3>
+        {loading && (
+            <LoadingBar
+              color="#f74c41"
+              progress={load}
+              onLoaderFinished={() => {}}
+            />
+          )}
         <p className="mt-6 mb-1 text-sm">Your Name</p>
         <input
           type="text"

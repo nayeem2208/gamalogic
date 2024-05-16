@@ -18,6 +18,7 @@ function QuickValidation() {
       let trimmedEmail=email.trim()
       if(trimmedEmail.length>0){
         setLoading(true)
+        setLoad(30)
       let res = await axiosInstance.post("/singleEmailValidator", { email });
       setLoad(100);
       setResult(res.data);
