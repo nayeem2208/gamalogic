@@ -4,7 +4,7 @@ import { FaFacebookF, FaLinkedinIn } from "react-icons/fa";
 
 export default function Support() {
   return (
-    <div className=" px-20 py-8">
+    <div className="px-6 md:px-20 py-8">
       <SubHeader SubHeader={"Support"} />
       <div className="mt-14 subHeading">
         <h3>We&apos;re Here To Help</h3>
@@ -13,19 +13,19 @@ export default function Support() {
           a mail here -{" "}
           <a href="mailto:support@gamalogic.com" className="underline font-medium" target="_blank">support@gamalogic.com</a> 
         </p>
-        <ul className="mt-48 text-sm">
+        <ul className=" text-sm lg:bottom-24  lg:absolute">
           <li className="my-4">
-            <a className="flex items-center font-light" href="mailto:support@gamalogic.com" target="_blank"><IoMail className="mr-3"/>
+            <a className="flex items-center font-light" href="mailto:support@gamalogic.com" target="_blank"><IoMail className="mr-3 text-base"/>
               Email
             </a>
           </li>
           <li className="my-4">
-            <a className="flex items-center font-light" href="https://twitter.com/Gamalogicapp" target="_blank"><IoLogoTwitter className="mr-3"/>
+            <a className="flex items-center font-light" href="https://twitter.com/Gamalogicapp" target="_blank"><IoLogoTwitter className="mr-3 text-base"/>
               Twitter
             </a>
           </li>
           <li className="my-4">
-            <a className="flex items-center font-light" href="https://www.facebook.com/gamalogicapp" target="_blank"><FaFacebookF className="mr-3"/>
+            <a className="flex items-center font-light" href="https://www.facebook.com/gamalogicapp" target="_blank"><FaFacebookF className="mr-3 text-base"/>
               Facebook
             </a>
           </li>
@@ -33,7 +33,7 @@ export default function Support() {
             <a className="flex items-center font-light"
               href="https://www.linkedin.com/company/gamalogic"
               target="_blank"
-            ><FaLinkedinIn className="mr-3" />
+            ><FaLinkedinIn className="mr-3 text-base" />
               Linkedin
             </a>
           </li>

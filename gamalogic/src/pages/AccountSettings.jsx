@@ -88,7 +88,7 @@ function AccountSettings() {
       }
       setLoading(true);
       setLoad(30);
-      await axiosInstance.post(
+      let response=await axiosInstance.post(
         "/changePassword",
         passwordData
       );
