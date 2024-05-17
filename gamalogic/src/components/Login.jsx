@@ -94,10 +94,10 @@ function Login() {
 
   return (
     <div
-      className="w-full flex justify-center items-center h-screen"
-      style={{ marginTop: "20vh" }}
+      className="w-full flex justify-center items-center "
+      // style={{ marginTop: "20vw" }}
     >
-      <div className="w-3/5 flex flex-col justify-center items-center">
+      <div className="w-4/5 sm:w-4/6 md:w-5/6 lg:w-3/6  px-2 flex flex-col justify-center items-center">
         <div className="text-center auth" style={{ position: "relative" }}>
           <div className="h2-background" style={{ position: "absolute" }}>
             <div className="red"></div>
@@ -109,10 +109,10 @@ function Login() {
           </p>
         </div>
         <div
-          className="flex flex-col p-10 w-3/6 mb-16"
+          className="flex flex-col p-10 px-1 sm:px-3 md:px-10 w-full sm:w-5/6 md:w-3/6 lg:w-4/6 xl:w-3/6 mb-16"
           style={{ backgroundColor: "#161736" }}
         >
-          <form onSubmit={handleSubmit} className="flex flex-col text-sm">
+          <form onSubmit={handleSubmit} className="flex flex-col text-sm px-1">
             <label htmlFor="">Email</label>
             <input
               type="email"
@@ -174,7 +174,7 @@ function Login() {
               }}
             />
           </div>
-          <div className="flex justify-center text-sm text-gray-300">
+          <div className="flex justify-center text-xs md:text-sm text-gray-300">
             <Link to="/signup">
               <div className="border-r border-cyan-400 mx-2 px-2">
                 Need an account?

@@ -29,7 +29,7 @@ function Authentication() {
        <Link to='/'><p className="font-semibold text-xl text-center">GAMALOGIC</p></Link> 
       </div>
      
-      <div className='flex justify-center items-center h-screen' ><Outlet/></div>
+      <div className='flex justify-center items-center h-screen mt-36 lg:mt-60' ><Outlet/></div>
     </div>}
     </GoogleOAuthProvider>
   )

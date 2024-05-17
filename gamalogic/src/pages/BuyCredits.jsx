@@ -32,6 +32,12 @@ export default function BuyCredits() {
   let [serverError, setServerError] = useState(false);
 
   let { setCreditBal, creditBal } = useUserState();
+
+  useEffect(()=>{
+    document.title='Buy Credits'
+  },[])
+
+
   const creditCostMappings = [
     [2500, 10],
     [5000, 15],

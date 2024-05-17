@@ -12,6 +12,12 @@ function EmailFinder() {
   let [load, setLoad] = useState(30);
   let [serverError, setServerError] = useState(false);
 
+
+  useEffect(()=>{
+    document.title='Email Finder'
+  },[])
+
+
   function onInputChange(event, inputType) {
     const value = event.target.value;
     setData((prevData) => ({

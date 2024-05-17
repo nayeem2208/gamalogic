@@ -12,6 +12,10 @@ function QuickValidation() {
   let [load, setLoad] = useState(30);
   let [serverError, setServerError] = useState(false);
 
+  useEffect(() => {
+    document.title="Quick Validation"
+  }, []);
+
   const submitHandler = async (e) => {
     e.preventDefault();
     try {

@@ -31,6 +31,8 @@ function AccountSettings() {
         old: "PasswordForgoogleUsers",
       }));
     }
+    document.title='Account Settings'
+
   }, []);
 
   const passwordVisibilityHandler = (field) => {

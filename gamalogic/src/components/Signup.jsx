@@ -135,10 +135,10 @@ function Signup() {
 
   return (
     <div
-      className="w-full flex justify-center items-center "
-      style={{ marginTop: "40vh" }}
+    className="w-full flex justify-center items-center  "
+    // style={{ marginTop: "40vh" }}
     >
-      <div className="w-3/5 flex flex-col justify-center items-center">
+      <div className="lg:w-3/5 flex flex-col justify-center items-center">
         <div className="text-center auth" style={{ position: "relative" }}>
           <div className="h2-background" style={{ position: "absolute" }}>
             <div className="red"></div>
@@ -148,7 +148,7 @@ function Signup() {
           <p className="my-12 description">Create a free gamalogic account</p>
         </div>
         <div
-          className="flex flex-col p-10 w-3/6 mb-16"
+          className="flex flex-col p-5 md:p-10  w-10/12 sm:w-4/6 md:w-4/6 xl:w-3/6 mb-16"
           style={{ backgroundColor: "#161736" }}
         >
           <form className="flex flex-col text-sm" onSubmit={handleSubmit}>
@@ -273,7 +273,7 @@ function Signup() {
             />
           </div>
           <Link to="/signin">
-            <div className="flex justify-center text-sm text-gray-300">
+          <div className="flex justify-center text-xs md:text-sm text-gray-300">
               Already have an account?
             </div>
           </Link>

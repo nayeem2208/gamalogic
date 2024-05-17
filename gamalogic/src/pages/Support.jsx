@@ -1,8 +1,12 @@
 import SubHeader from "../components/SubHeader";
 import { IoLogoTwitter, IoMail } from "react-icons/io5";
 import { FaFacebookF, FaLinkedinIn } from "react-icons/fa";
+import { useEffect } from "react";
 
 export default function Support() {
+  useEffect(()=>{
+    document.title='Support'
+  },[])
   return (
     <div className="px-6 md:px-20 py-8">
       <SubHeader SubHeader={"Support"} />

@@ -195,7 +195,7 @@ const Authentication = {
       } else {
         res.status(400).json({
           error:
-            "Unauthorised Access, Please register with google login",
+            "Unauthorised Access, Please register with us",
         });
       }
       await dbConnection.end()

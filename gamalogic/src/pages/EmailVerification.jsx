@@ -67,7 +67,7 @@ function EmailVerification() {
         }
       }
     };
-
+    document.title='Batch Email Verification'
     fetchAllFiles();
   }, []);
 

@@ -28,6 +28,7 @@ function ApiKey() {
         }
       }
     }
+    document.title='API key'
     fetchApikey();
   }, []);
 
