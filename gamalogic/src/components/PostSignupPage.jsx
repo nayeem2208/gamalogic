@@ -29,7 +29,6 @@ function PostSignupPage({ setLoading }) {
   return (
     <div
     className="w-full flex justify-center items-center "
-    style={{ marginTop: "36vw",marginBottom:'30vw' }}
   >
     <div className="w-3/5 flex flex-col justify-center items-center">
       <div className="text-center auth" style={{ position: "relative" }}>
