@@ -34,7 +34,7 @@ export default function BuyCredits() {
   let { setCreditBal, creditBal } = useUserState();
 
   useEffect(()=>{
-    document.title='Buy Credits'
+    document.title='Buy Credits | Beta Dashboard'
   },[])
 
 

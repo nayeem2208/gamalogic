@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 export default function Support() {
   useEffect(()=>{
-    document.title='Support'
+    document.title='Support | Beta Dashboard'
   },[])
   return (
     <div className="px-6 md:px-20 py-8">

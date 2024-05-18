@@ -1,5 +1,5 @@
 import { GoogleLogin } from "@react-oauth/google";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
@@ -24,6 +24,11 @@ function Signup() {
   let [serverError, setServerError] = useState(false);
   let navigate = useNavigate();
   let { setUserDetails, setCreditBal } = useUserState();
+
+  useEffect(()=>{
+    document.title='Sign-Up | Beta Gamalogic'
+  },[])
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

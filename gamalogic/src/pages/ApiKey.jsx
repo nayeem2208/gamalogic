@@ -28,7 +28,7 @@ function ApiKey() {
         }
       }
     }
-    document.title='API key'
+    document.title='API key | Beta Dashboard'
     fetchApikey();
   }, []);
 

@@ -24,6 +24,10 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  useEffect(()=>{
+    document.title='Sign-In | Beta Gamalogic'
+  },[])
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -109,7 +113,7 @@ function Login() {
           </p>
         </div>
         <div
-          className="flex flex-col p-10 px-1 sm:px-3 md:px-10 w-full sm:w-5/6 md:w-3/6 lg:w-4/6 xl:w-3/6 mb-16"
+          className="flex flex-col p-10 px-1 sm:px-3 md:px-10 w-full sm:w-5/6 md:w-4/6 lg:w-5/6 xl:w-4/6 mb-16"
           style={{ backgroundColor: "#161736" }}
         >
           <form onSubmit={handleSubmit} className="flex flex-col text-sm px-1">

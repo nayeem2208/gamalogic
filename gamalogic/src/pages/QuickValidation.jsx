@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SubHeader from "../components/SubHeader";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
@@ -13,7 +13,7 @@ function QuickValidation() {
   let [serverError, setServerError] = useState(false);
 
   useEffect(() => {
-    document.title="Quick Validation"
+    document.title="Quick Validation | Beta Dashboard"
   }, []);
 
   const submitHandler = async (e) => {

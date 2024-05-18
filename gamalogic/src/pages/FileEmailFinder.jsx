@@ -70,7 +70,7 @@ function FileEmailFinder() {
         setLoad(100);
       }
     };
-    document.title='Batch Email Finder'
+    document.title='Batch Email Finder | Beta Dashboard'
     fetchAllFiles();
   }, []);
 

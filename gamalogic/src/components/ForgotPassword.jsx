@@ -1,4 +1,4 @@
-import  { useState } from 'react'
+import  { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import axiosInstance from '../axios/axiosInstance'
 import { toast } from 'react-toastify'
@@ -7,6 +7,11 @@ import ServerError from '../pages/ServerError'
 function ForgotPassword() {
   let [email,setEmail]=useState('')
   let [serverError, setServerError] = useState(false);
+
+  useEffect(()=>{
+    document.title='Forgot Password | Beta Gamalogic'
+  },[])
+
   const handleSubmit=async(e)=>{
     e.preventDefault()
     try {

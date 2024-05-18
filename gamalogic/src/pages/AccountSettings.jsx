@@ -31,7 +31,7 @@ function AccountSettings() {
         old: "PasswordForgoogleUsers",
       }));
     }
-    document.title='Account Settings'
+    document.title='Account Settings | Beta Dashboard'
 
   }, []);
 

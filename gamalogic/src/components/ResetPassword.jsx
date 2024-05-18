@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaEye } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axiosInstance from "../axios/axiosInstance";
@@ -17,6 +17,10 @@ function ResetPassword() {
   let navigate=useNavigate()
   const queryParams = new URLSearchParams(location.search);
   const email = queryParams.get("email");
+
+  useEffect(()=>{
+    document.title='Reset Password | Beta Gamalogic'
+  },[])
 
   const handleChange = (e) => {
     let { name, value } = e.target;

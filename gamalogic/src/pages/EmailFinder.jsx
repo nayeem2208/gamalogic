@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SubHeader from "../components/SubHeader";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
@@ -14,7 +14,7 @@ function EmailFinder() {
 
 
   useEffect(()=>{
-    document.title='Email Finder'
+    document.title='Email Finder | Beta Dashboard'
   },[])
 
 
