@@ -8,19 +8,26 @@ import axios from "axios";
 import ErrorHandler from "../utils/errorHandler.js";
 import generateConfirmationToken from "../utils/confirmationToken.js";
 import isDisposableURL from "../utils/disposibleEmailList.js";
+import verifyEmailTemplate from "../EmailTemplates/verifyTemplate.js";
 
 const Authentication = {
   sample: async (req, res) => {
     ///its for checking purpose
     try {
-      console.log(req, 'req is here')
-      const referrer = req.headers.referer || req.headers.referrer;
-      console.log(referrer, 'referrrrrrrrrrrrrrrrrrrrrrr')
+      // console.log(req, 'req is here')
+      // const referrer = req.headers.referer || req.headers.referrer;
+      // console.log(referrer, 'referrrrrrrrrrrrrrrrrrrrrrr')
       res.send('hiii its working')
       // Simulating an error for demonstration purposes
       // console.log(req.route.path,'original url')
       // console.log(johnhoe)
-      // sendEmail('nayeem@gmail.com')
+      // let name='Mohamed Nayeem CE'
+      // let email='nayeem670@gmail.com'
+      // sendEmail(name,
+      //   email,
+      //   "Please Verify Your Account",
+      //   verifyEmailTemplate(name,)
+      // )
       // let response = await axios.get("http://localhost:3000/hi");
     } catch (error) {
       ErrorHandler("Sample Controller", error, req);
@@ -131,16 +138,22 @@ const Authentication = {
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0)`
         );
         let token = generateConfirmationToken(email)
+    //     sendEmail(
+    //       fullname,
+    //       email,
+    //       "Please Verify Your Account",
+    //       `<p>Hi ${fullname},</p>
+    // <p>Welcome to Gamalogic! To start using your account, please click the link below to verify your email address:</p>
+    // <p><a href="https://beta.gamalogic.com/api/verifyEmail?email=${token}">Verify Your Account</a></p>
+    // <p>Thank you for joining us. If you have any questions, feel free to contact our support team.</p>
+    // <p>Best regards,</p>
+    // <p>Gamalogic</p>`
+    //     );
         sendEmail(
           fullname,
           email,
           "Please Verify Your Account",
-          `<p>Hi ${fullname},</p>
-    <p>Welcome to Gamalogic! To start using your account, please click the link below to verify your email address:</p>
-    <p><a href="https://beta.gamalogic.com/api/verifyEmail?email=${token}">Verify Your Account</a></p>
-    <p>Thank you for joining us. If you have any questions, feel free to contact our support team.</p>
-    <p>Best regards,</p>
-    <p>Gamalogic</p>`
+          verifyEmailTemplate(email,token)
         );
 
         res.status(200).json("Please check your email for verification link");
