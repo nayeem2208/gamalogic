@@ -112,19 +112,19 @@ const verifyEmailTemplate = (name,token) => {
               <tbody class="icons-tbody">
                 <tr>
                   <td align="center" valign="top" class="es-p40r"><a target="_blank"
-                      href="https://www.facebook.com/gamalogicapp"><img src="https://beta.gamalogic.com/gamalogic/backend/public/fb.png" class="sicons" alt=""></a>
+                      href="https://www.facebook.com/gamalogicapp"><img src="https://beta.gamalogic.com/gamalogic/fb.png" class="sicons" alt=""></a>
                   </td>
                   <td align="center" valign="top" class="es-p40r"><a target="_blank"
-                      href="https://twitter.com/Gamalogicapp"><img src="https://beta.gamalogic.com/gamalogic/backend/public/twitter(2).png" class="sicons" alt=""></a>
+                      href="https://twitter.com/Gamalogicapp"><img src="https://beta.gamalogic.com/twitter(2).png" class="sicons" alt=""></a>
                   </td>
                   <td align="center" valign="top" class="es-p40r"><a target="_blank"
-                      href="https://www.youtube.com/@Gamalogic"><img src="https://beta.gamalogic.com/gamalogic/backend/public/youtube.png" class="sicons" alt=""></a>
+                      href="https://www.youtube.com/@Gamalogic"><img src="https://beta.gamalogic.com/gamalogic/youtube.png" class="sicons" alt=""></a>
                   </td>
                   <td align="center" valign="top" class="es-p40r"><a target="_blank"
-                      href="https://www.linkedin.com/company/gamalogic"><img src="https://beta.gamalogic.com/gamalogic/backend/public/linkedin.png" class="sicons" alt=""></a>
+                      href="https://www.linkedin.com/company/gamalogic"><img src="https://beta.gamalogic.com/linkedin.png" class="sicons" alt=""></a>
                   </td>
                   <td align="center" valign="top"><a target="_blank"
-                      href="mailto:support@gamalogic.com"><img src="https://beta.gamalogic.com/gamalogic/backend/public/mail.png" class="sicons" alt=""></a>
+                      href="mailto:support@gamalogic.com"><img src="https://beta.gamalogic.com/mail.png" class="sicons" alt=""></a>
                   </td>
                   <td></td>
                 </tr>
