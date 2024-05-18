@@ -153,7 +153,7 @@ const Authentication = {
           fullname,
           email,
           "Please Verify Your Account",
-          verifyEmailTemplate(email,token)
+          verifyEmailTemplate(fullname,token)
         );
 
         res.status(200).json("Please check your email for verification link");
