@@ -85,7 +85,7 @@ const verifyEmailTemplate = (name,token) => {
         .sicons{
             color:gray;
             margin:0 20px;
-            width: 20px;
+            width: 16px;
         }
       </style>
     </head>
