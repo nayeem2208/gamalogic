@@ -9,26 +9,13 @@ import ErrorHandler from "../utils/errorHandler.js";
 import generateConfirmationToken from "../utils/confirmationToken.js";
 import isDisposableURL from "../utils/disposibleEmailList.js";
 import verifyEmailTemplate from "../EmailTemplates/verifyTemplate.js";
+import basicTemplate from "../EmailTemplates/BasicTemplate.js";
 
 const Authentication = {
   sample: async (req, res) => {
     ///its for checking purpose
     try {
-      // console.log(req, 'req is here')
-      // const referrer = req.headers.referer || req.headers.referrer;
-      // console.log(referrer, 'referrrrrrrrrrrrrrrrrrrrrrr')
       res.send('hiii its working')
-      // Simulating an error for demonstration purposes
-      // console.log(req.route.path,'original url')
-      // console.log(johnhoe)
-      // let name='Mohamed Nayeem CE'
-      // let email='nayeem670@gmail.com'
-      // sendEmail(name,
-      //   email,
-      //   "Please Verify Your Account",
-      //   verifyEmailTemplate(name,)
-      // )
-      // let response = await axios.get("http://localhost:3000/hi");
     } catch (error) {
       ErrorHandler("Sample Controller", error, req);
     }
@@ -251,16 +238,14 @@ const Authentication = {
         );
         if (user[0].length > 0) {
           const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
+          let content = `<p>Welcome to Gamalogic! We're thrilled to have you on board.</p>
+          <p>Your registration is now complete, and you're all set to explore our platform.</p>
+          <p>If you have any questions or need assistance getting started, feel free to reach out to us.</p>`
           sendEmail(
             user[0][0].username,
             user[0][0].emailid,
             "Welcome to Gamalogic!",
-            `<p>Hi ${user[0][0].username},</p>
-            <p>Welcome to Gamalogic! We're thrilled to have you on board.</p>
-            <p>Your registration is now complete, and you're all set to explore our platform.</p>
-            <p>If you have any questions or need assistance getting started, feel free to reach out to us.</p>
-            <p>Best regards,</p>
-            <p>The Gamalogic Team</p>`
+            basicTemplate(user[0][0].username, content)
           );
           let password = false
           res.json({
@@ -328,17 +313,16 @@ const Authentication = {
         } else {
           creditBal = verifiedUser[0][0].credits;
         }
+        let content = ` <p>Welcome to Gamalogic! We're thrilled to have you on board.</p>
+        <p>Your registration is now complete, and your account has been successfully verified.</p>
+        <p>You're all set to explore our platform. If you have any questions or need assistance getting started, feel free to reach out to us.</p>`
         sendEmail(
           verifiedUser[0][0].username,
           verifiedUser[0][0].emailid,
           "Welcome to Gamalogic!",
-          `<p>Hi ${verifiedUser[0][0].username},</p>
-          <p>Welcome to Gamalogic! We're thrilled to have you on board.</p>
-          <p>Your registration is now complete, and your account has been successfully verified.</p>
-          <p>You're all set to explore our platform. If you have any questions or need assistance getting started, feel free to reach out to us.</p>
-          <p>Best regards,</p>
-          <p>The Gamalogic Team</p>`
+          basicTemplate(verifiedUser[0][0].username, content)
         );
+
         // res.json({
         //   name: verifiedUser[0][0].username,
         //   email: verifiedUser[0][0].emailid,
@@ -374,6 +358,7 @@ const Authentication = {
           return
         }
         let token = generateConfirmationToken(req.body.email)
+
         sendEmail(
           user[0][0].username,
           req.body.email,
@@ -417,19 +402,14 @@ const Authentication = {
         await dbConnection.query(
           `UPDATE registration SET password='${hashedPassword}' WHERE emailid='${userEmail}'`
         );
+        let content = ` <p>Your password has been successfully updated.</p>
+          
+        <p>If you did not initiate this action, please contact us immediately.</p> `
         sendEmail(
           user[0][0].username,
           userEmail,
           "Password successfully updated",
-          `<p>Hi ${user[0][0].username},</p>
-
-          <p>Your password has been successfully updated.</p>
-          
-          <p>If you did not initiate this action, please contact us immediately.</p>
-          
-          <p>Best regards,</p>
-            <p>Gamalogic</p>
-          `
+          basicTemplate(user[0][0].username,content)
         );
         res.status(200).json({ message: "Password succesfully updated" });
       } else {
@@ -451,16 +431,12 @@ const Authentication = {
     try {
       const username = req.query.email.split('@')[0];
       let token = generateConfirmationToken(req.query.email)
+      let link = `https://beta.gamalogic.com/api/verifyEmail?email=${token}`
       sendEmail(
         username,
         req.query.email,
         "Please Verify Your Account",
-        `<p>Hi ${username},</p>
-  <p>Welcome to Gamalogic! To start using your account, please click the link below to verify your email address:</p>
-  <p><a href="https://beta.gamalogic.com/api/verifyEmail?email=${token}">Verify Your Account</a></p>
-  <p>Thank you for joining us. If you have any questions, feel free to contact our support team.</p>
-  <p>Best regards,</p>
-  <p>Gamalogic</p>`
+        verifyEmailTemplate(username, token, link)
       );
       res.status(200)
     } catch (error) {
