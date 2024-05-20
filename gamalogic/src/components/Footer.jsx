@@ -1,4 +1,5 @@
 import { FaFacebookF, FaLinkedinIn, FaYoutube } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import { IoLogoInstagram, IoLogoTwitter, IoMail } from "react-icons/io5";
 import { AiOutlineHome } from "react-icons/ai";
 import { Link } from "react-router-dom";
@@ -37,7 +38,7 @@ function Footer() {
               href="https://twitter.com/Gamalogicapp"
               target="_blank"
             >
-              <IoLogoTwitter  />
+              <FaXTwitter />
             </a></li>
            
           <li className="my-2">

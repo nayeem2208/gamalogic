@@ -131,7 +131,7 @@ export default function BuyCredits() {
           <p className="my-7 description">
             Choose the best pack that suits your needs from below. For custom
             quoting,
-            <Link to="/support" className="underline font-medium">
+            <Link to="/support" className="underline font-medium ml-1">
               {" "}
               contact us.
             </Link>
