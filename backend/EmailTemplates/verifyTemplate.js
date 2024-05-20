@@ -127,27 +127,23 @@ const verifyEmailTemplate = (name, token, link) => {
                     Team Gamalogic</p>
             </div>
             <div class="footer">
-                <div class="tableDiv" style="display: flex;flex-direction: column;justify-content: center;">
-                    <p>If you have any questions, feel free to contact us at <a class="sprt">support@gamalogic.com</a></p>
-                    <div class="iconsDiv" style="display: flex;justify-content: center;align-items: center;">
-                    <div><a target="_blank"
-                            href="https://www.facebook.com/gamalogicapp"><img src="https://beta.gamalogic.com/fb.png"
-                                class="sicons" alt="FB"></a></div>
-                    <div><a target="_blank"
-                            href="https://twitter.com/Gamalogicapp"><img src="https://beta.gamalogic.com/twitter(2).png"
-                                class="sicons" alt="Twt"></a></div>
-                    <div><a target="_blank"
-                            href="https://www.youtube.com/@Gamalogic"><img src="https://beta.gamalogic.com/youtube.png"
-                                class="sicons" alt="YT"></a></div>
-                    <div><a target="_blank"
-                            href="https://www.linkedin.com/company/gamalogic"><img
+            <p>If you have any questions, feel free to contact us at <a class="sprt">support@gamalogic.com</a></p>
+            <div class="iconsDiv"
+                style="display: flex;justify-content: center;align-items: center;">
+                <div style="display: flex;">
+                    <div><a target="_blank" href="https://www.facebook.com/gamalogicapp"><img
+                                src="https://beta.gamalogic.com/fb.png" class="sicons" alt="FB"></a></div>
+                    <div><a target="_blank" href="https://twitter.com/Gamalogicapp"><img
+                                src="https://beta.gamalogic.com/twitter(2).png" class="sicons" alt="Twt"></a></div>
+                    <div><a target="_blank" href="https://www.youtube.com/@Gamalogic"><img
+                                src="https://beta.gamalogic.com/youtube.png" class="sicons" alt="YT"></a></div>
+                    <div><a target="_blank" href="https://www.linkedin.com/company/gamalogic"><img
                                 src="https://beta.gamalogic.com/linkedin.png" class="sicons" alt="LI"></a></div>
                     <div><a target="_blank" href="mailto:support@gamalogic.com"><img
                                 src="https://beta.gamalogic.com/mail.png" class="sicons" alt="GM"></a></div>
-                    
-                </div>
                 </div>
             </div>
+        </div>
         </div>
     </body>
     
