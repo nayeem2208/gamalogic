@@ -41,7 +41,7 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
       if (user[0].length > 0) {
-        if (user[0][0].session_google == 1&&user[0][0].password==0) {
+        if (user[0][0].session_google == 1 && user[0][0].password == 0) {
           return res.status(401).json({
             error: `Incorrect password
           ` });
@@ -50,31 +50,31 @@ const Authentication = {
         if (user[0][0].referer !== null) {
           let disposibleEmail = isDisposableURL(user[0][0].referer)
           if (disposibleEmail) {
-            return res.status(202).json({error:'Blocked'})
+            return res.status(202).json({ error: 'Blocked' })
           }
         }
         const hashedPassword = user[0][0].password;
         let passwordMatch = await verifyPassword(password, hashedPassword);
         if (passwordMatch) {
-            let token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
-            let creditBal;
-            let finalFree = new Date(user[0][0].free_final);
-            let finalFreeDate = new Date(finalFree);
-            let currentDate = new Date();
-            if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
-              creditBal = user[0][0].credits_free + user[0][0].credits
-            } else {
-              creditBal = user[0][0].credits;
-            }
-            let password = user[0][0].password !== 0;
-            res.json({
-              name: user[0][0].username,
-              email: user[0][0].emailid,
-              credit: creditBal,
-              token,
-              confirm: user[0][0].confirmed,
-              password
-            });
+          let token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
+          let creditBal;
+          let finalFree = new Date(user[0][0].free_final);
+          let finalFreeDate = new Date(finalFree);
+          let currentDate = new Date();
+          if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
+            creditBal = user[0][0].credits_free + user[0][0].credits
+          } else {
+            creditBal = user[0][0].credits;
+          }
+          let password = user[0][0].password !== 0;
+          res.json({
+            name: user[0][0].username,
+            email: user[0][0].emailid,
+            credit: creditBal,
+            token,
+            confirm: user[0][0].confirmed,
+            password
+          });
 
         } else {
           res.status(401).json({ error: "Incorrect password" });
@@ -138,12 +138,12 @@ const Authentication = {
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0)`
         );
         let token = generateConfirmationToken(email)
-    let link="https://beta.gamalogic.com/api/verifyEmail?email=${token}"
+        let link = `https://beta.gamalogic.com/api/verifyEmail?email=${token}`
         sendEmail(
           fullname,
           email,
           "Please Verify Your Account",
-          verifyEmailTemplate(fullname,token,link)
+          verifyEmailTemplate(fullname, token, link)
         );
         res.status(200).json("Please check your email for verification link");
       }
@@ -191,7 +191,7 @@ const Authentication = {
           email: user[0][0].emailid,
           credit: creditBal,
           token,
-          confirm:1,
+          confirm: 1,
           password
         });
       } else {
@@ -262,13 +262,13 @@ const Authentication = {
             <p>Best regards,</p>
             <p>The Gamalogic Team</p>`
           );
-          let password=false
+          let password = false
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
             credit: 500,
             token,
-            confirm:1,
+            confirm: 1,
             password
           });
         } else {

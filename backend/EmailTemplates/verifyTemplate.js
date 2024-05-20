@@ -76,6 +76,7 @@ const verifyEmailTemplate = (name,token,link) => {
     
             .verify {
                 text-align: center;
+                margin-top: 2rem;
             }
     
             .verifyButton {
@@ -86,6 +87,7 @@ const verifyEmailTemplate = (name,token,link) => {
                 text-decoration: none;
                 font-size: 16px;
                 margin: 20px auto;
+                
             }
     
             .emailSub {
