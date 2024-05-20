@@ -409,7 +409,7 @@ const Authentication = {
           user[0][0].username,
           userEmail,
           "Password successfully updated",
-          basicTemplate(user[0][0].username,content)
+          basicTemplate(user[0][0].username, content)
         );
         res.status(200).json({ message: "Password succesfully updated" });
       } else {
@@ -429,16 +429,20 @@ const Authentication = {
   },
   sendVerifyEmail: async (req, res) => {
     try {
-      const username = req.query.email.split('@')[0];
+      const dbConnection = req.dbConnection;
+      let user = await dbConnection.query(
+        `SELECT * FROM registration WHERE emailid='${req.query.email}'`
+      );
       let token = generateConfirmationToken(req.query.email)
       let link = `https://beta.gamalogic.com/api/verifyEmail?email=${token}`
       sendEmail(
-        username,
+        user[0][0].username,
         req.query.email,
         "Please Verify Your Account",
-        verifyEmailTemplate(username, token, link)
+        verifyEmailTemplate(user[0][0].username, token, link)
       );
       res.status(200)
+      await dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("sendVerifyEmail Controller", error, req);
