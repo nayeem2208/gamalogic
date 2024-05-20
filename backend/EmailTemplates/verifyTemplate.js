@@ -22,11 +22,11 @@ const verifyEmailTemplate = (name,token) => {
         }
     
         .header {
-          background-color: #0A0E2B;
-          padding: 10px 0;
-          text-align: center;
-          color: rgb(255, 255, 255);
-        }
+            background-color: #11112b;
+            padding: 10px 0;
+            text-align: center;
+            color: rgb(255, 255, 255);
+          }
     
         .content {
           padding: 20px 20px;
@@ -93,7 +93,7 @@ const verifyEmailTemplate = (name,token) => {
     <body>
       <div class="container">
         <div class="header">
-          <h1>GAMALOGIC</h1>
+        <img src="https://beta.gamalogic.com/gmLogo.png" alt="GAMALOGIC">
         </div>
         <div class="content">
           <p class="nameofUser">Hii ${name},</p>

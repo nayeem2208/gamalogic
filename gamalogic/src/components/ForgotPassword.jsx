@@ -33,7 +33,6 @@ function ForgotPassword() {
   return (
     <div
     className="w-full flex justify-center items-center "
-    style={{ marginTop: "10vw" }}
   >
     <div className="w-3/5 flex flex-col justify-center items-center">
       <div className="text-center auth" style={{ position: "relative" }}>
@@ -41,13 +40,13 @@ function ForgotPassword() {
           <div className="red"></div>
           <div className="blue"></div>
         </div>
-        <h2 className="font-semibold text-4xl">Reset you password</h2>
+        <h2 className="font-semibold text-2xl md:text-4xl">Reset you password</h2>
         <p className="my-12 description">
         We will send you a link to reset your password
         </p>
       </div>
       <div
-        className="flex flex-col p-10 w-3/6 mb-16"
+        className="flex flex-col p-10 lg:w-3/6 mb-16"
         style={{ backgroundColor: "#161736" }}
       >
         <form onSubmit={handleSubmit} className="flex flex-col text-sm">

@@ -9,7 +9,6 @@ import ErrorHandler from "../utils/errorHandler.js";
 import generateConfirmationToken from "../utils/confirmationToken.js";
 import isDisposableURL from "../utils/disposibleEmailList.js";
 import verifyEmailTemplate from "../EmailTemplates/verifyTemplate.js";
-import verifyEmailTemplate2 from "../EmailTemplates/verifyTemplate2.js";
 
 const Authentication = {
   sample: async (req, res) => {
@@ -156,13 +155,6 @@ const Authentication = {
           "Please Verify Your Account",
           verifyEmailTemplate(fullname,token)
         );
-
-        sendEmail(fullname,
-        email,
-        "Please Verify Your Account",
-        verifyEmailTemplate2(fullname,token)
-      )
-
         res.status(200).json("Please check your email for verification link");
       }
       // }
