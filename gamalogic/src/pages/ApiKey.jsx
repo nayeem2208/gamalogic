@@ -29,7 +29,9 @@ function ApiKey() {
       }
     }
     document.title='API key | Beta Dashboard'
+    if(userDetails.confirm == 1 ){
     fetchApikey();
+    }
   }, []);
 
   let resetApiKey = async () => {

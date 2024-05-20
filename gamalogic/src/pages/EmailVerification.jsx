@@ -20,12 +20,12 @@ function EmailVerification() {
   let [load, setLoad] = useState(30);
   let [serverError, setServerError] = useState(false);
 
-  let { creditBal } = useUserState();
+  let { creditBal, userDetails } = useUserState();
 
   useEffect(() => {
     const fetchAllFiles = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         let allFiles = await axiosInstance.get(
           "/getAllUploadedEmailValidationFiles"
         );
@@ -61,13 +61,13 @@ function EmailVerification() {
         ]);
       } catch (error) {
         if (error.response.status === 500) {
-          setServerError(true); 
+          setServerError(true);
         } else {
           toast.error(error.response?.data?.error);
         }
       }
     };
-    document.title='Batch Email Verification | Beta Dashboard'
+    document.title = "Batch Email Verification | Beta Dashboard";
     fetchAllFiles();
   }, []);
 
@@ -137,7 +137,7 @@ function EmailVerification() {
       console.log(data, "data is here");
       if (data.processed == 100) {
         setLoading(true);
-        setLoad(30)
+        setLoad(30);
         let res = await axiosInstance.get(
           `/downloadEmailVerificationFile?batchId=${data.id}`
         );
@@ -154,7 +154,7 @@ function EmailVerification() {
       }
     } catch (error) {
       if (error.response.status === 500) {
-        setServerError(true); 
+        setServerError(true);
       } else {
         toast.error(error.response?.data?.error);
       }
@@ -163,34 +163,39 @@ function EmailVerification() {
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
-
-    if (file && file.type === "text/csv") {
-      try {
-        Papa.parse(file, {
-          // header: true,
-          complete: async function (results) {
-            const emails = results.data.map((emailArray) => {
-              return { emailid: emailArray[0] };
-            });
-            const fileName = file.name;
-            if (emails.length <= 100001) {
-              // if (creditBal >= emails.length-1) {
+    if (userDetails.confirm == 1) {
+      if (file && file.type === "text/csv") {
+        try {
+          Papa.parse(file, {
+            // header: true,
+            complete: async function (results) {
+              const emails = results.data.map((emailArray) => {
+                return { emailid: emailArray[0] };
+              });
+              const fileName = file.name;
+              if (emails.length <= 100001) {
+                // if (creditBal >= emails.length-1) {
                 setJsonToServer({ emails: emails, fileName: fileName });
                 setShowAlert(true);
-              // } else {
-              //   toast.error("You dont have enough credits");
-              // }
-            } else {
-              toast.error("Please select a file with not more than 100,000 email address");
-            }
-          },
-        });
-      } catch (error) {
-        setLoading(false);
-        console.error("Error uploading file:", error);
+                // } else {
+                //   toast.error("You dont have enough credits");
+                // }
+              } else {
+                toast.error(
+                  "Please select a file with not more than 100,000 email address"
+                );
+              }
+            },
+          });
+        } catch (error) {
+          setLoading(false);
+          console.error("Error uploading file:", error);
+        }
+      } else {
+        alert("Please select a CSV file.");
       }
     } else {
-      alert("Please select a CSV file.");
+      toast.error('Please verify your email')
     }
   };
 
@@ -198,7 +203,7 @@ function EmailVerification() {
     e.preventDefault();
     try {
       setLoading(true);
-      setLoad(30)
+      setLoad(30);
       setShowAlert(false);
       let results = JsonToServer;
       const response = await axiosInstance.post(
@@ -240,7 +245,7 @@ function EmailVerification() {
       ]);
     } catch (error) {
       if (error.response.status === 500) {
-        setServerError(true); 
+        setServerError(true);
       } else {
         toast.error(error.response?.data?.error);
       }
@@ -252,7 +257,7 @@ function EmailVerification() {
     setShowAlert(false);
   };
   if (serverError) {
-    return <ServerError />; 
+    return <ServerError />;
   }
   return (
     <div className=" px-20 py-8">
@@ -320,12 +325,12 @@ function EmailVerification() {
         />
       </form>
       {loading && (
-          <LoadingBar
-            color="#f74c41"
-            progress={load}
-            onLoaderFinished={() => {}}
-          />
-        )}
+        <LoadingBar
+          color="#f74c41"
+          progress={load}
+          onLoaderFinished={() => {}}
+        />
+      )}
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       <table className="text-bgblue w-full  mt-14 ">
         <tbody>

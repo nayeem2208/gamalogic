@@ -4,19 +4,20 @@ import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import LoadingBar from "react-top-loading-bar";
 import ServerError from "./ServerError";
+import { useUserState } from "../context/userContext";
 
 function EmailFinder() {
   let [data, setData] = useState({ fullname: "", domain: "" });
   let [result, setResult] = useState("");
-  let [loading,setLoading]=useState(false)
+  let [loading, setLoading] = useState(false);
   let [load, setLoad] = useState(30);
   let [serverError, setServerError] = useState(false);
 
+  let { userDetails } = useUserState();
 
-  useEffect(()=>{
-    document.title='Email Finder | Beta Dashboard'
-  },[])
-
+  useEffect(() => {
+    document.title = "Email Finder | Beta Dashboard";
+  }, []);
 
   function onInputChange(event, inputType) {
     const value = event.target.value;
@@ -29,31 +30,36 @@ function EmailFinder() {
   const HandleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setResult('')
-      let domain = data.domain.trim();
-      let fullname = data.fullname.trim();
-      if (domain && fullname) {
-        let fullnameArray = fullname.split(" ");
-          setLoading(true)
-          setLoad(30)
+      if (userDetails.confirm == 1) {
+        setResult("");
+        let domain = data.domain.trim();
+        let fullname = data.fullname.trim();
+        if (domain && fullname) {
+          let fullnameArray = fullname.split(" ");
+          setLoading(true);
+          setLoad(30);
           let res = await axiosInstance.post("/singleEmailFinder", data);
           setLoad(100);
           setResult(res.data);
           setData({ fullname: "", domain: "" });
-      } else {
-        toast.error("Please provide valid fullname and domain");
+        } else {
+          toast.error("Please provide valid fullname and domain");
+        }
+      }
+      else{
+        toast.error('Please verify your email')
       }
     } catch (error) {
       if (error.response.status === 500) {
-        setServerError(true); 
+        setServerError(true);
       } else {
         toast.error(error.response?.data?.error);
       }
     }
   };
-  
+
   if (serverError) {
-    return <ServerError />; 
+    return <ServerError />;
   }
   return (
     <div className=" px-20 py-8">
@@ -66,7 +72,10 @@ function EmailFinder() {
           tool.
         </p>
         <div className="flex w-4/5 justify-between">
-          <form className="flex flex-col w-5/12 text-sm" onSubmit={HandleSubmit}>
+          <form
+            className="flex flex-col w-5/12 text-sm"
+            onSubmit={HandleSubmit}
+          >
             <p>Full Name</p>
             <input
               type="text"
@@ -118,24 +127,25 @@ function EmailFinder() {
                 </p>
                 <table className="description QucikValidationtable my-4  w-2/6">
                   <tbody>
-                  <tr>
-                    <td className="mr-5 py-2">{result.email}</td>
-                    <td className="mr-5 py-2 flex justify-center items-center">
-                      <button
-                        className="bg-bgblue text-white p-1 rounded-md   text-sm"
-                        onClick={() => {
-                          navigator.clipboard.writeText(result.email);
-                        }}
-                      >
-                        COPY
-                      </button>
-                    </td>
-                  </tr>
+                    <tr>
+                      <td className="mr-5 py-2">{result.email}</td>
+                      <td className="mr-5 py-2 flex justify-center items-center">
+                        <button
+                          className="bg-bgblue text-white p-1 rounded-md   text-sm"
+                          onClick={() => {
+                            navigator.clipboard.writeText(result.email);
+                          }}
+                        >
+                          COPY
+                        </button>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
-            ):<p>Oops! Sorry, we couldn&apos;t help you.</p>
-          }
+            ) : (
+              <p>Oops! Sorry, we couldn&apos;t help you.</p>
+            )}
           </div>
         )}
       </div>

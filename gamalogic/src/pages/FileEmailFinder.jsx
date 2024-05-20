@@ -21,7 +21,9 @@ function FileEmailFinder() {
   const [JsonToServer, setJsonToServer] = useState([]);
   let [load, setLoad] = useState(30);
   let [serverError, setServerError] = useState(false);
-  let { creditBal } = useUserState();
+
+  
+  let { creditBal,userDetails } = useUserState();
 
   useEffect(() => {
     const fetchAllFiles = async () => {
@@ -63,57 +65,63 @@ function FileEmailFinder() {
       } catch (error) {
         console.log(error);
         if (error.response.status === 500) {
-          setServerError(true); 
+          setServerError(true);
         } else {
           toast.error(error.response?.data?.error);
         }
         setLoad(100);
       }
     };
-    document.title='Batch Email Finder | Beta Dashboard'
+    document.title = "Batch Email Finder | Beta Dashboard";
     fetchAllFiles();
   }, []);
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
-    if (file && file.type === "text/csv") {
-      try {
-        Papa.parse(file, {
-          header: true,
-          complete: async function (results) {
-            results.fileName = file.name;
-            results.data = results.data.map((item) => {
-              if (
-                !Object.prototype.hasOwnProperty.call(item, "first_name") &&
-                !Object.prototype.hasOwnProperty.call(item, "last_name") &&
-                !Object.prototype.hasOwnProperty.call(item, "domain")
-              ) {
-                item = {
-                  first_name: item.firstname,
-                  last_name: item.lastname,
-                  domain: item.url,
-                };
+    if (userDetails.confirm == 1) {
+      if (file && file.type === "text/csv") {
+        try {
+          Papa.parse(file, {
+            header: true,
+            complete: async function (results) {
+              results.fileName = file.name;
+              results.data = results.data.map((item) => {
+                if (
+                  !Object.prototype.hasOwnProperty.call(item, "first_name") &&
+                  !Object.prototype.hasOwnProperty.call(item, "last_name") &&
+                  !Object.prototype.hasOwnProperty.call(item, "domain")
+                ) {
+                  item = {
+                    first_name: item.firstname,
+                    last_name: item.lastname,
+                    domain: item.url,
+                  };
+                }
+                return item;
+              });
+              if (results.data.length <= 100000) {
+                // if (creditBal >= (results.data.length-1 )* 10) {
+                setJsonToServer(results);
+                setShowAlert(true);
+                // } else {
+                //   toast.error("You dont have enough credits");
+                // }
+              } else {
+                toast.error(
+                  "Please select a file with not more than 100,000 email address"
+                );
               }
-              return item;
-            });
-            if (results.data.length <= 100000) {
-              // if (creditBal >= (results.data.length-1 )* 10) {
-              setJsonToServer(results);
-              setShowAlert(true);
-              // } else {
-              //   toast.error("You dont have enough credits");
-              // }
-            } else {
-              toast.error("Please select a file with not more than 100,000 email address");
-            }
-          },
-        });
-      } catch (error) {
-        setLoading(false);
-        console.error("Error uploading file:", error);
+            },
+          });
+        } catch (error) {
+          setLoading(false);
+          console.error("Error uploading file:", error);
+        }
+      } else {
+        alert("Please select a CSV file.");
       }
     } else {
-      alert("Please select a CSV file.");
+      toast.error("Please verify your email");
     }
   };
 
@@ -122,7 +130,7 @@ function FileEmailFinder() {
       if (Selection === true) {
         setShowAlert(false);
         setLoading(true);
-        setLoad(30)
+        setLoad(30);
         let results = JsonToServer;
         async function BatchFileFinder() {
           try {
@@ -162,7 +170,7 @@ function FileEmailFinder() {
             ]);
           } catch (error) {
             if (error.response.status === 500) {
-              setServerError(true); 
+              setServerError(true);
             } else {
               toast.error(error.response?.data?.error);
             }
@@ -298,7 +306,7 @@ function FileEmailFinder() {
       console.log(data, "data is here");
       if (data.processed == 100) {
         setLoading(true);
-        setLoad(30)
+        setLoad(30);
         let res = await axiosInstance.get(
           `/downloadEmailFinderFile?batchId=${data.id}`
         );
@@ -315,11 +323,11 @@ function FileEmailFinder() {
       }
     } catch (error) {
       if (error.response.status === 500) {
-        setServerError(true); 
+        setServerError(true);
       } else {
         toast.error(error.response?.data?.error);
       }
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -334,7 +342,7 @@ function FileEmailFinder() {
   console.log(resultFile, "resultFile");
 
   if (serverError) {
-    return <ServerError />; 
+    return <ServerError />;
   }
   return (
     <div className=" px-20 py-8">
