@@ -127,9 +127,9 @@ const verifyEmailTemplate = (name, token, link) => {
                     Team Gamalogic</p>
             </div>
             <div class="footer">
-                <div class="tableDiv">
+                <div class="tableDiv" style="display: flex;flex-direction: column;justify-content: center;">
                     <p>If you have any questions, feel free to contact us at <a class="sprt">support@gamalogic.com</a></p>
-                    <div class="iconsDiv" style="display: flex;justify-content: center;">
+                    <div class="iconsDiv" style="display: flex;justify-content: center;align-items: center;">
                     <div><a target="_blank"
                             href="https://www.facebook.com/gamalogicapp"><img src="https://beta.gamalogic.com/fb.png"
                                 class="sicons" alt="FB"></a></div>
