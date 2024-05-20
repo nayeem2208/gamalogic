@@ -62,10 +62,6 @@ const verifyEmailTemplate = (name, token, link) => {
             }
     
             .iconsDiv {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            
                 width: 100%;
                 margin: 0 auto; 
                 text-align: center;
@@ -133,7 +129,7 @@ const verifyEmailTemplate = (name, token, link) => {
             <div class="footer">
                 <div class="tableDiv">
                     <p>If you have any questions, feel free to contact us at <a class="sprt">support@gamalogic.com</a></p>
-                    <div class="iconsDiv">
+                    <div class="iconsDiv" style="display: flex;justify-content: center;">
                     <div><a target="_blank"
                             href="https://www.facebook.com/gamalogicapp"><img src="https://beta.gamalogic.com/fb.png"
                                 class="sicons" alt="FB"></a></div>
