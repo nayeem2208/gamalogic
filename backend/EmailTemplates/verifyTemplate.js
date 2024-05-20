@@ -76,7 +76,7 @@ const verifyEmailTemplate = (name,token,link) => {
     
             .verify {
                 text-align: center;
-                margin-top: 2rem;
+                margin-top: 30px;
             }
     
             .verifyButton {
@@ -101,7 +101,7 @@ const verifyEmailTemplate = (name,token,link) => {
             .sicons {
                 color: gray;
                 width: 16px;
-                margin:0 1.7rem;
+                margin:0 30px;
             }
         </style>
     </head>
@@ -137,18 +137,18 @@ const verifyEmailTemplate = (name,token,link) => {
                             <tr>
                                 <td align="center" valign="top" class="es-p40r"><a target="_blank"
                                         href="https://www.facebook.com/gamalogicapp"><img
-                                            src="https://beta.gamalogic.com/fb.png" class="sicons" alt="Facebook"></a></td>
+                                            src="https://beta.gamalogic.com/fb.png" class="sicons" alt="FB"></a></td>
                                 <td align="center" valign="top" class="es-p40r"><a target="_blank"
                                         href="https://twitter.com/Gamalogicapp"><img
-                                            src="https://beta.gamalogic.com/twitter(2).png" class="sicons" alt="Twitter"></a></td>
+                                            src="https://beta.gamalogic.com/twitter(2).png" class="sicons" alt="Twt"></a></td>
                                 <td align="center" valign="top" class="es-p40r"><a target="_blank"
                                         href="https://www.youtube.com/@Gamalogic"><img
-                                            src="https://beta.gamalogic.com/youtube.png" class="sicons" alt="Youtube"></a></td>
+                                            src="https://beta.gamalogic.com/youtube.png" class="sicons" alt="YT"></a></td>
                                 <td align="center" valign="top" class="es-p40r"><a target="_blank"
                                         href="https://www.linkedin.com/company/gamalogic"><img
-                                            src="https://beta.gamalogic.com/linkedin.png" class="sicons" alt="Linkedin"></a></td>
+                                            src="https://beta.gamalogic.com/linkedin.png" class="sicons" alt="LI"></a></td>
                                 <td align="center" valign="top"><a target="_blank" href="mailto:support@gamalogic.com"><img
-                                            src="https://beta.gamalogic.com/mail.png" class="sicons" alt="Gmail"></a></td>
+                                            src="https://beta.gamalogic.com/mail.png" class="sicons" alt="GM"></a></td>
                                 <td></td>
                             </tr>
                         </tbody>
