@@ -138,22 +138,12 @@ const Authentication = {
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0)`
         );
         let token = generateConfirmationToken(email)
-    //     sendEmail(
-    //       fullname,
-    //       email,
-    //       "Please Verify Your Account",
-    //       `<p>Hi ${fullname},</p>
-    // <p>Welcome to Gamalogic! To start using your account, please click the link below to verify your email address:</p>
-    // <p><a href="https://beta.gamalogic.com/api/verifyEmail?email=${token}">Verify Your Account</a></p>
-    // <p>Thank you for joining us. If you have any questions, feel free to contact our support team.</p>
-    // <p>Best regards,</p>
-    // <p>Gamalogic</p>`
-    //     );
+    let link="https://beta.gamalogic.com/api/verifyEmail?email=${token}"
         sendEmail(
           fullname,
           email,
           "Please Verify Your Account",
-          verifyEmailTemplate(fullname,token)
+          verifyEmailTemplate(fullname,token,link)
         );
         res.status(200).json("Please check your email for verification link");
       }
