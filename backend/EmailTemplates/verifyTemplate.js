@@ -66,6 +66,7 @@ const verifyEmailTemplate = (name,token,link) => {
                 justify-content: center;
                 align-items: center;
                 width: 100%;
+                margin: 0 auto; 
                 text-align: center;
             }
     
