@@ -63,7 +63,6 @@ const verifyEmailTemplate = (name, token, link) => {
     
             .iconsDiv {
                 width: 100%;
-                margin: 0 auto; 
                 text-align: center;
             }
     
@@ -86,6 +85,7 @@ const verifyEmailTemplate = (name, token, link) => {
                 font-size: 16px;
                 margin: 20px auto;
                 font-weight: 600;
+                border: none;
             }
     
             .emailSub {
@@ -99,7 +99,7 @@ const verifyEmailTemplate = (name, token, link) => {
             .sicons {
                 color: gray;
                 width: 16px;
-                margin: 0 30px;
+                margin: 0 15px;
             }
         </style>
     </head>
@@ -115,7 +115,8 @@ const verifyEmailTemplate = (name, token, link) => {
                     address:</p>
     
                 <div class="verify">
-                    <a  href="https://beta.gamalogic.com/api/verifyEmail?email=${token}"><button class="verifyButton">Verify</button></a>
+                    <a href="https://beta.gamalogic.com/api/verifyEmail?email=${token}"><button
+                            class="verifyButton">Verify</button></a>
                     <p>Or</p>
                     <p>
                         <a href="https://beta.gamalogic.com/api/verifyEmail?email=${token}">${link}</a>
@@ -127,27 +128,29 @@ const verifyEmailTemplate = (name, token, link) => {
                     Team Gamalogic</p>
             </div>
             <div class="footer">
-            <p>If you have any questions, feel free to contact us at <a class="sprt">support@gamalogic.com</a></p>
-            <div class="iconsDiv"
-                style="display: flex;justify-content: center;align-items: center;">
-                <div style="display: flex;">
-                    <div><a target="_blank" href="https://www.facebook.com/gamalogicapp"><img
-                                src="https://beta.gamalogic.com/fb.png" class="sicons" alt="FB"></a></div>
-                    <div><a target="_blank" href="https://twitter.com/Gamalogicapp"><img
-                                src="https://beta.gamalogic.com/twitter(2).png" class="sicons" alt="Twt"></a></div>
-                    <div><a target="_blank" href="https://www.youtube.com/@Gamalogic"><img
-                                src="https://beta.gamalogic.com/youtube.png" class="sicons" alt="YT"></a></div>
-                    <div><a target="_blank" href="https://www.linkedin.com/company/gamalogic"><img
-                                src="https://beta.gamalogic.com/linkedin.png" class="sicons" alt="LI"></a></div>
-                    <div><a target="_blank" href="mailto:support@gamalogic.com"><img
-                                src="https://beta.gamalogic.com/mail.png" class="sicons" alt="GM"></a></div>
+                <p>If you have any questions, feel free to contact us at <a class="sprt">support@gamalogic.com</a></p>
+                <div class="iconsDiv">
+                    <table align="center">
+                        <tr>
+                            <td><a target="_blank" href="https://www.facebook.com/gamalogicapp"><img
+                                        src="https://beta.gamalogic.com/fb.png" class="sicons" alt="FB"></a></td>
+                            <td><a target="_blank" href="https://twitter.com/Gamalogicapp"><img
+                                        src="https://beta.gamalogic.com/twitter(2).png" class="sicons" alt="Twt"></a></td>
+                            <td><a target="_blank" href="https://www.youtube.com/@Gamalogic"><img
+                                        src="https://beta.gamalogic.com/youtube.png" class="sicons" alt="YT"></a></td>
+                            <td><a target="_blank" href="https://www.linkedin.com/company/gamalogic"><img
+                                        src="https://beta.gamalogic.com/linkedin.png" class="sicons" alt="LI"></a></td>
+                            <td><a target="_blank" href="mailto:support@gamalogic.com"><img
+                                        src="https://beta.gamalogic.com/mail.png" class="sicons" alt="GM"></a></td>
+                        </tr>
+                    </table>
                 </div>
             </div>
-        </div>
         </div>
     </body>
     
     </html>
+    
     `
     return htmlFile
 }
