@@ -306,6 +306,15 @@ let APIControllers = {
           `INSERT INTO useractivity_batch_finder_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${req.body.fileName}','${req.body.fileName}',1,0,0)`
         );
         let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
+        let content = `<p>This is to inform you that the bulk email finder process for the file you uploaded has been started.</p>
+        <p>Please note that the finding process may take some time depending on the size of the file and the number of emails to be find.</p>
+        <p>Thank you for using our service.</p>`
+        sendEmail(
+          req.user[0][0].username,
+          req.user[0][0].emailid,
+          "Bulk Email Finder Started",
+          basicTemplate(req.user[0][0].username, content)
+        );
         res.status(200).json({ message: response.data.message, files: files[0][0] });
       }
       else {
