@@ -10,6 +10,7 @@ import generateConfirmationToken from "../utils/confirmationToken.js";
 import isDisposableURL from "../utils/disposibleEmailList.js";
 import verifyEmailTemplate from "../EmailTemplates/verifyTemplate.js";
 import basicTemplate from "../EmailTemplates/BasicTemplate.js";
+import forgotPasswordTemplate from "../EmailTemplates/forgotPasswordTemplate.js";
 
 const Authentication = {
   sample: async (req, res) => {
@@ -358,17 +359,12 @@ const Authentication = {
           return
         }
         let token = generateConfirmationToken(req.body.email)
-
+        let link=`https://beta.gamalogic.com/resetPassword?email=${token}`
         sendEmail(
           user[0][0].username,
           req.body.email,
           "Reset your password",
-          `<p>Hi ${user[0][0].username},</p>
-          <p>We received a request to reset your password. To proceed with resetting your password, please click the link below:</p>
-          <p><a href="https://beta.gamalogic.com/resetPassword?email=${token}">Reset Password</a></p>
-          <p>If you didn't request this change, you can ignore this email. Your account security is important to us.</p>
-          <p>Best regards,</p>
-          <p>Gamalogic </p>`
+          forgotPasswordTemplate(user[0][0].username,token,link)
         );
         res
           .status(200)
