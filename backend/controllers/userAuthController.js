@@ -301,7 +301,7 @@ const Authentication = {
         <div class="verify">
                     <a href="https://beta.gamalogic.com/"><button
                             class="verifyButton">Sign In</button></a>
-                    <p>Or</p>
+    
                     </div>`
         sendEmail(
           verifiedUser[0][0].username,
