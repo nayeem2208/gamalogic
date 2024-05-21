@@ -38,9 +38,9 @@ function SubHeader(props) {
   }
   return (
     <div>
-      <div className="flex justify-between mt-1 ">
+      <div className="sm:flex justify-between mt-1 ">
         <p className="orangeUnderline ">{props.SubHeader}</p>
-        <div className="flex subHeaderCredits">
+        <div className="flex justify-end subHeaderCredits mt-6 md:mt-0">
           <p className="bg-gray-100 rounded-lg px-4 flex items-center ">
             {creditBal} Credits Left
           </p>{" "}

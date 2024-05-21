@@ -8,6 +8,7 @@ import ProgressBar from "@ramonak/react-progress-bar";
 import { useUserState } from "../context/userContext";
 import LoadingBar from "react-top-loading-bar";
 import ServerError from "./ServerError";
+import { IoDownload } from "react-icons/io5";
 
 function EmailVerification() {
   let [message, setMessage] = useState("");
@@ -195,7 +196,7 @@ function EmailVerification() {
         alert("Please select a CSV file.");
       }
     } else {
-      toast.error('Please verify your email')
+      toast.error("Please verify your email");
     }
   };
 
@@ -260,9 +261,9 @@ function EmailVerification() {
     return <ServerError />;
   }
   return (
-    <div className=" px-20 py-8">
+    <div className=" px-6 md:px-20 py-8">
       <SubHeader SubHeader={"Upload your file"} />
-      <form className="mt-14 subHeading">
+      <form className="mt-8 sm:mt-14 subHeading">
         <h3>Upload Your File Here | Email Validation</h3>
         <p className="my-7 w-4/5 description">
           You can upload the email address list in csv file and get results in
@@ -332,41 +333,51 @@ function EmailVerification() {
         />
       )}
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
-      <table className="text-bgblue w-full  mt-14 ">
-        <tbody>
-          <tr className="text-left">
-            <th className="font-normal w-1/5">File Name</th>
-            <th className="font-normal  w-2/5">Status</th>
-            <th className="font-normal  w-1/5">Upload Time</th>
-            <th></th>
-          </tr>
-          {resultFile.map((data, index) => (
-            <tr key={index} className="text-sm">
-              <td className="">{data.file}</td>
-              <td className="flex ">
-                <ProgressBar
-                  isLabelVisible={false}
-                  completed={data.processed}
-                  bgColor="#181e4a"
-                  labelSize="13px"
-                  className="w-2/5 mr-2"
-                  maxCompleted={100}
-                />
-                {data.processed}%
-              </td>
-              <td>{data.formattedDate}</td>
-              <td className="flex justify-center items-center ">
-                <button
-                  className="bg-bgblue text-white py-1 px-4 rounded-md ml-2   h-9 mt-8 text-xs"
-                  onClick={() => DownloadFile(data)}
-                >
-                  DOWNLOAD
-                </button>
-              </td>
+      <div className="overflow-x-auto">
+        <table className="text-bgblue w-full  mt-14 min-w-96">
+          <tbody>
+            <tr className="text-left text-xs sm:text-sm">
+              <th className="font-normal  md:w-1/5">File Name</th>
+              <th className="font-normal  md:w-2/5 ">Status</th>
+              <th className="font-normal  md:w-1/5">Upload Time</th>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+            {resultFile.map((data, index) => (
+              <tr key={index} className="text-xs sm:text-sm">
+                <td className="">{data.file}</td>
+                <td className="flex ">
+                  <ProgressBar
+                    isLabelVisible={false}
+                    completed={data.processed}
+                    bgColor="#181e4a"
+                    labelSize="13px"
+                    className="md:w-2/5 mr-2"
+                    maxCompleted={100}
+                  />
+                  {data.processed}%
+                </td>
+                <td>{data.formattedDate}</td>
+                <td className="flex justify-center items-center ">
+                  <div className="sm:hidden">
+                    <IoDownload
+                      className="text-xl"
+                      onClick={() => DownloadFile(data)}
+                    />
+                  </div>
+                  <div className="hidden sm:block">
+                    <button
+                      className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-8 text-xs"
+                      onClick={() => DownloadFile(data)}
+                    >
+                      DOWNLOAD
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

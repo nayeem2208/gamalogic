@@ -297,7 +297,12 @@ const Authentication = {
         }
         let content = ` <p>Welcome to Gamalogic! We're thrilled to have you on board.</p>
         <p>Your registration is now complete, and your account has been successfully verified.</p>
-        <p>You're all set to explore our platform. If you have any questions or need assistance getting started, feel free to reach out to us.</p>`
+        <p>You're all set to explore our platform. If you have any questions or need assistance getting started, feel free to reach out to us.</p>
+        <div class="verify">
+                    <a href="https://beta.gamalogic.com/"><button
+                            class="verifyButton">Sign In</button></a>
+                    <p>Or</p>
+                    </div>`
         sendEmail(
           verifiedUser[0][0].username,
           verifiedUser[0][0].emailid,

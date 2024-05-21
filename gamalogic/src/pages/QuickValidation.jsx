@@ -51,30 +51,30 @@ function QuickValidation() {
     return <ServerError />;
   }
   return (
-    <div className=" px-20 py-8">
-      <SubHeader SubHeader={"Quick Validation"} />
-      <div className="mt-14 text-bgblue subHeading">
-        <h3>Single Email Validator</h3>
-        <p className="my-7 description">
-          Type in any email address to have it quickly validated.
-        </p>
-        <form onSubmit={submitHandler}>
-          <div>
-            <input
-              type="email"
-              value={email}
-              placeholder="enter the email here"
-              className="w-2/6 border border-gray-400 text-md rounded-md py-2 px-4 mr-3"
-              onChange={(e) => setEmail(e.target.value)}
-            />{" "}
-            <button
-              className="bg-bgblue text-white py-2 px-4 rounded-md text-sm font-medium"
-              type="submit"
-            >
-              VALIDATE
-            </button>
-          </div>
-        </form>
+    <div className=" px-6 md:px-20 py-8">
+    <SubHeader SubHeader={"Quick Validation"} />
+    <div className="mt-14 text-bgblue subHeading">
+      <h3>Single Email Validator</h3>
+      <p className="my-7 description">
+        Type in any email address to have it quickly validated.
+      </p>
+      <form onSubmit={submitHandler}>
+        <div className="">
+          <input
+            type="email"
+            value={email}
+            placeholder="enter the email here"
+            className="w-full sm:w-3/6 lg:w-2/6 border border-gray-400 text-md rounded-md py-2 px-4 mr-3"
+            onChange={(e) => setEmail(e.target.value)}
+          />{" "}
+          <button
+            className="bg-bgblue text-white mt-3 sm:mt-0 py-2 px-4 rounded-md text-sm font-medium"
+            type="submit"
+          >
+            VALIDATE
+          </button>
+        </div>
+      </form>
         {loading && (
           <LoadingBar
             color="#f74c41"

@@ -62,7 +62,7 @@ function EmailFinder() {
     return <ServerError />;
   }
   return (
-    <div className=" px-20 py-8">
+    <div className=" px-6 md:px-20 py-8">
       <SubHeader SubHeader={"Email Finder"} />
       <div className="mt-14 subHeading">
         <h3>Find The Email Address</h3>
@@ -71,9 +71,9 @@ function EmailFinder() {
           find the email address of any professional with our email finding
           tool.
         </p>
-        <div className="flex w-4/5 justify-between">
+        <div className="sm:flex xl:w-4/5 justify-between">
           <form
-            className="flex flex-col w-5/12 text-sm"
+            className="flex flex-col w-full sm:w-8/12 md:w-5/12 text-sm"
             onSubmit={HandleSubmit}
           >
             <p>Full Name</p>
@@ -93,7 +93,7 @@ function EmailFinder() {
               onChange={(e) => onInputChange(e, "domain")}
             />
             <button
-              className="bg-bgblue text-white py-2 px-2 rounded-md text-sm font-medium w-2/5 mt-8"
+              className="bg-bgblue text-white py-2 px-2 rounded-md text-sm font-medium w-3/5 lg:w-2/5 mt-8"
               type="submit"
             >
               FIND EMAIL
@@ -125,7 +125,7 @@ function EmailFinder() {
                 <p className="description text-base">
                   We found 1 email addresses.
                 </p>
-                <table className="description QucikValidationtable my-4  w-2/6">
+                <table className="description QucikValidationtable my-4  md:w-2/6">
                   <tbody>
                     <tr>
                       <td className="mr-5 py-2">{result.email}</td>

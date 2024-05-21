@@ -55,10 +55,10 @@ function ApiKey() {
     return <ServerError />; 
   }
   return (
-    <div className=" px-20 py-8">
+    <div className=" px-6 md:px-20 py-8">
       <SubHeader SubHeader={"API Key"} />
       {userDetails.confirm == 1 ? (
-        <div className="mt-14 subHeading">
+        <div className="mt-6 sm:mt-14 subHeading">
           <h3>Your API Key</h3>
           <p className="my-7 w-4/5 description">
             Your API Key is given below. It is required to use our API. Keep it
@@ -71,7 +71,7 @@ function ApiKey() {
               onLoaderFinished={() => {}}
             />
           )}
-          <div className="flex justify-between">
+          <div className="sm:flex justify-between">
             <div className="flex flex-col">
               <textarea
                 name=""
@@ -101,19 +101,19 @@ function ApiKey() {
               </div>
             </div>
             <div
-              className="w-5/12 flex flex-col justify-center h-full rounded p-3 text-sm"
+              className="sm:w-5/12 mt-4 sm:mt-0 flex flex-col justify-center h-full rounded p-3 text-sm"
               style={{
                 backgroundColor: "rgba(247, 76, 65 , 0.05)",
                 color: "rgba(247, 76, 65 , 0.6)",
               }}
             >
-              <p className="font-semibold mb-4 text-sm">Note:</p>
+              <p className="font-semibold mb-4 text-xs sm:text-sm">Note:</p>
               <ol className="font-light text-base">
-                <li className="text-sm">
+                <li className="text-xs sm:text-sm">
                   <span className="font-semibold" >1.</span >Don’t share the API
                   key with anyone
                 </li>
-                <li className="text-sm">
+                <li className="text-xs sm:text-sm">
                   <span className="font-semibold">2.</span>In case you feel any
                   unauthorized access, change the key immediately
                 </li>

@@ -132,7 +132,6 @@ export default function BuyCredits() {
             Choose the best pack that suits your needs from below. For custom
             quoting,
             <Link to="/support" className="underline font-medium ml-1">
-              {" "}
               contact us.
             </Link>
           </p>
