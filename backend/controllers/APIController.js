@@ -19,31 +19,27 @@ let APIControllers = {
         creditBal = req.user[0][0].credits;
       }
       res.status(200).json(creditBal)
-      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       // ErrorHandler("getApi Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     }
     finally {
-      console.log('credit bal api')
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
   },
   getApi: async (req, res) => {
     try {
       res.status(200).json({ apiKey: req.user[0][0].api_key });
-      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("getApi Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
-      console.log('getApi end')
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -58,7 +54,6 @@ let APIControllers = {
       if (user[0].affectedRows === 1) {
         res.status(200).json({ newApiKey });
       }
-      await dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("resetApiKey Controller", error, req);
@@ -66,7 +61,7 @@ let APIControllers = {
     } finally {
       console.log('getApi end')
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -78,14 +73,13 @@ let APIControllers = {
         `https://gamalogic.com/emailvrf/?emailid=${req.body.email}&apikey=${process.env.API_KEY}&speed_rank=0`
       );
       res.status(200).json(validate.data.gamalogic_emailid_vrfy[0]);
-      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("emailValidation Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -100,14 +94,13 @@ let APIControllers = {
         `https://gamalogic.com/email-discovery/?firstname=${firstname}&lastname=${lastname}&domain=${req.body.domain}&apikey=${process.env.API_KEY}&speed_rank=0`
       );
       res.status(200).json(find.data);
-      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("FindSingleEmail Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -145,14 +138,13 @@ let APIControllers = {
         );
         res.status(200).json({ message: "Password successfully changed", googleUser });
       }
-      await dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("changePassword Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -165,7 +157,6 @@ let APIControllers = {
         `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}' ORDER BY date_time DESC`
       );
       res.status(200).json(files[0]);
-      await dbConnection.end()
     } catch (error) {
       console.error(error);
       ErrorHandler("getAlreadyCheckedBatchEmailFiles Controller", error, req);
@@ -174,7 +165,7 @@ let APIControllers = {
     finally {
       if (dbConnection) {
         try {
-          await dbConnection.end();
+          await dbConnection.release();
         } catch (endError) {
           console.error("Error closing database connection:", endError);
         }
@@ -219,7 +210,6 @@ let APIControllers = {
           basicTemplate(req.user[0][0].username, content)
         );
         res.status(200).json({ message: response.data.message, files: files[0][0] });
-        await dbConnection.end()
       } else {
         const errorMessage = Object.values(response.data)[0];
         res.status(400).json({ error: errorMessage });
@@ -230,7 +220,7 @@ let APIControllers = {
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -249,7 +239,7 @@ let APIControllers = {
     }
     // finally {
     //   if (req.dbConnection) {
-    //     await req.dbConnection.end();
+    //     await req.dbConnection.release();
     //   }
     // }
 
@@ -261,14 +251,13 @@ let APIControllers = {
         `https://gamalogic.com/batchresult/?apikey=${process.env.API_KEY}&batchid=${req.query.batchId}`
       );
       res.status(200).json(download.data);
-      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -280,14 +269,13 @@ let APIControllers = {
       const dbConnection = req.dbConnection;
       let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}' ORDER BY date_time DESC`)
       res.status(200).json(files[0])
-      await dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("getAlreadyCheckedBatchEmailFinderFiles Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -325,13 +313,12 @@ let APIControllers = {
         console.log(errorMessage, 'errorMessage')
         res.status(400).json({ error: errorMessage });
       }
-      await dbConnection.end()
     } catch (error) {
       console.log(error)
       res.status(400).json(error)
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -357,14 +344,13 @@ let APIControllers = {
         `https://gamalogic.com/batch-email-discovery-result/?apikey=${process.env.API_KEY}&batchid=${req.query.batchId}`
       );
       res.status(200).json(download.data);
-      await req.dbConnection.end();
     } catch (error) {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -388,14 +374,13 @@ let APIControllers = {
         basicTemplate(req.user[0][0].username,content)
       );
       res.status(200).json('Successfull')
-      await dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("updateCredit Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -418,7 +403,7 @@ let APIControllers = {
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
   }

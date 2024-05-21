@@ -7,8 +7,6 @@ import cors from "cors";
 import morgan from "morgan";
 import  mySqlPool from "./config/DB.js";
 import userRouter from "./routers/userRouter.js";
-import connectToMySQL from "./config/RemoteDb.js";
-// import { releaseDbConnection } from "./middlewares/dbMiddleware.js";
 
 
 
@@ -31,37 +29,20 @@ app.use(express.static(path.join(__dirname, '..', 'gamalogic', 'dist')));
 
 
 app.use('/api',userRouter)
-// app.use(releaseDbConnection);
-app.use((req, res, next) => {
-  req.dbConnection = null;
-  if (req.dbConnection) {
-    req.dbConnection.end((err) => {
-      if (err) {
-        console.error('Error closing DB connection:', err);
-      }
-    });
-  }
-  next();
-});
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'gamalogic', 'dist', 'index.html'));
 });
 
 
-
-app.listen(port, async () => {
-  console.log(`Server started on port ${port}`);
-});
-
-// mySqlPool
-//   .query("SELECT 1")
-//   .then(() => {
-//     console.log("MySQL DB connected ");
-//     app.listen(port, () => {
-//       console.log(`Server started on port ${port}`);
-//     });
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//   });
+mySqlPool
+  .query("SELECT 1")
+  .then(() => {
+    console.log("MySQL DB connected ");
+    app.listen(port, () => {
+      console.log(`Server started on port ${port}`);
+    });
+  })
+  .catch((error) => {
+    console.log(error);
+  });

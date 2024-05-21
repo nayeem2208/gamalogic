@@ -1,9 +1,9 @@
-import mySQLconnect from "../config/RemoteDb.js";
+import mySqlPool from "../config/DB.js";
 
 const dbMiddleware = async (req, res, next) => {
   let connection;
   try {
-    connection = await mySQLconnect();
+    connection = await mySqlPool.getConnection();
     req.dbConnection = connection;
     next(); 
   } catch (error) {

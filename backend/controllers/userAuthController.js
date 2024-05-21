@@ -70,13 +70,12 @@ const Authentication = {
       } else {
         res.status(401).json({ error: "Invalid User" });
       }
-      await dbConnection.end()
     } catch (error) {
       ErrorHandler("Login Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -91,17 +90,6 @@ const Authentication = {
         req.socket.remoteAddress || '';
 
       const dbConnection = req.dbConnection;
-      // console.log(req.body.token,'token')
-      // console.log(process.env.RECAPTCHA_SECRET_KEY,'key is getting ')
-      // const response = await axios.post(
-      //   "https://www.google.com/recaptcha/api/siteverify",
-      //   {
-      //     secret: process.env.RECAPTCHA_SECRET_KEY,
-      //     response: req.body.token,
-      //   }
-      // );
-      // console.log(response,'data')
-      // if(response.data.success){
       let userExists = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
@@ -135,11 +123,6 @@ const Authentication = {
         );
         res.status(200).json("Please check your email for verification link");
       }
-      // }
-      // else{
-      //   res.status(400).json({error:'Failed in human verification'})
-      // }
-      await dbConnection.end()
     } catch (error) {
       ErrorHandler("registerUser Controller", error, req);
       res
@@ -147,7 +130,7 @@ const Authentication = {
         .json({ message: "Registration failed", error: error.message });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -188,13 +171,12 @@ const Authentication = {
             "Unauthorised Access, Please register with us",
         });
       }
-      await dbConnection.end()
     } catch (error) {
       ErrorHandler("googleLogin Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -263,14 +245,13 @@ const Authentication = {
             .json({ error: "Error while adding user with google login" });
         }
       }
-      await dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("googleAuth Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -323,27 +304,18 @@ const Authentication = {
           "Welcome to Gamalogic!",
           basicTemplate(verifiedUser[0][0].username, content)
         );
-
-        // res.json({
-        //   name: verifiedUser[0][0].username,
-        //   email: verifiedUser[0][0].emailid,
-        //   token,
-        //   credit: creditBal
-        // });
         res.redirect('https://beta.gamalogic.com/EmailConfirmed');
 
       }
-      await dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("verifyEmail Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
-
   },
   forgotPassword: async (req, res) => {
     try {
@@ -372,14 +344,13 @@ const Authentication = {
       } else {
         res.status(400).json({ error: "Invalid email Id" });
       }
-      await dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("forgotPassword Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -393,7 +364,6 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${userEmail}'`
       );
       if (user[0].length > 0) {
-        // let hash = generateSHA256Hash(req.body.password);
         let hashedPassword = await passwordHash(req.body.password);
         await dbConnection.query(
           `UPDATE registration SET password='${hashedPassword}' WHERE emailid='${userEmail}'`
@@ -411,14 +381,13 @@ const Authentication = {
       } else {
         res.status(400).json({ error: "Invalid user" });
       }
-      await dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("resetPassword Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
-        await req.dbConnection.end();
+        await req.dbConnection.release();
       }
     }
 
@@ -438,7 +407,6 @@ const Authentication = {
         verifyEmailTemplate(user[0][0].username, token, link)
       );
       res.status(200)
-      await dbConnection.end()
     } catch (error) {
       console.log(error);
       ErrorHandler("sendVerifyEmail Controller", error, req);
