@@ -304,7 +304,7 @@ const Authentication = {
           "Welcome to Gamalogic!",
           basicTemplate(verifiedUser[0][0].username, content)
         );
-        res.redirect('https://beta.gamalogic.com/EmailConfirmed');
+        res.redirect('https://beta.gamalogic.com/EmailConfirmed?confirm=true');
 
       }
     } catch (error) {
