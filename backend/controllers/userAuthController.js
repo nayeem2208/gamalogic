@@ -313,9 +313,13 @@ const Authentication = {
 
       }
     } catch (error) {
-      console.log(error);
-      ErrorHandler("verifyEmail Controller", error, req);
-      res.status(500).json({ error: "Internal Server Error" });
+      if (error.name === 'TokenExpiredError') {
+        return res.status(401).json({ error: 'link has expired,please resend email' });
+      } else {
+        console.log(error);
+        ErrorHandler("verifyEmail Controller", error, req);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.release();
@@ -336,12 +340,12 @@ const Authentication = {
           return
         }
         let token = generateConfirmationToken(req.body.email)
-        let link=`https://beta.gamalogic.com/reset?email=${token}`
+        let link = `https://beta.gamalogic.com/reset?email=${token}`
         sendEmail(
           user[0][0].username,
           req.body.email,
           "Reset your password",
-          forgotPasswordTemplate(user[0][0].username,token,link)
+          forgotPasswordTemplate(user[0][0].username, token, link)
         );
         res
           .status(200)
@@ -387,9 +391,13 @@ const Authentication = {
         res.status(400).json({ error: "Invalid user" });
       }
     } catch (error) {
-      console.log(error);
-      ErrorHandler("resetPassword Controller", error, req);
-      res.status(500).json({ error: "Internal Server Error" });
+      if (error.name === 'TokenExpiredError') {
+        return res.status(401).json({ error: 'link has expired,please resend email' });
+      } else {
+        console.log(error);
+        ErrorHandler("resetPassword Controller", error, req);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.release();

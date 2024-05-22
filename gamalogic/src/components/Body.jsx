@@ -27,6 +27,12 @@ function Body() {
         const response = await axiosInstance.get("/getCreditBalance");
         setCreditBal(response.data);
       } catch (error) {
+        if (error.response && error.response.status === 401 && error.response.data.error === "TokenExpired") {
+          localStorage.removeItem('Gamalogic_token');
+          setUserDetails(null)
+          toast.error(error.response.data.message);
+          navigate("/signin");
+        }
         console.error("Error fetching credit balance:", error);
       }
     };

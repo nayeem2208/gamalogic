@@ -44,8 +44,8 @@ function Router() {
       <Route path="/" element={<Authentication />}>
         <Route index path="signin" element={<Suspense fallback={<TopLoader loading={loading} />}><Login setLoading={setLoading}/></Suspense>} />
         <Route path="signup" element={<Suspense fallback={<TopLoader loading={loading} />}><Signup setLoading={setLoading}/></Suspense>} />
-        <Route path="forgotPassword" element={<Suspense fallback={<TopLoader loading={loading} />}><ForgotPassword setLoading={setLoading}/></Suspense>} />
-        <Route path="resetPassword" element={<Suspense fallback={<TopLoader loading={loading} />}><ResetPassword setLoading={setLoading}/></Suspense>} />
+        <Route path="resetPassword" element={<Suspense fallback={<TopLoader loading={loading} />}><ForgotPassword setLoading={setLoading}/></Suspense>} />
+        <Route path="reset" element={<Suspense fallback={<TopLoader loading={loading} />}><ResetPassword setLoading={setLoading}/></Suspense>} />
         <Route path="VerifyYourEmail" element={<Suspense fallback={<TopLoader loading={loading} />}><PostSignupPage setLoading={setLoading}/></Suspense>} />
       </Route>
       <Route path="*" element={<NotFound />} />

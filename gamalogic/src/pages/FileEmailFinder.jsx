@@ -9,6 +9,7 @@ import Alert from "../components/Alert";
 import { useUserState } from "../context/userContext";
 import LoadingBar from "react-top-loading-bar";
 import ServerError from "./ServerError";
+import { IoDownload } from "react-icons/io5";
 
 function FileEmailFinder() {
   let [message, setMessage] = useState("");
@@ -22,8 +23,7 @@ function FileEmailFinder() {
   let [load, setLoad] = useState(30);
   let [serverError, setServerError] = useState(false);
 
-  
-  let { creditBal,userDetails } = useUserState();
+  let { creditBal, userDetails } = useUserState();
 
   useEffect(() => {
     const fetchAllFiles = async () => {
@@ -186,59 +186,6 @@ function FileEmailFinder() {
     }
   }, [Selection]);
 
-  // useEffect(() => {
-  //   const checkCompletion = async () => {
-  //     try {
-  //       if (filesStatus.length > 0) {
-  //         for (const [index, file] of filesStatus.entries()) {
-  //           if (file.id && file.processed !== 100) {
-  //             const res = await axiosInstance.get(
-  //               `/getBatchFinderStatus?id=${file.id}`
-  //             );
-  //             if (res.data.emailStatus.processed === res.data.emailStatus.total) {
-  //               // File completed, update filesStatus and resultFile
-  //               setFilesStatus(prevFilesStatus => {
-  //                 const updatedFilesStatus = [...prevFilesStatus];
-  //                 updatedFilesStatus.splice(index, 1);
-  //                 return updatedFilesStatus;
-  //               });
-
-  //               setResultFile(prevResultFiles => [
-  //                 ...prevResultFiles.slice(0, index),
-  //                 { ...file, processed: 100 },
-  //                 ...prevResultFiles.slice(index + 1),
-  //               ]);
-
-  //               setMessage("");
-  //             } else {
-  //               const progress = Math.round(
-  //                 (res.data.emailStatus.processed / res.data.emailStatus.total) * 100
-  //               );
-  //               // Update progress in filesStatus and resultFile
-  //               setFilesStatus(prevFilesStatus => [
-  //                 ...prevFilesStatus.slice(0, index),
-  //                 { ...file, processed: progress },
-  //                 ...prevFilesStatus.slice(index + 1),
-  //               ]);
-
-  //               setResultFile(prevResultFiles => [
-  //                 ...prevResultFiles.slice(0, index),
-  //                 { ...file, processed: progress },
-  //                 ...prevResultFiles.slice(index + 1),
-  //               ]);
-  //               await new Promise(resolve => setTimeout(resolve, 10000));
-
-  //             }
-  //           }
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-
-  //   checkCompletion();
-  // }, [resultFile,filesStatus]);
   useEffect(() => {
     if (filesStatus.length === 0 || isCheckingCompletion.current) return;
     isCheckingCompletion.current = true;
@@ -297,7 +244,7 @@ function FileEmailFinder() {
 
     checkCompletion();
 
-    const intervalId = setInterval(checkCompletion, 20000);
+    const intervalId = setInterval(checkCompletion, 10000);
     return () => clearInterval(intervalId);
   }, [filesStatus]);
 
@@ -311,8 +258,23 @@ function FileEmailFinder() {
           `/downloadEmailFinderFile?batchId=${data.id}`
         );
         setLoad(100);
-        console.log(res.data.gamalogic_emailid_vrfy, "ressssssssssss");
-        const csvData = res.data.gamalogic_discovery;
+        const outputArray=res.data.gamalogic_discovery.map((obj)=>{
+          let remarks=''
+          if(obj.is_catchall==1){
+            remarks='Catch all Address'
+          }
+          else{
+            remarks='Valid Address'
+          }
+          return{
+            Domain:obj.domain,
+            FirstName:obj.firstname,
+            LastName:obj.lastname,
+            Email_Address:obj.email_address,
+            Remarks:remarks
+          }
+        })
+        const csvData = outputArray;
         const fileName = "Emails Finder results";
         const exportType = exportFromJSON.types.csv;
         exportFromJSON({ data: csvData, fileName, exportType });
@@ -345,7 +307,7 @@ function FileEmailFinder() {
     return <ServerError />;
   }
   return (
-    <div className=" px-20 py-8">
+    <div className=" px-6 md:px-20 py-8">
       <SubHeader SubHeader={"Upload your file"} />
       {showAlert && (
         <Alert
@@ -354,7 +316,7 @@ function FileEmailFinder() {
           onDismiss={handleDismiss}
         />
       )}
-      <div className="mt-14 subHeading">
+      <div className="mt-8 sm:mt-14 subHeading">
         <h3>Upload Your File Here | Email Finder</h3>
         <p className="my-7 w-4/5 description">
           You can upload the email address list in csv file and get results in
@@ -376,16 +338,17 @@ function FileEmailFinder() {
       )}
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       {resultFile.length > 0 && (
+          <div className="overflow-x-auto">
         <table className="text-bgblue w-full  mt-14 ">
           <tbody>
-            <tr className="text-left">
-              <th className="font-normal w-1/5">File Name</th>
-              <th className="font-normal  w-2/5">Status</th>
-              <th className="font-normal  w-1/5">Upload Time</th>
+            <tr className="text-left text-xs sm:text-sm">
+              <th className="font-normal md:w-1/5">File Name</th>
+              <th className="font-normal  md:w-2/5">Status</th>
+              <th className="font-normal  md:w-1/5">Upload Time</th>
               <th className=""></th>
             </tr>
             {resultFile.map((data, index) => (
-              <tr key={index} className="text-sm ">
+              <tr key={index} className="text-xs sm:text-sm">
                 <td>{data.file}</td>
                 <td className="flex ">
                   <ProgressBar
@@ -393,24 +356,33 @@ function FileEmailFinder() {
                     completed={data.processed}
                     bgColor="#181e4a"
                     labelSize="13px"
-                    className="w-2/5 mr-2"
+                    className="md:w-2/5  mr-2"
                     maxCompleted={100}
                   />
                   {data.processed}%
                 </td>
                 <td>{data.formattedDate}</td>
                 <td className="flex justify-center items-center ">
-                  <button
-                    className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 mt-4  h-9  text-xs"
-                    onClick={() => DownloadFile(data)}
-                  >
-                    DOWNLOAD
-                  </button>
+                  <div className="sm:hidden">
+                    <IoDownload
+                      className="text-xl"
+                      onClick={() => DownloadFile(data)}
+                    />
+                  </div>
+                  <div className="hidden sm:block">
+                    <button
+                      className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-8 text-xs"
+                      onClick={() => DownloadFile(data)}
+                    >
+                      DOWNLOAD
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

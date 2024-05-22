@@ -129,7 +129,7 @@ function EmailVerification() {
 
     checkCompletion();
 
-    const intervalId = setInterval(checkCompletion, 20000);
+    const intervalId = setInterval(checkCompletion, 10000);
     return () => clearInterval(intervalId);
   }, [filesStatus]);
 
@@ -143,8 +143,26 @@ function EmailVerification() {
           `/downloadEmailVerificationFile?batchId=${data.id}`
         );
         setLoad(100);
-        console.log(res.data.gamalogic_emailid_vrfy, "ressssssssssss");
-        const csvData = res.data.gamalogic_emailid_vrfy;
+        const outputArray = res.data.gamalogic_emailid_vrfy
+        .filter(obj => obj.emailid !== 'emailid') 
+        .map(obj => {
+          let status = '';
+          if (obj.is_catchall) {
+              status = 'Catchall';
+          } else if (obj.is_unknown) {
+              status = 'Unknown';
+          } else if (obj.is_valid) {
+              status = 'Valid Address';
+          } else {
+              status = 'Not Valid Address';
+          }
+      
+          return {
+              emailid: obj.emailid,
+              status: status
+          };
+      });
+        const csvData = outputArray;
         const fileName = "Verified Emails";
         const exportType = exportFromJSON.types.csv;
         exportFromJSON({ data: csvData, fileName, exportType });

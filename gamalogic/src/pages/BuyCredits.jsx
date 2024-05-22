@@ -123,10 +123,10 @@ export default function BuyCredits() {
 
   const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
   return (
-    <div className=" px-20 py-8">
+    <div className=" px-6 md:px-20 py-8">
       <SubHeader SubHeader={"Buy Credits"} />
       {success == false && failure == false && (
-        <div className="mt-14 text-bgblue subHeading">
+        <div className="mt-6 sm:mt-14 text-bgblue subHeading">
           <h3>Pricing</h3>
           <p className="my-7 description">
             Choose the best pack that suits your needs from below. For custom
@@ -135,16 +135,16 @@ export default function BuyCredits() {
               contact us.
             </Link>
           </p>
-          <div className="bg-gray-100 rounded h-96 shadow flex flex-col justify-center items-center">
+          <div className="bg-gray-100 rounded h-52 md:h-96 shadow flex flex-col justify-center items-center">
             <div className="flex w-full text-center">
               <div className="w-3/6 border-r-4 border-gray-400">
-                <p className="buyCreditsCost text-3xl font-medium">
+                <p className="buyCreditsCost text-xl md:text-3xl font-medium">
                   {selectedCredits.toLocaleString()}
                 </p>
                 <p>Credits</p>
               </div>
               <div className="w-3/6">
-                <p className="buyCreditsCost text-3xl font-medium">${cost}</p>
+                <p className="buyCreditsCost text-xl md:text-3xl font-medium">${cost}</p>
                 <p>Cost</p>
               </div>
             </div>
@@ -163,7 +163,7 @@ export default function BuyCredits() {
             </div>
           </div>
           <div className=" flex justify-center mt-6">
-            <div className="w-2/6  z-0">
+            <div className="w-4/6 sm:w-3/6 md:w-2/6  z-0">
               <PayPalButton
                 createOrder={(data, actions) => createOrder(data, actions)}
                 onApprove={onApprove}

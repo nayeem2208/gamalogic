@@ -10,8 +10,11 @@ const APIDecode =  async (req, res, next) => {
       req.user = decoded
       next();
     } catch (error) {
-      console.error(error);
-      res.status(401).json({ error: "Unauthorized" }); 
+      if (error.name === 'TokenExpiredError') {
+        res.status(401).json({ error: "TokenExpired", message: "Your session has expired. Please log in again." });
+      } else {
+        res.status(401).json({ error: "Unauthorized" });
+      }
     }
 
   } else {
