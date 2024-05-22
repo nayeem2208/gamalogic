@@ -32,7 +32,9 @@ let APIControllers = {
   },
   getApi: async (req, res) => {
     try {
-      res.status(200).json({ apiKey: req.user[0][0].api_key });
+      if (req.user[0][0].api_key) {
+        res.status(200).json({ apiKey: req.user[0][0].api_key });
+      }
     } catch (error) {
       console.log(error);
       ErrorHandler("getApi Controller", error, req);
@@ -390,7 +392,7 @@ let APIControllers = {
         req.user[0][0].username,
         req.user[0][0].emailid,
         "Payment successfull",
-        basicTemplate(req.user[0][0].username,content)
+        basicTemplate(req.user[0][0].username, content)
       );
       res.status(200).json('Successfull')
     } catch (error) {
@@ -412,7 +414,7 @@ let APIControllers = {
         req.user[0][0].username,
         req.user[0][0].emailid,
         "Payment Unsuccessful",
-        basicTemplate(req.user[0][0].username,content)
+        basicTemplate(req.user[0][0].username, content)
       );
 
       res.status(200)
