@@ -83,9 +83,9 @@ function ResetPassword() {
             <div className="red"></div>
             <div className="blue"></div>
           </div>
-          <h2 className="font-semibold text-4xl">Reset you password</h2>
+          <h2 className="font-semibold text-4xl">Set New Password</h2>
           <p className="my-12 description">
-           Please add password to reset your password
+          Give a new password and confirm
           </p>
         </div>
         <div

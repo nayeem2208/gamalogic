@@ -336,7 +336,7 @@ const Authentication = {
           return
         }
         let token = generateConfirmationToken(req.body.email)
-        let link=`https://beta.gamalogic.com/resetPassword?email=${token}`
+        let link=`https://beta.gamalogic.com/reset?email=${token}`
         sendEmail(
           user[0][0].username,
           req.body.email,

@@ -116,7 +116,7 @@ function Signup() {
       setUserDetails(token);
       setCreditBal(token.credit);
       localStorage.setItem("Gamalogic_token", JSON.stringify(token));
-      navigate("/");
+      navigate("/dashboard/quick-validation");
     } catch (err) {
       console.log(err);
       if (err.response.status === 500) {

@@ -41,7 +41,7 @@ function Login() {
         setUserDetails(token);
         setCreditBal(token.credit);
         localStorage.setItem("Gamalogic_token", JSON.stringify(token));
-        navigate("/");
+        navigate("/dashboard/quick-validation");
       }
     } catch (error) {
       if (error.response.status === 500) {
@@ -76,7 +76,7 @@ function Login() {
       setUserDetails(token);
       setCreditBal(token.credit);
       localStorage.setItem("Gamalogic_token", JSON.stringify(token));
-      navigate("/");
+      navigate("/dashboard/quick-validation");
     } catch (err) {
       if (err.response.status === 500) {
         setServerError(true); 
@@ -184,7 +184,7 @@ function Login() {
                 Need an account?
               </div>
             </Link>
-            <Link to="/forgotPassword">
+            <Link to="/resetpassword">
               <div className="mx-2">Forgot Password?</div>
             </Link>
           </div>

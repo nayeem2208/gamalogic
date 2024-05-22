@@ -49,19 +49,19 @@ function SideBar() {
         <p className="font-semibold text-xl text-center mt-2" style={{fontFamily: "Montserrat, sans-serif"}}>GAMALOGIC</p>
       </Link>
       <ul className="mt-14 text-lg font-semibold text-left">
-        <Link to="/">
+        <Link to="/dashboard/quick-validation">
           <li className="my-4 flex ">
             <GrDocumentVerified className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
             Quick Validation
           </li>
         </Link>
-        <Link to="/email-finder">
-          <li className="my-4 flex">
+        <Link to="/dashboard/email-finder">
+            <li className="my-4 flex">
             <IoSearchOutline className="text-teal-800 mt-2 mx-2 text-lg" />
             Email Finder
           </li>
         </Link>
-        <Link to="/api-Key">
+        <Link to="/dashboard/apikey">
           <li className="my-4 flex">
             <LuKey className="text-teal-800 mt-2 mx-2 text-lg" />
             API Key
@@ -75,11 +75,11 @@ function SideBar() {
         </li>
         {uploadfileDropDown && (
           <ul className="ml-6">
-             <Link to='/email-verification-bulk'><li className="my-4 flex">
+             <Link to='/dashboard/file-upload'><li className="my-4 flex">
               <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" /> Email
               Verification
             </li></Link>
-            <Link to='/email-finder-bulk'><li className="my-4 flex">
+            <Link to='/dashboard/file-upload-finder'><li className="my-4 flex">
               <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" /> Email
               Finder
             </li></Link>
@@ -117,15 +117,15 @@ function SideBar() {
             
           </ul>
         )}
-        <Link to='/account-settings'><li className="my-4 flex">
+        <Link to='/dashboard/account-settings'><li className="my-4 flex">
           <IoSettingsOutline className="text-teal-800 mt-2 mx-2 text-lg" />
           Account Settings
         </li></Link>
-       <Link to='/buyCredits'> <li className="my-4 flex">
+       <Link to='/dashboard/buy-credits'> <li className="my-4 flex">
           <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
           Buy Credits
         </li></Link>
-        <Link to='/support'><li className="my-4 flex">
+        <Link to='/dashboard/support'><li className="my-4 flex">
           <SlSupport className="text-teal-800 mt-2 mx-2 text-lg" /> Support
         </li></Link>
         <li className="my-4 flex cursor-pointer" onClick={logoutHandler}>

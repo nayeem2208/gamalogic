@@ -114,11 +114,11 @@ const forgotPasswordTemplate = (name, token, link) => {
                 <p>We received a request to reset your password. To proceed with resetting your password, please click the link below:</p>
     
                 <div class="verify">
-                    <a href="https://beta.gamalogic.com/resetPassword?email=${token}"><button
+                    <a href="https://beta.gamalogic.com/reset?email=${token}"><button
                             class="verifyButton">Reset Password</button></a>
                     <p>Or</p>
                     <p>
-                        <a href="https://beta.gamalogic.com/resetPassword?email=${token}">${link}</a>
+                        <a href="https://beta.gamalogic.com/reset?email=${token}">${link}</a>
                     </p>
                 </div>
                 <p>If you didn't request this change, you can ignore this email. Your account security is important to us.</p>

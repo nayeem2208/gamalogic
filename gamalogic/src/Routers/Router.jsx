@@ -1,9 +1,11 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { Suspense, lazy, useState } from 'react';
 import TopLoader from '../components/TopLoader';
 import NotFound from '../pages/Notfound';
 import BlockePage from '../pages/BlockePage';
 import EmailVerifiedPage from '../components/EmailVerifiedPage';
+import ServerError from '../pages/ServerError';
+import { useUserState } from '../context/userContext';
 
 const QuickValidation = lazy(() => import('../pages/QuickValidation'));
 const Body = lazy(() => import('../components/Body'));
@@ -23,17 +25,21 @@ const PostSignupPage = lazy(() => import('../components/PostSignupPage'));
 
 function Router() {
   const [loading, setLoading] = useState(true);
+  let { userDetails } = useUserState();
+
+  
   return (
     <Routes>
       <Route path="/" element={<Body />}>
-        <Route index element={<Suspense fallback={<TopLoader loading={loading} />}><QuickValidation setLoading={setLoading}/></Suspense>} />
-        <Route path="/email-finder" element={<Suspense fallback={<TopLoader loading={loading} />}><EmailFinder setLoading={setLoading}/></Suspense>} />
-        <Route path="/api-Key" element={<Suspense fallback={<TopLoader loading={loading} />}><ApiKey setLoading={setLoading}/></Suspense>} />
-        <Route path="/email-verification-bulk" element={<Suspense fallback={<TopLoader loading={loading} />}><EmailVerification setLoading={setLoading}/></Suspense>} />
-        <Route path="/email-finder-bulk" element={<Suspense fallback={<TopLoader loading={loading} />}><FileEmailFinder setLoading={setLoading}/></Suspense>} />
-        <Route path="/account-settings" element={<Suspense fallback={<TopLoader loading={loading} />}><AccountSettings setLoading={setLoading}/></Suspense>} />
-        <Route path="/buyCredits" element={<Suspense fallback={<TopLoader loading={loading} />}><BuyCredits setLoading={setLoading}/></Suspense>} />
-        <Route path="/support" element={<Suspense fallback={<TopLoader loading={loading} />}><Support setLoading={setLoading}/></Suspense>} />
+      <Route index element={<Navigate to={userDetails ? "/dashboard/quick-validation" : "/signin"} />} />
+        <Route  path='dashboard/quick-validation' element={<Suspense fallback={<TopLoader loading={loading} />}><QuickValidation setLoading={setLoading}/></Suspense>} />
+        <Route path="dashboard/email-finder" element={<Suspense fallback={<TopLoader loading={loading} />}><EmailFinder setLoading={setLoading}/></Suspense>} />
+        <Route path="dashboard/apikey" element={<Suspense fallback={<TopLoader loading={loading} />}><ApiKey setLoading={setLoading}/></Suspense>} />
+        <Route path="dashboard/file-upload" element={<Suspense fallback={<TopLoader loading={loading} />}><EmailVerification setLoading={setLoading}/></Suspense>} />
+        <Route path="dashboard/file-upload-finder" element={<Suspense fallback={<TopLoader loading={loading} />}><FileEmailFinder setLoading={setLoading}/></Suspense>} />
+        <Route path="dashboard/account-settings" element={<Suspense fallback={<TopLoader loading={loading} />}><AccountSettings setLoading={setLoading}/></Suspense>} />
+        <Route path="dashboard/buy-credits" element={<Suspense fallback={<TopLoader loading={loading} />}><BuyCredits setLoading={setLoading}/></Suspense>} />
+        <Route path="dashboard/support" element={<Suspense fallback={<TopLoader loading={loading} />}><Support setLoading={setLoading}/></Suspense>} />
       </Route>
       <Route path="/" element={<Authentication />}>
         <Route index path="signin" element={<Suspense fallback={<TopLoader loading={loading} />}><Login setLoading={setLoading}/></Suspense>} />

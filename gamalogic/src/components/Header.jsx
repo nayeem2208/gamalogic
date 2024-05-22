@@ -64,19 +64,19 @@ function Header() {
           style={{ backgroundColor: "rgba(10, 14, 43,0.97)" }}
         >
           <ul className="mb-14 text-lg font-semibold text-left px-8">
-            <Link to="/" onClick={dropDownToggle}>
+            <Link to="/dashboard/quick-validation" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
                 <GrDocumentVerified className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
                 Quick Validation
               </li>
             </Link>
-            <Link to="/email-finder" onClick={dropDownToggle}>
+            <Link to="/dashboard/email-finder" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
                 <IoSearchOutline className="text-teal-800 mt-2 mx-2 text-lg" />
                 Email Finder
               </li>
             </Link>
-            <Link to="/api-Key" onClick={dropDownToggle}>
+            <Link to="/dashboard/apikey" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
                 <LuKey className="text-teal-800 mt-2 mx-2 text-lg" />
                 API Key
@@ -92,13 +92,13 @@ function Header() {
             </li>
             {uploadfileDropDown && (
               <ul className="ml-6 ">
-                <Link to="/email-verification-bulk" onClick={dropDownToggle}>
+                <Link to="/dashboard/file-upload" onClick={dropDownToggle}>
                   <li className="py-2 flex ">
                     <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
                     Email Verification
                   </li>
                 </Link>
-                <Link to="/email-finder-bulk" onClick={dropDownToggle}>
+                <Link to="/dashboard/file-upload-finder" onClick={dropDownToggle}>
                   <li className="py-2 flex ">
                     <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
                     Email Finder
@@ -145,19 +145,19 @@ function Header() {
                 </a>
               </ul>
             )}
-            <Link to='/account-settings' onClick={dropDownToggle}>
+            <Link to='/dashboard/account-settings' onClick={dropDownToggle}>
             <li className="py-2 flex underlineLi">
               <IoSettingsOutline className="text-teal-800 mt-2 mx-2 text-lg" />
               Account Settings
             </li>
             </Link>
-            <Link to='/buyCredits' onClick={dropDownToggle}> 
+            <Link to='/dashboard/buy-credits' onClick={dropDownToggle}> 
             <li className="py-2 flex underlineLi">
               <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
               Buy Credits
             </li>
             </Link>
-            <Link to='/support' onClick={dropDownToggle}>
+            <Link to='/dashboard/support' onClick={dropDownToggle}>
             <li className="py-2 flex underlineLi">
               <SlSupport className="text-teal-800 mt-2 mx-2 text-lg" /> Support
             </li>
