@@ -202,7 +202,12 @@ let APIControllers = {
         let files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
         let content = `<p>This is to inform you that the bulk email verification process for the file you uploaded has been started.</p>
         <p>Please note that the verification process may take some time depending on the size of the file and the number of emails to be verified.</p>
-        <p>Thank you for using our service.</p>`
+        <p>Thank you for using our service.</p>
+        <div class="verify">
+        <a href="https://beta.gamalogic.com/email-verification-bulk"><button
+                class="verifyButton">Download</button></a>
+
+        </div>`
         sendEmail(
           req.user[0][0].username,
           req.user[0][0].emailid,
@@ -308,7 +313,12 @@ let APIControllers = {
         let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
         let content = `<p>This is to inform you that the bulk email finder process for the file you uploaded has been started.</p>
         <p>Please note that the finding process may take some time depending on the size of the file and the number of emails to be find.</p>
-        <p>Thank you for using our service.</p>`
+        <p>Thank you for using our service.</p>
+        <div class="verify">
+        <a href="https://beta.gamalogic.com/email-finder-bulk"><button
+                class="verifyButton">Download</button></a>
+
+        </div>`
         sendEmail(
           req.user[0][0].username,
           req.user[0][0].emailid,
