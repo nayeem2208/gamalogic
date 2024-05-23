@@ -355,29 +355,33 @@ let APIControllers = {
     try {
       const dbConnection = req.dbConnection;
       let apiKey = req.user[0][0].api_key;
-      const data = {
-        gamalogic_emailid_finder: req.body.data,
-      };
-      let response = await axios.post(
-        `https://gamalogic.com/batch-email-discovery/?apikey=${process.env.API_KEY}`,
-        data
-      );
-      if (response.data.error !== undefined && response.data.error == false) {
-        let currenttime = new Date();
-        const formattedDate = currenttime
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " ");
-        const userAgent = req.headers["user-agent"];
-        const ip = req.headers['cf-connecting-ip'] ||
-          req.headers['x-real-ip'] ||
-          req.headers['x-forwarded-for'] ||
-          req.socket.remoteAddress || '';
-        let fileAdded = await dbConnection.query(
-          `INSERT INTO useractivity_batch_finder_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${req.body.fileName}','${req.body.fileName}',1,0,0)`
+      let finalFreeDate = new Date(req.user[0][0].free_final);
+      let currentDate = new Date();
+      //checking that we have enough credits to do this 
+      if ((req.user[0][0].credits + req.user[0][0].credits_free >= (req.body.data.length * 10) && finalFreeDate > currentDate) || (req.user[0][0].credits >= req.body.data.length * 10)) {
+        const data = {
+          gamalogic_emailid_finder: req.body.data,
+        };
+        let response = await axios.post(
+          `https://gamalogic.com/batch-email-discovery/?apikey=${process.env.API_KEY}`,
+          data
         );
-        let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
-        let content = `<p>This is to inform you that the bulk email finder process for the file ${req.body.fileName} has been started.</p>
+        if (response.data.error !== undefined && response.data.error == false) {
+          let currenttime = new Date();
+          const formattedDate = currenttime
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
+          const userAgent = req.headers["user-agent"];
+          const ip = req.headers['cf-connecting-ip'] ||
+            req.headers['x-real-ip'] ||
+            req.headers['x-forwarded-for'] ||
+            req.socket.remoteAddress || '';
+          let fileAdded = await dbConnection.query(
+            `INSERT INTO useractivity_batch_finder_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${req.body.fileName}','${req.body.fileName}',1,0,0)`
+          );
+          let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
+          let content = `<p>This is to inform you that the bulk email finder process for the file ${req.body.fileName} has been started.</p>
         <p>Please note that the finding process may take some time depending on the size of the file and the number of emails to be find.</p>
         <p>Thank you for using our service.</p>
         <div class="verify">
@@ -385,18 +389,52 @@ let APIControllers = {
                 class="verifyButton">Download</button></a>
 
         </div>`
-        sendEmail(
-          req.user[0][0].username,
-          req.user[0][0].emailid,
-          "Bulk Email Finder Started",
-          basicTemplate(req.user[0][0].username, content)
-        );
-        res.status(200).json({ message: response.data.message, files: files[0][0] });
-      }
-      else {
-        const errorMessage = Object.values(response.data)[0];
-        console.log(errorMessage, 'errorMessage')
-        res.status(400).json({ error: errorMessage });
+          //sending email when finding process started 
+          sendEmail(
+            req.user[0][0].username,
+            req.user[0][0].emailid,
+            "Bulk Email Finder Started",
+            basicTemplate(req.user[0][0].username, content)
+          );
+          //decreasing the credit amout based on length of data
+          if (req.user[0][0].credits_free >= (req.body.data.length * 10) && finalFreeDate > currentDate) {
+            let val = req.body.data.length * 10
+            //to decrease from credits_free
+            await dbConnection.query(
+              `UPDATE registration 
+         SET credits_free = credits_free - ${val} 
+         WHERE rowid = '${req.user[0][0].rowid}'`
+            );
+          }
+          else if (req.user[0][0].credits_free > 0 && finalFreeDate > currentDate && (req.body.data.length * 10) > req.user[0][0].credits_free) {
+            //to decrease from both credits_free and credits 
+            const remainingCreditsToSubtract = req.body.data.length * 10 - req.user[0][0].credits_free;
+
+            await dbConnection.query(
+              `UPDATE users 
+     SET credits = credits - ${remainingCreditsToSubtract}, 
+         credits_free = 0 
+     WHERE rowid = '${req.user[0][0].rowid}'`
+            );
+          }
+          else if (req.user[0][0].credits >= req.body.data.length * 10) {
+            //to decrease from credits_free
+            let val = req.body.data.length * 10
+            await dbConnection.query(
+              `UPDATE registration 
+         SET credits = credits - ${val} 
+         WHERE rowid = '${req.user[0][0].rowid}'`
+            );
+          }
+          res.status(200).json({ message: response.data.message, files: files[0][0] });
+        }
+        else {
+          const errorMessage = Object.values(response.data)[0];
+          console.log(errorMessage, 'errorMessage')
+          res.status(400).json({ error: errorMessage });
+        }
+      } else {
+        res.status(400).json({ error: 'You dont have enough to do this' });
       }
     } catch (error) {
       console.log(error)
