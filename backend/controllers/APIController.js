@@ -74,6 +74,23 @@ let APIControllers = {
       let validate = await axios.get(
         `https://gamalogic.com/emailvrf/?emailid=${req.body.email}&apikey=${process.env.API_KEY}&speed_rank=0`
       );
+      let finalFree = new Date(req.user[0][0].free_final);
+      let finalFreeDate = new Date(finalFree);
+      let currentDate = new Date();
+      if (req.user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
+        await req.dbConnection.query(
+          `UPDATE registration 
+         SET credits_free = credits_free - 1 
+         WHERE rowid = '${req.user[0][0].rowid}'`
+        );
+      }
+      else if (req.user[0][0].credits > 0) {
+        await req.dbConnection.query(
+          `UPDATE registration 
+         SET credits = credits - 1 
+         WHERE rowid = '${req.user[0][0].rowid}'`
+        );
+      }
       res.status(200).json(validate.data.gamalogic_emailid_vrfy[0]);
     } catch (error) {
       console.log(error);
@@ -95,6 +112,23 @@ let APIControllers = {
       let find = await axios.get(
         `https://gamalogic.com/email-discovery/?firstname=${firstname}&lastname=${lastname}&domain=${req.body.domain}&apikey=${process.env.API_KEY}&speed_rank=0`
       );
+      let finalFree = new Date(req.user[0][0].free_final);
+      let finalFreeDate = new Date(finalFree);
+      let currentDate = new Date();
+      if (req.user[0][0].credits_free >= 10 && finalFreeDate > currentDate) {
+        await req.dbConnection.query(
+          `UPDATE registration 
+         SET credits_free = credits_free - 10 
+         WHERE rowid = '${req.user[0][0].rowid}'`
+        );
+      }
+      else if (req.user[0][0].credits >= 10) {
+        await req.dbConnection.query(
+          `UPDATE registration 
+         SET credits = credits - 10 
+         WHERE rowid = '${req.user[0][0].rowid}'`
+        );
+      }
       res.status(200).json(find.data);
     } catch (error) {
       console.log(error);
@@ -180,29 +214,32 @@ let APIControllers = {
       const dbConnection = req.dbConnection;
       let apiKey = req.user[0][0].api_key;
       const { emails, fileName } = req.body;
-      const data = {
-        gamalogic_emailid_vrfy: emails,
-      };
-      let response = await axios.post(
-        `https://gamalogic.com/batchemailvrf?apikey=${process.env.API_KEY}&speed_rank=0`,
-        data
-      );
-      if (response.data.error !== undefined && response.data.error == false) {
-        let currenttime = new Date();
-        const formattedDate = currenttime
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " ");
-        const userAgent = req.headers["user-agent"];
-        const ip = req.headers['cf-connecting-ip'] ||
-          req.headers['x-real-ip'] ||
-          req.headers['x-forwarded-for'] ||
-          req.socket.remoteAddress || '';
-        let fileAdded = await dbConnection.query(
-          `INSERT INTO useractivity_batch_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${fileName}','${fileName}',1,0,0)`
+      let finalFreeDate = new Date(req.user[0][0].free_final);
+      let currentDate = new Date();
+      if ((req.user[0][0].credits + req.user[0][0].credits_free >= emails.length && finalFreeDate > currentDate) || (req.user[0][0].credits >= emails.length)) {
+        const data = {
+          gamalogic_emailid_vrfy: emails,
+        };
+        let response = await axios.post(
+          `https://gamalogic.com/batchemailvrf?apikey=${process.env.API_KEY}&speed_rank=0`,
+          data
         );
-        let files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
-        let content = `<p>This is to inform you that the bulk email verification process for the file ${fileName} has been started.</p>
+        if (response.data.error !== undefined && response.data.error == false) {
+          let currenttime = new Date();
+          const formattedDate = currenttime
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
+          const userAgent = req.headers["user-agent"];
+          const ip = req.headers['cf-connecting-ip'] ||
+            req.headers['x-real-ip'] ||
+            req.headers['x-forwarded-for'] ||
+            req.socket.remoteAddress || '';
+          let fileAdded = await dbConnection.query(
+            `INSERT INTO useractivity_batch_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${fileName}','${fileName}',1,0,0)`
+          );
+          let files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
+          let content = `<p>This is to inform you that the bulk email verification process for the file ${fileName} has been started.</p>
         <p>Please note that the verification process may take some time depending on the size of the file and the number of emails to be verified.</p>
         <p>Thank you for using our service.</p>
         <div class="verify">
@@ -210,16 +247,43 @@ let APIControllers = {
                 class="verifyButton">Download</button></a>
 
         </div>`
-        sendEmail(
-          req.user[0][0].username,
-          req.user[0][0].emailid,
-          "Bulk Email Verification Started",
-          basicTemplate(req.user[0][0].username, content)
-        );
-        res.status(200).json({ message: response.data.message, files: files[0][0] });
+          sendEmail(
+            req.user[0][0].username,
+            req.user[0][0].emailid,
+            "Bulk Email Verification Started",
+            basicTemplate(req.user[0][0].username, content)
+          );
+          if (req.user[0][0].credits_free >= emails.length && finalFreeDate > currentDate) {
+            await dbConnection.query(
+              `UPDATE registration 
+         SET credits_free = credits_free - ${emails.length} 
+         WHERE rowid = '${req.user[0][0].rowid}'`
+            );
+          }
+          else if (req.user[0][0].credits_free > 0 && finalFreeDate > currentDate && emails.length > req.user[0][0].credits_free) {
+            const remainingCreditsToSubtract = emails.length - req.user[0][0].credits_free;
+
+            await dbConnection.query(
+              `UPDATE users 
+     SET credits = credits - ${remainingCreditsToSubtract}, 
+         credits_free = 0 
+     WHERE rowid = '${req.user[0][0].rowid}'`
+            );
+          }
+          else if (req.user[0][0].credits >= emails.length) {
+            await dbConnection.query(
+              `UPDATE registration 
+         SET credits = credits - ${emails.length} 
+         WHERE rowid = '${req.user[0][0].rowid}'`
+            );
+          }
+          res.status(200).json({ message: response.data.message, files: files[0][0] });
+        } else {
+          const errorMessage = Object.values(response.data)[0];
+          res.status(400).json({ error: errorMessage });
+        }
       } else {
-        const errorMessage = Object.values(response.data)[0];
-        res.status(400).json({ error: errorMessage });
+        res.status(400).json({ error: 'You dont have enough to do this' });
       }
     } catch (error) {
       console.log(error);

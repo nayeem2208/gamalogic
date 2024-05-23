@@ -23,7 +23,7 @@ function FileEmailFinder() {
   let [load, setLoad] = useState(30);
   let [serverError, setServerError] = useState(false);
 
-  let { creditBal, userDetails } = useUserState();
+  let { creditBal, setCreditBal, userDetails } = useUserState();
 
   useEffect(() => {
     const fetchAllFiles = async () => {
@@ -128,56 +128,64 @@ function FileEmailFinder() {
   useEffect(() => {
     if (showAlert && Selection !== null) {
       if (Selection === true) {
-        setShowAlert(false);
-        setLoading(true);
-        setLoad(30);
-        let results = JsonToServer;
-        async function BatchFileFinder() {
-          try {
-            const response = await axiosInstance.post(
-              "/batchEmailFinder",
-              results
-            );
-            setLoad(100);
-            setMessage(response.data.message);
-            const options = {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            };
-            setResultFile((prevResultFiles) => [
-              {
-                ...response.data.files,
-                processed: 0,
-                formattedDate: new Date(
-                  response.data.files.date_time
-                ).toLocaleString("en-US", options),
-              },
-              ...prevResultFiles,
-            ]);
-            setFilesStatus((prevResultFiles) => [
-              {
-                ...response.data.files,
-                processed: 0,
-                formattedDate: new Date(
-                  response.data.files.date_time
-                ).toLocaleString("en-US", options),
-              },
-              ...prevResultFiles,
-            ]);
-          } catch (error) {
-            if (error.response.status === 500) {
-              setServerError(true);
-            } else {
-              toast.error(error.response?.data?.error);
+        console.log(JsonToServer,'json to server')
+        if (creditBal >= JsonToServer.data.length * 10) {
+          setShowAlert(false);
+          setLoading(true);
+          setLoad(30);
+          let results = JsonToServer;
+          async function BatchFileFinder() {
+            try {
+              const response = await axiosInstance.post(
+                "/batchEmailFinder",
+                results
+              );
+              
+              setLoad(100);
+              setCreditBal(creditBal-(results.data.length*10))
+              setMessage(response.data.message);
+              const options = {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              };
+              setResultFile((prevResultFiles) => [
+                {
+                  ...response.data.files,
+                  processed: 0,
+                  formattedDate: new Date(
+                    response.data.files.date_time
+                  ).toLocaleString("en-US", options),
+                },
+                ...prevResultFiles,
+              ]);
+              setFilesStatus((prevResultFiles) => [
+                {
+                  ...response.data.files,
+                  processed: 0,
+                  formattedDate: new Date(
+                    response.data.files.date_time
+                  ).toLocaleString("en-US", options),
+                },
+                ...prevResultFiles,
+              ]);
+            } catch (error) {
+              if (error.response.status === 500) {
+                setServerError(true);
+              } else {
+                toast.error(error.response?.data?.error);
+              }
+              setLoading(false);
             }
-            setLoading(false);
           }
+          BatchFileFinder();
+        } else {
+          setShowAlert(false);
+          toast.error("You dont have enough credits to do this");
         }
-        BatchFileFinder();
       } else {
         setShowAlert(false);
         setJsonToServer([]);
@@ -258,22 +266,21 @@ function FileEmailFinder() {
           `/downloadEmailFinderFile?batchId=${data.id}`
         );
         setLoad(100);
-        const outputArray=res.data.gamalogic_discovery.map((obj)=>{
-          let remarks=''
-          if(obj.is_catchall==1){
-            remarks='Catch all Address'
+        const outputArray = res.data.gamalogic_discovery.map((obj) => {
+          let remarks = "";
+          if (obj.is_catchall == 1) {
+            remarks = "Catch all Address";
+          } else {
+            remarks = "Valid Address";
           }
-          else{
-            remarks='Valid Address'
-          }
-          return{
-            Domain:obj.domain,
-            FirstName:obj.firstname,
-            LastName:obj.lastname,
-            Email_Address:obj.email_address,
-            Remarks:remarks
-          }
-        })
+          return {
+            Domain: obj.domain,
+            FirstName: obj.firstname,
+            LastName: obj.lastname,
+            Email_Address: obj.email_address,
+            Remarks: remarks,
+          };
+        });
         const csvData = outputArray;
         const fileName = "Emails Finder results";
         const exportType = exportFromJSON.types.csv;
@@ -338,50 +345,50 @@ function FileEmailFinder() {
       )}
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       {resultFile.length > 0 && (
-          <div className="overflow-x-auto">
-        <table className="text-bgblue w-full  mt-14 ">
-          <tbody>
-            <tr className="text-left text-xs sm:text-sm">
-              <th className="font-normal md:w-1/5">File Name</th>
-              <th className="font-normal  md:w-2/5">Status</th>
-              <th className="font-normal  md:w-1/5">Upload Time</th>
-              <th className=""></th>
-            </tr>
-            {resultFile.map((data, index) => (
-              <tr key={index} className="text-xs sm:text-sm">
-                <td>{data.file}</td>
-                <td className="flex ">
-                  <ProgressBar
-                    isLabelVisible={false}
-                    completed={data.processed}
-                    bgColor="#181e4a"
-                    labelSize="13px"
-                    className="md:w-2/5  mr-2"
-                    maxCompleted={100}
-                  />
-                  {data.processed}%
-                </td>
-                <td>{data.formattedDate}</td>
-                <td className="flex justify-center items-center ">
-                  <div className="sm:hidden">
-                    <IoDownload
-                      className="text-xl"
-                      onClick={() => DownloadFile(data)}
-                    />
-                  </div>
-                  <div className="hidden sm:block">
-                    <button
-                      className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-8 text-xs"
-                      onClick={() => DownloadFile(data)}
-                    >
-                      DOWNLOAD
-                    </button>
-                  </div>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="text-bgblue w-full  mt-14 ">
+            <tbody>
+              <tr className="text-left text-xs sm:text-sm">
+                <th className="font-normal md:w-1/5">File Name</th>
+                <th className="font-normal  md:w-2/5">Status</th>
+                <th className="font-normal  md:w-1/5">Upload Time</th>
+                <th className=""></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+              {resultFile.map((data, index) => (
+                <tr key={index} className="text-xs sm:text-sm">
+                  <td>{data.file}</td>
+                  <td className="flex ">
+                    <ProgressBar
+                      isLabelVisible={false}
+                      completed={data.processed}
+                      bgColor="#181e4a"
+                      labelSize="13px"
+                      className="md:w-2/5  mr-2"
+                      maxCompleted={100}
+                    />
+                    {data.processed}%
+                  </td>
+                  <td>{data.formattedDate}</td>
+                  <td className="flex justify-center items-center ">
+                    <div className="sm:hidden">
+                      <IoDownload
+                        className="text-xl"
+                        onClick={() => DownloadFile(data)}
+                      />
+                    </div>
+                    <div className="hidden sm:block">
+                      <button
+                        className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-8 text-xs"
+                        onClick={() => DownloadFile(data)}
+                      >
+                        DOWNLOAD
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

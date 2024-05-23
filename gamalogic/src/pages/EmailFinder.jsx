@@ -13,7 +13,7 @@ function EmailFinder() {
   let [load, setLoad] = useState(30);
   let [serverError, setServerError] = useState(false);
 
-  let { userDetails } = useUserState();
+  let { userDetails, setCreditBal, creditBal  } = useUserState();
 
   useEffect(() => {
     document.title = "Email Finder | Beta Dashboard";
@@ -31,23 +31,27 @@ function EmailFinder() {
     e.preventDefault();
     try {
       if (userDetails.confirm == 1) {
-        setResult("");
-        let domain = data.domain.trim();
-        let fullname = data.fullname.trim();
-        if (domain && fullname) {
-          let fullnameArray = fullname.split(" ");
-          setLoading(true);
-          setLoad(30);
-          let res = await axiosInstance.post("/singleEmailFinder", data);
-          setLoad(100);
-          setResult(res.data);
-          setData({ fullname: "", domain: "" });
+        if (creditBal > 9) {
+          setResult("");
+          let domain = data.domain.trim();
+          let fullname = data.fullname.trim();
+          if (domain && fullname) {
+            let fullnameArray = fullname.split(" ");
+            setLoading(true);
+            setLoad(30);
+            let res = await axiosInstance.post("/singleEmailFinder", data);
+            setLoad(100);
+            setCreditBal(creditBal-10)
+            setResult(res.data);
+            setData({ fullname: "", domain: "" });
+          } else {
+            toast.error("Please provide valid fullname and domain");
+          }
         } else {
-          toast.error("Please provide valid fullname and domain");
+          toast.error("You dont have enough credits to do this");
         }
-      }
-      else{
-        toast.error('Please verify your email')
+      } else {
+        toast.error("Please verify your email");
       }
     } catch (error) {
       if (error.response.status === 500) {

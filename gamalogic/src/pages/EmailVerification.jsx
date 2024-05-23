@@ -9,6 +9,7 @@ import { useUserState } from "../context/userContext";
 import LoadingBar from "react-top-loading-bar";
 import ServerError from "./ServerError";
 import { IoDownload } from "react-icons/io5";
+import { json } from "react-router-dom";
 
 function EmailVerification() {
   let [message, setMessage] = useState("");
@@ -21,7 +22,7 @@ function EmailVerification() {
   let [load, setLoad] = useState(30);
   let [serverError, setServerError] = useState(false);
 
-  let { creditBal, userDetails } = useUserState();
+  let { userDetails, setCreditBal, creditBal } = useUserState();
 
   useEffect(() => {
     const fetchAllFiles = async () => {
@@ -144,24 +145,24 @@ function EmailVerification() {
         );
         setLoad(100);
         const outputArray = res.data.gamalogic_emailid_vrfy
-        .filter(obj => obj.emailid !== 'emailid') 
-        .map(obj => {
-          let status = '';
-          if (obj.is_catchall) {
-              status = 'Catchall';
-          } else if (obj.is_unknown) {
-              status = 'Unknown';
-          } else if (obj.is_valid) {
-              status = 'Valid Address';
-          } else {
-              status = 'Not Valid Address';
-          }
-      
-          return {
+          .filter((obj) => obj.emailid !== "emailid")
+          .map((obj) => {
+            let status = "";
+            if (obj.is_catchall) {
+              status = "Catchall";
+            } else if (obj.is_unknown) {
+              status = "Unknown";
+            } else if (obj.is_valid) {
+              status = "Valid Address";
+            } else {
+              status = "Not Valid Address";
+            }
+
+            return {
               emailid: obj.emailid,
-              status: status
-          };
-      });
+              status: status,
+            };
+          });
         const csvData = outputArray;
         const fileName = "Verified Emails";
         const exportType = exportFromJSON.types.csv;
@@ -188,7 +189,9 @@ function EmailVerification() {
           Papa.parse(file, {
             // header: true,
             complete: async function (results) {
-              const emails = results.data.map((emailArray) => {
+              const emails = results.data
+              .filter(emailArray => emailArray[0] !== 'emailid')
+              .map((emailArray) => {
                 return { emailid: emailArray[0] };
               });
               const fileName = file.name;
@@ -221,47 +224,51 @@ function EmailVerification() {
   const handleAccept = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true);
-      setLoad(30);
-      setShowAlert(false);
-      let results = JsonToServer;
-      const response = await axiosInstance.post(
-        "/batchEmailVerification",
-        results
-      );
-      console.log(response, "responseeeeeeeeeeee");
-      setLoad(100);
-      setMessage(response.data.message);
-      const options = {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      };
-      setResultFile((prevResultFiles) => [
-        {
-          ...response.data.files,
-          processed: 0,
-          formattedDate: new Date(response.data.files.date_time).toLocaleString(
-            "en-US",
-            options
-          ),
-        },
-        ...prevResultFiles,
-      ]);
-      setFilesStatus((prevResultFiles) => [
-        {
-          ...response.data.files,
-          processed: 0,
-          formattedDate: new Date(response.data.files.date_time).toLocaleString(
-            "en-US",
-            options
-          ),
-        },
-        ...prevResultFiles,
-      ]);
+      if (JsonToServer.emails.length  <= creditBal ) {
+        setLoading(true);
+        setLoad(30);
+        setShowAlert(false);
+        let results = JsonToServer;
+        const response = await axiosInstance.post(
+          "/batchEmailVerification",
+          results
+        );
+        console.log(response, "responseeeeeeeeeeee");
+        setLoad(100);
+        setCreditBal(creditBal-(JsonToServer.emails.length))
+        setMessage(response.data.message);
+        const options = {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        };
+        setResultFile((prevResultFiles) => [
+          {
+            ...response.data.files,
+            processed: 0,
+            formattedDate: new Date(
+              response.data.files.date_time
+            ).toLocaleString("en-US", options),
+          },
+          ...prevResultFiles,
+        ]);
+        setFilesStatus((prevResultFiles) => [
+          {
+            ...response.data.files,
+            processed: 0,
+            formattedDate: new Date(
+              response.data.files.date_time
+            ).toLocaleString("en-US", options),
+          },
+          ...prevResultFiles,
+        ]);
+      } else {
+        setShowAlert(false);
+        toast.error("You dont have enough credits to do this");
+      }
     } catch (error) {
       if (error.response.status === 500) {
         setServerError(true);
