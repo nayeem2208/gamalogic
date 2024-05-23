@@ -130,7 +130,7 @@ function AccountSettings() {
     <div className=" px-6 md:px-20 py-8 accountSettings">
       <SubHeader SubHeader={"Account Settings"} />
       {userDetails.confirm == 1 ? (
-      <form className="mt-6 sm:mt-14 text-bgblue subHeading" onSubmit={changaePassword}>
+      <form className="mt-6 sm:mt-14 text-bgblue subHeading" onSubmit={changaePassword} style={{fontFamily:"Raleway,sans-serif"}}>
         <h3>Your Profile</h3>
         {loading && (
             <LoadingBar

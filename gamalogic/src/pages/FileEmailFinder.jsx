@@ -346,7 +346,7 @@ function FileEmailFinder() {
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       {resultFile.length > 0 && (
         <div className="overflow-x-auto">
-          <table className="text-bgblue w-full  mt-14 ">
+          <table className="text-bgblue w-full  mt-14 " style={{fontFamily:"Raleway,sans-serif"}}>
             <tbody>
               <tr className="text-left text-xs sm:text-sm">
                 <th className="font-normal md:w-1/5">File Name</th>

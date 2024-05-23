@@ -64,7 +64,7 @@ function QuickValidation() {
         <p className="my-7 description">
           Type in any email address to have it quickly validated.
         </p>
-        <form onSubmit={submitHandler}>
+        <form onSubmit={submitHandler} style={{fontFamily:"Raleway,sans-serif"}}>
           <div className="">
             <input
               type="email"

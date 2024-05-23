@@ -288,7 +288,7 @@ function EmailVerification() {
   return (
     <div className=" px-6 md:px-20 py-8">
       <SubHeader SubHeader={"Upload your file"} />
-      <form className="mt-8 sm:mt-14 subHeading">
+      <form className="mt-8 sm:mt-14 subHeading" >
         <h3>Upload Your File Here | Email Validation</h3>
         <p className="my-7 w-4/5 description">
           You can upload the email address list in csv file and get results in
@@ -359,8 +359,8 @@ function EmailVerification() {
       )}
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       <div className="overflow-x-auto">
-        <table className="text-bgblue w-full  mt-14 min-w-96">
-          <tbody>
+        <table className="text-bgblue w-full  mt-14 min-w-96" style={{fontFamily:"Raleway,sans-serif"}}>
+          <tbody >
             <tr className="text-left text-xs sm:text-sm">
               <th className="font-normal  md:w-1/5">File Name</th>
               <th className="font-normal  md:w-2/5 ">Status</th>

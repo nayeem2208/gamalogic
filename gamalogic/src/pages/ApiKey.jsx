@@ -58,7 +58,7 @@ function ApiKey() {
     <div className=" px-6 md:px-20 py-8">
       <SubHeader SubHeader={"API Key"} />
       {userDetails.confirm == 1 ? (
-        <div className="mt-6 sm:mt-14 subHeading">
+        <div className="mt-6 sm:mt-14 subHeading"  style={{fontFamily:"Raleway,sans-serif"}}>
           <h3>Your API Key</h3>
           <p className="my-7 w-4/5 description">
             Your API Key is given below. It is required to use our API. Keep it
@@ -107,7 +107,7 @@ function ApiKey() {
                 color: "rgba(247, 76, 65 , 0.6)",
               }}
             >
-              <p className="font-semibold mb-4 text-xs sm:text-sm">Note:</p>
+              <p className="font-semibold mb-4 text-xs sm:text-sm" style={{fontFamily:'Ubuntu, sans-serif'}}>Note:</p>
               <ol className="font-light text-base">
                 <li className="text-xs sm:text-sm">
                   <span className="font-semibold" >1.</span >Don’t share the API

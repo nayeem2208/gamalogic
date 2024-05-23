@@ -77,6 +77,7 @@ function EmailFinder() {
         </p>
         <div className="sm:flex xl:w-4/5 justify-between">
           <form
+          style={{fontFamily:"Raleway,sans-serif"}}
             className="flex flex-col w-full sm:w-8/12 md:w-5/12 text-sm"
             onSubmit={HandleSubmit}
           >
@@ -104,10 +105,10 @@ function EmailFinder() {
             </button>
           </form>
           <div className=" flex justify-end w-3/6 text-sm">
-            <p className="bg-gray-100 rounded h-2/5 text-base p-2 mt-6 font-semibold">
+            <p className="bg-gray-100 rounded h-2/5 text-base p-2 mt-6 font-semibold" style={{fontFamily:'Ubuntu, sans-serif'}}>
               Note:
               <br />
-              <span className="font-light text-sm">
+              <span className="font-light text-sm" style={{fontFamily:"Raleway,sans-serif"}}>
                 {" "}
                 Each check will cost you 10 credits!
               </span>
