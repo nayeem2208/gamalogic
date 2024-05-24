@@ -321,7 +321,8 @@ let APIControllers = {
       let download = await axios.get(
         `https://gamalogic.com/batchresult/?apikey=${process.env.API_KEY}&batchid=${req.query.batchId}`
       );
-      res.status(200).json(download.data);
+      let fileName=await req.dbConnection.query(`SELECT file from useractivity_batch_link where id='${req.query.batchId}'`)
+      res.status(200).json({datas:download.data,fileName:fileName[0][0].file});
     } catch (error) {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
@@ -466,7 +467,8 @@ let APIControllers = {
       let download = await axios.get(
         `https://gamalogic.com/batch-email-discovery-result/?apikey=${process.env.API_KEY}&batchid=${req.query.batchId}`
       );
-      res.status(200).json(download.data);
+      let fileName=await req.dbConnection.query(`SELECT file from useractivity_batch_finder_link where id='${req.query.batchId}'`)
+      res.status(200).json({datas:download.data,fileName:fileName[0][0].file});
     } catch (error) {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);

@@ -266,7 +266,7 @@ function FileEmailFinder() {
           `/downloadEmailFinderFile?batchId=${data.id}`
         );
         setLoad(100);
-        const outputArray = res.data.gamalogic_discovery.map((obj) => {
+        const outputArray = res.data.datas.gamalogic_discovery.map((obj) => {
           let remarks = "";
           if (obj.is_catchall == 1) {
             remarks = "Catch all Address";
@@ -282,7 +282,7 @@ function FileEmailFinder() {
           };
         });
         const csvData = outputArray;
-        const fileName = "Emails Finder results";
+        const fileName = res.data.fileName
         const exportType = exportFromJSON.types.csv;
         exportFromJSON({ data: csvData, fileName, exportType });
       } else {

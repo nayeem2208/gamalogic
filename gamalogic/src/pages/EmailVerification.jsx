@@ -144,7 +144,7 @@ function EmailVerification() {
           `/downloadEmailVerificationFile?batchId=${data.id}`
         );
         setLoad(100);
-        const outputArray = res.data.gamalogic_emailid_vrfy
+        const outputArray = res.data.datas.gamalogic_emailid_vrfy
           .filter((obj) => obj.emailid !== "emailid")
           .map((obj) => {
             let status = "";
@@ -164,7 +164,7 @@ function EmailVerification() {
             };
           });
         const csvData = outputArray;
-        const fileName = "Verified Emails";
+        const fileName =res.data.fileName;
         const exportType = exportFromJSON.types.csv;
         exportFromJSON({ data: csvData, fileName, exportType });
       } else {
