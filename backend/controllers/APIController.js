@@ -190,7 +190,7 @@ let APIControllers = {
     try {
       dbConnection = req.dbConnection;
       let files = await dbConnection.query(
-        `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}' ORDER BY date_time DESC`
+        `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}' ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page- 1) * 5};`
       );
       res.status(200).json(files[0]);
     } catch (error) {

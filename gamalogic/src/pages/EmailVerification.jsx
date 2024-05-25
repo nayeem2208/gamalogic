@@ -10,28 +10,38 @@ import LoadingBar from "react-top-loading-bar";
 import ServerError from "./ServerError";
 import { IoDownload } from "react-icons/io5";
 import { json } from "react-router-dom";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 function EmailVerification() {
   let [message, setMessage] = useState("");
   let [resultFile, setResultFile] = useState([]);
   let [loading, setLoading] = useState(false);
   const [filesStatus, setFilesStatus] = useState([]);
-  const isCheckingCompletion = useRef(false);
   const [showAlert, setShowAlert] = useState(false);
   const [JsonToServer, setJsonToServer] = useState({});
   let [load, setLoad] = useState(30);
   let [serverError, setServerError] = useState(false);
+  const [pageIndex, setPageIndex] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
+  const isCheckingCompletion = useRef(false);
   let { userDetails, setCreditBal, creditBal } = useUserState();
 
   useEffect(() => {
-    const fetchAllFiles = async () => {
-      try {
-        setLoading(true);
-        let allFiles = await axiosInstance.get(
-          "/getAllUploadedEmailValidationFiles"
-        );
-        setLoad(100);
+    document.title = "Batch Email Verification | Beta Dashboard";
+    fetchAllFiles(pageIndex);
+  }, []);
+
+  const fetchAllFiles = async (newPageIndex) => {
+    try {
+      setLoading(true);
+      const allFiles = await axiosInstance.get(
+        `/getAllUploadedEmailValidationFiles?page=${newPageIndex}`
+      );
+      
+      if (allFiles.data.length === 0) {
+        setHasMore(false);
+      } else {
         const options = {
           year: "numeric",
           month: "2-digit",
@@ -43,35 +53,38 @@ function EmailVerification() {
         const filesWithProcessedField = allFiles.data.map((file) => ({
           ...file,
           processed: 0,
-          formattedDate: new Date(file.date_time).toLocaleString(
-            "en-US",
-            options
-          ),
+          formattedDate: new Date(file.date_time).toLocaleString("en-US", options),
         }));
-        const allProcessed = filesWithProcessedField.every(
-          (file) => file.processed === 100
-        );
-        if (!allProcessed) {
-          setResultFile((prevResultFiles) => [
-            ...prevResultFiles,
-            ...filesWithProcessedField,
-          ]);
-        }
-        setFilesStatus((prevResultFiles) => [
+  
+        setResultFile((prevResultFiles) => [
           ...prevResultFiles,
           ...filesWithProcessedField,
         ]);
-      } catch (error) {
-        if (error.response.status === 500) {
-          setServerError(true);
-        } else {
-          toast.error(error.response?.data?.error);
-        }
+        setFilesStatus((prevFilesStatus) => [
+          ...prevFilesStatus,
+          ...filesWithProcessedField,
+        ]);
       }
-    };
-    document.title = "Batch Email Verification | Beta Dashboard";
-    fetchAllFiles();
-  }, []);
+  
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      if (error.response?.status === 500) {
+        setServerError(true);
+      } else {
+        toast.error(error.response?.data?.error);
+      }
+    }
+  };
+  
+  const fetchMoreFiles = async () => {
+    setPageIndex((prevPageIndex) => {
+      const newPageIndex = prevPageIndex + 1;
+      fetchAllFiles(newPageIndex);
+      return newPageIndex;
+    });
+  };
+  console.log(hasMore,'hasmore')
 
   useEffect(() => {
     if (filesStatus.length === 0 || isCheckingCompletion.current) return;
@@ -164,7 +177,7 @@ function EmailVerification() {
             };
           });
         const csvData = outputArray;
-        const fileName =res.data.fileName;
+        const fileName = res.data.fileName;
         const exportType = exportFromJSON.types.csv;
         exportFromJSON({ data: csvData, fileName, exportType });
       } else {
@@ -190,10 +203,10 @@ function EmailVerification() {
             // header: true,
             complete: async function (results) {
               const emails = results.data
-              .filter(emailArray => emailArray[0] !== 'emailid')
-              .map((emailArray) => {
-                return { emailid: emailArray[0] };
-              });
+                .filter((emailArray) => emailArray[0] !== "emailid")
+                .map((emailArray) => {
+                  return { emailid: emailArray[0] };
+                });
               const fileName = file.name;
               if (emails.length <= 100001) {
                 // if (creditBal >= emails.length-1) {
@@ -224,7 +237,7 @@ function EmailVerification() {
   const handleAccept = async (e) => {
     e.preventDefault();
     try {
-      if (JsonToServer.emails.length  <= creditBal ) {
+      if (JsonToServer.emails.length <= creditBal) {
         setLoading(true);
         setLoad(30);
         setShowAlert(false);
@@ -235,7 +248,7 @@ function EmailVerification() {
         );
         console.log(response, "responseeeeeeeeeeee");
         setLoad(100);
-        setCreditBal(creditBal-(JsonToServer.emails.length))
+        setCreditBal(creditBal - JsonToServer.emails.length);
         setMessage(response.data.message);
         const options = {
           year: "numeric",
@@ -288,7 +301,7 @@ function EmailVerification() {
   return (
     <div className=" px-6 md:px-20 py-8">
       <SubHeader SubHeader={"Upload your file"} />
-      <form className="mt-8 sm:mt-14 subHeading" >
+      <form className="mt-8 sm:mt-14 subHeading">
         <h3>Upload Your File Here | Email Validation</h3>
         <p className="my-7 w-4/5 description">
           You can upload the email address list in csv file and get results in
@@ -359,49 +372,61 @@ function EmailVerification() {
       )}
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       <div className="overflow-x-auto">
-        <table className="text-bgblue w-full  mt-14 min-w-96" style={{fontFamily:"Raleway,sans-serif"}}>
-          <tbody >
-            <tr className="text-left text-xs sm:text-sm">
-              <th className="font-normal  md:w-1/5">File Name</th>
-              <th className="font-normal  md:w-2/5 ">Status</th>
-              <th className="font-normal  md:w-1/5">Upload Time</th>
-              <th></th>
-            </tr>
-            {resultFile.map((data, index) => (
-              <tr key={index} className="text-xs sm:text-sm">
-                <td className="">{data.file}</td>
-                <td className="flex ">
-                  <ProgressBar
-                    isLabelVisible={false}
-                    completed={data.processed}
-                    bgColor="#181e4a"
-                    labelSize="13px"
-                    className="md:w-2/5 mr-2"
-                    maxCompleted={100}
-                  />
-                  {data.processed}%
-                </td>
-                <td>{data.formattedDate}</td>
-                <td className="flex justify-center items-center ">
-                  <div className="sm:hidden">
-                    <IoDownload
-                      className="text-xl"
-                      onClick={() => DownloadFile(data)}
-                    />
-                  </div>
-                  <div className="hidden sm:block">
-                    <button
-                      className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-8 text-xs"
-                      onClick={() => DownloadFile(data)}
-                    >
-                      DOWNLOAD
-                    </button>
-                  </div>
-                </td>
+        <InfiniteScroll
+          dataLength={resultFile.length}
+          next={fetchMoreFiles}
+          hasMore={hasMore}
+          height={300}
+          loader={<p>Loading...</p>}
+          endMessage={<p className="text-xs">No more data to load.</p>}
+        >
+          <table
+            className="text-bgblue w-full  mt-14 min-w-96"
+            style={{ fontFamily: "Raleway,sans-serif" }}
+          >
+            <tbody>
+              <tr className="text-left text-xs sm:text-sm">
+                <th className="font-normal  md:w-1/5">File Name</th>
+                <th className="font-normal  md:w-2/5 ">Status</th>
+                <th className="font-normal  md:w-1/5">Upload Time</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+              {resultFile.map((data, index) => (
+                <tr key={index} className="text-xs sm:text-sm">
+                  <td className="">{data.file}</td>
+                  <td className="flex ">
+                    <ProgressBar
+                      isLabelVisible={false}
+                      completed={data.processed}
+                      bgColor="#181e4a"
+                      labelSize="13px"
+                      className="md:w-2/5 mr-2"
+                      maxCompleted={100}
+                    />
+                    {data.processed}%
+                  </td>
+                  <td>{data.formattedDate}</td>
+                  <td className="flex justify-center items-center ">
+                    <div className="sm:hidden">
+                      <IoDownload
+                        className="text-xl"
+                        onClick={() => DownloadFile(data)}
+                      />
+                    </div>
+                    <div className="hidden sm:block">
+                      <button
+                        className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-8 text-xs"
+                        onClick={() => DownloadFile(data)}
+                      >
+                        DOWNLOAD
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </InfiniteScroll>
       </div>
     </div>
   );
