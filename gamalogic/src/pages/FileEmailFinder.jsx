@@ -10,6 +10,7 @@ import { useUserState } from "../context/userContext";
 import LoadingBar from "react-top-loading-bar";
 import ServerError from "./ServerError";
 import { IoDownload } from "react-icons/io5";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 function FileEmailFinder() {
   let [message, setMessage] = useState("");
@@ -22,17 +23,25 @@ function FileEmailFinder() {
   const [JsonToServer, setJsonToServer] = useState([]);
   let [load, setLoad] = useState(30);
   let [serverError, setServerError] = useState(false);
+  const [pageIndex, setPageIndex] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
 
   let { creditBal, setCreditBal, userDetails } = useUserState();
 
   useEffect(() => {
-    const fetchAllFiles = async () => {
-      try {
-        setLoading(true);
-        let allFiles = await axiosInstance.get(
-          "/getAllUploadedEmailFinderFiles"
-        );
-        setLoad(100);
+    document.title = "Batch Email Finder | Beta Dashboard";
+    fetchAllFiles(pageIndex);
+  }, []);
+
+  const fetchAllFiles = async (newPageIndex) => {
+    try {
+      setLoading(true);
+      let allFiles = await axiosInstance.get(`/getAllUploadedEmailFinderFiles?page=${newPageIndex}`);
+      setLoad(100);
+      if (allFiles.data.length === 0) {
+        setHasMore(false);
+      } else {
         const options = {
           year: "numeric",
           month: "2-digit",
@@ -62,19 +71,27 @@ function FileEmailFinder() {
           ...prevResultFiles,
           ...filesWithProcessedField,
         ]);
-      } catch (error) {
-        console.log(error);
-        if (error.response.status === 500) {
-          setServerError(true);
-        } else {
-          toast.error(error.response?.data?.error);
-        }
-        setLoad(100);
       }
-    };
-    document.title = "Batch Email Finder | Beta Dashboard";
-    fetchAllFiles();
-  }, []);
+
+      // setLoading(false);
+    } catch (error) {
+      console.log(error);
+      if (error.response.status === 500) {
+        setServerError(true);
+      } else {
+        toast.error(error.response?.data?.error);
+      }
+      setLoad(100);
+    }
+  };
+
+  const fetchMoreFiles = async () => {
+    setPageIndex((prevPageIndex) => {
+      const newPageIndex = prevPageIndex + 1;
+      fetchAllFiles(newPageIndex);
+      return newPageIndex;
+    });
+  };
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -346,6 +363,14 @@ function FileEmailFinder() {
       <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       {resultFile.length > 0 && (
         <div className="overflow-x-auto">
+          <InfiniteScroll
+            dataLength={resultFile.length}
+            next={fetchMoreFiles}
+            hasMore={hasMore}
+            height={300}
+            loader={<p>Loading...</p>}
+            endMessage={<p className="text-xs">No more data to load.</p>}
+          >
           <table className="text-bgblue w-full  mt-14 " style={{fontFamily:"Raleway,sans-serif"}}>
             <tbody>
               <tr className="text-left text-xs sm:text-sm">
@@ -389,6 +414,7 @@ function FileEmailFinder() {
               ))}
             </tbody>
           </table>
+          </InfiniteScroll>
         </div>
       )}
     </div>

@@ -84,7 +84,7 @@ function EmailVerification() {
       return newPageIndex;
     });
   };
-  console.log(hasMore,'hasmore')
+
 
   useEffect(() => {
     if (filesStatus.length === 0 || isCheckingCompletion.current) return;

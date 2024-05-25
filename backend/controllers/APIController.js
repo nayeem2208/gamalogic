@@ -339,7 +339,7 @@ let APIControllers = {
   getAlreadyCheckedBatchEmailFinderFiles: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}' ORDER BY date_time DESC`)
+      let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}' ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page- 1) * 5};`)
       res.status(200).json(files[0])
     } catch (error) {
       console.log(error);
