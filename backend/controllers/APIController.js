@@ -165,7 +165,11 @@ let APIControllers = {
         );
         let content = `<p>Your password has been successfully updated.</p>
           
-        <p>If you did not initiate this action, please contact us immediately.</p>`
+        <p>If you did not initiate this action, please contact us immediately.</p>
+        <a href="https://beta.gamalogic.com/"><button
+        class="verifyButton">Sign In</button></a>
+
+</div>`
         sendEmail(
           req.user[0][0].username,
           req.user[0][0].emailid,
@@ -190,7 +194,7 @@ let APIControllers = {
     try {
       dbConnection = req.dbConnection;
       let files = await dbConnection.query(
-        `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}' ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page- 1) * 5};`
+        `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}' ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page - 1) * 5};`
       );
       res.status(200).json(files[0]);
     } catch (error) {
@@ -239,7 +243,7 @@ let APIControllers = {
             `INSERT INTO useractivity_batch_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${fileName}','${fileName}',1,0,0)`
           );
           let files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
-          let content = `<p>This is to inform you that the bulk email verification process for the file ${fileName} has been started.</p>
+          let content = `<p>This is to inform you that the batch email verification process for the file ${fileName} has been started.</p>
         <p>Please note that the verification process may take some time depending on the size of the file and the number of emails to be verified.</p>
         <p>Thank you for using our service.</p>
         <div class="verify">
@@ -250,7 +254,7 @@ let APIControllers = {
           sendEmail(
             req.user[0][0].username,
             req.user[0][0].emailid,
-            "Bulk Email Verification Started",
+            "Batch Email Verification Started",
             basicTemplate(req.user[0][0].username, content)
           );
           if (req.user[0][0].credits_free >= emails.length && finalFreeDate > currentDate) {
@@ -321,8 +325,8 @@ let APIControllers = {
       let download = await axios.get(
         `https://gamalogic.com/batchresult/?apikey=${process.env.API_KEY}&batchid=${req.query.batchId}`
       );
-      let fileName=await req.dbConnection.query(`SELECT file from useractivity_batch_link where id='${req.query.batchId}'`)
-      res.status(200).json({datas:download.data,fileName:fileName[0][0].file});
+      let fileName = await req.dbConnection.query(`SELECT file from useractivity_batch_link where id='${req.query.batchId}'`)
+      res.status(200).json({ datas: download.data, fileName: fileName[0][0].file });
     } catch (error) {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
@@ -339,7 +343,7 @@ let APIControllers = {
   getAlreadyCheckedBatchEmailFinderFiles: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}' ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page- 1) * 5};`)
+      let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}' ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page - 1) * 5};`)
       res.status(200).json(files[0])
     } catch (error) {
       console.log(error);
@@ -382,7 +386,7 @@ let APIControllers = {
             `INSERT INTO useractivity_batch_finder_link(id,userid,apikey,date_time,speed_rank,count,ip_address,user_agent,file,file_upload,is_api,is_api_file,is_dashboard)VALUES('${response.data["batch id"]}','${req.user[0][0].rowid}','${process.env.API_KEY}','${formattedDate}',0,'${response.data["total count"]}','${ip}','${userAgent}','${req.body.fileName}','${req.body.fileName}',1,0,0)`
           );
           let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
-          let content = `<p>This is to inform you that the bulk email finder process for the file ${req.body.fileName} has been started.</p>
+          let content = `<p>This is to inform you that the batch email finder process for the file ${req.body.fileName} has been started.</p>
         <p>Please note that the finding process may take some time depending on the size of the file and the number of emails to be find.</p>
         <p>Thank you for using our service.</p>
         <div class="verify">
@@ -394,7 +398,7 @@ let APIControllers = {
           sendEmail(
             req.user[0][0].username,
             req.user[0][0].emailid,
-            "Bulk Email Finder Started",
+            "Batch Email Finder Started",
             basicTemplate(req.user[0][0].username, content)
           );
           //decreasing the credit amout based on length of data
@@ -467,8 +471,8 @@ let APIControllers = {
       let download = await axios.get(
         `https://gamalogic.com/batch-email-discovery-result/?apikey=${process.env.API_KEY}&batchid=${req.query.batchId}`
       );
-      let fileName=await req.dbConnection.query(`SELECT file from useractivity_batch_finder_link where id='${req.query.batchId}'`)
-      res.status(200).json({datas:download.data,fileName:fileName[0][0].file});
+      let fileName = await req.dbConnection.query(`SELECT file from useractivity_batch_finder_link where id='${req.query.batchId}'`)
+      res.status(200).json({ datas: download.data, fileName: fileName[0][0].file });
     } catch (error) {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);

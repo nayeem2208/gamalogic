@@ -38,7 +38,7 @@ function EmailVerification() {
       const allFiles = await axiosInstance.get(
         `/getAllUploadedEmailValidationFiles?page=${newPageIndex}`
       );
-      
+      setLoad(100);
       if (allFiles.data.length === 0) {
         setHasMore(false);
       } else {

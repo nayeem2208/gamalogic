@@ -223,7 +223,12 @@ const Authentication = {
           const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
           let content = `<p>Welcome to Gamalogic! We're thrilled to have you on board.</p>
           <p>Your registration is now complete, and you're all set to explore our platform.</p>
-          <p>If you have any questions or need assistance getting started, feel free to reach out to us.</p>`
+          <p>If you have any questions or need assistance getting started, feel free to reach out to us.</p>
+          <div class="verify">
+          <a href="https://beta.gamalogic.com/"><button
+                  class="verifyButton">Sign In</button></a>
+
+          </div>`
           sendEmail(
             user[0][0].username,
             user[0][0].emailid,
@@ -379,7 +384,12 @@ const Authentication = {
         );
         let content = ` <p>Your password has been successfully updated.</p>
           
-        <p>If you did not initiate this action, please contact us immediately.</p> `
+        <p>If you did not initiate this action, please contact us immediately.</p> 
+        <div class="verify">
+        <a href="https://beta.gamalogic.com/"><button
+                class="verifyButton">Sign In</button></a>
+
+        </div>`
         sendEmail(
           user[0][0].username,
           userEmail,

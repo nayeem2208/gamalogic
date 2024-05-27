@@ -101,7 +101,7 @@ function Login() {
       className="w-full flex justify-center items-center "
       // style={{ marginTop: "20vw" }}
     >
-      <div className="w-4/5 sm:w-4/6 md:w-5/6 lg:w-3/6  px-2 flex flex-col justify-center items-center">
+      <div className="w-4/5 sm:w-4/6 md:w-5/6 lg:w-4/6  px-2 flex flex-col justify-center items-center">
         <div className="text-center auth" style={{ position: "relative" }}>
           <div className="h2-background" style={{ position: "absolute" }}>
             <div className="red"></div>
