@@ -26,7 +26,6 @@ function FileEmailFinder() {
   const [pageIndex, setPageIndex] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-
   let { creditBal, setCreditBal, userDetails } = useUserState();
 
   useEffect(() => {
@@ -37,7 +36,9 @@ function FileEmailFinder() {
   const fetchAllFiles = async (newPageIndex) => {
     try {
       setLoading(true);
-      let allFiles = await axiosInstance.get(`/getAllUploadedEmailFinderFiles?page=${newPageIndex}`);
+      let allFiles = await axiosInstance.get(
+        `/getAllUploadedEmailFinderFiles?page=${newPageIndex}`
+      );
       setLoad(100);
       if (allFiles.data.length === 0) {
         setHasMore(false);
@@ -145,7 +146,7 @@ function FileEmailFinder() {
   useEffect(() => {
     if (showAlert && Selection !== null) {
       if (Selection === true) {
-        console.log(JsonToServer,'json to server')
+        console.log(JsonToServer, "json to server");
         if (creditBal >= JsonToServer.data.length * 10) {
           setShowAlert(false);
           setLoading(true);
@@ -157,9 +158,9 @@ function FileEmailFinder() {
                 "/batchEmailFinder",
                 results
               );
-              
+
               setLoad(100);
-              setCreditBal(creditBal-(results.data.length*10))
+              setCreditBal(creditBal - results.data.length * 10);
               setMessage(response.data.message);
               const options = {
                 year: "numeric",
@@ -299,7 +300,7 @@ function FileEmailFinder() {
           };
         });
         const csvData = outputArray;
-        const fileName = res.data.fileName
+        const fileName = res.data.fileName;
         const exportType = exportFromJSON.types.csv;
         exportFromJSON({ data: csvData, fileName, exportType });
       } else {
@@ -368,52 +369,62 @@ function FileEmailFinder() {
             next={fetchMoreFiles}
             hasMore={hasMore}
             height={300}
-            loader={<p>Loading...</p>}
+            loader={resultFile.length>=4&&(<div
+              className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+              role="status"
+            >
+              <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                Loading...
+              </span>
+            </div>)}
             // endMessage={<p className="text-xs">No more data to load.</p>}
           >
-          <table className="text-bgblue w-full  mt-14 " style={{fontFamily:"Raleway,sans-serif"}}>
-            <tbody>
-              <tr className="text-left text-xs sm:text-sm">
-                <th className="font-normal md:w-1/5">File Name</th>
-                <th className="font-normal  md:w-2/5">Status</th>
-                <th className="font-normal  md:w-1/5">Upload Time</th>
-                <th className=""></th>
-              </tr>
-              {resultFile.map((data, index) => (
-                <tr key={index} className="text-xs sm:text-sm">
-                  <td>{data.file}</td>
-                  <td className="flex ">
-                    <ProgressBar
-                      isLabelVisible={false}
-                      completed={data.processed}
-                      bgColor="#181e4a"
-                      labelSize="13px"
-                      className="md:w-2/5  mr-2"
-                      maxCompleted={100}
-                    />
-                    {data.processed}%
-                  </td>
-                  <td>{data.formattedDate}</td>
-                  <td className="flex justify-center items-center ">
-                    <div className="sm:hidden">
-                      <IoDownload
-                        className="text-xl"
-                        onClick={() => DownloadFile(data)}
-                      />
-                    </div>
-                    <div className="hidden sm:block">
-                      <button
-                        className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-8 text-xs"
-                        onClick={() => DownloadFile(data)}
-                      >
-                        DOWNLOAD
-                      </button>
-                    </div>
-                  </td>
+            <table
+              className="text-bgblue w-full  mt-14 "
+              style={{ fontFamily: "Raleway,sans-serif" }}
+            >
+              <tbody>
+                <tr className="text-left text-xs sm:text-sm">
+                  <th className="font-normal md:w-1/5">File Name</th>
+                  <th className="font-normal  md:w-2/5">Status</th>
+                  <th className="font-normal  md:w-1/5">Upload Time</th>
+                  <th className=""></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+                {resultFile.map((data, index) => (
+                  <tr key={index} className="text-xs sm:text-sm">
+                    <td>{data.file}</td>
+                    <td className="flex ">
+                      <ProgressBar
+                        isLabelVisible={false}
+                        completed={data.processed}
+                        bgColor="#181e4a"
+                        labelSize="13px"
+                        className="md:w-2/5  mr-2"
+                        maxCompleted={100}
+                      />
+                      {data.processed}%
+                    </td>
+                    <td>{data.formattedDate}</td>
+                    <td className="flex justify-center items-center ">
+                      <div className="sm:hidden">
+                        <IoDownload
+                          className="text-xl"
+                          onClick={() => DownloadFile(data)}
+                        />
+                      </div>
+                      <div className="hidden sm:block">
+                        <button
+                          className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-8 text-xs"
+                          onClick={() => DownloadFile(data)}
+                        >
+                          DOWNLOAD
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </InfiniteScroll>
         </div>
       )}
