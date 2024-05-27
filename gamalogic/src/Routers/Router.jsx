@@ -6,6 +6,7 @@ import BlockePage from '../pages/BlockePage';
 import EmailVerifiedPage from '../components/EmailVerifiedPage';
 import ServerError from '../pages/ServerError';
 import { useUserState } from '../context/userContext';
+import VerifyAgainErrorPage from '../components/VerifyAgainErrorPage';
 
 const QuickValidation = lazy(() => import('../pages/QuickValidation'));
 const Body = lazy(() => import('../components/Body'));
@@ -51,6 +52,7 @@ function Router() {
       <Route path="*" element={<NotFound />} />
       <Route path='/blocked' element={<BlockePage/>}/>
       <Route path='/EmailConfirmed' element={<EmailVerifiedPage/>}/>
+      <Route path='/EmailAlreadyverified' element={<VerifyAgainErrorPage/>}/>
     </Routes>
   );
 }

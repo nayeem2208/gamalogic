@@ -144,7 +144,7 @@ export default function BuyCredits() {
                 <p>Credits</p>
               </div>
               <div className="w-3/6">
-                <p className="buyCreditsCost text-xl md:text-3xl font-medium">${cost}</p>
+                <p className="buyCreditsCost text-xl md:text-3xl font-medium">${cost.toLocaleString('en-US')}</p>
                 <p>Cost</p>
               </div>
             </div>

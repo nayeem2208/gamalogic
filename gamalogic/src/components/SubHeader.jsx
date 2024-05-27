@@ -42,7 +42,7 @@ function SubHeader(props) {
         <p className="orangeUnderline ">{props.SubHeader}</p>
         <div className="flex justify-end subHeaderCredits mt-6 md:mt-0">
           <p className="bg-gray-100 rounded-lg px-4 flex items-center ">
-            {creditBal} Credits Left
+          {creditBal.toLocaleString('en-US')} Credits Left
           </p>{" "}
           <p className="ml-6 mr-2 flex items-center ">{userDetails.name}</p>
           <button onClick={logoutHandler}>

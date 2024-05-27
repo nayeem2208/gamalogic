@@ -280,7 +280,7 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
       );
       if (alreadyVerifiedUser[0].length > 0) {
-        return res.status(200).json({ message: "User is already verified." });
+        return res.redirect('https://beta.gamalogic.com/EmailAlreadyverified')
       }
       let apiKey = await generateUniqueApiKey(req);
       let confirmedDate = new Date();
