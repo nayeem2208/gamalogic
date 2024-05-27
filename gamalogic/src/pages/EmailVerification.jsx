@@ -378,7 +378,7 @@ function EmailVerification() {
           hasMore={hasMore}
           height={300}
           loader={<p>Loading...</p>}
-          endMessage={<p className="text-xs">No more data to load.</p>}
+          // endMessage={<p className="text-xs">No more data to load.</p>}
         >
           <table
             className="text-bgblue w-full  mt-14 min-w-96"

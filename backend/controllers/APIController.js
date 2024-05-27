@@ -166,6 +166,7 @@ let APIControllers = {
         let content = `<p>Your password has been successfully updated.</p>
           
         <p>If you did not initiate this action, please contact us immediately.</p>
+        <div>
         <a href="https://beta.gamalogic.com/"><button
         class="verifyButton">Sign In</button></a>
 
