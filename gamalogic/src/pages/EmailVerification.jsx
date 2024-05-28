@@ -250,6 +250,7 @@ function EmailVerification() {
         setLoad(100);
         setCreditBal(creditBal - JsonToServer.emails.length);
         setMessage(response.data.message);
+        toast.success(response.data.message)
         const options = {
           year: "numeric",
           month: "2-digit",
@@ -358,7 +359,7 @@ function EmailVerification() {
         )}
         <input
           type="file"
-          className="flex h-9 shadow-lg text-white  rounded-md border border-input bg-slate-500 hover:bg-slate-700 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-lg file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
+          className="flex h-9 shadow-lg text-white rounded-lg font-semibold  border border-input bg-red-600 hover:bg-red-800 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-lg file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
           accept=".csv"
           onChange={handleFileChange}
         />
@@ -370,7 +371,7 @@ function EmailVerification() {
           onLoaderFinished={() => {}}
         />
       )}
-      <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
+
       <div className="overflow-x-auto">
         <InfiniteScroll
           dataLength={resultFile.length}

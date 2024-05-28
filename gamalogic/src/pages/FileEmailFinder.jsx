@@ -161,7 +161,7 @@ function FileEmailFinder() {
 
               setLoad(100);
               setCreditBal(creditBal - results.data.length * 10);
-              setMessage(response.data.message);
+              toast.success(response.data.message);
               const options = {
                 year: "numeric",
                 month: "2-digit",
@@ -349,7 +349,7 @@ function FileEmailFinder() {
         </p>
         <input
           type="file"
-          className="flex h-9 shadow-lg text-white  rounded-md border border-input bg-slate-500 hover:bg-slate-700 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-lg file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
+          className="flex h-9 shadow-lg text-white rounded-lg font-semibold  border border-input bg-red-600 hover:bg-red-800 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-lg file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
           onChange={handleFileChange}
           accept=".csv"
         />
@@ -361,7 +361,6 @@ function FileEmailFinder() {
           onLoaderFinished={() => {}}
         />
       )}
-      <p className="bg-cyan-400 font-semibold my-4 ">{message}</p>
       {resultFile.length > 0 && (
         <div className="overflow-x-auto">
           <InfiniteScroll
