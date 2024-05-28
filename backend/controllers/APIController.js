@@ -226,7 +226,7 @@ let APIControllers = {
           gamalogic_emailid_vrfy: emails,
         };
         let response = await axios.post(
-          `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0`,
+          `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}`,
           data
         );
         if (response.data.error !== undefined && response.data.error == false) {
@@ -369,7 +369,7 @@ let APIControllers = {
           gamalogic_emailid_finder: req.body.data,
         };
         let response = await axios.post(
-          `https://gamalogic.com/batch-email-discovery/?apikey=${apiKey}`,
+          `https://gamalogic.com/batch-email-discovery/?apikey=${apiKey}&file_name=${req.body.fileName}`,
           data
         );
         if (response.data.error !== undefined && response.data.error == false) {
