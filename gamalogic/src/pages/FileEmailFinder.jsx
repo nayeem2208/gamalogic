@@ -240,7 +240,7 @@ function FileEmailFinder() {
                 (res.data.emailStatus.processed / res.data.emailStatus.total) *
                   100
               );
-              const adjustedProgress = Math.floor(progress / 10) * 10;
+              const adjustedProgress = Math.floor(progress / 5) * 5;
               if (file.processed !== adjustedProgress) {
                 setFilesStatus((prevFilesStatus) =>
                   prevFilesStatus.map((prevFile) =>
