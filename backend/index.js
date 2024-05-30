@@ -21,7 +21,7 @@ app.use(cookieParser());
 
 
 app.use(cors({
-  origin: 'https://beta.gamalogic.com'
+  origin: 'https://app.gamalogic.com'
 }));
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);

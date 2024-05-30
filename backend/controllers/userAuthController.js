@@ -11,6 +11,7 @@ import isDisposableURL from "../utils/disposibleEmailList.js";
 import verifyEmailTemplate from "../EmailTemplates/verifyTemplate.js";
 import basicTemplate from "../EmailTemplates/BasicTemplate.js";
 import forgotPasswordTemplate from "../EmailTemplates/forgotPasswordTemplate.js";
+import urls from "../ConstFiles/urls.js";
 
 const Authentication = {
   sample: async (req, res) => {
@@ -114,7 +115,7 @@ const Authentication = {
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0)`
         );
         let token = generateConfirmationToken(email)
-        let link = `https://beta.gamalogic.com/api/verifyEmail?email=${token}`
+        let link = `${urls.frontendUrl}/api/verifyEmail?email=${token}`
         sendEmail(
           fullname,
           email,
@@ -225,7 +226,7 @@ const Authentication = {
           <p>Your registration is now complete, and you're all set to explore our platform.</p>
           <p>If you have any questions or need assistance getting started, feel free to reach out to us.</p>
           <div class="verify">
-          <a href="https://beta.gamalogic.com/"><button
+          <a href=https://app.gamalogic.com/"><button
                   class="verifyButton">Sign In</button></a>
 
           </div>`
@@ -272,7 +273,7 @@ const Authentication = {
         if (disposibleEmail) {
           const query = `UPDATE registration SET referer=? WHERE emailid = ?`;
           await dbConnection.query(query, [referer, userEmail]);
-          res.redirect('https://beta.gamalogic.com/blocked')
+          res.redirect('${urls.frontendUrl}/blocked')
           return
         }
       }
@@ -280,7 +281,7 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
       );
       if (alreadyVerifiedUser[0].length > 0) {
-        return res.redirect('https://beta.gamalogic.com/EmailAlreadyverified')
+        return res.redirect(`${urls.frontendUrl}/EmailAlreadyverified`)
       }
       let apiKey = await generateUniqueApiKey(req);
       let confirmedDate = new Date();
@@ -304,7 +305,7 @@ const Authentication = {
         <p>Your registration is now complete, and your account has been successfully verified.</p>
         <p>You're all set to explore our platform. If you have any questions or need assistance getting started, feel free to reach out to us.</p>
         <div class="verify">
-                    <a href="https://beta.gamalogic.com/"><button
+                    <a href=https://app.gamalogic.com/"><button
                             class="verifyButton">Sign In</button></a>
     
                     </div>`
@@ -314,7 +315,7 @@ const Authentication = {
           "Welcome to Gamalogic!",
           basicTemplate(verifiedUser[0][0].username, content)
         );
-        res.redirect('https://beta.gamalogic.com/EmailConfirmed?confirm=true');
+        res.redirect('${urls.frontendUrl}/EmailConfirmed?confirm=true');
 
       }
     } catch (error) {
@@ -345,7 +346,7 @@ const Authentication = {
           return
         }
         let token = generateConfirmationToken(req.body.email)
-        let link = `https://beta.gamalogic.com/reset?email=${token}`
+        let link = `${urls.frontendUrl}/reset?email=${token}`
         sendEmail(
           user[0][0].username,
           req.body.email,
@@ -386,7 +387,7 @@ const Authentication = {
           
         <p>If you did not initiate this action, please contact us immediately.</p> 
         <div class="verify">
-        <a href="https://beta.gamalogic.com/"><button
+        <a href=https://app.gamalogic.com/"><button
                 class="verifyButton">Sign In</button></a>
 
         </div>`
@@ -422,7 +423,7 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${req.query.email}'`
       );
       let token = generateConfirmationToken(req.query.email)
-      let link = `https://beta.gamalogic.com/api/verifyEmail?email=${token}`
+      let link = `${urls.frontendUrl}/api/verifyEmail?email=${token}`
       sendEmail(
         user[0][0].username,
         req.query.email,

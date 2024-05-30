@@ -133,7 +133,7 @@ let APIControllers = {
           
         <p>If you did not initiate this action, please contact us immediately.</p>
         <div class="verify">
-        <a href="https://beta.gamalogic.com/"><button
+        <a href="https://app.gamalogic.com/"><button
         class="verifyButton">Sign In</button></a>
 
 </div>`
@@ -201,7 +201,7 @@ let APIControllers = {
         <p>Please note that the verification process may take some time depending on the size of the file and the number of emails to be verified.</p>
         <p>Thank you for using our service.</p>
         <div class="verify">
-        <a href="https://beta.gamalogic.com/dashboard/file-upload"><button
+        <a href="https://app.gamalogic.com/dashboard/file-upload"><button
                 class="verifyButton">Download</button></a>
 
         </div>`
@@ -307,7 +307,7 @@ let APIControllers = {
         <p>Please note that the finding process may take some time depending on the size of the file and the number of emails to be find.</p>
         <p>Thank you for using our service.</p>
         <div class="verify">
-        <a href="https://beta.gamalogic.com/dashboard/file-upload-finder"><button
+        <a href="https://app.gamalogic.com/dashboard/file-upload-finder"><button
                 class="verifyButton">Download</button></a>
 
         </div>`

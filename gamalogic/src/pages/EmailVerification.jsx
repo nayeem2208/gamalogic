@@ -53,9 +53,12 @@ function EmailVerification() {
         const filesWithProcessedField = allFiles.data.map((file) => ({
           ...file,
           processed: 0,
-          formattedDate: new Date(file.date_time).toLocaleString("en-US", options),
+          formattedDate: new Date(file.date_time).toLocaleString(
+            "en-US",
+            options
+          ),
         }));
-  
+
         setResultFile((prevResultFiles) => [
           ...prevResultFiles,
           ...filesWithProcessedField,
@@ -65,7 +68,7 @@ function EmailVerification() {
           ...filesWithProcessedField,
         ]);
       }
-  
+
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -76,7 +79,7 @@ function EmailVerification() {
       }
     }
   };
-  
+
   const fetchMoreFiles = async () => {
     setPageIndex((prevPageIndex) => {
       const newPageIndex = prevPageIndex + 1;
@@ -84,7 +87,6 @@ function EmailVerification() {
       return newPageIndex;
     });
   };
-
 
   useEffect(() => {
     if (filesStatus.length === 0 || isCheckingCompletion.current) return;
@@ -114,7 +116,14 @@ function EmailVerification() {
                 (res.data.emailStatus.processed / res.data.emailStatus.total) *
                   100
               );
-              const adjustedProgress = Math.floor(progress / 5) * 5;
+              let adjustedProgress
+              if(res.data.emailStatus.total>2000){
+                 adjustedProgress=progress
+              }
+              else{
+                 adjustedProgress = Math.floor(progress / 5) * 5;
+              }
+              // const adjustedProgress = Math.floor(progress / 5) * 5;
               if (file.processed !== adjustedProgress) {
                 setFilesStatus((prevFilesStatus) =>
                   prevFilesStatus.map((prevFile) =>
@@ -234,6 +243,7 @@ function EmailVerification() {
     }
   };
 
+
   const handleAccept = async (e) => {
     e.preventDefault();
     try {
@@ -250,7 +260,7 @@ function EmailVerification() {
         setLoad(100);
         setCreditBal(creditBal - JsonToServer.emails.length);
         setMessage(response.data.message);
-        toast.success(response.data.message)
+        toast.success(response.data.message);
         const options = {
           year: "numeric",
           month: "2-digit",
@@ -377,15 +387,21 @@ function EmailVerification() {
           dataLength={resultFile.length}
           next={fetchMoreFiles}
           hasMore={hasMore}
-          height={ 300}
-          loader={resultFile.length>=4&&(<div className="w-full mt-4  flex justify-center items-center"><div
-          className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-          role="status"
-        >
-          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-            Loading...
-          </span>
-        </div></div>)}
+          height={300}
+          loader={
+            resultFile.length >= 4 && (
+              <div className="w-full mt-4  flex justify-center items-center">
+                <div
+                  className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                  role="status"
+                >
+                  <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                    Loading...
+                  </span>
+                </div>
+              </div>
+            )
+          }
           // endMessage={<p className="text-xs">No more data to load.</p>}
         >
           <table

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // const baseURL ="http://localhost:3000/api/"
-const baseURL='https://beta.gamalogic.com/api/'
+const baseURL='https://app.gamalogic.com/api/'
 const axiosInstance = axios.create({
   baseURL,
 });

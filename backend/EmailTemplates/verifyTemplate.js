@@ -107,7 +107,7 @@ const verifyEmailTemplate = (name, token, link) => {
     <body>
         <div class="container">
             <div class="header">
-                <img src="https://beta.gamalogic.com/gmLogo.png" alt="GAMALOGIC">
+                <img src="https://app.gamalogic.com/gmLogo.png" alt="GAMALOGIC">
             </div>
             <div class="content">
                 <p class="nameofUser">Hi ${name},</p>
@@ -115,11 +115,11 @@ const verifyEmailTemplate = (name, token, link) => {
                     address:</p>
     
                 <div class="verify">
-                    <a href="https://beta.gamalogic.com/api/verifyEmail?email=${token}"><button
+                    <a href="https://app.gamalogic.com/api/verifyEmail?email=${token}"><button
                             class="verifyButton">Verify</button></a>
                     <p>Or</p>
                     <p>
-                        <a href="https://beta.gamalogic.com/api/verifyEmail?email=${token}">${link}</a>
+                        <a href="https://app.gamalogic.com/api/verifyEmail?email=${token}">${link}</a>
                     </p>
                 </div>
                 <p>Thank you for joining us. If you have any questions, feel free to contact our support team.</p>
@@ -133,15 +133,15 @@ const verifyEmailTemplate = (name, token, link) => {
                     <table align="center">
                         <tr>
                             <td><a target="_blank" href="https://www.facebook.com/gamalogicapp"><img
-                                        src="https://beta.gamalogic.com/fb.png" class="sicons" alt="FB"></a></td>
+                                        src="https://app.gamalogic.com/fb.png" class="sicons" alt="FB"></a></td>
                             <td><a target="_blank" href="https://twitter.com/Gamalogicapp"><img
-                                        src="https://beta.gamalogic.com/twitter(2).png" class="sicons" alt="Twt"></a></td>
+                                        src="https://app.gamalogic.com/twitter(2).png" class="sicons" alt="Twt"></a></td>
                             <td><a target="_blank" href="https://www.youtube.com/@Gamalogic"><img
-                                        src="https://beta.gamalogic.com/youtube.png" class="sicons" alt="YT"></a></td>
+                                        src="https://app.gamalogic.com/youtube.png" class="sicons" alt="YT"></a></td>
                             <td><a target="_blank" href="https://www.linkedin.com/company/gamalogic"><img
-                                        src="https://beta.gamalogic.com/linkedin.png" class="sicons" alt="LI"></a></td>
+                                        src="https://app.gamalogic.com/linkedin.png" class="sicons" alt="LI"></a></td>
                             <td><a target="_blank" href="mailto:support@gamalogic.com"><img
-                                        src="https://beta.gamalogic.com/mail.png" class="sicons" alt="GM"></a></td>
+                                        src="https://app.gamalogic.com/mail.png" class="sicons" alt="GM"></a></td>
                         </tr>
                     </table>
                 </div>
