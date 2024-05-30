@@ -1,17 +1,19 @@
 import React from 'react';
 
 function Alert({ sizeOfData,onAccept, onDismiss }) {
-    const handleAccept = () => {
-        if (typeof onAccept === 'function') {
-          onAccept(true);
-        }
-      };
-    
-      const handleDismiss = () => {
-        if (typeof onDismiss === 'function') {
-          onDismiss(false);
-        }
-      };
+  const handleAccept = () => {
+    if (typeof onAccept === 'function') {
+      onAccept(true);
+    }
+    setSelection(true); // Update selection state on accept
+  };
+  
+  const handleDismiss = () => {
+    if (typeof onDismiss === 'function') {
+      onDismiss(false);
+    }
+    setSelection(false); // Update selection state on dismiss
+  };
       console.log(sizeOfData,'size of data')
   return (
     <div role="alert" className="mx-auto max-w-lg rounded-lg border border-stone bg-slate-200 p-4 shadow-xl sm:p-6 lg:p-8 absolute">

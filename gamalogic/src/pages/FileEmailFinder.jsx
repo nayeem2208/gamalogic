@@ -149,6 +149,7 @@ function FileEmailFinder() {
         console.log(JsonToServer, "json to server");
         if (creditBal >= JsonToServer.data.length * 10) {
           setShowAlert(false);
+          SetSelection(null)
           setLoading(true);
           setLoad(30);
           let results = JsonToServer;
@@ -158,7 +159,6 @@ function FileEmailFinder() {
                 "/batchEmailFinder",
                 results
               );
-
               setLoad(100);
               setCreditBal(creditBal - results.data.length * 10);
               toast.success(response.data.message);
@@ -202,6 +202,7 @@ function FileEmailFinder() {
           BatchFileFinder();
         } else {
           setShowAlert(false);
+          SetSelection(null);
           toast.error("You dont have enough credits to do this");
         }
       } else {
@@ -320,6 +321,7 @@ function FileEmailFinder() {
 
   const handleAccept = (value) => {
     SetSelection(value);
+    showAlert(false)
   };
 
   const handleDismiss = (value) => {
@@ -336,10 +338,12 @@ function FileEmailFinder() {
       <SubHeader SubHeader={"Upload your file"} />
       {showAlert && (
         <Alert
-          sizeOfData={JsonToServer}
-          onAccept={handleAccept}
-          onDismiss={handleDismiss}
-        />
+        sizeOfData={JsonToServer}
+        selection={Selection} // Pass down selection state
+        setSelection={SetSelection} // Pass down function to update selection
+        onAccept={() => SetSelection(true)} // Update selection on accept
+        onDismiss={() => SetSelection(false)} // Update selection on dismiss
+      />
       )}
       <div className="mt-8 sm:mt-14 subHeading">
         <h3>Upload Your File Here | Email Finder</h3>
@@ -349,7 +353,7 @@ function FileEmailFinder() {
         </p>
         <input
           type="file"
-          className="flex h-9 shadow-lg text-white rounded-lg font-semibold  border border-input bg-red-600 hover:bg-red-800 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-lg file:bg-red-400 file:rounded-lg file:px-2 file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
+          className="flex h-9 shadow-lg text-white rounded-lg font-semibold  border border-input bg-red-600 hover:bg-red-800 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-xl file:bg-red-900 hover:file:bg-red-600 file:rounded-lg file:px-4 file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
           onChange={handleFileChange}
           accept=".csv"
         />
