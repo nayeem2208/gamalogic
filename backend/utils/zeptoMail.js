@@ -1,5 +1,5 @@
 import { SendMailClient } from "zeptomail";
-import ErrorHandler from "./errorHandler";
+import ErrorHandler from "./errorHandler.js";
 
 async function zeptomailsend(name,email,subject,content) {
     const url =  "api.zeptomail.com/"; 
