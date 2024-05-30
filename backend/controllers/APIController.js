@@ -5,6 +5,7 @@ import ErrorHandler from "../utils/errorHandler.js";
 import { passwordHash, verifyPassword } from "../utils/passwordHash.js";
 import sendEmail from "../utils/zeptoMail.js";
 import basicTemplate from "../EmailTemplates/BasicTemplate.js";
+import urls from "../ConstFiles/urls.js";
 
 let APIControllers = {
   getCreditBalance: async (req, res) => {
