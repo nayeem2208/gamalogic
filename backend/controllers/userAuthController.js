@@ -226,7 +226,7 @@ const Authentication = {
           <p>Your registration is now complete, and you're all set to explore our platform.</p>
           <p>If you have any questions or need assistance getting started, feel free to reach out to us.</p>
           <div class="verify">
-          <a href=https://app.gamalogic.com/"><button
+          <a href="${urls.frontendUrl}/"><button
                   class="verifyButton">Sign In</button></a>
 
           </div>`
@@ -273,7 +273,7 @@ const Authentication = {
         if (disposibleEmail) {
           const query = `UPDATE registration SET referer=? WHERE emailid = ?`;
           await dbConnection.query(query, [referer, userEmail]);
-          res.redirect('${urls.frontendUrl}/blocked')
+          res.redirect(`${urls.frontendUrl}/blocked`)
           return
         }
       }
@@ -305,7 +305,7 @@ const Authentication = {
         <p>Your registration is now complete, and your account has been successfully verified.</p>
         <p>You're all set to explore our platform. If you have any questions or need assistance getting started, feel free to reach out to us.</p>
         <div class="verify">
-                    <a href=https://app.gamalogic.com/"><button
+                    <a href="${urls.frontendUrl}/"><button
                             class="verifyButton">Sign In</button></a>
     
                     </div>`
@@ -315,7 +315,7 @@ const Authentication = {
           "Welcome to Gamalogic!",
           basicTemplate(verifiedUser[0][0].username, content)
         );
-        res.redirect('${urls.frontendUrl}/EmailConfirmed?confirm=true');
+        res.redirect(`${urls.frontendUrl}/EmailConfirmed?confirm=true`);
 
       }
     } catch (error) {
@@ -387,7 +387,7 @@ const Authentication = {
           
         <p>If you did not initiate this action, please contact us immediately.</p> 
         <div class="verify">
-        <a href=https://app.gamalogic.com/"><button
+        <a href="${urls.frontendUrl}/"><button
                 class="verifyButton">Sign In</button></a>
 
         </div>`

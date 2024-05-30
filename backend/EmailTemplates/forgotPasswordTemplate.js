@@ -1,3 +1,5 @@
+import urls from "../ConstFiles/urls.js"
+
 const forgotPasswordTemplate = (name, token, link) => {
     // const encodedReferer = encodeURIComponent(referer);
     const htmlFile = `
@@ -107,18 +109,18 @@ const forgotPasswordTemplate = (name, token, link) => {
     <body>
         <div class="container">
             <div class="header">
-                <img src="https://app.gamalogic.com/gmLogo.png" alt="GAMALOGIC">
+                <img src="${urls.frontendUrl}/gmLogo.png" alt="GAMALOGIC">
             </div>
             <div class="content">
                 <p class="nameofUser">Hi ${name},</p>
                 <p>We received a request to reset your password. To proceed with resetting your password, please click the link below:</p>
     
                 <div class="verify">
-                    <a href="https://app.gamalogic.com/reset?email=${token}"><button
+                    <a href="${urls.frontendUrl}/reset?email=${token}"><button
                             class="verifyButton">Reset Password</button></a>
                     <p>Or</p>
                     <p>
-                        <a href="https://app.gamalogic.com/reset?email=${token}">${link}</a>
+                        <a href="${urls.frontendUrl}/reset?email=${token}">${link}</a>
                     </p>
                 </div>
                 <p>If you didn't request this change, you can ignore this email. Your account security is important to us.</p>
@@ -132,15 +134,15 @@ const forgotPasswordTemplate = (name, token, link) => {
                     <table align="center">
                         <tr>
                             <td><a target="_blank" href="https://www.facebook.com/gamalogicapp"><img
-                                        src="https://app.gamalogic.com/fb.png" class="sicons" alt="FB"></a></td>
+                                        src="${urls.frontendUrl}/fb.png" class="sicons" alt="FB"></a></td>
                             <td><a target="_blank" href="https://twitter.com/Gamalogicapp"><img
-                                        src="https://app.gamalogic.com/twitter(2).png" class="sicons" alt="Twt"></a></td>
+                                        src="${urls.frontendUrl}/twitter(2).png" class="sicons" alt="Twt"></a></td>
                             <td><a target="_blank" href="https://www.youtube.com/@Gamalogic"><img
-                                        src="https://app.gamalogic.com/youtube.png" class="sicons" alt="YT"></a></td>
+                                        src="${urls.frontendUrl}/youtube.png" class="sicons" alt="YT"></a></td>
                             <td><a target="_blank" href="https://www.linkedin.com/company/gamalogic"><img
-                                        src="https://app.gamalogic.com/linkedin.png" class="sicons" alt="LI"></a></td>
+                                        src="${urls.frontendUrl}/linkedin.png" class="sicons" alt="LI"></a></td>
                             <td><a target="_blank" href="mailto:support@gamalogic.com"><img
-                                        src="https://app.gamalogic.com/mail.png" class="sicons" alt="GM"></a></td>
+                                        src="${urls.frontendUrl}/mail.png" class="sicons" alt="GM"></a></td>
                         </tr>
                     </table>
                 </div>
