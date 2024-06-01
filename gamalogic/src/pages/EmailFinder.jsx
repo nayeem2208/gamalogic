@@ -78,14 +78,14 @@ function EmailFinder() {
         <div className="sm:flex  xl:w-4/5 justify-center sm:justify-between flex flex-col sm:flex-row">
           <form
             style={{ fontFamily: "Raleway,sans-serif" }}
-            className="flex flex-col justify-center items-center sm:items-start sm:justify-normal w-full sm:w-8/12 md:w-5/12 text-sm"
+            className="flex flex-col justify-center items-center sm:items-start sm:justify-normal w-full sm:w-8/12 md:w-5/12 lg:w-8/12 text-sm"
             onSubmit={HandleSubmit}
           >
             <p>Full Name</p>
             <input
               type="text"
               placeholder="Elon Musk"
-              className=" border border-gray-400 rounded-md py-2 px-4 sm:mr-3"
+              className=" border border-gray-400 rounded-md py-2 px-4 sm:mr-3 w-4/5"
               value={data.fullname}
               onChange={(e) => onInputChange(e, "fullname")}
             />
@@ -93,7 +93,7 @@ function EmailFinder() {
             <input
               type="text"
               placeholder="tesla.com"
-              className=" border border-gray-400 rounded-md py-2 px-4 sm:mr-3"
+              className=" border border-gray-400 rounded-md py-2 px-4 sm:mr-3 w-4/5"
               value={data.domain}
               onChange={(e) => onInputChange(e, "domain")}
             />
@@ -112,7 +112,7 @@ function EmailFinder() {
               Note:
               <br />
               <span
-                className="font-light text-sm"
+                className="font-light text-xs sm:text-base"
                 style={{ fontFamily: "Raleway,sans-serif" }}
               >
                 {" "}

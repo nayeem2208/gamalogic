@@ -31,7 +31,7 @@ export default function BuyCredits() {
   const [cost, setCost] = useState(10);
   let [serverError, setServerError] = useState(false);
 
-  let { setCreditBal, creditBal } = useUserState();
+  let { setCreditBal, creditBal,userDetails } = useUserState();
 
   useEffect(()=>{
     document.title='Buy Credits | Beta Dashboard'
@@ -169,7 +169,7 @@ export default function BuyCredits() {
               />
             </div>
           </div>
-          <div className=" flex justify-center mt-6">
+          {userDetails.confirm == 1 &&<div className=" flex justify-center mt-6">
             <div className="w-4/6 sm:w-3/6 md:w-2/6  z-0">
               <PayPalButton
                 createOrder={(data, actions) => createOrder(data, actions)}
@@ -177,7 +177,7 @@ export default function BuyCredits() {
                 onError={onError}
               />
             </div>
-          </div>
+          </div>}
         </div>
       )}
       {success == true && <PaymentSuccess data={{ cost, selectedCredits }} />}

@@ -104,24 +104,24 @@ function ApiKey() {
               </div>
             </div>
             <div
-              className="sm:w-5/12 mt-4 sm:mt-0 flex flex-col justify-center h-full rounded p-3 text-sm"
+              className="sm:w-5/12 mt-4 sm:mt-0 flex flex-col justify-center h-full rounded p-3 "
               style={{
                 backgroundColor: "rgba(247, 76, 65 , 0.05)",
                 color: "rgba(247, 76, 65 , 0.6)",
               }}
             >
               <p
-                className="font-semibold mb-4 text-xs sm:text-sm"
+                className="font-semibold mb-4 text-xs sm:text-base"
                 style={{ fontFamily: "Ubuntu, sans-serif" }}
               >
                 Note:
               </p>
               <ol className="font-light text-base">
-                <li className="text-xs sm:text-sm">
+                <li className="text-xs sm:text-base">
                   <span className="font-semibold">1.</span>Don’t share the API
                   key with anyone
                 </li>
-                <li className="text-xs sm:text-sm">
+                <li className="text-xs sm:text-base">
                   <span className="font-semibold">2.</span>In case you feel any
                   unauthorized access, change the key immediately
                 </li>
