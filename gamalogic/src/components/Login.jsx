@@ -101,7 +101,7 @@ function Login() {
       className="w-full flex justify-center items-center "
       // style={{ marginTop: "20vw" }}
     >
-      <div className="w-4/5 sm:w-4/6 md:w-5/6 lg:w-4/6  px-2 flex flex-col justify-center items-center">
+      <div className="w-5/6 sm:w-4/6 md:w-5/6 lg:w-4/6  px-2 flex flex-col justify-center items-center">
         <div className="text-center auth" style={{ position: "relative" }}>
           <div className="h2-background" style={{ position: "absolute" }}>
             <div className="red"></div>
@@ -113,10 +113,10 @@ function Login() {
           </p>
         </div>
         <div
-          className="flex flex-col p-10 px-1 sm:px-3 md:px-10 w-full sm:w-5/6 md:w-3/6 lg:w-4/6 xl:w-3/6 mb-16"
+          className="flex flex-col p-10 px-5 md:px-10 w-full sm:w-5/6 md:w-3/6 lg:w-4/6 xl:w-3/6 mb-16"
           style={{ backgroundColor: "#161736" }}
         >
-          <form onSubmit={handleSubmit} className="flex flex-col text-sm px-1">
+          <form onSubmit={handleSubmit} className="flex flex-col text-xs sm:text-sm px-1">
             <label htmlFor="">Email</label>
             <input
               type="email"
@@ -125,7 +125,7 @@ function Login() {
               placeholder="Enter your email"
               onChange={handleInputChange}
               value={data.email}
-              className="bg-transparent border border-cyan-400 rounded-md py-1 px-4 text-gray-400 my-1"
+              className="bg-transparent border border-cyan-400 rounded-md py-2 px-4 text-gray-400 my-1"
             />
             <label htmlFor="" className="mt-6">
               Password
@@ -139,7 +139,7 @@ function Login() {
               value={data.password}
               className="bg-transparent border border-cyan-400 rounded-md py-1 px-4 text-gray-400 my-1"
             /> */}
-            <div className="flex bg-transparent border justify-between items-center border-cyan-400 rounded-md py-1 px-1  text-gray-400 my-1">
+            <div className="flex bg-transparent border justify-between items-center border-cyan-400 rounded-md py-2 px-1  text-gray-400 my-1">
               <input
                 className="bg-transparent w-5/6 px-3 outline-none"
                 type={passwordVisible ? "text" : "password"}

@@ -310,11 +310,11 @@ function EmailVerification() {
     return <ServerError />;
   }
   return (
-    <div className=" px-6 md:px-20 py-8">
+    <div className=" px-6 md:px-20 py-8 text-center sm:text-left">
       <SubHeader SubHeader={"Upload your file"} />
-      <form className="mt-8 sm:mt-14 subHeading">
+      <form className="mt-8 sm:mt-14 subHeading flex flex-col sm:flex-none justify-center items-center sm:justify-start sm:items-start">
         <h3>Upload Your File Here | Email Validation</h3>
-        <p className="my-7 w-4/5 description">
+        <p className="my-7  description">
           You can upload the email address list in csv file and get results in
           csv. Select a file to upload.
         </p>
@@ -409,7 +409,7 @@ function EmailVerification() {
             style={{ fontFamily: "Raleway,sans-serif" }}
           >
             <tbody>
-              <tr className="text-left text-xs sm:text-sm">
+              <tr className="sm:text-left text-xs sm:text-sm">
                 <th className="font-normal  md:w-1/5">File Name</th>
                 <th className="font-normal  md:w-2/5 ">Status</th>
                 <th className="font-normal  md:w-1/5">Upload Time</th>
@@ -417,7 +417,7 @@ function EmailVerification() {
               </tr>
               {resultFile.map((data, index) => (
                 <tr key={index} className="text-xs sm:text-sm">
-                  <td className="">{data.file_upload}</td>
+                  <td className="md:pt-5">{data.file_upload}</td>
                   <td className="flex ">
                     <ProgressBar
                       isLabelVisible={false}
@@ -429,7 +429,7 @@ function EmailVerification() {
                     />
                     {data.processed}%
                   </td>
-                  <td>{data.formattedDate}</td>
+                  <td className="md:pt-5">{data.formattedDate}</td>
                   <td className="flex justify-center items-center ">
                     <div className="sm:hidden">
                       <IoDownload

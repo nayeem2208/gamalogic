@@ -38,7 +38,7 @@ function SubHeader(props) {
   }
   return (
     <div>
-      <div className="sm:flex justify-between mt-1 ">
+      <div className="hidden sm:flex  justify-between mt-1 ">
         <p className="orangeUnderline ">{props.SubHeader}</p>
         <div className="flex justify-end subHeaderCredits mt-6 md:mt-0">
           <p className="bg-gray-100 rounded-lg px-4 flex items-center ">
@@ -49,6 +49,18 @@ function SubHeader(props) {
             <IoLogOutOutline className="  text-2xl" />
           </button>
         </div>
+      </div>
+      <div className="sm:hidden justify-between mt-1 ">
+        <div className="flex flex-wrap justify-center subHeaderCredits mb-4 md:mt-0">
+          <p className="bg-gray-100 rounded-lg px-4 flex items-center mt-3">
+            {creditBal.toLocaleString('en-US')} Credits Left
+          </p>{" "}
+          <p className="ml-6 mr-2 flex items-center mt-3">{userDetails.name}</p>
+          <button onClick={logoutHandler}>
+            <IoLogOutOutline className="  text-2xl mt-3" />
+          </button>
+        </div>
+        <p className="orangeUnderline text-center">{props.SubHeader}</p>
       </div>
       {userDetails.confirm == 0 && (
         <div className="my-4 flex bg-red-100 border border-red-400 rounded-lg p-2 text-sm 2xl:text-base">

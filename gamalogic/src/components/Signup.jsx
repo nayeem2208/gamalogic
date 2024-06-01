@@ -143,7 +143,7 @@ function Signup() {
     className="w-full flex justify-center items-center  "
     // style={{ marginTop: "40vh" }}
     >
-      <div className="w-4/5 sm:w-4/6 md:w-5/6 lg:w-4/6 flex flex-col justify-center items-center">
+      <div className="w-5/6 sm:w-4/6 md:w-5/6 lg:w-4/6 flex flex-col justify-center items-center">
         <div className="text-center auth" style={{ position: "relative" }}>
           <div className="h2-background" style={{ position: "absolute" }}>
             <div className="red"></div>
@@ -156,7 +156,7 @@ function Signup() {
           className="flex flex-col p-5 md:p-10  w-10/12 sm:w-5/6 md:w-3/6 lg:w-4/6 xl:w-3/6 mb-16"
           style={{ backgroundColor: "#161736" }}
         >
-          <form className="flex flex-col text-sm" onSubmit={handleSubmit}>
+          <form className="flex flex-col text-xs sm:text-sm" onSubmit={handleSubmit}>
             <label htmlFor="">Full Name</label>
             <input
               type="text"
@@ -164,7 +164,7 @@ function Signup() {
               value={data.fullname}
               placeholder="Enter your name"
               onChange={handleInputChange}
-              className="bg-transparent border border-cyan-400 rounded-md py-1 px-4 text-gray-400 my-1"
+              className="bg-transparent border border-cyan-400 rounded-md py-2 px-4 text-gray-400 my-1"
             />
             <label htmlFor="" className="mt-6">
               Email
@@ -175,12 +175,12 @@ function Signup() {
               value={data.email}
               placeholder="Enter your email"
               onChange={handleInputChange}
-              className="bg-transparent border border-cyan-400 rounded-md py-1 px-4 text-gray-400 my-1"
+              className="bg-transparent border border-cyan-400 rounded-md py-2 px-4 text-gray-400 my-1"
             />
             <label htmlFor="" className="mt-6">
               Password
             </label>
-            <div className="flex bg-transparent border justify-between items-center border-cyan-400 rounded-md py-1 px-1  text-gray-400 my-1">
+            <div className="flex bg-transparent border justify-between items-center border-cyan-400 rounded-md py-2 px-1  text-gray-400 my-1">
               <input
                 className="bg-transparent w-5/6 px-3 outline-none"
                 type={passwordVisible.new ? "text" : "password"}
@@ -213,7 +213,7 @@ function Signup() {
             <label htmlFor="" className="mt-6">
               Confirm Password
             </label>
-            <div className="flex bg-transparent border justify-between items-center border-cyan-400 rounded-md py-1 px-1  text-gray-400 my-1">
+            <div className="flex bg-transparent border justify-between items-center border-cyan-400 rounded-md py-2 px-1  text-gray-400 my-1">
               <input
                 className="bg-transparent w-5/6 px-3 outline-none"
                 type={passwordVisible.confirm ? "text" : "password"}

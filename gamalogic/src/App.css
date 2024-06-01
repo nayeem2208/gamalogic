@@ -162,6 +162,100 @@
     margin: 7rem 0 12rem;
 }
 
+input[type="range"].custom-range {
+    -webkit-appearance: none; /* Override default styling in Safari */
+    width: 100%;
+    background: transparent; /* Remove default background */
+    margin: 0; /* Ensure there's no margin affecting layout */
+  }
+  
+  /* General styles */
+  input[type="range"].custom-range:focus {
+    outline: none; /* Remove outline */
+  }
+  
+  /* WebKit browsers */
+  input[type="range"].custom-range::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    background: linear-gradient(to right, #0A0E2B var(--value, 50%), #ddd var(--value, 50%));
+    border-radius: 5px;
+    border: 1px solid #aaa; /* Optional: Add a border */
+  }
+  
+  input[type="range"].custom-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #0A0E2B; /* Customize the thumb color */
+    cursor: pointer;
+    margin-top: -6px; /* Adjust to align with the track */
+    position: relative; /* Needed for Safari */
+    z-index: 1; /* Bring the thumb above the track */
+  }
+  
+  /* Firefox */
+  input[type="range"].custom-range::-moz-range-track {
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    background: #ddd; /* Customize the track background color */
+    border-radius: 5px;
+    border: 1px solid #aaa; /* Optional: Add a border */
+  }
+  
+  input[type="range"].custom-range::-moz-range-progress {
+    background: #0A0E2B; /* Customize the selected track color */
+  }
+  
+  input[type="range"].custom-range::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #0A0E2B; /* Customize the thumb color */
+    cursor: pointer;
+  }
+  
+  /* Internet Explorer/Edge */
+  input[type="range"].custom-range::-ms-track {
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    background: transparent; /* Transparent to show the custom track */
+    border-color: transparent;
+    color: transparent;
+  }
+  
+  input[type="range"].custom-range::-ms-fill-lower {
+    background: #0A0E2B; /* Customize the selected track color */
+    border: 1px solid #aaa; /* Optional: Add a border */
+    border-radius: 5px;
+  }
+  
+  input[type="range"].custom-range::-ms-fill-upper {
+    background: #ddd; /* Customize the track background color */
+    border: 1px solid #aaa; /* Optional: Add a border */
+    border-radius: 5px;
+  }
+  
+  input[type="range"].custom-range::-ms-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #0A0E2B; /* Customize the thumb color */
+    cursor: pointer;
+    margin-top: 0px; /* Adjust to align with the track */
+  }
+  
+  input[type="range"].custom-range:focus::-ms-fill-lower {
+    background: #0A0E2B; /* Change color when focused */
+  }
+  
+  input[type="range"].custom-range:focus::-ms-fill-upper {
+    background: #ddd; /* Change color when focused */
+  }
 
 
 

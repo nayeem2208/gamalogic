@@ -127,10 +127,10 @@ function AccountSettings() {
     return <ServerError />; 
   }
   return (
-    <div className=" px-6 md:px-20 py-8 accountSettings">
+    <div className=" px-6 md:px-20 py-8 accountSettings text-center sm:text-start">
       <SubHeader SubHeader={"Account Settings"} />
       {userDetails.confirm == 1 ? (
-      <form className="mt-6 sm:mt-14 text-bgblue subHeading" onSubmit={changaePassword} style={{fontFamily:"Raleway,sans-serif"}}>
+      <form className="mt-6 sm:mt-14 text-xs sm:text-sm text-bgblue subHeading" onSubmit={changaePassword} style={{fontFamily:"Raleway,sans-serif"}}>
         <h3>Your Profile</h3>
         {loading && (
             <LoadingBar
@@ -143,7 +143,7 @@ function AccountSettings() {
         <input
           type="text"
           placeholder="enter your name here"
-          className="sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3"
+          className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3"
           value={userDetails.name}
           readOnly
         />{" "}
@@ -151,7 +151,7 @@ function AccountSettings() {
         <input
           type="email"
           placeholder="enter the email here"
-          className="sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 selection:border-gray-400"
+          className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 selection:border-gray-400"
           value={userDetails.email}
           readOnly
         />{" "}
@@ -182,7 +182,7 @@ function AccountSettings() {
             </div>
           )}
         <p className="mt-6 mb-1 text-sm">New Password</p>
-        <div className="flex bg-transparent  justify-between items-center sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 text-gray-400 my-1">
+        <div className="flex bg-transparent  justify-between items-center  sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 text-gray-400 my-1">
           <input
             className="bg-transparent w-5/6  outline-none"
             type={passwordVisible.newPassword ? "text" : "password"}

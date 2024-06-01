@@ -53,8 +53,10 @@ export default function BuyCredits() {
     [2500000, 2200],
   ];
 
-  const handleCreditsChange = (e) => {
-    const index = parseInt(e.target.value);
+  const handleCreditsChange = (event) => {
+    const value = event.target.value;
+    event.target.style.setProperty('--value', (value / (creditCostMappings.length - 1)) * 100 + '%');
+    const index = parseInt(event.target.value);
     const [credits, cost] = creditCostMappings[index];
     setSelectedCredits(credits);
     setCost(cost);
@@ -113,6 +115,11 @@ export default function BuyCredits() {
     }
   }, [success]);
 
+  useEffect(() => {
+    const rangeInput = document.querySelector('.custom-range');
+    rangeInput.style.setProperty('--value', (rangeInput.value / (creditCostMappings.length - 1)) * 100 + '%');
+  }, []);
+
   const handleTryAgain = () => {
     setFailure(false);
   };
@@ -123,7 +130,7 @@ export default function BuyCredits() {
 
   const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
   return (
-    <div className=" px-6 md:px-20 py-8">
+    <div className=" px-6 md:px-20 py-8 text-center sm:text-start">
       <SubHeader SubHeader={"Buy Credits"} />
       {success == false && failure == false && (
         <div className="mt-6 sm:mt-14 text-bgblue subHeading">
@@ -149,7 +156,7 @@ export default function BuyCredits() {
               </div>
             </div>
             <div className=" w-3/5 mt-12">
-              <input
+            <input
                 type="range"
                 className="w-full custom-range"
                 min="0"

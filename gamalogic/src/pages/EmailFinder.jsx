@@ -13,7 +13,7 @@ function EmailFinder() {
   let [load, setLoad] = useState(30);
   let [serverError, setServerError] = useState(false);
 
-  let { userDetails, setCreditBal, creditBal  } = useUserState();
+  let { userDetails, setCreditBal, creditBal } = useUserState();
 
   useEffect(() => {
     document.title = "Email Finder | Beta Dashboard";
@@ -41,7 +41,7 @@ function EmailFinder() {
             setLoad(30);
             let res = await axiosInstance.post("/singleEmailFinder", data);
             setLoad(100);
-            setCreditBal(creditBal-10)
+            setCreditBal(creditBal - 10);
             setResult(res.data);
             setData({ fullname: "", domain: "" });
           } else {
@@ -66,26 +66,26 @@ function EmailFinder() {
     return <ServerError />;
   }
   return (
-    <div className=" px-6 md:px-20 py-8">
+    <div className=" px-6 md:px-20 py-8 text-center sm:text-left">
       <SubHeader SubHeader={"Email Finder"} />
-      <div className="mt-14 subHeading">
+      <div className="mt-14 subHeading text-center sm:text-left">
         <h3>Find The Email Address</h3>
-        <p className="my-7 w-4/5 description">
+        <p className="my-7  description">
           Enter a full name and the domain name of the email address below to
           find the email address of any professional with our email finding
           tool.
         </p>
-        <div className="sm:flex xl:w-4/5 justify-between">
+        <div className="sm:flex  xl:w-4/5 justify-center sm:justify-between flex flex-col sm:flex-row">
           <form
-          style={{fontFamily:"Raleway,sans-serif"}}
-            className="flex flex-col w-full sm:w-8/12 md:w-5/12 text-sm"
+            style={{ fontFamily: "Raleway,sans-serif" }}
+            className="flex flex-col justify-center items-center sm:items-start sm:justify-normal w-full sm:w-8/12 md:w-5/12 text-sm"
             onSubmit={HandleSubmit}
           >
             <p>Full Name</p>
             <input
               type="text"
               placeholder="Elon Musk"
-              className=" border border-gray-400 rounded-md py-2 px-4 mr-3"
+              className=" border border-gray-400 rounded-md py-2 px-4 sm:mr-3"
               value={data.fullname}
               onChange={(e) => onInputChange(e, "fullname")}
             />
@@ -93,22 +93,28 @@ function EmailFinder() {
             <input
               type="text"
               placeholder="tesla.com"
-              className=" border border-gray-400 rounded-md py-2 px-4 mr-3"
+              className=" border border-gray-400 rounded-md py-2 px-4 sm:mr-3"
               value={data.domain}
               onChange={(e) => onInputChange(e, "domain")}
             />
             <button
-              className="bg-bgblue text-white py-2 px-2 rounded-md text-sm font-medium w-3/5 lg:w-2/5 mt-8"
+              className="bg-bgblue text-white py-2 px-2 rounded-md text-sm font-medium w-2/5  sm:w-3/5 lg:w-2/5 mt-8"
               type="submit"
             >
               FIND EMAIL
             </button>
           </form>
-          <div className=" flex justify-end w-3/6 text-sm">
-            <p className="bg-gray-100 rounded h-2/5 text-base p-2 mt-6 font-semibold" style={{fontFamily:'Ubuntu, sans-serif'}}>
+          <div className=" flex justify-center sm:justify-end sm:w-3/6 text-sm">
+            <p
+              className="bg-gray-100 rounded h-2/5 text-base p-2 mt-6 font-semibold"
+              style={{ fontFamily: "Ubuntu, sans-serif" }}
+            >
               Note:
               <br />
-              <span className="font-light text-sm" style={{fontFamily:"Raleway,sans-serif"}}>
+              <span
+                className="font-light text-sm"
+                style={{ fontFamily: "Raleway,sans-serif" }}
+              >
                 {" "}
                 Each check will cost you 10 credits!
               </span>
@@ -123,7 +129,7 @@ function EmailFinder() {
           />
         )}
         {result && (
-          <div>
+          <div className="flex flex-col justify-center items-center sm:flex-none sm:justify-start sm:items-start">
             <p className="font-medium text-lg mt-8 mb-4">Result</p>
             {result.email ? (
               <div>

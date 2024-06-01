@@ -352,9 +352,9 @@ function FileEmailFinder() {
         onDismiss={() => SetSelection(false)} // Update selection on dismiss
       />
       )}
-      <div className="mt-8 sm:mt-14 subHeading">
+      <div className="mt-8 sm:mt-14 subHeading flex flex-col sm:flex-none justify-center items-center sm:justify-start sm:items-start">
         <h3>Upload Your File Here | Email Finder</h3>
-        <p className="my-7 w-4/5 description">
+        <p className="my-7  description">
           You can upload the email address list in csv file and get results in
           csv. Download a sample file to upload here Select a file to upload.
         </p>
@@ -390,19 +390,19 @@ function FileEmailFinder() {
             // endMessage={<p className="text-xs">No more data to load.</p>}
           >
             <table
-              className="text-bgblue w-full  mt-14 "
+              className="text-bgblue w-full  mt-14"
               style={{ fontFamily: "Raleway,sans-serif" }}
             >
               <tbody>
-                <tr className="text-left text-xs sm:text-sm">
-                  <th className="font-normal md:w-1/5">File Name</th>
+                <tr className="sm:text-left text-xs sm:text-sm ">
+                  <th className="font-normal md:w-1/5 ">File Name</th>
                   <th className="font-normal  md:w-2/5">Status</th>
                   <th className="font-normal  md:w-1/5">Upload Time</th>
                   <th className=""></th>
                 </tr>
                 {resultFile.map((data, index) => (
-                  <tr key={index} className="text-xs sm:text-sm">
-                    <td>{data.file_upload}</td>
+                  <tr key={index} className="text-xs sm:text-sm ">
+                    <td className="md:pt-5">{data.file_upload}</td>
                     <td className="flex ">
                       <ProgressBar
                         isLabelVisible={false}
@@ -414,7 +414,7 @@ function FileEmailFinder() {
                       />
                       {data.processed}%
                     </td>
-                    <td>{data.formattedDate}</td>
+                    <td className="md:pt-5">{data.formattedDate}</td>
                     <td className="flex justify-center items-center ">
                       <div className="sm:hidden">
                         <IoDownload

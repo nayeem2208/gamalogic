@@ -59,7 +59,7 @@ function QuickValidation() {
   return (
     <div className=" px-6 md:px-20 py-8">
       <SubHeader SubHeader={"Quick Validation"} />
-      <div className="mt-14 text-bgblue subHeading">
+      <div className="mt-14 text-bgblue subHeading text-center sm:text-left">
         <h3>Single Email Validator</h3>
         <p className="my-7 description">
           Type in any email address to have it quickly validated.
@@ -89,8 +89,8 @@ function QuickValidation() {
           />
         )}
         {result && (
-          <div>
-            <p className="font-medium text-lg mt-8 mb-4">Result</p>
+          <div className="flex flex-col justify-center items-center sm:flex-none sm:justify-start sm:items-start">
+          <p className="font-medium text-lg mt-8 mb-4">Result</p>
             <p className="description text-base">
               {result.emailid} is{" "}
               {result.is_valid ? (

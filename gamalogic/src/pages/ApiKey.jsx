@@ -22,15 +22,15 @@ function ApiKey() {
         setApi(res.data.apiKey);
       } catch (error) {
         if (error.response.status === 500) {
-          setServerError(true); 
+          setServerError(true);
         } else {
           toast.error(error.response?.data?.error);
         }
       }
     }
-    document.title='API key | Beta Dashboard'
-    if(userDetails.confirm == 1 ){
-    fetchApikey();
+    document.title = "API key | Beta Dashboard";
+    if (userDetails.confirm == 1) {
+      fetchApikey();
     }
   }, []);
 
@@ -45,22 +45,25 @@ function ApiKey() {
       setApi(resetApiKey.data.newApiKey);
     } catch (error) {
       if (error.response.status === 500) {
-        setServerError(true); 
+        setServerError(true);
       } else {
         toast.error(error.response?.data?.error);
       }
     }
   };
   if (serverError) {
-    return <ServerError />; 
+    return <ServerError />;
   }
   return (
-    <div className=" px-6 md:px-20 py-8">
+    <div className=" px-6 md:px-20 py-8 text-center sm:text-start">
       <SubHeader SubHeader={"API Key"} />
       {userDetails.confirm == 1 ? (
-        <div className="mt-6 sm:mt-14 subHeading"  style={{fontFamily:"Raleway,sans-serif"}}>
+        <div
+          className="mt-6 sm:mt-14 subHeading"
+          style={{ fontFamily: "Raleway,sans-serif" }}
+        >
           <h3>Your API Key</h3>
-          <p className="my-7 w-4/5 description">
+          <p className="my-7  description">
             Your API Key is given below. It is required to use our API. Keep it
             safe and secure. You can view and change it at any time.
           </p>
@@ -79,7 +82,7 @@ function ApiKey() {
                 value={api}
                 cols="30"
                 rows="5"
-                style={{ fontFamily: "Raleway, sans-serif" }}
+                style={{ fontFamily: "Ubuntu, sans-serif" }}
                 className=" border border-gray-400 rounded-md py-2 px-4 mr-3 font-semibold tracking-widest"
               ></textarea>
               <div className="flex pr-2">
@@ -107,10 +110,15 @@ function ApiKey() {
                 color: "rgba(247, 76, 65 , 0.6)",
               }}
             >
-              <p className="font-semibold mb-4 text-xs sm:text-sm" style={{fontFamily:'Ubuntu, sans-serif'}}>Note:</p>
+              <p
+                className="font-semibold mb-4 text-xs sm:text-sm"
+                style={{ fontFamily: "Ubuntu, sans-serif" }}
+              >
+                Note:
+              </p>
               <ol className="font-light text-base">
                 <li className="text-xs sm:text-sm">
-                  <span className="font-semibold" >1.</span >Don’t share the API
+                  <span className="font-semibold">1.</span>Don’t share the API
                   key with anyone
                 </li>
                 <li className="text-xs sm:text-sm">
