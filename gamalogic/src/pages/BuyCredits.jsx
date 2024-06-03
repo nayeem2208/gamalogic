@@ -29,9 +29,42 @@ export default function BuyCredits() {
   const [orderID, setOrderID] = useState(false);
   const [selectedCredits, setSelectedCredits] = useState(2500);
   const [cost, setCost] = useState(10);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
   let [serverError, setServerError] = useState(false);
 
   let { setCreditBal, creditBal,userDetails } = useUserState();
+
+  useEffect(() => {
+    const loadPayPalScript = () => {
+      if (window.paypal) {
+        setIsLoaded(true);
+        setLoading(false);
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = `https://www.paypal.com/sdk/js?client-id=${import.meta.env.VITE_PAYPAL_CLIENT_ID}`;
+      script.onload = () => {
+        setIsLoaded(true);
+        setLoading(false);
+      };
+      script.onerror = () => {
+        toast.error("Failed to load PayPal script");
+        setLoading(false);
+      };
+      document.body.appendChild(script);
+    };
+
+    loadPayPalScript();
+
+    return () => {
+      const paypalScript = document.querySelector(`script[src="https://www.paypal.com/sdk/js?client-id=${import.meta.env.VITE_PAYPAL_CLIENT_ID}"]`);
+      if (paypalScript) {
+        document.body.removeChild(paypalScript);
+      }
+    };
+  }, []);
 
   useEffect(()=>{
     document.title='Buy Credits | Beta Dashboard'
@@ -170,13 +203,13 @@ export default function BuyCredits() {
             </div>
           </div>
           {userDetails.confirm == 1 &&<div className=" flex justify-center mt-6">
-            <div className="w-4/6 sm:w-3/6 md:w-2/6  z-0">
+          {!isLoaded?<div className="w-4/6 sm:w-3/6 md:w-2/6  z-0">
               <PayPalButton
                 createOrder={(data, actions) => createOrder(data, actions)}
                 onApprove={onApprove}
                 onError={onError}
               />
-            </div>
+            </div>:<div className="text-center"><button className="bg-yellow-400 px-24 py-2 font-bold rounded  italic text-blue-900">Pay<span className="text-sky-600">Pal</span></button><p className="font-semibold text-sm">The safer,easier way to pay </p></div>}
           </div>}
         </div>
       )}
