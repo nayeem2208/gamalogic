@@ -404,7 +404,7 @@ let APIControllers = {
   },
   creditFailureEmail: async (req, res) => {
     try {
-      let content = ` <p>We regret to inform you that your payment for ${req.body.cost} was unsuccessful.</p>
+      let content = ` <p>We regret to inform you that your payment for ${req.body.cost}$ was unsuccessful.</p>
       <p>If you have any questions or concerns regarding this issue, please feel free to contact us.</p>`
       sendEmail(
         req.user[0][0].username,

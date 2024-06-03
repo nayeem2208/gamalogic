@@ -60,7 +60,7 @@ export default function BuyCredits() {
 
     return () => {
       const paypalScript = document.querySelector(`script[src="https://www.paypal.com/sdk/js?client-id=${import.meta.env.VITE_PAYPAL_CLIENT_ID}"]`);
-      if (paypalScript) {
+      if (paypalScript && document.body.contains(paypalScript)) {
         document.body.removeChild(paypalScript);
       }
     };
@@ -203,7 +203,7 @@ export default function BuyCredits() {
             </div>
           </div>
           {userDetails.confirm == 1 &&<div className=" flex justify-center mt-6">
-          {!isLoaded?<div className="w-4/6 sm:w-3/6 md:w-2/6  z-0">
+          {isLoaded?<div className="w-4/6 sm:w-3/6 md:w-2/6  z-0">
               <PayPalButton
                 createOrder={(data, actions) => createOrder(data, actions)}
                 onApprove={onApprove}

@@ -339,7 +339,7 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${req.body.email}'`
       );
       if (user[0].length > 0) {
-        if ((user[0][0].session_google == 1&&user[0][0].password==0)||user[0][0].confirmed==0) {
+        if ((user[0][0].session_google == 1&&user[0][0].password==0)|| user[0][0].confirmed==0) {
           res.status(401).json({
             error: `Unauthorised access
           ` });
