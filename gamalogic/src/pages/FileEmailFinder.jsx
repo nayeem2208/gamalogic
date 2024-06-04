@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import SubHeader from "../components/SubHeader";
 import Papa from "papaparse";
 import exportFromJSON from "export-from-json";
-import axiosInstance from "../axios/axiosInstance";
+import axiosInstance, { APP } from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import ProgressBar from "@ramonak/react-progress-bar";
 import Alert from "../components/Alert";
@@ -29,7 +29,11 @@ function FileEmailFinder() {
   let { creditBal, setCreditBal, userDetails } = useUserState();
 
   useEffect(() => {
-    document.title = "Batch Email Finder | Beta Dashboard";
+    if (APP == "beta") {
+      document.title = "Batch Email Verification | Beta Dashboard";
+    } else {
+      document.title = "Batch Email Verification | Dashboard";
+    }
     fetchAllFiles(pageIndex);
   }, []);
 

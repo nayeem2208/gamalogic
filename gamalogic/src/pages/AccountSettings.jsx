@@ -2,7 +2,7 @@ import { FaEye } from "react-icons/fa";
 import SubHeader from "../components/SubHeader";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import axiosInstance from "../axios/axiosInstance";
+import axiosInstance, { APP } from "../axios/axiosInstance";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { useUserState } from "../context/userContext";
 import ServerError from "./ServerError";
@@ -31,8 +31,11 @@ function AccountSettings() {
         old: "PasswordForgoogleUsers",
       }));
     }
-    document.title='Account Settings | Beta Dashboard'
-
+    if (APP == "beta") {
+      document.title = "Account Settings | Beta Dashboard";
+    } else {
+      document.title = "Account Settings | Dashboard";
+    }
   }, []);
 
   const passwordVisibilityHandler = (field) => {

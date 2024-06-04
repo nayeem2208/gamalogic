@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import SubHeader from "../components/SubHeader";
-import axiosInstance from "../axios/axiosInstance";
+import axiosInstance, { APP } from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import LoadingBar from "react-top-loading-bar";
 import ServerError from "./ServerError";
@@ -16,7 +16,11 @@ function EmailFinder() {
   let { userDetails, setCreditBal, creditBal } = useUserState();
 
   useEffect(() => {
-    document.title = "Email Finder | Beta Dashboard";
+    if (APP == "beta") {
+      document.title = "Email Finder | Beta Dashboard";
+    } else {
+      document.title = "Email Finder | Dashboard";
+    }
   }, []);
 
   function onInputChange(event, inputType) {

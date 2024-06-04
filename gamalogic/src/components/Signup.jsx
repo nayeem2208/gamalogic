@@ -1,7 +1,7 @@
 import { GoogleLogin } from "@react-oauth/google";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axiosInstance from "../axios/axiosInstance";
+import axiosInstance, { APP } from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useUserState } from "../context/userContext";
@@ -25,9 +25,13 @@ function Signup() {
   let navigate = useNavigate();
   let { setUserDetails, setCreditBal } = useUserState();
 
-  useEffect(()=>{
-    document.title='Sign-Up | Beta Gamalogic'
-  },[])
+  useEffect(() => {
+    if (APP == "beta") {
+      document.title = "Sign-Up | Beta Gamalogic";
+    } else {
+      document.title = "Sign-Up | Gamalogic";
+    }
+  }, []);
 
 
   const handleInputChange = (e) => {

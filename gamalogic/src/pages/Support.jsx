@@ -2,11 +2,16 @@ import SubHeader from "../components/SubHeader";
 import { IoLogoTwitter, IoMail } from "react-icons/io5";
 import { FaFacebookF, FaLinkedinIn } from "react-icons/fa";
 import { useEffect } from "react";
+import { APP } from "../axios/axiosInstance";
 
 export default function Support() {
-  useEffect(()=>{
-    document.title='Support | Beta Dashboard'
-  },[])
+  useEffect(() => {
+    if (APP == "beta") {
+      document.title = "Support | Beta Dashboard";
+    } else {
+      document.title = "Support | Dashboard";
+    }
+  }, []);
   return (
     <div className="px-6 md:px-20 py-8 text-center sm:text-start">
       <SubHeader SubHeader={"Support"} />

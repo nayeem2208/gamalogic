@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaEye } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import axiosInstance from "../axios/axiosInstance";
+import axiosInstance, { APP } from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import ServerError from "../pages/ServerError";
 
@@ -18,9 +18,13 @@ function ResetPassword() {
   const queryParams = new URLSearchParams(location.search);
   const email = queryParams.get("email");
 
-  useEffect(()=>{
-    document.title='Reset Password | Beta Gamalogic'
-  },[])
+  useEffect(() => {
+    if (APP == "beta") {
+      document.title = "Reset Password | Beta Gamalogic";
+    } else {
+      document.title = "Reset Password | Gamalogic";
+    }
+  }, []);
 
   const handleChange = (e) => {
     let { name, value } = e.target;

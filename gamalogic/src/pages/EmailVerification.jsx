@@ -1,5 +1,5 @@
 import SubHeader from "../components/SubHeader";
-import axiosInstance from "../axios/axiosInstance";
+import axiosInstance, { APP } from "../axios/axiosInstance";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import exportFromJSON from "export-from-json";
@@ -28,7 +28,11 @@ function EmailVerification() {
   let { userDetails, setCreditBal, creditBal } = useUserState();
 
   useEffect(() => {
-    document.title = "Batch Email Verification | Beta Dashboard";
+    if (APP == "beta") {
+      document.title = "Batch Email Verification | Beta Dashboard";
+    } else {
+      document.title = "Batch Email Verification | Dashboard";
+    }
     fetchAllFiles(pageIndex);
   }, []);
 

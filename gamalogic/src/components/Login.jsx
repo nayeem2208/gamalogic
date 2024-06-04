@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
-import axiosInstance from "../axios/axiosInstance";
+import axiosInstance, { APP } from "../axios/axiosInstance";
 import { useUserState } from "../context/userContext";
 import { toast } from "react-toastify";
 import { FaEye } from "react-icons/fa";
@@ -24,9 +24,13 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(()=>{
-    document.title='Sign-In | Beta Gamalogic'
-  },[])
+  useEffect(() => {
+    if (APP == "beta") {
+      document.title = "Sign-In | Beta Gamalogic";
+    } else {
+      document.title = "Sign-In | Gamalogic";
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

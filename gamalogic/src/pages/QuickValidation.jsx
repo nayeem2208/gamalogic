@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import SubHeader from "../components/SubHeader";
-import axiosInstance from "../axios/axiosInstance";
+import axiosInstance, { APP } from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import LoadingBar from "react-top-loading-bar";
 import ServerError from "./ServerError";
@@ -15,7 +15,11 @@ function QuickValidation() {
   let { userDetails, setCreditBal, creditBal } = useUserState();
 
   useEffect(() => {
-    document.title = "Quick Validation | Beta Dashboard";
+    if (APP == "beta") {
+      document.title = "Quick Validation | Beta Dashboard";
+    } else {
+      document.title = "Quick Validation | Dashboard";
+    }
   }, []);
 
   const submitHandler = async (e) => {

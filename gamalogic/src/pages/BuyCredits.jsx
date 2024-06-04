@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import SubHeader from "../components/SubHeader";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useEffect, useRef, useState } from "react";
-import axiosInstance from "../axios/axiosInstance";
+import axiosInstance, { APP } from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import { useUserState } from "../context/userContext";
 import PaymentSuccess from "../components/PaymentSuccess";
@@ -72,9 +72,15 @@ export default function BuyCredits() {
     };
   }, []);
 
-  useEffect(()=>{
-    document.title='Buy Credits | Beta Dashboard'
-  },[])
+  useEffect(() => {
+    if(APP=='beta'){
+    document.title = "Buy Credits | Beta Dashboard";
+    }
+    else{
+      document.title = "Buy Credits | Dashboard";
+
+    }
+  }, []);
 
 
   const creditCostMappings = [

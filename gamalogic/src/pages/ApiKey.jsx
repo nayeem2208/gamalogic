@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import SubHeader from "../components/SubHeader";
-import axiosInstance from "../axios/axiosInstance";
+import axiosInstance, { APP } from "../axios/axiosInstance";
 import LoadingBar from "react-top-loading-bar";
 import { toast } from "react-toastify";
 import { useUserState } from "../context/userContext";
@@ -28,8 +28,12 @@ function ApiKey() {
         }
       }
     }
-    document.title = "API key | Beta Dashboard";
-    if (userDetails.confirm == 1) {
+    if (APP == "beta") {
+      document.title='API key | Beta Dashboard'
+      }
+      else{
+        document.title='API key | Dashboard'
+      }    if (userDetails.confirm == 1) {
       fetchApikey();
     }
   }, []);
