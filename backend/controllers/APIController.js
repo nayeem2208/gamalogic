@@ -376,8 +376,8 @@ let APIControllers = {
   updateCredit: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      let credit = await dbConnection.query(`SELECT credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
-      let newBalance = credit[0][0].credits + req.body.credits
+      let user = await dbConnection.query(`SELECT rowid,credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
+      let newBalance = user[0][0].credits + req.body.credits
       await dbConnection.query(`UPDATE registration SET credits='${newBalance}' WHERE emailid='${req.user[0][0].emailid}'`)
       
       let content = `
@@ -391,6 +391,60 @@ let APIControllers = {
         "Payment successfull",
         basicTemplate(req.user[0][0].username, content)
       );
+        //finding access token from paypal
+        const clientId = process.env.PAYPAL_CLIENTID;
+        const clientSecret = process.env.PAYPAL_CLIENTSECRET;
+  
+        const url = 'https://api-m.sandbox.paypal.com/v1/oauth2/token';
+  
+        const data = new URLSearchParams({
+          grant_type: 'client_credentials',
+        });
+  
+        const headers = {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+        };
+  
+        let payPalToken = await axios.post(url, data, { headers })
+        
+      //finding order details based on that order id and access token
+      const payPaldetails = await axios.get(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${req.body.data.orderID}`, {
+        headers: {
+          'Authorization': `Bearer ${payPalToken.data.access_token}`
+        }
+      });
+      let details = payPaldetails.data;
+      let query = `
+          INSERT INTO gl_paypal (
+              userid, order_id, order_time, email, name, payer_paypal_id, amount,
+              currency, recipient_name, line1, city, country_code, postal_code, state,
+              paypal_fee, net_amount, gross_amount, gross_currency
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      
+      let values = [
+          user[0][0].rowid,
+          req.body.data.orderID,
+          details.create_time,
+          details.payer?.email_address,
+          details.purchase_units[0].shipping?.name.full_name,
+          details.payer?.payer_id,
+          details.purchase_units[0].amount?.value,
+          details.purchase_units[0].amount?.currency_code,
+          details.purchase_units[0].shipping?.name.full_name,
+          details.purchase_units[0].shipping?.address?.address_line_1,
+          details.purchase_units[0].shipping?.address?.admin_area_2,
+          details.purchase_units[0].shipping?.address?.country_code,
+          details.purchase_units[0].shipping?.address?.postal_code,
+          details.purchase_units[0].shipping?.address?.admin_area_1,
+          details.purchase_units[0].payments?.captures[0].seller_receivable_breakdown.paypal_fee?.value,
+          details.purchase_units[0].payments?.captures[0].seller_receivable_breakdown.net_amount?.value,
+          details.purchase_units[0].payments?.captures[0].seller_receivable_breakdown.gross_amount?.value,
+          details.purchase_units[0].payments?.captures[0].seller_receivable_breakdown.gross_amount?.currency_code
+      ];
+      
+      await dbConnection.query(query, values);
       res.status(200).json('Successfull')
     } catch (error) {
       console.log(error);

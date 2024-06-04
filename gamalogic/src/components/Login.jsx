@@ -26,9 +26,9 @@ function Login() {
 
   useEffect(() => {
     if (APP == "beta") {
-      document.title = "Sign-In | Beta Gamalogic";
+      document.title = "Real time Catch all email validation | Beta Gamalogic";
     } else {
-      document.title = "Sign-In | Gamalogic";
+      document.title = "Real time Catch all email validation | Gamalogic";
     }
   }, []);
 
