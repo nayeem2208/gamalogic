@@ -379,8 +379,9 @@ let APIControllers = {
       let credit = await dbConnection.query(`SELECT credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
       let newBalance = credit[0][0].credits + req.body.credits
       await dbConnection.query(`UPDATE registration SET credits='${newBalance}' WHERE emailid='${req.user[0][0].emailid}'`)
+      
       let content = `
-      <p>Your payment for ${req.body.cost} $ has been successfully processed.</p>
+      <p>Your payment for $ ${Number(req.body.cost).toLocaleString()} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.</p>
       
       <p>If you have any questions or concerns regarding this payment, please feel free to contact us.</p>
       `
@@ -404,7 +405,7 @@ let APIControllers = {
   },
   creditFailureEmail: async (req, res) => {
     try {
-      let content = ` <p>We regret to inform you that your payment for ${req.body.cost} $ was unsuccessful.</p>
+      let content = ` <p>We regret to inform you that your payment for $ ${Number(req.body.cost).toLocaleString()} for ${Number(req.body.credits).toLocaleString()} credits was unsuccessful.</p>
       <p>If you have any questions or concerns regarding this issue, please feel free to contact us.</p>`
       sendEmail(
         req.user[0][0].username,

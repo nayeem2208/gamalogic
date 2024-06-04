@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import SubHeader from "../components/SubHeader";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import { useUserState } from "../context/userContext";
@@ -34,7 +34,13 @@ export default function BuyCredits() {
   let [serverError, setServerError] = useState(false);
 
   let { setCreditBal, creditBal,userDetails } = useUserState();
+  const costRef = useRef(cost);
+  const creditsRef = useRef(selectedCredits);
 
+  useEffect(() => {
+    costRef.current = cost;
+    creditsRef.current = selectedCredits;
+  }, [cost, selectedCredits]);
   useEffect(() => {
     const loadPayPalScript = () => {
       if (window.paypal) {
@@ -104,7 +110,7 @@ export default function BuyCredits() {
             description: "Gamalogic Credits",
             amount: {
               currency_code: "USD",
-              value: cost,
+              value: costRef.current,
             },
           },
         ],
@@ -116,20 +122,17 @@ export default function BuyCredits() {
   };
 
   const onApprove = (data, actions) => {
-    return actions.order.capture().then(function () {
+    return actions.order.capture().then(async function () {
       try {
-        const updateCreditFunction = async () => {
-          await axiosInstance.post("/updateCredit", {
-            credits: selectedCredits,
-            cost
-          });
-        };
-        updateCreditFunction();
+        await axiosInstance.post("/updateCredit", {
+          credits: creditsRef.current,
+          cost: costRef.current,
+        });
         setSuccess(true);
-        setCreditBal(creditBal + selectedCredits);
+        setCreditBal(creditBal + creditsRef.current);
       } catch (error) {
-        if (error.response.status === 500) {
-          setServerError(true); 
+        if (error.response && error.response.status === 500) {
+          setServerError(true);
         } else {
           toast.error(error.response?.data?.error);
         }

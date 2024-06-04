@@ -14,7 +14,7 @@ function PaymentSuccess({ data }) {
         <div className="text-center flex flex-col justify-center my-6">
         <h3 className="text-5xl">Payment Success!</h3>
         <p className="my-2">
-          Your payment of ${data.cost} for {data.selectedCredits} credits was
+          Your payment of ${data.cost.toLocaleString("en-US")} for {data.selectedCredits.toLocaleString("en-US")} credits was
           successfull.
         </p>
         <p>You can now continue using our services.</p>
