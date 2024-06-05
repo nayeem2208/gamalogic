@@ -14,9 +14,17 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 
+
+morgan.token('ip', req => {
+  return req.headers['cf-connecting-ip'] || 
+         req.headers['x-real-ip'] || 
+         req.headers['x-forwarded-for'] || 
+         req.socket.remoteAddress || '';
+});
+morgan.token('date', () => new Date().toISOString());
 app.use(express.json({ limit: '500mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan("dev"));
+app.use(morgan(":date[iso] :method :url :status :res[content-length] - :response-time ms  :ip"));
 app.use(cookieParser());
 
 

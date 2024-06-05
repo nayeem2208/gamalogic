@@ -11,7 +11,7 @@ import { PiCurrencyDollarSimpleBold } from "react-icons/pi";
 import { SlSupport } from "react-icons/sl";
 import { MdArrowDropDown, MdOutlineFindInPage } from "react-icons/md";
 import { RiProfileLine } from "react-icons/ri";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUserState } from "../context/userContext";
 import { startTransition } from 'react';
