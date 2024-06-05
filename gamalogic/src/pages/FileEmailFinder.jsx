@@ -47,21 +47,21 @@ function FileEmailFinder() {
       if (allFiles.data.length === 0) {
         setHasMore(false);
       } else {
-        const options = {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
+        const formatDate = (dateTimeString) => {
+          const date = new Date(dateTimeString);
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+          const day = String(date.getDate()).padStart(2, "0");
+          const hours = String(date.getHours()).padStart(2, "0");
+          const minutes = String(date.getMinutes()).padStart(2, "0");
+          const seconds = String(date.getSeconds()).padStart(2, "0");
+
+          return `${month}/${day}/${year}, ${hours}:${minutes}`;
         };
         const filesWithProcessedField = allFiles.data.map((file) => ({
           ...file,
           processed: 0,
-          formattedDate: new Date(file.date_time).toLocaleString(
-            "en-US",
-            options
-          ),
+          formattedDate: formatDate(file.date_time),
         }));
         const allProcessed = filesWithProcessedField.every(
           (file) => file.processed === 100
@@ -153,7 +153,7 @@ function FileEmailFinder() {
         console.log(JsonToServer, "json to server");
         if (creditBal >= JsonToServer.data.length * 10) {
           setShowAlert(false);
-          SetSelection(null)
+          SetSelection(null);
           setLoading(true);
           setLoad(30);
           let results = JsonToServer;
@@ -166,21 +166,22 @@ function FileEmailFinder() {
               setLoad(100);
               setCreditBal(creditBal - results.data.length * 10);
               toast.success(response.data.message);
-              const options = {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
+              const formatDate = (dateTimeString) => {
+                const date = new Date(dateTimeString);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const seconds = String(date.getSeconds()).padStart(2, '0');
+              
+                return `${month}/${day}/${year}, ${hours}:${minutes}`;
               };
               setResultFile((prevResultFiles) => [
                 {
                   ...response.data.files,
                   processed: 0,
-                  formattedDate: new Date(
-                    response.data.files.date_time
-                  ).toLocaleString("en-US", options),
+                  formattedDate: formatDate(response.data.files.date_time)
                 },
                 ...prevResultFiles,
               ]);
@@ -188,9 +189,7 @@ function FileEmailFinder() {
                 {
                   ...response.data.files,
                   processed: 0,
-                  formattedDate: new Date(
-                    response.data.files.date_time
-                  ).toLocaleString("en-US", options),
+                  formattedDate: formatDate(response.data.files.date_time)
                 },
                 ...prevResultFiles,
               ]);
@@ -245,12 +244,11 @@ function FileEmailFinder() {
                 (res.data.emailStatus.processed / res.data.emailStatus.total) *
                   100
               );
-              let adjustedProgress
-              if(res.data.emailStatus.total>100){
-                 adjustedProgress=progress
-              }
-              else{
-                 adjustedProgress = Math.floor(progress / 5) * 5;
+              let adjustedProgress;
+              if (res.data.emailStatus.total > 100) {
+                adjustedProgress = progress;
+              } else {
+                adjustedProgress = Math.floor(progress / 5) * 5;
               }
               // const adjustedProgress = Math.floor(progress / 5) * 5;
               if (file.processed !== adjustedProgress) {
@@ -332,7 +330,7 @@ function FileEmailFinder() {
 
   const handleAccept = (value) => {
     SetSelection(value);
-    showAlert(false)
+    showAlert(false);
   };
 
   const handleDismiss = (value) => {
@@ -349,12 +347,12 @@ function FileEmailFinder() {
       <SubHeader SubHeader={"Upload your file"} />
       {showAlert && (
         <Alert
-        sizeOfData={JsonToServer}
-        selection={Selection} // Pass down selection state
-        setSelection={SetSelection} // Pass down function to update selection
-        onAccept={() => SetSelection(true)} // Update selection on accept
-        onDismiss={() => SetSelection(false)} // Update selection on dismiss
-      />
+          sizeOfData={JsonToServer}
+          selection={Selection} // Pass down selection state
+          setSelection={SetSelection} // Pass down function to update selection
+          onAccept={() => SetSelection(true)} // Update selection on accept
+          onDismiss={() => SetSelection(false)} // Update selection on dismiss
+        />
       )}
       <div className="mt-8 sm:mt-14 subHeading flex flex-col sm:flex-none justify-center items-center sm:justify-start sm:items-start">
         <h3>Upload Your File Here | Email Finder</h3>
@@ -383,14 +381,20 @@ function FileEmailFinder() {
             next={fetchMoreFiles}
             hasMore={hasMore}
             height={300}
-            loader={resultFile.length>=4&&(<div className="w-full mt-4  flex justify-center items-center"><div
-            className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-            role="status"
-          >
-            <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-              Loading...
-            </span>
-          </div></div>)}
+            loader={
+              resultFile.length >= 4 && (
+                <div className="w-full mt-4  flex justify-center items-center">
+                  <div
+                    className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                    role="status"
+                  >
+                    <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                      Loading...
+                    </span>
+                  </div>
+                </div>
+              )
+            }
             // endMessage={<p className="text-xs">No more data to load.</p>}
           >
             <table

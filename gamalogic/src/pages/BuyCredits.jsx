@@ -133,6 +133,7 @@ export default function BuyCredits() {
         await axiosInstance.post("/updateCredit", {
           credits: creditsRef.current,
           cost: costRef.current,
+          data
         });
         setSuccess(true);
         setCreditBal(creditBal + creditsRef.current);

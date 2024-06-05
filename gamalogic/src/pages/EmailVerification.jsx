@@ -46,21 +46,21 @@ function EmailVerification() {
       if (allFiles.data.length === 0) {
         setHasMore(false);
       } else {
-        const options = {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
+        const formatDate = (dateTimeString) => {
+          const date = new Date(dateTimeString);
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+          const day = String(date.getDate()).padStart(2, '0');
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          const seconds = String(date.getSeconds()).padStart(2, '0');
+        
+          return `${month}/${day}/${year}, ${hours}:${minutes}`;
         };
         const filesWithProcessedField = allFiles.data.map((file) => ({
           ...file,
           processed: 0,
-          formattedDate: new Date(file.date_time).toLocaleString(
-            "en-US",
-            options
-          ),
+          formattedDate: formatDate(file.date_time),
         }));
 
         setResultFile((prevResultFiles) => [
@@ -265,21 +265,22 @@ function EmailVerification() {
         setCreditBal(creditBal - JsonToServer.emails.length);
         setMessage(response.data.message);
         toast.success(response.data.message);
-        const options = {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
+        const formatDate = (dateTimeString) => {
+          const date = new Date(dateTimeString);
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+          const day = String(date.getDate()).padStart(2, '0');
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          const seconds = String(date.getSeconds()).padStart(2, '0');
+        
+          return `${month}/${day}/${year}, ${hours}:${minutes}`;
         };
         setResultFile((prevResultFiles) => [
           {
             ...response.data.files,
             processed: 0,
-            formattedDate: new Date(
-              response.data.files.date_time
-            ).toLocaleString("en-US", options),
+            formattedDate:formatDate(response.data.files.date_time)
           },
           ...prevResultFiles,
         ]);
@@ -287,9 +288,7 @@ function EmailVerification() {
           {
             ...response.data.files,
             processed: 0,
-            formattedDate: new Date(
-              response.data.files.date_time
-            ).toLocaleString("en-US", options),
+            formattedDate: formatDate(response.data.files.date_time)
           },
           ...prevResultFiles,
         ]);

@@ -12,7 +12,7 @@ import { SlSupport } from "react-icons/sl";
 import { MdArrowDropDown, MdOutlineFindInPage } from "react-icons/md";
 import { RiProfileLine } from "react-icons/ri";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUserState } from "../context/userContext";
 import { startTransition } from 'react';
 
@@ -21,6 +21,15 @@ function SideBar() {
   let [tutorialDropDown, setTutorialDropDown] = useState(false);
   let {setUserDetails,userDetails}=useUserState()
   let navigate = useNavigate();
+
+  const location=useLocation()
+  // console.log(location,'locationnnnn')
+
+  useEffect(()=>{
+    if(location.pathname=="/dashboard/file-upload"||"/dashboard/file-upload-finder"){
+      setUploadFileDropDown(true)
+    }
+  })
 
   const uploadfileDropDownToggle = () => {
     setUploadFileDropDown(!uploadfileDropDown);
