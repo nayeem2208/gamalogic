@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import LoadingBar from "react-top-loading-bar";
 import ServerError from "./ServerError";
 import { useUserState } from "../context/userContext";
+import VideoModal from "../components/VideoModal";
 
 function QuickValidation() {
   let [email, setEmail] = useState("");
@@ -12,7 +13,13 @@ function QuickValidation() {
   let [loading, setLoading] = useState(false);
   let [load, setLoad] = useState(30);
   let [serverError, setServerError] = useState(false);
-  let { userDetails, setCreditBal, creditBal } = useUserState();
+  let {
+    userDetails,
+    setCreditBal,
+    creditBal,
+    tutorialVideo,
+    setTutorialVideo,
+  } = useUserState();
 
   useEffect(() => {
     if (APP == "beta") {
@@ -34,15 +41,14 @@ function QuickValidation() {
             let res = await axiosInstance.post("/singleEmailValidator", {
               email,
             });
-            setCreditBal(creditBal-1)
+            setCreditBal(creditBal - 1);
             setLoad(100);
             setResult(res.data);
             setEmail("");
           } else {
             toast.error("Please provide a valid email address.");
           }
-        }
-        else{
+        } else {
           toast.error("You dont have enough credits to do this");
         }
       } else {
@@ -56,19 +62,37 @@ function QuickValidation() {
       }
     }
   };
+  const handleCloseVideoModal = () => {
+    setTutorialVideo(false);
+  };
+  const selectVideoId = () => {
+    let ids = ["9CnyAJZiQ38", "_ualvh37g9Y"];
+    const index = Math.floor(Math.random() * ids.length);
+    return ids[index];
+  };
   console.log(result, "res");
   if (serverError) {
     return <ServerError />;
   }
   return (
     <div className=" px-6 md:px-20 py-8">
+      {tutorialVideo && (
+        <VideoModal
+          videoId={selectVideoId()}
+          isOpen={tutorialVideo}
+          onClose={handleCloseVideoModal}
+        />
+      )}
       <SubHeader SubHeader={"Quick Validation"} />
       <div className="mt-14 text-bgblue subHeading text-center sm:text-left">
         <h3>Single Email Validator</h3>
         <p className="my-7 description">
           Type in any email address to have it quickly validated.
         </p>
-        <form onSubmit={submitHandler} style={{fontFamily:"Raleway,sans-serif"}}>
+        <form
+          onSubmit={submitHandler}
+          style={{ fontFamily: "Raleway,sans-serif" }}
+        >
           <div className="">
             <input
               type="email"
@@ -94,7 +118,7 @@ function QuickValidation() {
         )}
         {result && (
           <div className="flex flex-col justify-center items-center sm:flex-none sm:justify-start sm:items-start">
-          <p className="font-medium text-lg mt-8 mb-4">Result</p>
+            <p className="font-medium text-lg mt-8 mb-4">Result</p>
             <p className="description text-base">
               {result.emailid} is{" "}
               {result.is_valid ? (

@@ -23,7 +23,7 @@ function Signup() {
   let [loading, setLoading] = useState(false);
   let [serverError, setServerError] = useState(false);
   let navigate = useNavigate();
-  let { setUserDetails, setCreditBal } = useUserState();
+  let { setUserDetails, setCreditBal,setTutorialVideo } = useUserState();
 
   useEffect(() => {
     if (APP == "beta") {
@@ -120,6 +120,7 @@ function Signup() {
       setUserDetails(token);
       setCreditBal(token.credit);
       localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+      setTutorialVideo(true)
       navigate("/dashboard/quick-validation");
     } catch (err) {
       console.log(err);

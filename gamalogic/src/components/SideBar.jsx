@@ -25,11 +25,11 @@ function SideBar() {
   const location=useLocation()
   // console.log(location,'locationnnnn')
 
-  useEffect(()=>{
-    if(location.pathname=="/dashboard/file-upload"||"/dashboard/file-upload-finder"){
-      setUploadFileDropDown(true)
+  useEffect(() => {
+    if (location.pathname === "/dashboard/file-upload" || location.pathname === "/dashboard/file-upload-finder") {
+      setUploadFileDropDown(true);
     }
-  })
+  }, [location.pathname]);
 
   const uploadfileDropDownToggle = () => {
     setUploadFileDropDown(!uploadfileDropDown);

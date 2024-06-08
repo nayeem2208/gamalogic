@@ -6,6 +6,8 @@ const userDetailsContext = createContext();
 const UserDetailsProvider = ({ children }) => {
   let [userDetails, setUserDetails] = useState(null);
   let [creditBal,setCreditBal]=useState(0)
+  let [tutorialVideo,setTutorialVideo]=useState(false)
+
 
   return (
     <userDetailsContext.Provider
@@ -13,7 +15,9 @@ const UserDetailsProvider = ({ children }) => {
         userDetails,
         setUserDetails,
         creditBal,
-        setCreditBal
+        setCreditBal,
+        tutorialVideo,
+        setTutorialVideo
       }}
     >
       {children}

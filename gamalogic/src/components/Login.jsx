@@ -9,7 +9,7 @@ import ServerError from "../pages/ServerError";
 
 function Login() {
   let [data, setData] = useState({ email: "", password: "" });
-  let { setUserDetails, setCreditBal } = useUserState();
+  let { setUserDetails, setCreditBal,setTutorialVideo } = useUserState();
   let [passwordVisible, setPasswordVisible] = useState(false);
   let [loading, setLoading] = useState(false);
   let [serverError, setServerError] = useState(false);
@@ -45,6 +45,7 @@ function Login() {
         setUserDetails(token);
         setCreditBal(token.credit);
         localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+        setTutorialVideo(true)
         navigate("/dashboard/quick-validation");
       }
     } catch (error) {
@@ -80,6 +81,7 @@ function Login() {
       setUserDetails(token);
       setCreditBal(token.credit);
       localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+      setTutorialVideo(true)
       navigate("/dashboard/quick-validation");
     } catch (err) {
       if (err.response.status === 500) {

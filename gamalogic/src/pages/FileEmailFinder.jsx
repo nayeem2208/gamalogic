@@ -48,15 +48,22 @@ function FileEmailFinder() {
         setHasMore(false);
       } else {
         const formatDate = (dateTimeString) => {
-          const date = new Date(dateTimeString);
-          const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
-          const day = String(date.getDate()).padStart(2, "0");
-          const hours = String(date.getHours()).padStart(2, "0");
-          const minutes = String(date.getMinutes()).padStart(2, "0");
-          const seconds = String(date.getSeconds()).padStart(2, "0");
-
-          return `${month}/${day}/${year}, ${hours}:${minutes}`;
+          console.log(dateTimeString, typeof(dateTimeString), 'hiiiii');
+        
+          // Split the string into date and time components
+          const [dateString, timeString] = dateTimeString.split('T');
+          console.log(dateString,timeString,'date and time ')
+          // Split the date string further
+          const [year, month, day] = dateString.split('-');
+        
+          // Split the time string further
+          const [hours, minutes, seconds] = timeString.split(':');
+        
+          // Format the month with leading zero (optional)
+          const formattedMonth = String(parseInt(month) - 1).padStart(2, '0'); // Months are zero-indexed
+        
+          // Format the date and time in the desired format
+          return `${formattedMonth}/${day}/${year}, ${hours}:${minutes}`;
         };
         const filesWithProcessedField = allFiles.data.map((file) => ({
           ...file,
@@ -167,15 +174,22 @@ function FileEmailFinder() {
               setCreditBal(creditBal - results.data.length * 10);
               toast.success(response.data.message);
               const formatDate = (dateTimeString) => {
-                const date = new Date(dateTimeString);
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-                const day = String(date.getDate()).padStart(2, '0');
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                const seconds = String(date.getSeconds()).padStart(2, '0');
+                console.log(dateTimeString, typeof(dateTimeString), 'hiiiii');
               
-                return `${month}/${day}/${year}, ${hours}:${minutes}`;
+                // Split the string into date and time components
+                const [dateString, timeString] = dateTimeString.split('T');
+                console.log(dateString,timeString,'date and time ')
+                // Split the date string further
+                const [year, month, day] = dateString.split('-');
+              
+                // Split the time string further
+                const [hours, minutes, seconds] = timeString.split(':');
+              
+                // Format the month with leading zero (optional)
+                const formattedMonth = String(parseInt(month) - 1).padStart(2, '0'); // Months are zero-indexed
+              
+                // Format the date and time in the desired format
+                return `${formattedMonth}/${day}/${year}, ${hours}:${minutes}`;
               };
               setResultFile((prevResultFiles) => [
                 {
