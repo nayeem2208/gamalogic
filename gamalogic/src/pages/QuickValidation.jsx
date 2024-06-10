@@ -67,21 +67,32 @@ function QuickValidation() {
   };
   const selectVideoId = () => {
     let ids = ["9CnyAJZiQ38", "_ualvh37g9Y"];
+    let urls = [
+      "https://blog.gamalogic.com/email-validation-google-sheets-add-on/",
+      "https://blog.gamalogic.com/find-email-address-using-name-and-company-on-google-sheets-add-on/",
+    ];
+    let texts = [
+      "Learn how to integrate the Gamalogic email validation add-on with Google Sheets",
+      "Learn more to integrate Gamalogic to find email address list on Google sheets",
+    ];
     const index = Math.floor(Math.random() * ids.length);
-    return ids[index];
+    return { id: ids[index], url: urls[index], texts: texts[index] };
   };
-  console.log(result, "res");
+  const { id, url,texts } = selectVideoId();
+
   if (serverError) {
     return <ServerError />;
   }
   return (
     <div className=" px-6 md:px-20 py-8">
       {tutorialVideo && (
-        <VideoModal
-          videoId={selectVideoId()}
-          isOpen={tutorialVideo}
-          onClose={handleCloseVideoModal}
-        />
+       <VideoModal
+       videoId={id}
+       url={url}
+       texts={texts}
+       isOpen={tutorialVideo}
+       onClose={handleCloseVideoModal}
+     />
       )}
       <SubHeader SubHeader={"Quick Validation"} />
       <div className="mt-14 text-bgblue subHeading text-center sm:text-left">

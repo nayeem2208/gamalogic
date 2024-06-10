@@ -7,7 +7,7 @@ const disposible_list=["temp-mail.org","tempmailbox.net","tempmail.net","tempail
 "another-temp-mail.com","linshi-email.com","uranomail.es","emailtemp.org","tempmailid.com","tempr.email","tempmail.email","hour.email","receivemail.org","tmail.gg",
 "deref-mail.com","emailgenerator.org","emailley.com","temp-mail.org","dropmail.me","minuteinbox.com","zemail.me","emailnator.com","spoofbox.com","muellmail.com",
 "temp-mailbox.com","hotmailbox.tk","tempo-mail.com","signupaddress.com","webmail.sbb.rs","instaddr.fun","looksecure.net","megaradical.com","tm-mail.com","ucm8.com","pimmel.top",
-"privacylock.net","email1.io","another-temp-mail.co","britishpreschool.net","linux0.net","internxt.com"]
+"privacylock.net","email1.io","another-temp-mail.co","britishpreschool.net","linux0.net","internxt.com","temp-mail.id","temp-mail.org","www.agogmail.com","agogmail.com"]
 
 
 function isDisposableURL(url) {

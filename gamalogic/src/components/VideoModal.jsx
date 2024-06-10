@@ -3,7 +3,7 @@ import ReactModal from "react-modal";
 import YouTube from "react-youtube";
 import { IoClose } from "react-icons/io5";
 
-const VideoModal = ({ videoId, isOpen, onClose }) => {
+const VideoModal = ({ videoId,url,texts, isOpen, onClose }) => {
   const [modalIsOpen, setModalIsOpen] = useState(isOpen);
   const playerRef = useRef(null);
   console.log(videoId, "video idddddddddddddddddddd");
@@ -21,11 +21,11 @@ const VideoModal = ({ videoId, isOpen, onClose }) => {
       transform: "translate(-50%, -50%)",
       backgroundColor: "#e2e8f0",
       border: "none",
-      borderRadius:0,
+      borderRadius:15,
       padding: 6,
       //   width: "60%",
-      height: "65vh",
-      width: "80%", // Set a base width for responsiveness
+      height: "63vh",
+      width: "90%", // Set a base width for responsiveness
       maxWidth: "650px",
       maxHeight: "calc(100vh - 100px)",
     },
@@ -46,20 +46,26 @@ const VideoModal = ({ videoId, isOpen, onClose }) => {
             <IoClose className="h-6 w-6 hover:text-red-500" />
           </button>
         </div>
-        <YouTube
-          videoId={videoId}
-          opts={{ width: "100%", height: "340vw", playerVars: { autoplay: 1,controls:0 } }}
-        />
+        
+        <div className="youtube-container mx-3">
+          <YouTube
+            videoId={videoId}
+            opts={{
+              width: "100%",
+              height: "340vw",
+              playerVars: { autoplay: 1, controls: 0 },
+            }}
+          />
+        </div>
         <div className="text-center">
           <p className="text-xs md:text-sm my-2 ">
-            is simply dummy text of the printing and typesetting industry. Lorem
-            Ipsum has been the industry's standard dummy text ever since the
-            1500s, when an unknown printer took a galley of type and scrambled
-            it to make a type specimen book.{" "}
+            {texts}
           </p>
-          <button className="bg-bgblue  text-white py-1 px-4 rounded-md ml-2  w-3/6 h-9 text-sm font-medium">
-            Click here
-          </button>
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            <button className="bg-bgblue hover:bg-teal-600 text-white py-1 px-4 rounded-md ml-2 w-3/6 h-9 text-sm font-medium transition-colors duration-300">
+              Learn more
+            </button>
+          </a>
         </div>
       </div>
     </ReactModal>

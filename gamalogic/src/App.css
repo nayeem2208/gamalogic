@@ -257,6 +257,11 @@ input[type="range"].custom-range {
     background: #ddd; /* Change color when focused */
   }
 
+  .youtube-container {
+    border-radius: 8px; /* Adjust radius as needed */
+    overflow: hidden; /* Prevent overflowing content */
+  }
+
 
 
 
