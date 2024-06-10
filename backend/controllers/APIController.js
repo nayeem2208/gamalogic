@@ -424,25 +424,26 @@ let APIControllers = {
       `;
       
       let values = [
-          user[0][0].rowid,
-          req.body.data.orderID,
-          details.create_time,
-          details.payer?.email_address,
-          details.purchase_units[0].shipping?.name.full_name,
-          details.payer?.payer_id,
-          details.purchase_units[0].amount?.value,
-          details.purchase_units[0].amount?.currency_code,
-          details.purchase_units[0].shipping?.name.full_name,
-          details.purchase_units[0].shipping?.address?.address_line_1,
-          details.purchase_units[0].shipping?.address?.admin_area_2,
-          details.purchase_units[0].shipping?.address?.country_code,
-          details.purchase_units[0].shipping?.address?.postal_code,
-          details.purchase_units[0].shipping?.address?.admin_area_1,
-          details.purchase_units[0].payments?.captures[0].seller_receivable_breakdown.paypal_fee?.value,
-          details.purchase_units[0].payments?.captures[0].seller_receivable_breakdown.net_amount?.value,
-          details.purchase_units[0].payments?.captures[0].seller_receivable_breakdown.gross_amount?.value,
-          details.purchase_units[0].payments?.captures[0].seller_receivable_breakdown.gross_amount?.currency_code
-      ];
+        user[0][0]?.rowid ?? null, 
+        req.body?.data?.orderID ?? null, 
+        details?.create_time ?? null, 
+        details?.payer?.email_address ?? null, 
+        details?.purchase_units?.[0]?.shipping?.name?.full_name ?? null, 
+        details?.payer?.payer_id ?? null, 
+        details?.purchase_units?.[0]?.amount?.value ?? null, 
+        details?.purchase_units?.[0]?.amount?.currency_code ?? null, 
+        details?.purchase_units?.[0]?.shipping?.name?.full_name ?? null, 
+        details?.purchase_units?.[0]?.shipping?.address?.address_line_1 ?? null, 
+        details?.purchase_units?.[0]?.shipping?.address?.admin_area_2 ?? null, 
+        details?.purchase_units?.[0]?.shipping?.address?.country_code ?? null,
+        details?.purchase_units?.[0]?.shipping?.address?.postal_code ?? null, 
+        details?.purchase_units?.[0]?.shipping?.address?.admin_area_1 ?? null,
+        details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.paypal_fee?.value ?? null, 
+        details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.net_amount?.value ?? null, 
+        details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.gross_amount?.value ?? null, 
+        details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.gross_amount?.currency_code ?? null 
+    ];
+    
       
       await dbConnection.query(query, values);
       res.status(200).json('Successfull')
