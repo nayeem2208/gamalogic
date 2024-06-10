@@ -56,13 +56,21 @@ const Authentication = {
             creditBal = user[0][0].credits;
           }
           let password = user[0][0].password !== 0;
+          let ip = req.headers['cf-connecting-ip'] ||
+            req.headers['x-real-ip'] ||
+            req.headers['x-forwarded-for'] ||
+            req.socket.remoteAddress || '';
+
+          const response = await axios.get(`https://ipapi.co/${ip}/json/`);
+          const { country_name } = response.data;
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
             credit: creditBal,
             token,
             confirm: user[0][0].confirmed,
-            password
+            password,
+            country_name
           });
 
         } else {
@@ -158,13 +166,20 @@ const Authentication = {
         }
 
         let password = user[0][0].password != 0;
+        let ip = req.headers['cf-connecting-ip'] ||
+          req.headers['x-real-ip'] ||
+          req.headers['x-forwarded-for'] ||
+          req.socket.remoteAddress || '';
+        const response = await axios.get(`https://ipapi.co/${ip}/json/`);
+        const { country_name } = response.data;
         res.status(200).json({
           name: user[0][0].username,
           email: user[0][0].emailid,
           credit: creditBal,
           token,
           confirm: 1,
-          password
+          password,
+          country_name
         });
       } else {
         res.status(400).json({
@@ -237,13 +252,16 @@ const Authentication = {
             basicTemplate(user[0][0].username, content)
           );
           let password = false
+          const response = await axios.get(`https://ipapi.co/${ip}/json/`);
+          const { country_name } = response.data;
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
             credit: 500,
             token,
             confirm: 1,
-            password
+            password,
+            country_name
           });
         } else {
           res
@@ -339,7 +357,7 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${req.body.email}'`
       );
       if (user[0].length > 0) {
-        if ((user[0][0].session_google == 1&&user[0][0].password==0)|| user[0][0].confirmed==0) {
+        if ((user[0][0].session_google == 1 && user[0][0].password == 0) || user[0][0].confirmed == 0) {
           res.status(401).json({
             error: `Unauthorised access
           ` });
