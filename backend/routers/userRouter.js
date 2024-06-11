@@ -36,8 +36,10 @@ router.get('/downloadEmailFinderFile',dbMiddleware,authcheck,APIControllers.down
 router.get('/getApiKey',dbMiddleware,authcheck,APIControllers.getApi)
 router.get('/resetApiKey',dbMiddleware,authcheck,APIControllers.resetApiKey)
 router.post('/changePassword',dbMiddleware,authcheck,APIControllers.changePassword)
-router.post('/updateCredit',dbMiddleware,authcheck,APIControllers.updateCredit)
-router.post('/paymentFailedEmail',dbMiddleware,authcheck,APIControllers.creditFailureEmail)
+router.post('/updateCredit',dbMiddleware,authcheck,APIControllers.PayPalUpdateCredit)
+router.post('/paymentFailedEmail',dbMiddleware,authcheck,APIControllers.PayPalCreditFailureEmail)
+router.post('/Razorpay',dbMiddleware,authcheck,APIControllers.RazorpayPayment)
+router.post('/RazorPayPaymentSuccess',dbMiddleware,authcheck,APIControllers.razorPayPaymentSuccess)
 
 
 export default router;

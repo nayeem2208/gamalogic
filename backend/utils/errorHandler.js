@@ -3,6 +3,7 @@ import clickUp from "./ClickUp.js";
 const ErrorHandler = async (controller, error, req) => {
     const errorName = controller;
     const filename = controller;
+    let err = error;
     const lineNumber =
       error.lineNumber ||
       (error.stack &&
@@ -10,7 +11,7 @@ const ErrorHandler = async (controller, error, req) => {
         error.stack.split("\n")[1].trim().split(":")[1]) ||
       "UnknownLine";
     const url = req.route.path;
-    let err = error;
+    const user=req.user[0][0].rowid
     let errorMessage;
     if(controller=='Login Controller'){
        errorMessage = `
@@ -37,7 +38,7 @@ const ErrorHandler = async (controller, error, req) => {
        errorMessage = `
       Error occurred in file ${controller},
       line ${lineNumber},
-      userId:0
+      userId:${user},
       URL: '${url}'. 
       Error message: ${err}`;
     }

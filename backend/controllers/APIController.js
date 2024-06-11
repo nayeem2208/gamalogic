@@ -6,6 +6,8 @@ import { passwordHash, verifyPassword } from "../utils/passwordHash.js";
 import sendEmail from "../utils/zeptoMail.js";
 import basicTemplate from "../EmailTemplates/BasicTemplate.js";
 import urls from "../ConstFiles/urls.js";
+import Razorpay from "razorpay";
+
 
 let APIControllers = {
   getCreditBalance: async (req, res) => {
@@ -373,7 +375,7 @@ let APIControllers = {
 
   },
 
-  updateCredit: async (req, res) => {
+  PayPalUpdateCredit: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
       let user = await dbConnection.query(`SELECT rowid,credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
@@ -449,7 +451,7 @@ let APIControllers = {
       res.status(200).json('Successfull')
     } catch (error) {
       console.log(error);
-      ErrorHandler("updateCredit Controller", error, req);
+      ErrorHandler("PayPalUpdateCredit Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
@@ -458,7 +460,7 @@ let APIControllers = {
     }
 
   },
-  creditFailureEmail: async (req, res) => {
+  PayPalCreditFailureEmail: async (req, res) => {
     try {
       let content = ` <p>We regret to inform you that your payment for $${Number(req.body.cost).toLocaleString()} for ${Number(req.body.credits).toLocaleString()} credits was unsuccessful.</p>
       <p>If you have any questions or concerns regarding this issue, please feel free to contact us.</p>`
@@ -472,12 +474,58 @@ let APIControllers = {
       res.status(200)
     } catch (error) {
       console.log(error);
-      ErrorHandler("creditFailureEmail Controller", error, req);
+      ErrorHandler("PayPalCreditFailureEmail Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.release();
       }
+    }
+  },
+  RazorpayPayment : async (req, res) => {
+    try {
+      const instance = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_SECRET,
+      });
+      const options = {
+        amount: Math.floor(req.body.amount)*100, 
+        currency: "INR",
+        receipt: "info@gamalogic.com",
+      };
+      const order = await instance.orders.create(options);
+      if (!order) return res.status(500).send("Some error occured");
+  
+      res.json({order,planId:req.body.Planid,duration:req.body.duration});
+    } catch (error) {
+      res.status(500).send(error);
+      ErrorHandler("RazorpayPayment Controller", error, req);
+    }
+  },
+  razorPayPaymentSuccess:async(req,res)=>{
+    try {
+      const dbConnection = req.dbConnection;
+      let user = await dbConnection.query(`SELECT rowid,credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
+
+      let newBalance = user[0][0].credits + req.body.credits
+      await dbConnection.query(`UPDATE registration SET credits='${newBalance}' WHERE emailid='${req.user[0][0].emailid}'`)
+
+      let content = `
+      <p>Your payment for $ ${req.body.cost} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.</p>
+      
+      <p>If you have any questions or concerns regarding this payment, please feel free to contact us.</p>
+      `
+      sendEmail(
+        req.user[0][0].username,
+        req.user[0][0].emailid,
+        "Payment successfull",
+        basicTemplate(req.user[0][0].username, content)
+      );
+      res.status(200).json('Successfull')
+    } catch (error) {
+      console.log(error);
+      ErrorHandler("RazorPayUpdateCredit Controller", error, req);
+      res.status(500).json({ error: "Internal Server Error" });
     }
   }
 };
