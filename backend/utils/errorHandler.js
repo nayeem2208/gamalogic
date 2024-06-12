@@ -3,6 +3,7 @@ import clickUp from "./ClickUp.js";
 const ErrorHandler = async (controller, error, req) => {
     const errorName = controller;
     const filename = controller;
+    const jsonString = JSON.stringify(req.body || {});
     let err = error;
     const lineNumber =
       error.lineNumber ||
@@ -40,6 +41,7 @@ const ErrorHandler = async (controller, error, req) => {
       line ${lineNumber},
       userId:${user},
       URL: '${url}'. 
+      body:${jsonString} 
       Error message: ${err}`;
     }
     let res = await clickUp(errorName, errorMessage, filename, url);
