@@ -91,7 +91,7 @@ const Authentication = {
   },
   registerUser: async (req, res) => {
     try {
-      const { fullname, email, password } = req.body.data;
+      const { firstname, lastname, email, password } = req.body.data;
       const userAgent = req.headers["user-agent"];
       let ip = req.headers['cf-connecting-ip'] ||
         req.headers['x-real-ip'] ||
@@ -105,7 +105,7 @@ const Authentication = {
       if (userExists[0].length > 0) {
         res.status(401).json({ error: "User already exists" });
       } else {
-        // let hashedPassword = await bcrypt.hash(password, 10);
+        let fullname = firstname + ' ' + lastname
         let hashedPassword = await passwordHash(password);
         const currentDate = new Date();
         const futureDate = new Date(currentDate);
@@ -120,7 +120,7 @@ const Authentication = {
           .replace("T", " ");
         let apiKey = await generateUniqueApiKey(req);
         await dbConnection.query(
-          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0)`
+          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0,'${firstname}','${lastname}')`
         );
         let token = generateConfirmationToken(email)
         let link = `${urls.frontendUrl}/api/verifyEmail?email=${token}`
@@ -203,7 +203,12 @@ const Authentication = {
       const body_Token = req.body.credentialResponse.credential;
       const decode = jwt.decode(body_Token);
       const { name, email } = decode;
-
+      let [firstname, ...lastnameArray] = name.split(" ");
+      let lastname = lastnameArray.join(" ");
+      if(!lastname||!isNaN(lastname)){
+        lastname=firstname
+        firstname=''
+      }
       const userExists = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
@@ -230,7 +235,7 @@ const Authentication = {
         let apiKey = await generateUniqueApiKey(req);
 
         await dbConnection.query(
-          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium)VALUES(null,'${name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0)`
+          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname)VALUES(null,'${name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}')`
         );
         let user = await dbConnection.query(
           `SELECT * FROM registration WHERE emailid='${email}'`

@@ -11,7 +11,8 @@ import ServerError from "../pages/ServerError";
 
 function Signup() {
   let [data, setData] = useState({
-    fullname: "",
+    firstname: "",
+    lastname: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -23,16 +24,16 @@ function Signup() {
   let [loading, setLoading] = useState(false);
   let [serverError, setServerError] = useState(false);
   let navigate = useNavigate();
-  let { setUserDetails, setCreditBal,setTutorialVideo } = useUserState();
+  let { setUserDetails, setCreditBal, setTutorialVideo } = useUserState();
 
   useEffect(() => {
     if (APP == "beta") {
-      document.title = "Real time Catch all email validation API | Beta Gamalogic";
+      document.title =
+        "Real time Catch all email validation API | Beta Gamalogic";
     } else {
       document.title = "Real time Catch all email validation API | Gamalogic";
     }
   }, []);
-
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -51,46 +52,51 @@ function Signup() {
 
   const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?!\s).{6,}$/;
   var emailPattern = /\S+@\S+\.\S+/;
-  let nameOfUser = data.fullname.trim();
-  console.log(nameOfUser.length, "length");
+  let firstname = data.firstname.trim();
+  let lastname = data.lastname.trim();
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // const token = await window.grecaptcha.getResponse();
     try {
       if (
-        data.fullname &&
+        data.firstname &&
+        data.lastname &&
         data.email &&
         data.password &&
         data.confirmPassword
       ) {
-        if (nameOfUser.length > 2) {
-          if (data.password == data.confirmPassword) {
-            if (emailPattern.test(data.email)) {
-              if (passwordPattern.test(data.password)) {
-                let userData = await axiosInstance.post("signup", {
-                  data,
-                  // token,
-                });
-                console.log(userData, "userdata");
-                toast.success(userData?.data);
-                navigate("/VerifyYourEmail", { state: { email: data.email } });
+        if (firstname.length > 2) {
+          if (lastname.length > 2) {
+            if (data.password == data.confirmPassword) {
+              if (emailPattern.test(data.email)) {
+                if (passwordPattern.test(data.password)) {
+                  let userData = await axiosInstance.post("signup", {
+                    data,
+                  });
+                  console.log(userData, "userdata");
+                  toast.success(userData?.data);
+                  navigate("/VerifyYourEmail", {
+                    state: { email: data.email },
+                  });
+                } else {
+                  toast.error(
+                    "Please ensure your password contains at least 6 characters, including both letters and numbers.",
+                    4000
+                  );
+                }
               } else {
-                toast.error(
-                  "Please ensure your password contains at least 6 characters, including both letters and numbers.",
-                  4000
-                );
+                toast.error("Please enter a valid email address.");
               }
             } else {
-              toast.error("Please enter a valid email address.");
+              toast.error(
+                "The password and confirm password do not match. Please ensure they are identical."
+              );
             }
           } else {
-            toast.error(
-              "The password and confirm password do not match. Please ensure they are identical."
-            );
+            toast.error("Last Name must be at least 3 characters long.");
           }
-        }else{
-          toast.error('Name must be at least 3 characters long.')
+        } else {
+          toast.error("First Name must be at least 3 characters long.");
         }
       } else {
         toast.error("Please provide all required information.");
@@ -98,7 +104,7 @@ function Signup() {
     } catch (error) {
       console.log(error);
       if (error.response.status === 500) {
-        setServerError(true); 
+        setServerError(true);
       } else {
         toast.error(error.response?.data?.error);
       }
@@ -109,7 +115,6 @@ function Signup() {
 
   const authenticateData = async (credentialResponse) => {
     try {
-      // let res = await axios.post('https://poseben-backend.onrender.com/api/GoogleLogin',{credentialResponse})
       let res = await axiosInstance.post("/googleSignup", {
         credentialResponse,
       });
@@ -120,33 +125,29 @@ function Signup() {
       setUserDetails(token);
       setCreditBal(token.credit);
       localStorage.setItem("Gamalogic_token", JSON.stringify(token));
-      setTutorialVideo(true)
+      setTutorialVideo(true);
       navigate("/dashboard/quick-validation");
     } catch (err) {
       console.log(err);
       if (err.response.status === 500) {
-        setServerError(true); 
+        setServerError(true);
       } else {
         toast.error(err.response?.data?.error);
       }
     }
   };
 
-  // const recaptchaSiteKey = import.meta.env.VITE_RECAPTA_SITE_KEY;
-  // const recaptchaSiteKey='aldfsjkj'
-  // console.log(recaptchaSiteKey, "recaptcha");
   function reCaptchaOnChange(value) {
     console.log("Captcha value:", value);
   }
 
   if (serverError) {
-    return <ServerError />; 
+    return <ServerError />;
   }
 
   return (
     <div
-    className="w-full flex justify-center items-center  "
-    // style={{ marginTop: "40vh" }}
+      className="w-full flex justify-center items-center  "
     >
       <div className="w-5/6 sm:w-4/6 md:w-5/6 lg:w-4/6 flex flex-col justify-center items-center">
         <div className="text-center auth" style={{ position: "relative" }}>
@@ -155,22 +156,40 @@ function Signup() {
             <div className="blue"></div>
           </div>
           <h2 className="font-semibold text-4xl">Sign Up</h2>
-          <p className="my-12 description">Create a free gamalogic account</p>
+          <p className="my-12 description">Create a free Gamalogic account</p>
         </div>
         <div
           className="flex flex-col p-5 md:p-10  w-10/12 sm:w-5/6 md:w-3/6 lg:w-4/6 xl:w-3/6 mb-16"
           style={{ backgroundColor: "#161736" }}
         >
-          <form className="flex flex-col text-xs sm:text-sm" onSubmit={handleSubmit}>
-            <label htmlFor="">Full Name</label>
-            <input
-              type="text"
-              name="fullname"
-              value={data.fullname}
-              placeholder="Enter your name"
-              onChange={handleInputChange}
-              className="bg-transparent border border-cyan-400 rounded-md py-2 px-4 text-gray-400 my-1"
-            />
+          <form
+            className="flex flex-col text-xs sm:text-sm"
+            onSubmit={handleSubmit}
+          >
+            <div className="xl:flex w-full">
+              <div className="xl:mr-2">
+                <label htmlFor="">First Name</label>
+                <input
+                  type="text"
+                  name="firstname"
+                  value={data.firstname}
+                  placeholder="Enter your name"
+                  onChange={handleInputChange}
+                  className="bg-transparent border border-cyan-400 rounded-md py-2 px-4 text-gray-400 my-1 w-full"
+                />
+              </div>
+              <div className="mt-6 xl:mt-0 xl:ml-2">
+                <label htmlFor="">Last Name</label>
+                <input
+                  type="text"
+                  name="lastname"
+                  value={data.lastname}
+                  placeholder="Enter your name"
+                  onChange={handleInputChange}
+                  className="bg-transparent border border-cyan-400 rounded-md py-2 px-4 text-gray-400 my-1 w-full"
+                />
+              </div>
+            </div>
             <label htmlFor="" className="mt-6">
               Email
             </label>
@@ -233,11 +252,6 @@ function Signup() {
                 onClick={() => passwordVisibilityHandler("confirm")}
               />
             </div>
-            {/* <ReCAPTCHA
-              sitekey={recaptchaSiteKey}
-              onChange={reCaptchaOnChange}
-              className="my-2 flex justify-center"
-            /> */}
             <p className="text-xs text-center text-gray-400">
               By signing up, you agree to our{" "}
               <a
@@ -269,9 +283,6 @@ function Signup() {
           </form>
           <div className="flex justify-center my-5 ">
             {" "}
-            {/* <div className="bg-white text-gray-700 p-3 w-3/5 h-16 rounded-lg shadow-md shadow-gray-200 flex justify-center items-center">
-              Signup with Google
-            </div> */}
             <GoogleLogin
               text="Sign up with Google"
               onSuccess={(credentialResponse) => {
@@ -283,7 +294,7 @@ function Signup() {
             />
           </div>
           <Link to="/signin">
-          <div className="flex justify-center text-xs md:text-sm text-gray-300">
+            <div className="flex justify-center text-xs md:text-sm text-gray-300">
               Already have an account?
             </div>
           </Link>
