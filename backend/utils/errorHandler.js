@@ -50,6 +50,7 @@ const ErrorHandler = async (controller, error, req) => {
       Error message: ${err}`;
     }
     let res = await clickUp(errorName, errorMessage, filename, url);
+    return res  
   };
 
   export default ErrorHandler

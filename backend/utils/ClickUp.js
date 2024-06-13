@@ -30,6 +30,7 @@ async function clickUp(errorName, errorDescription, filename, url) {
         },
       }
     );
+    return response.data
   } catch (error) {
     console.error("Error:", error);
   }
