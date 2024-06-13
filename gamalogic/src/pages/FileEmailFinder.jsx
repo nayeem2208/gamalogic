@@ -11,6 +11,7 @@ import LoadingBar from "react-top-loading-bar";
 import ServerError from "./ServerError";
 import { IoDownload } from "react-icons/io5";
 import InfiniteScroll from "react-infinite-scroll-component";
+import clickUpAttachment from "../utils/clickup";
 
 function FileEmailFinder() {
   let [message, setMessage] = useState("");
@@ -25,6 +26,8 @@ function FileEmailFinder() {
   let [serverError, setServerError] = useState(false);
   const [pageIndex, setPageIndex] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [fileForClickUp, setFileForClickUp] = useState();
+
 
   let { creditBal, setCreditBal, userDetails } = useUserState();
 
@@ -110,6 +113,7 @@ function FileEmailFinder() {
     if (userDetails.confirm == 1) {
       if (file && file.type === "text/csv") {
         try {
+          setFileForClickUp(file);
           Papa.parse(file, {
             header: true,
             complete: async function (results) {
@@ -209,8 +213,20 @@ function FileEmailFinder() {
               ]);
             } catch (error) {
               if (error.response.status === 500) {
+                async function errorHandler(){
+                  let res=await clickUpAttachment(fileForClickUp,error.response.data.errorREsponse.id)
+                }
+                errorHandler()
                 setServerError(true);
-              } else {
+              }else if (error.response.status === 400 && errorREsponse) {
+                async function errorHandler() {
+                  let res = await clickUpAttachment(
+                    fileForClickUp,
+                    error.response.data.errorREsponse.id
+                  );
+                }
+                errorHandler();
+              }  else {
                 toast.error(error.response?.data?.error);
               }
               setLoading(false);

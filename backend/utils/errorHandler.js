@@ -12,7 +12,12 @@ const ErrorHandler = async (controller, error, req) => {
         error.stack.split("\n")[1].trim().split(":")[1]) ||
       "UnknownLine";
     const url = req.route.path;
-    const user=req.user[0][0].rowid
+    let user
+    if (req.user) {
+       user = req.user[0][0]?.rowid ;
+    } else {
+      console.error('req.user is undefined');
+    }
     let errorMessage;
     if(controller=='Login Controller'){
        errorMessage = `

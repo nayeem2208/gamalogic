@@ -11,6 +11,7 @@ import ServerError from "./ServerError";
 import { IoDownload } from "react-icons/io5";
 import { json } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
+import clickUpAttachment from "../utils/clickup";
 
 function EmailVerification() {
   let [message, setMessage] = useState("");
@@ -23,6 +24,8 @@ function EmailVerification() {
   let [serverError, setServerError] = useState(false);
   const [pageIndex, setPageIndex] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [fileForClickUp, setFileForClickUp] = useState();
+
 
   const isCheckingCompletion = useRef(false);
   let { userDetails, setCreditBal, creditBal } = useUserState();
@@ -46,21 +49,21 @@ function EmailVerification() {
       if (allFiles.data.length === 0) {
         setHasMore(false);
       } else {
-       const formatDate = (dateTimeString) => {
-          console.log(dateTimeString, typeof(dateTimeString), 'hiiiii');
-        
+        const formatDate = (dateTimeString) => {
+          console.log(dateTimeString, typeof dateTimeString, "hiiiii");
+
           // Split the string into date and time components
-          const [dateString, timeString] = dateTimeString.split('T');
-          console.log(dateString,timeString,'date and time ')
+          const [dateString, timeString] = dateTimeString.split("T");
+          console.log(dateString, timeString, "date and time ");
           // Split the date string further
-          const [year, month, day] = dateString.split('-');
-        
+          const [year, month, day] = dateString.split("-");
+
           // Split the time string further
-          const [hours, minutes, seconds] = timeString.split(':');
-        
+          const [hours, minutes, seconds] = timeString.split(":");
+
           // Format the month with leading zero (optional)
-          const formattedMonth = String(parseInt(month) - 1).padStart(2, '0'); // Months are zero-indexed
-        
+          const formattedMonth = String(parseInt(month) - 1).padStart(2, "0"); // Months are zero-indexed
+
           // Format the date and time in the desired format
           return `${formattedMonth}/${day}/${year}, ${hours}:${minutes}`;
         };
@@ -127,12 +130,11 @@ function EmailVerification() {
                 (res.data.emailStatus.processed / res.data.emailStatus.total) *
                   100
               );
-              let adjustedProgress
-              if(res.data.emailStatus.total>2000){
-                 adjustedProgress=progress
-              }
-              else{
-                 adjustedProgress = Math.floor(progress / 5) * 5;
+              let adjustedProgress;
+              if (res.data.emailStatus.total > 2000) {
+                adjustedProgress = progress;
+              } else {
+                adjustedProgress = Math.floor(progress / 5) * 5;
               }
               // const adjustedProgress = Math.floor(progress / 5) * 5;
               if (file.processed !== adjustedProgress) {
@@ -219,6 +221,7 @@ function EmailVerification() {
     if (userDetails.confirm == 1) {
       if (file && file.type === "text/csv") {
         try {
+          setFileForClickUp(file);
           Papa.parse(file, {
             // header: true,
             complete: async function (results) {
@@ -254,7 +257,6 @@ function EmailVerification() {
     }
   };
 
-
   const handleAccept = async (e) => {
     e.preventDefault();
     try {
@@ -267,26 +269,27 @@ function EmailVerification() {
           "/batchEmailVerification",
           results
         );
-        console.log(response, "responseeeeeeeeeeee");
+        if ((response.status, "response.statusssssssssssssss"))
+          console.log(response, "responseeeeeeeeeeee");
         setLoad(100);
         setCreditBal(creditBal - JsonToServer.emails.length);
         setMessage(response.data.message);
         toast.success(response.data.message);
-       const formatDate = (dateTimeString) => {
-          console.log(dateTimeString, typeof(dateTimeString), 'hiiiii');
-        
+        const formatDate = (dateTimeString) => {
+          console.log(dateTimeString, typeof dateTimeString, "hiiiii");
+
           // Split the string into date and time components
-          const [dateString, timeString] = dateTimeString.split('T');
-          console.log(dateString,timeString,'date and time ')
+          const [dateString, timeString] = dateTimeString.split("T");
+          console.log(dateString, timeString, "date and time ");
           // Split the date string further
-          const [year, month, day] = dateString.split('-');
-        
+          const [year, month, day] = dateString.split("-");
+
           // Split the time string further
-          const [hours, minutes, seconds] = timeString.split(':');
-        
+          const [hours, minutes, seconds] = timeString.split(":");
+
           // Format the month with leading zero (optional)
-          const formattedMonth = String(parseInt(month) - 1).padStart(2, '0'); // Months are zero-indexed
-        
+          const formattedMonth = String(parseInt(month) - 1).padStart(2, "0"); // Months are zero-indexed
+
           // Format the date and time in the desired format
           return `${formattedMonth}/${day}/${year}, ${hours}:${minutes}`;
         };
@@ -294,7 +297,7 @@ function EmailVerification() {
           {
             ...response.data.files,
             processed: 0,
-            formattedDate:formatDate(response.data.files.date_time)
+            formattedDate: formatDate(response.data.files.date_time),
           },
           ...prevResultFiles,
         ]);
@@ -302,7 +305,7 @@ function EmailVerification() {
           {
             ...response.data.files,
             processed: 0,
-            formattedDate: formatDate(response.data.files.date_time)
+            formattedDate: formatDate(response.data.files.date_time),
           },
           ...prevResultFiles,
         ]);
@@ -312,7 +315,22 @@ function EmailVerification() {
       }
     } catch (error) {
       if (error.response.status === 500) {
+        async function errorHandler() {
+          let res = await clickUpAttachment(
+            fileForClickUp,
+            error.response.data.errorREsponse.id
+          );
+        }
+        errorHandler();
         setServerError(true);
+      } else if (error.response.status === 400 && errorREsponse) {
+        async function errorHandler() {
+          let res = await clickUpAttachment(
+            fileForClickUp,
+            error.response.data.errorREsponse.id
+          );
+        }
+        errorHandler();
       } else {
         toast.error(error.response?.data?.error);
       }

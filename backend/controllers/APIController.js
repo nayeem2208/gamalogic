@@ -217,15 +217,16 @@ let APIControllers = {
           res.status(200).json({ message: response.data.message, files: files[0][0] });
         } else {
           const errorMessage = Object.values(response.data)[0];
-          res.status(400).json({ error: errorMessage });
+          let errorREsponse = await ErrorHandler("batchEmailValidation Controller", errorMessage, req);
+          res.status(400).json({ error: errorMessage,errorREsponse });
         }
       } else {
         res.status(400).json({ error: 'You dont have enough to do this' });
       }
     } catch (error) {
       console.log(error);
-      ErrorHandler("batchEmailValidation Controller", error, req);
-      res.status(500).json({ error: "Internal Server Error" });
+      let errorREsponse = await ErrorHandler("batchEmailValidation Controller", error, req);
+      res.status(500).json({ error: "Internal Server Error",errorREsponse });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.release();
@@ -325,15 +326,16 @@ let APIControllers = {
         }
         else {
           const errorMessage = Object.values(response.data)[0];
-          console.log(errorMessage, 'errorMessage')
-          res.status(400).json({ error: errorMessage });
+          let errorREsponse = await ErrorHandler("batchEmailFinder Controller", errorMessage, req);
+          res.status(400).json({ error: errorMessage,errorREsponse });
         }
       } else {
         res.status(400).json({ error: 'You dont have enough to do this' });
       }
     } catch (error) {
       console.log(error)
-      res.status(400).json(error)
+      let errorREsponse = await ErrorHandler("batchEmailFinder Controller", error, req);
+      res.status(500).json({ error: "Internal Server Error",errorREsponse });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.release();
