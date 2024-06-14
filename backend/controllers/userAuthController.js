@@ -66,6 +66,8 @@ const Authentication = {
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
+            firstname: user[0][0].firstname || null,
+            lastname: user[0][0].lastname || null,
             credit: creditBal,
             token,
             confirm: user[0][0].confirmed,
@@ -175,6 +177,8 @@ const Authentication = {
         res.status(200).json({
           name: user[0][0].username,
           email: user[0][0].emailid,
+          firstname: user[0][0].firstname || null,
+          lastname: user[0][0].lastname || null,
           credit: creditBal,
           token,
           confirm: 1,
@@ -205,9 +209,9 @@ const Authentication = {
       const { name, email } = decode;
       let [firstname, ...lastnameArray] = name.split(" ");
       let lastname = lastnameArray.join(" ");
-      if(!lastname||!isNaN(lastname)){
-        lastname=firstname
-        firstname=''
+      if (!lastname || !isNaN(lastname)) {
+        lastname = firstname
+        firstname = ''
       }
       const userExists = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
@@ -262,6 +266,8 @@ const Authentication = {
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
+            firstname:user[0][0].firstname||null,
+            lastname:user[0][0].lastname||null,
             credit: 500,
             token,
             confirm: 1,

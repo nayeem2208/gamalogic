@@ -173,7 +173,7 @@ function Signup() {
                   type="text"
                   name="firstname"
                   value={data.firstname}
-                  placeholder="Enter your name"
+                  placeholder="Enter your first name"
                   onChange={handleInputChange}
                   className="bg-transparent border border-cyan-400 rounded-md py-2 px-4 text-gray-400 my-1 w-full"
                 />
@@ -184,7 +184,7 @@ function Signup() {
                   type="text"
                   name="lastname"
                   value={data.lastname}
-                  placeholder="Enter your name"
+                  placeholder="Enter your last name"
                   onChange={handleInputChange}
                   className="bg-transparent border border-cyan-400 rounded-md py-2 px-4 text-gray-400 my-1 w-full"
                 />

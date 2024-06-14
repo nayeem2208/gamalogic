@@ -52,14 +52,14 @@ function AccountSettings() {
       [name]: value,
     }));
   };
-  useEffect(()=>{
-    if(userDetails.password==false){
-      setPasswordData((prevState)=>({
+  useEffect(() => {
+    if (userDetails.password == false) {
+      setPasswordData((prevState) => ({
         ...prevState,
-        old: 'PasswordForgoogleUsers'
-      }))
+        old: "PasswordForgoogleUsers",
+      }));
     }
-  },[])
+  }, []);
 
   const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?!\s).{6,}$/;
   let changaePassword = async (e) => {
@@ -93,10 +93,7 @@ function AccountSettings() {
       }
       setLoading(true);
       setLoad(30);
-      let response=await axiosInstance.post(
-        "/changePassword",
-        passwordData
-      );
+      let response = await axiosInstance.post("/changePassword", passwordData);
       if (response.data.googleUser == 1) {
         const storedToken = localStorage.getItem("Gamalogic_token");
         if (storedToken) {
@@ -120,51 +117,79 @@ function AccountSettings() {
       });
     } catch (error) {
       if (error.response.status === 500) {
-        setServerError(true); 
+        setServerError(true);
       } else {
         toast.error(error.response?.data?.message);
       }
     }
   };
   if (serverError) {
-    return <ServerError />; 
+    return <ServerError />;
   }
   return (
     <div className=" px-6 md:px-20 py-8 accountSettings text-center sm:text-start">
       <SubHeader SubHeader={"Account Settings"} />
       {userDetails.confirm == 1 ? (
-      <form className="mt-6 sm:mt-14 text-xs sm:text-sm text-bgblue subHeading" onSubmit={changaePassword} style={{fontFamily:"Raleway,sans-serif"}}>
-        <h3>Your Profile</h3>
-        {loading && (
+        <form
+          className="mt-6 sm:mt-14 text-xs sm:text-sm text-bgblue subHeading"
+          onSubmit={changaePassword}
+          style={{ fontFamily: "Raleway,sans-serif" }}
+        >
+          <h3>Your Profile</h3>
+          {loading && (
             <LoadingBar
               color="#f74c41"
               progress={load}
               onLoaderFinished={() => {}}
             />
           )}
-        <p className="mt-6 mb-1 text-sm">Your Name</p>
-        <input
-          type="text"
-          placeholder="enter your name here"
-          className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3"
-          value={userDetails.name}
-          readOnly
-        />{" "}
-        <p className="mt-6 mb-1 text-sm">Your Email</p>
-        <input
-          type="email"
-          placeholder="enter the email here"
-          className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 selection:border-gray-400"
-          value={userDetails.email}
-          readOnly
-        />{" "}
-        <h3 className="mt-6 mb-1">Change Your Password</h3>
-        <p className="my-7 description">
-          Changing your Gamalogic password to a secure password that only you
-          know and that no one else can guess protects your private information
-          from unauthorized access.
-        </p>
-        {userDetails.password == true && (
+          {!userDetails.firstname && !userDetails.lastname && (
+            <div>
+              <p className="mt-6 mb-1 text-sm">Your Name</p>
+              <input
+                type="text"
+                placeholder="enter your name here"
+                className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3"
+                value={userDetails.name}
+                readOnly
+              />{" "}
+            </div>
+          )}
+          {(userDetails.firstname || userDetails.lastname) && (
+            <div>
+              <p className="mt-6 mb-1 text-sm">First Name</p>
+              <input
+                type="text"
+                placeholder="first name"
+                className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3"
+                value={userDetails.firstname}
+                readOnly
+              />
+              <p className="mt-6 mb-1 text-sm">Last Name</p>
+              <input
+                type="text"
+                placeholder="last name "
+                className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3"
+                value={userDetails.lastname}
+                readOnly
+              />
+            </div>
+          )}
+          <p className="mt-6 mb-1 text-sm">Your Email</p>
+          <input
+            type="email"
+            placeholder="enter the email here"
+            className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 selection:border-gray-400"
+            value={userDetails.email}
+            readOnly
+          />{" "}
+          <h3 className="mt-6 mb-1">Change Your Password</h3>
+          <p className="my-7 description">
+            Changing your Gamalogic password to a secure password that only you
+            know and that no one else can guess protects your private
+            information from unauthorized access.
+          </p>
+          {userDetails.password == true && (
             <p className="mt-6 mb-1 text-sm">Old Password</p>
           )}
           {userDetails.password == true && (
@@ -184,63 +209,66 @@ function AccountSettings() {
               />
             </div>
           )}
-        <p className="mt-6 mb-1 text-sm">New Password</p>
-        <div className="flex bg-transparent  justify-between items-center  sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 text-gray-400 my-1">
-          <input
-            className="bg-transparent w-5/6  outline-none"
-            type={passwordVisible.newPassword ? "text" : "password"}
-            name="newPassword"
-            id="password"
-            placeholder="Enter your new password"
-            onChange={handleInputChange}
-            value={passwordData.newPassword}
-          />
-          <button className="group relative inline-flex items-center justify-center  text-sm font-medium ">
-            <IoInformationCircleOutline className="w-5 h-5 text-slate-900 ml-2" />
-            <div className="ease-in duration-300 opacity-0 group-hover:block group-hover:opacity-100 transition-all">
-              <div className="ease-in-out duration-500 -translate-y-4 pointer-events-none transition-all group-hover:-translate-y-16 absolute left-1/2 z-50 flex -translate-x-1/2 flex-col items-center rounded-sm text-center text-sm text-slate-300 before:-top-2">
-                <div className="rounded-sm bg-black py-1 px-2">
-                  <p className="whitespace-nowrap">
-                    Please ensure your password <br /> contains at least 6
-                    characters,
-                    <br /> including both letters and numbers.{" "}
-                  </p>
+          <p className="mt-6 mb-1 text-sm">New Password</p>
+          <div className="flex bg-transparent  justify-between items-center  sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 text-gray-400 my-1">
+            <input
+              className="bg-transparent w-5/6  outline-none"
+              type={passwordVisible.newPassword ? "text" : "password"}
+              name="newPassword"
+              id="password"
+              placeholder="Enter your new password"
+              onChange={handleInputChange}
+              value={passwordData.newPassword}
+            />
+            <button className="group relative inline-flex items-center justify-center  text-sm font-medium ">
+              <IoInformationCircleOutline className="w-5 h-5 text-slate-900 ml-2" />
+              <div className="ease-in duration-300 opacity-0 group-hover:block group-hover:opacity-100 transition-all">
+                <div className="ease-in-out duration-500 -translate-y-4 pointer-events-none transition-all group-hover:-translate-y-16 absolute left-1/2 z-50 flex -translate-x-1/2 flex-col items-center rounded-sm text-center text-sm text-slate-300 before:-top-2">
+                  <div className="rounded-sm bg-black py-1 px-2">
+                    <p className="whitespace-nowrap">
+                      Please ensure your password <br /> contains at least 6
+                      characters,
+                      <br /> including both letters and numbers.{" "}
+                    </p>
+                  </div>
+                  <div className="h-0 w-fit border-l-8 border-r-8 border-t-8 border-transparent border-t-black"></div>
                 </div>
-                <div className="h-0 w-fit border-l-8 border-r-8 border-t-8 border-transparent border-t-black"></div>
               </div>
-            </div>
+            </button>
+            <FaEye
+              className="w-4 h-4 text-slate-900 "
+              onClick={() => passwordVisibilityHandler("newPassword")}
+            />
+          </div>
+          <p className="mt-6 mb-1 text-sm">Confirm Password</p>
+          <div className="flex bg-transparent  justify-between items-center sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 text-gray-400 my-1">
+            <input
+              className="bg-transparent w-5/6  outline-none"
+              type={passwordVisible.confirm ? "text" : "password"}
+              name="confirm"
+              id="password"
+              placeholder="Confirm your new password"
+              onChange={handleInputChange}
+              value={passwordData.confirm}
+            />
+            <FaEye
+              className="w-4 h-4 text-slate-900 ml-2"
+              onClick={() => passwordVisibilityHandler("confirm")}
+            />
+          </div>
+          <br />
+          <button
+            className="bg-bgblue text-white py-2  px-4 rounded-md mt-6 text-sm font-medium"
+            type="submit"
+          >
+            CHANGE PASSWORD
           </button>
-          <FaEye
-            className="w-4 h-4 text-slate-900 "
-            onClick={() => passwordVisibilityHandler("newPassword")}
-          />
-        </div>
-        <p className="mt-6 mb-1 text-sm">Confirm Password</p>
-        <div className="flex bg-transparent  justify-between items-center sm:w-4/6 md:w-3/6 border border-gray-100 rounded py-2 px-4 mr-3 text-gray-400 my-1">
-          <input
-            className="bg-transparent w-5/6  outline-none"
-            type={passwordVisible.confirm ? "text" : "password"}
-            name="confirm"
-            id="password"
-            placeholder="Confirm your new password"
-            onChange={handleInputChange}
-            value={passwordData.confirm}
-          />
-          <FaEye
-            className="w-4 h-4 text-slate-900 ml-2"
-            onClick={() => passwordVisibilityHandler("confirm")}
-          />
-        </div>
-        <br />
-        <button
-          className="bg-bgblue text-white py-2  px-4 rounded-md mt-6 text-sm font-medium"
-          type="submit"
-        >
-          CHANGE PASSWORD
-        </button>
-      </form>):( <p className="my-10 text-red-600 font-semibold text-lg">
+        </form>
+      ) : (
+        <p className="my-10 text-red-600 font-semibold text-lg">
           You should verify your email to view account settings.
-        </p>)}
+        </p>
+      )}
     </div>
   );
 }
