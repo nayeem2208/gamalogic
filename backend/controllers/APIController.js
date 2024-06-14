@@ -73,11 +73,16 @@ let APIControllers = {
   },
   emailValidation: async (req, res) => {
     try {
-      let apiKey = req.user[0][0].api_key;
-      let validate = await axios.get(
-        `https://gamalogic.com/emailvrf/?emailid=${req.body.email}&apikey=${apiKey}&speed_rank=0`
-      );
-      res.status(200).json(validate.data.gamalogic_emailid_vrfy[0]);
+      if (req.user[0][0]?.api_key) {
+        let apiKey = req.user[0][0].api_key;
+        let validate = await axios.get(
+          `https://gamalogic.com/emailvrf/?emailid=${req.body.email}&apikey=${apiKey}&speed_rank=0`
+        );
+        res.status(200).json(validate.data.gamalogic_emailid_vrfy[0]);
+      }
+      else{
+        res.status(202)
+      }
     } catch (error) {
       console.log(error);
       ErrorHandler("emailValidation Controller", error, req);
@@ -218,7 +223,7 @@ let APIControllers = {
         } else {
           const errorMessage = Object.values(response.data)[0];
           let errorREsponse = await ErrorHandler("batchEmailValidation Controller", errorMessage, req);
-          res.status(400).json({ error: errorMessage,errorREsponse });
+          res.status(400).json({ error: errorMessage, errorREsponse });
         }
       } else {
         res.status(400).json({ error: 'You dont have enough to do this' });
@@ -226,7 +231,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       let errorREsponse = await ErrorHandler("batchEmailValidation Controller", error, req);
-      res.status(500).json({ error: "Internal Server Error",errorREsponse });
+      res.status(500).json({ error: "Internal Server Error", errorREsponse });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.release();
@@ -327,7 +332,7 @@ let APIControllers = {
         else {
           const errorMessage = Object.values(response.data)[0];
           let errorREsponse = await ErrorHandler("batchEmailFinder Controller", errorMessage, req);
-          res.status(400).json({ error: errorMessage,errorREsponse });
+          res.status(400).json({ error: errorMessage, errorREsponse });
         }
       } else {
         res.status(400).json({ error: 'You dont have enough to do this' });
@@ -335,7 +340,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error)
       let errorREsponse = await ErrorHandler("batchEmailFinder Controller", error, req);
-      res.status(500).json({ error: "Internal Server Error",errorREsponse });
+      res.status(500).json({ error: "Internal Server Error", errorREsponse });
     } finally {
       if (req.dbConnection) {
         await req.dbConnection.release();
@@ -383,7 +388,7 @@ let APIControllers = {
       let user = await dbConnection.query(`SELECT rowid,credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
       let newBalance = user[0][0].credits + req.body.credits
       await dbConnection.query(`UPDATE registration SET credits='${newBalance}' WHERE emailid='${req.user[0][0].emailid}'`)
-      
+
       let content = `
       <p>Your payment for $${Number(req.body.cost).toLocaleString()} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.</p>
       
@@ -395,23 +400,23 @@ let APIControllers = {
         "Payment successfull",
         basicTemplate(req.user[0][0].username, content)
       );
-        //finding access token from paypal
-        const clientId = process.env.PAYPAL_CLIENTID;
-        const clientSecret = process.env.PAYPAL_CLIENTSECRET;
-  
-        const url = 'https://api-m.sandbox.paypal.com/v1/oauth2/token';
-  
-        const data = new URLSearchParams({
-          grant_type: 'client_credentials',
-        });
-  
-        const headers = {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
-        };
-  
-        let payPalToken = await axios.post(url, data, { headers })
-        
+      //finding access token from paypal
+      const clientId = process.env.PAYPAL_CLIENTID;
+      const clientSecret = process.env.PAYPAL_CLIENTSECRET;
+
+      const url = 'https://api-m.sandbox.paypal.com/v1/oauth2/token';
+
+      const data = new URLSearchParams({
+        grant_type: 'client_credentials',
+      });
+
+      const headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+      };
+
+      let payPalToken = await axios.post(url, data, { headers })
+
       //finding order details based on that order id and access token
       const payPaldetails = await axios.get(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${req.body.data.orderID}`, {
         headers: {
@@ -426,29 +431,29 @@ let APIControllers = {
               paypal_fee, net_amount, gross_amount, gross_currency
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-      
+
       let values = [
-        user[0][0]?.rowid ?? null, 
-        req.body?.data?.orderID ?? null, 
-        details?.create_time ?? null, 
-        details?.payer?.email_address ?? null, 
-        details?.purchase_units?.[0]?.shipping?.name?.full_name ?? null, 
-        details?.payer?.payer_id ?? null, 
-        details?.purchase_units?.[0]?.amount?.value ?? null, 
-        details?.purchase_units?.[0]?.amount?.currency_code ?? null, 
-        details?.purchase_units?.[0]?.shipping?.name?.full_name ?? null, 
-        details?.purchase_units?.[0]?.shipping?.address?.address_line_1 ?? null, 
-        details?.purchase_units?.[0]?.shipping?.address?.admin_area_2 ?? null, 
+        user[0][0]?.rowid ?? null,
+        req.body?.data?.orderID ?? null,
+        details?.create_time ?? null,
+        details?.payer?.email_address ?? null,
+        details?.purchase_units?.[0]?.shipping?.name?.full_name ?? null,
+        details?.payer?.payer_id ?? null,
+        details?.purchase_units?.[0]?.amount?.value ?? null,
+        details?.purchase_units?.[0]?.amount?.currency_code ?? null,
+        details?.purchase_units?.[0]?.shipping?.name?.full_name ?? null,
+        details?.purchase_units?.[0]?.shipping?.address?.address_line_1 ?? null,
+        details?.purchase_units?.[0]?.shipping?.address?.admin_area_2 ?? null,
         details?.purchase_units?.[0]?.shipping?.address?.country_code ?? null,
-        details?.purchase_units?.[0]?.shipping?.address?.postal_code ?? null, 
+        details?.purchase_units?.[0]?.shipping?.address?.postal_code ?? null,
         details?.purchase_units?.[0]?.shipping?.address?.admin_area_1 ?? null,
-        details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.paypal_fee?.value ?? null, 
-        details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.net_amount?.value ?? null, 
-        details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.gross_amount?.value ?? null, 
-        details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.gross_amount?.currency_code ?? null 
-    ];
-    
-      
+        details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.paypal_fee?.value ?? null,
+        details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.net_amount?.value ?? null,
+        details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.gross_amount?.value ?? null,
+        details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.gross_amount?.currency_code ?? null
+      ];
+
+
       await dbConnection.query(query, values);
       res.status(200).json('Successfull')
     } catch (error) {
@@ -484,27 +489,27 @@ let APIControllers = {
       }
     }
   },
-  RazorpayPayment : async (req, res) => {
+  RazorpayPayment: async (req, res) => {
     try {
       const instance = new Razorpay({
         key_id: process.env.RAZORPAY_KEY_ID,
         key_secret: process.env.RAZORPAY_SECRET,
       });
       const options = {
-        amount: Math.floor(req.body.amount)*100, 
+        amount: Math.floor(req.body.amount) * 100,
         currency: "INR",
         receipt: "info@gamalogic.com",
       };
       const order = await instance.orders.create(options);
       if (!order) return res.status(500).send("Some error occured");
-  
-      res.json({order,planId:req.body.Planid,duration:req.body.duration});
+
+      res.json({ order, planId: req.body.Planid, duration: req.body.duration });
     } catch (error) {
       res.status(500).send(error);
       ErrorHandler("RazorpayPayment Controller", error, req);
     }
   },
-  razorPayPaymentSuccess:async(req,res)=>{
+  razorPayPaymentSuccess: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
       let user = await dbConnection.query(`SELECT rowid,credits from registration WHERE emailid='${req.user[0][0].emailid}'`)

@@ -41,6 +41,11 @@ function QuickValidation() {
             let res = await axiosInstance.post("/singleEmailValidator", {
               email,
             });
+            if (res.status == 202) {
+              res = await axiosInstance.post("/singleEmailValidator", {
+                email,
+              });
+            }
             setCreditBal(creditBal - 1);
             setLoad(100);
             setResult(res.data);
