@@ -73,15 +73,12 @@ let APIControllers = {
   },
   emailValidation: async (req, res) => {
     try {
-      if (req.user[0][0]?.api_key) {
-        let apiKey = req.user[0][0].api_key;
+      if (req.user?.api_key) {
+        let apiKey = req.user.api_key;
         let validate = await axios.get(
           `https://gamalogic.com/emailvrf/?emailid=${req.body.email}&apikey=${apiKey}&speed_rank=0`
         );
         res.status(200).json(validate.data.gamalogic_emailid_vrfy[0]);
-      }
-      else{
-        res.status(202)
       }
     } catch (error) {
       console.log(error);
@@ -99,7 +96,7 @@ let APIControllers = {
       let nameArray = req.body.fullname.split(" ");
       let firstname = nameArray[0];
       let lastname = nameArray[nameArray.length - 1];
-      let apiKey = req.user[0][0].api_key;
+      let apiKey = req.user.api_key;
       let find = await axios.get(
         `https://gamalogic.com/email-discovery/?firstname=${firstname}&lastname=${lastname}&domain=${req.body.domain}&apikey=${apiKey}&speed_rank=0`
       );

@@ -1,7 +1,10 @@
 import React from "react";
 import { GoVerified } from "react-icons/go";
 import { Link } from "react-router-dom";
+import { useUserState } from "../context/userContext";
 function PaymentSuccess({ data }) {
+  let { userDetails } = useUserState();
+
   return (
     <div className="flex justify-center items-center mt-16">
       <div className="payment-success">
@@ -13,10 +16,13 @@ function PaymentSuccess({ data }) {
         </div>
         <div className="text-center flex flex-col justify-center my-6">
         <h3 className="text-5xl">Payment Success!</h3>
-        <p className="my-2">
+        {userDetails.country_name === "India"?<p className="my-2">
+          Your payment of ₹{data.cost.toLocaleString("en-US")} for {data.selectedCredits.toLocaleString("en-US")} credits was
+          successfull.
+        </p>:<p className="my-2">
           Your payment of ${data.cost.toLocaleString("en-US")} for {data.selectedCredits.toLocaleString("en-US")} credits was
           successfull.
-        </p>
+        </p>}
         <p>You can now continue using our services.</p>
 
         

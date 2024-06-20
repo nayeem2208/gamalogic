@@ -18,8 +18,8 @@ router.post('/resetPassword',dbMiddleware,Authentication.resetPassword)
 router.get('/SendVerifyEmail',dbMiddleware,Authentication.sendVerifyEmail)
 
 router.get('/getCreditBalance',dbMiddleware,authcheck,APIControllers.getCreditBalance)
-router.post('/singleEmailValidator',dbMiddleware,authcheck,APIControllers.emailValidation)
-router.post('/singleEmailFinder',dbMiddleware,authcheck,APIControllers.FindSingleEmail)
+router.post('/singleEmailValidator',APIDecode,APIControllers.emailValidation)
+router.post('/singleEmailFinder',APIDecode,APIControllers.FindSingleEmail)
 
 //file based email validation
 router.get('/getAllUploadedEmailValidationFiles',dbMiddleware,authcheck,APIControllers.getAlreadyCheckedBatchEmailFiles)

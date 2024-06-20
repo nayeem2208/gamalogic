@@ -180,9 +180,9 @@ export default function BuyCredits() {
   if (serverError) {
     return <ServerError />;
   }
-  if (userDetails.country_name === "India") {
-    return <BuyCreditsRazorPay />;
-  }
+  // if (userDetails.country_name === "India") {
+  //   return <BuyCreditsRazorPay />;
+  // }
 
   const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
   return (
