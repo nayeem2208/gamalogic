@@ -35,8 +35,8 @@ let APIControllers = {
   },
   getApi: async (req, res) => {
     try {
-      if (req.user[0][0].api_key) {
-        res.status(200).json({ apiKey: req.user[0][0].api_key });
+      if (req.user?.api_key) {
+        res.status(200).json({ apiKey: req.user.api_key });
       }
     } catch (error) {
       console.log(error);

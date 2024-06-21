@@ -33,7 +33,7 @@ router.post('/batchEmailFinder',dbMiddleware,authcheck,APIControllers.batchEmail
 router.get('/getBatchFinderStatus',APIDecode,APIControllers.batchEmailFinderStatus)
 router.get('/downloadEmailFinderFile',dbMiddleware,authcheck,APIControllers.downloadEmailFinderResultFile)
 
-router.get('/getApiKey',dbMiddleware,authcheck,APIControllers.getApi)
+router.get('/getApiKey',APIDecode,APIControllers.getApi)
 router.get('/resetApiKey',dbMiddleware,authcheck,APIControllers.resetApiKey)
 router.post('/changePassword',dbMiddleware,authcheck,APIControllers.changePassword)
 router.post('/updateCredit',dbMiddleware,authcheck,APIControllers.PayPalUpdateCredit)
