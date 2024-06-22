@@ -63,7 +63,7 @@ function FileEmailFinder() {
           const [hours, minutes, seconds] = timeString.split(':');
         
           // Format the month with leading zero (optional)
-          const formattedMonth = String(parseInt(month) - 1).padStart(2, '0'); // Months are zero-indexed
+          const formattedMonth = String(parseInt(month)).padStart(2, '0'); // Months are zero-indexed
         
           // Format the date and time in the desired format
           return `${formattedMonth}/${day}/${year}, ${hours}:${minutes}`;
@@ -190,7 +190,7 @@ function FileEmailFinder() {
                 const [hours, minutes, seconds] = timeString.split(':');
               
                 // Format the month with leading zero (optional)
-                const formattedMonth = String(parseInt(month) - 1).padStart(2, '0'); // Months are zero-indexed
+                const formattedMonth = String(parseInt(month)).padStart(2, '0'); // Months are zero-indexed
               
                 // Format the date and time in the desired format
                 return `${formattedMonth}/${day}/${year}, ${hours}:${minutes}`;
@@ -340,9 +340,21 @@ function FileEmailFinder() {
           };
         });
         const csvData = outputArray;
-        const fileName = res.data.fileName;
-        const exportType = exportFromJSON.types.csv;
-        exportFromJSON({ data: csvData, fileName, exportType });
+          const fileName = res.data.fileName;
+          const dateOfUpload = res.data.dateOfUpload;
+  
+          const parts = fileName.split(".");
+          const nameWithoutExtension = parts[0];
+  
+          const uploadDate = new Date(dateOfUpload);
+          const year = uploadDate.getFullYear(); 
+          const month = ("0" + (uploadDate.getMonth() + 1)).slice(-2); 
+          const day = ("0" + uploadDate.getDate()).slice(-2);
+  
+          const finalFileName = `${nameWithoutExtension}_${year}-${month}-${day}`;
+  
+          const exportType = exportFromJSON.types.csv;
+          exportFromJSON({ data: csvData,fileName: finalFileName, exportType });
       } else {
         toast.error(
           `Oops! It looks like the processing isn't complete yet. Please wait until it reaches 100% before downloading.`
