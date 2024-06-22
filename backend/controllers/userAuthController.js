@@ -61,8 +61,8 @@ const Authentication = {
             req.headers['x-forwarded-for'] ||
             req.socket.remoteAddress || '';
 
-          const response = await axios.get(`https://ipapi.co/${ip}/json/`);
-          const { country_name } = response.data;
+          // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
+          // const { country_name } = response.data;
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
@@ -72,7 +72,7 @@ const Authentication = {
             token,
             confirm: user[0][0].confirmed,
             password,
-            country_name
+            country_name:'USA'
           });
 
         } else {
@@ -172,8 +172,8 @@ const Authentication = {
           req.headers['x-real-ip'] ||
           req.headers['x-forwarded-for'] ||
           req.socket.remoteAddress || '';
-        const response = await axios.get(`https://ipapi.co/${ip}/json/`);
-        const { country_name } = response.data;
+        // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
+        // const { country_name } = response.data;
         res.status(200).json({
           name: user[0][0].username,
           email: user[0][0].emailid,
@@ -183,7 +183,7 @@ const Authentication = {
           token,
           confirm: 1,
           password,
-          country_name
+          country_name:'USA'
         });
       } else {
         res.status(400).json({
@@ -261,8 +261,8 @@ const Authentication = {
             basicTemplate(user[0][0].username, content)
           );
           let password = false
-          const response = await axios.get(`https://ipapi.co/${ip}/json/`);
-          const { country_name } = response.data;
+          // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
+          // const { country_name } = response.data;
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
@@ -272,7 +272,7 @@ const Authentication = {
             token,
             confirm: 1,
             password,
-            country_name
+            country_name:'USA'
           });
         } else {
           res
