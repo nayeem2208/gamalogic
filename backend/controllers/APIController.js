@@ -261,8 +261,8 @@ let APIControllers = {
       let download = await axios.get(
         `https://gamalogic.com/batchresult/?apikey=${apiKey}&batchid=${req.query.batchId}`
       );
-      let fileName = await req.dbConnection.query(`SELECT file_upload,date_time from useractivity_batch_link where id='${req.query.batchId}'`)
-      res.status(200).json({ datas: download.data, fileName: fileName[0][0].file_upload,dateOfUpload:fileName[0][0].date_time});
+      let fileName = await req.dbConnection.query(`SELECT file_upload from useractivity_batch_link where id='${req.query.batchId}'`)
+      res.status(200).json({ datas: download.data, fileName: fileName[0][0].file_upload});
     } catch (error) {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
@@ -365,8 +365,8 @@ let APIControllers = {
       let download = await axios.get(
         `https://gamalogic.com/batch-email-discovery-result/?apikey=${apiKey}&batchid=${req.query.batchId}`
       );
-      let fileName = await req.dbConnection.query(`SELECT file_upload,date_time from useractivity_batch_finder_link where id='${req.query.batchId}'`)
-      res.status(200).json({ datas: download.data, fileName: fileName[0][0].file_upload,dateOfUpload:fileName[0][0].date_time });
+      let fileName = await req.dbConnection.query(`SELECT file_upload from useractivity_batch_finder_link where id='${req.query.batchId}'`)
+      res.status(200).json({ datas: download.data, fileName: fileName[0][0].file_upload });
     } catch (error) {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);

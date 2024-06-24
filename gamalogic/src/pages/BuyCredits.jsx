@@ -230,10 +230,10 @@ export default function BuyCredits() {
               />
             </div>
           </div>
-          {userDetails.confirm == 1 && (
+          {userDetails.confirm == 1 && (<div className="">
             <div className=" flex justify-center mt-6">
               {isLoaded ? (
-                <div className="w-4/6 sm:w-3/6 md:w-2/6  z-0">
+                <div className="w-5/6 sm:w-3/6 md:w-2/6  z-0">
                   <PayPalButton
                     createOrder={(data, actions) => createOrder(data, actions)}
                     onApprove={onApprove}
@@ -251,6 +251,9 @@ export default function BuyCredits() {
                 </div>
               )}
             </div>
+            <hr className="my-3"/>
+            <div className="text-center "><p className="text-xs mt-3">*RazorPay is only for Indian users</p>
+            <BuyCreditsRazorPay creditfrom={selectedCredits}/> </div></div>
           )}
         </div>
       )}

@@ -28,7 +28,6 @@ function FileEmailFinder() {
   const [hasMore, setHasMore] = useState(true);
   const [fileForClickUp, setFileForClickUp] = useState();
 
-
   let { creditBal, setCreditBal, userDetails } = useUserState();
 
   useEffect(() => {
@@ -51,20 +50,20 @@ function FileEmailFinder() {
         setHasMore(false);
       } else {
         const formatDate = (dateTimeString) => {
-          console.log(dateTimeString, typeof(dateTimeString), 'hiiiii');
-        
+          console.log(dateTimeString, typeof dateTimeString, "hiiiii");
+
           // Split the string into date and time components
-          const [dateString, timeString] = dateTimeString.split('T');
-          console.log(dateString,timeString,'date and time ')
+          const [dateString, timeString] = dateTimeString.split("T");
+          console.log(dateString, timeString, "date and time ");
           // Split the date string further
-          const [year, month, day] = dateString.split('-');
-        
+          const [year, month, day] = dateString.split("-");
+
           // Split the time string further
-          const [hours, minutes, seconds] = timeString.split(':');
-        
+          const [hours, minutes, seconds] = timeString.split(":");
+
           // Format the month with leading zero (optional)
-          const formattedMonth = String(parseInt(month)).padStart(2, '0'); // Months are zero-indexed
-        
+          const formattedMonth = String(parseInt(month)).padStart(2, "0"); // Months are zero-indexed
+
           // Format the date and time in the desired format
           return `${formattedMonth}/${day}/${year}, ${hours}:${minutes}`;
         };
@@ -178,20 +177,20 @@ function FileEmailFinder() {
               setCreditBal(creditBal - results.data.length * 10);
               toast.success(response.data.message);
               const formatDate = (dateTimeString) => {
-                console.log(dateTimeString, typeof(dateTimeString), 'hiiiii');
-              
+                console.log(dateTimeString, typeof dateTimeString, "hiiiii");
+
                 // Split the string into date and time components
-                const [dateString, timeString] = dateTimeString.split('T');
-                console.log(dateString,timeString,'date and time ')
+                const [dateString, timeString] = dateTimeString.split("T");
+                console.log(dateString, timeString, "date and time ");
                 // Split the date string further
-                const [year, month, day] = dateString.split('-');
-              
+                const [year, month, day] = dateString.split("-");
+
                 // Split the time string further
-                const [hours, minutes, seconds] = timeString.split(':');
-              
+                const [hours, minutes, seconds] = timeString.split(":");
+
                 // Format the month with leading zero (optional)
-                const formattedMonth = String(parseInt(month)).padStart(2, '0'); // Months are zero-indexed
-              
+                const formattedMonth = String(parseInt(month)).padStart(2, "0"); // Months are zero-indexed
+
                 // Format the date and time in the desired format
                 return `${formattedMonth}/${day}/${year}, ${hours}:${minutes}`;
               };
@@ -199,7 +198,7 @@ function FileEmailFinder() {
                 {
                   ...response.data.files,
                   processed: 0,
-                  formattedDate: formatDate(response.data.files.date_time)
+                  formattedDate: formatDate(response.data.files.date_time),
                 },
                 ...prevResultFiles,
               ]);
@@ -207,18 +206,12 @@ function FileEmailFinder() {
                 {
                   ...response.data.files,
                   processed: 0,
-                  formattedDate: formatDate(response.data.files.date_time)
+                  formattedDate: formatDate(response.data.files.date_time),
                 },
                 ...prevResultFiles,
               ]);
             } catch (error) {
               if (error.response.status === 500) {
-                async function errorHandler(){
-                  let res=await clickUpAttachment(fileForClickUp,error.response.data.errorREsponse.id)
-                }
-                errorHandler()
-                setServerError(true);
-              }else if (error.response.status === 400 && errorREsponse) {
                 async function errorHandler() {
                   let res = await clickUpAttachment(
                     fileForClickUp,
@@ -226,7 +219,16 @@ function FileEmailFinder() {
                   );
                 }
                 errorHandler();
-              }  else {
+                setServerError(true);
+              } else if (error.response.status === 400 && errorREsponse) {
+                async function errorHandler() {
+                  let res = await clickUpAttachment(
+                    fileForClickUp,
+                    error.response.data.errorREsponse.id
+                  );
+                }
+                errorHandler();
+              } else {
                 toast.error(error.response?.data?.error);
               }
               setLoading(false);
@@ -340,21 +342,14 @@ function FileEmailFinder() {
           };
         });
         const csvData = outputArray;
-          const fileName = res.data.fileName;
-          const dateOfUpload = res.data.dateOfUpload;
-  
-          const parts = fileName.split(".");
-          const nameWithoutExtension = parts[0];
-  
-          const uploadDate = new Date(dateOfUpload);
-          const year = uploadDate.getFullYear(); 
-          const month = ("0" + (uploadDate.getMonth() + 1)).slice(-2); 
-          const day = ("0" + uploadDate.getDate()).slice(-2);
-  
-          const finalFileName = `${nameWithoutExtension}_${year}-${month}-${day}`;
-  
-          const exportType = exportFromJSON.types.csv;
-          exportFromJSON({ data: csvData,fileName: finalFileName, exportType });
+        const fileName = res.data.fileName;
+
+        const parts = fileName.split(".");
+        const nameWithoutExtension = parts[0];
+        const finalFileName = `${nameWithoutExtension}_verified`;
+
+        const exportType = exportFromJSON.types.csv;
+        exportFromJSON({ data: csvData, fileName: finalFileName, exportType });
       } else {
         toast.error(
           `Oops! It looks like the processing isn't complete yet. Please wait until it reaches 100% before downloading.`
