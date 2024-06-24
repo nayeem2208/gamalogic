@@ -12,6 +12,7 @@ import verifyEmailTemplate from "../EmailTemplates/verifyTemplate.js";
 import basicTemplate from "../EmailTemplates/BasicTemplate.js";
 import forgotPasswordTemplate from "../EmailTemplates/forgotPasswordTemplate.js";
 import urls from "../ConstFiles/urls.js";
+import leadGeneration from "../utils/crm.js";
 
 const Authentication = {
   sample: async (req, res) => {
