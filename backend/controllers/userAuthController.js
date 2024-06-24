@@ -124,6 +124,11 @@ const Authentication = {
         await dbConnection.query(
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0,'${firstname}','${lastname}')`
         );
+        try {
+          await leadGeneration(firstname, lastname, email)
+        } catch (error) {
+          ErrorHandler("registerUser Controller CRM lead Generation ", error, req);
+        }
         let token = generateConfirmationToken(email)
         let link = `${urls.frontendUrl}/api/verifyEmail?email=${token}`
         sendEmail(
@@ -241,6 +246,11 @@ const Authentication = {
         await dbConnection.query(
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname)VALUES(null,'${name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}')`
         );
+        try {
+          await leadGeneration(firstname, lastname, email)
+        } catch (error) {
+          ErrorHandler("registerUser Controller CRM lead Generation ", error, req);
+        }
         let user = await dbConnection.query(
           `SELECT * FROM registration WHERE emailid='${email}'`
         );
