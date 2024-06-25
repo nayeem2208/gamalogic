@@ -7,6 +7,7 @@ const UserDetailsProvider = ({ children }) => {
   let [userDetails, setUserDetails] = useState(null);
   let [creditBal,setCreditBal]=useState(0)
   let [tutorialVideo,setTutorialVideo]=useState(false)
+  let [paymentResult,setPaymentResult]=useState({result:null,methord:null})
 
 
   return (
@@ -17,7 +18,9 @@ const UserDetailsProvider = ({ children }) => {
         creditBal,
         setCreditBal,
         tutorialVideo,
-        setTutorialVideo
+        setTutorialVideo,
+        paymentResult,
+        setPaymentResult
       }}
     >
       {children}

@@ -25,9 +25,9 @@ const RazorpayButton = ({ cost, credits, onSuccess, onFailure }) => {
     }
 
     try {
-      const totalAmount = cost + (cost * taxRate); // Calculate total amount including tax
+      const totalAmount = cost + (cost * taxRate); 
       const result = await axiosInstance.post("/Razorpay", {
-        amount: totalAmount, // Amount in paise (1 INR = 100 paise)
+        amount: totalAmount, 
         currency: "INR",
         receipt: `receipt_${Date.now()}`,
       });

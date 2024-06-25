@@ -73,7 +73,7 @@ const Authentication = {
             token,
             confirm: user[0][0].confirmed,
             password,
-            country_name:'USA'
+            country_name: 'USA'
           });
 
         } else {
@@ -126,7 +126,7 @@ const Authentication = {
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0,'${firstname}','${lastname}')`
         );
         try {
-          await leadGeneration(firstname, lastname, email)
+          leadGeneration(firstname, lastname, email)
         } catch (error) {
           ErrorHandler("registerUser Controller CRM lead Generation ", error, req);
         }
@@ -189,7 +189,7 @@ const Authentication = {
           token,
           confirm: 1,
           password,
-          country_name:'USA'
+          country_name: 'USA'
         });
       } else {
         res.status(400).json({
@@ -248,7 +248,7 @@ const Authentication = {
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname)VALUES(null,'${name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}')`
         );
         try {
-          await leadGeneration(firstname, lastname, email)
+          leadGeneration(firstname, lastname, email)
         } catch (error) {
           ErrorHandler("registerUser Controller CRM lead Generation ", error, req);
         }
@@ -277,13 +277,13 @@ const Authentication = {
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
-            firstname:user[0][0].firstname||null,
-            lastname:user[0][0].lastname||null,
+            firstname: user[0][0].firstname || null,
+            lastname: user[0][0].lastname || null,
             credit: 500,
             token,
             confirm: 1,
             password,
-            country_name:'USA'
+            country_name: 'USA'
           });
         } else {
           res

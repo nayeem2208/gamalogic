@@ -514,6 +514,89 @@ let APIControllers = {
       let newBalance = user[0][0].credits + req.body.credits
       await dbConnection.query(`UPDATE registration SET credits='${newBalance}' WHERE emailid='${req.user[0][0].emailid}'`)
 
+      var instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET })
+      let resp=await instance.payments.fetch(req.body.razorpayPaymentId)
+      const {
+        id,
+        entity,
+        amount,
+        currency,
+        status,
+        order_id,
+        invoice_id,
+        international,
+        method,
+        amount_refunded,
+        refund_status,
+        captured,
+        description,
+        card_id,
+        bank,
+        wallet,
+        vpa,
+        email,
+        contact,
+        notes,
+        fee,
+        tax,
+        error_code,
+        error_description,
+        error_source,
+        error_step,
+        error_reason,
+        acquirer_data,
+        created_at
+      } = resp;
+
+      const amountInRupees = amount / 100;
+      const feeInRupees = fee / 100;
+      const taxInRupees = tax / 100;
+    
+      const query = `
+    INSERT INTO gl_razorpay (
+       rp_id, entity, amount, currency, status, order_id, invoice_id,
+      international, method, amount_refunded, refund_status, captured,
+      description, card_id, bank, wallet, vpa, email, contact, address, fee,
+      tax, error_code, error_description, error_source, error_step,
+      error_reason, bank_transaction_id, created_at,payment_id
+    ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+  `;
+
+  const values = [
+    req.body.razorpayPaymentId || null,
+    entity || null,
+    amountInRupees || null,
+    currency || null,
+    status || null,
+    order_id || null,
+    invoice_id || null,
+    international || null,
+    method || null,
+    amount_refunded || null,
+    refund_status || null,
+    captured || null,
+    description || null,
+    card_id || null,
+    bank || null,
+    wallet || null,
+    vpa || null,
+    email || null,
+    contact || null,
+    notes && notes.address ? notes.address : null,
+    feeInRupees || null,
+    taxInRupees || null,
+    error_code || null,
+    error_description || null,
+    error_source || null,
+    error_step || null,
+    error_reason || null,
+    acquirer_data && acquirer_data.bank_transaction_id ? acquirer_data.bank_transaction_id : null, 
+    created_at ? new Date(created_at * 1000).toISOString().slice(0, 19).replace('T', ' ') : null,
+    id
+  ];
+
+  await dbConnection.query(query, values);
+
       let content = `
       <p>Your payment for $ ${req.body.cost} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.</p>
       

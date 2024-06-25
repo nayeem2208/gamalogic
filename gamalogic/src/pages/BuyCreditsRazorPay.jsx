@@ -1,24 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useUserState } from "../context/userContext";
-import SubHeader from "../components/SubHeader";
-import { Link } from "react-router-dom";
 import RazorpayButton from "../components/RazorPayButton";
-import PaymentSuccess from "../components/PaymentSuccess";
-import PaymentFailure from "../components/PaymentFailure";
 
 export default function BuyCreditsRazorPay({creditfrom}) {
-  const [success, setSuccess] = useState(false);
-  const [failure, setFailure] = useState(false);
-  const [orderID, setOrderID] = useState(false);
+
   const [selectedCredits, setSelectedCredits] = useState(2500);
   const [cost, setCost] = useState(847.46);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [loading, setLoading] = useState(true);
   let [serverError, setServerError] = useState(false);
 
-  let { setCreditBal, creditBal, userDetails } = useUserState();
+  let { setCreditBal, creditBal,setPaymentResult } = useUserState();
   const creditsRef = useRef(selectedCredits);
-  console.log(creditfrom,'creditFrom')
+  
 
   let creditCostMappings = [
     [2500, 847.46],
@@ -45,7 +37,7 @@ export default function BuyCreditsRazorPay({creditfrom}) {
   }, [creditfrom]);
 
   const handleSuccess = () => {
-    setSuccess(true);
+    setPaymentResult({result:true,methord:'RazorPay'})
     setCreditBal(creditBal + creditsRef.current);
     toast.success("Payment successful!!");
   };
@@ -53,9 +45,8 @@ export default function BuyCreditsRazorPay({creditfrom}) {
   const handleFailure = (type) => {
     if (type === "serverError") {
       setServerError(true);
-    } else {
-      setFailure(true);
-    }
+      setPaymentResult({result:false,methord:'RazorPay'})
+    } 
   };
   return (
     <div className="text-center flex justify-center ">
