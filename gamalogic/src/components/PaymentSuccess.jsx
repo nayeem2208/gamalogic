@@ -43,7 +43,7 @@ function PaymentSuccess({ data }) {
     if (selectedCost) {
       setCostToShow(selectedCost[1]); 
     }
-  }, [paymentResult.method, data.selectedCredits]);
+  }, [paymentResult.methord, data.selectedCredits]);
 
   
   return (
@@ -58,8 +58,10 @@ function PaymentSuccess({ data }) {
         <div className="text-center flex flex-col justify-center my-6">
           <h3 className="text-5xl">Payment Success!</h3>
           <p className="my-2">
-            Your payment of {paymentResult.method === "payPal" ? `$${costToShow !== null ? costToShow.toLocaleString("en-US") : "Loading..."}` : `₹${costToShow !== null ? (Math.round(costToShow + (costToShow * 18 / 100))).toLocaleString("en-US") + ` (${costToShow.toLocaleString("en-US")} + 18%)` : "Loading..."}`}
-             for{" "}
+            Your payment of {paymentResult.methord === "payPal" ? `$${costToShow !== null ? costToShow.toLocaleString("en-US") : "Loading..."}` : `₹${costToShow !== null ? (Math.round(costToShow + (costToShow * 18 / 100))).toLocaleString("en-US")
+            //  + ` (${costToShow.toLocaleString("en-US")} + 18%)`
+              : "Loading..."}`}
+            {" "} for{" "}
             {data.selectedCredits.toLocaleString("en-US")} credits was
             successfull.
           </p>
