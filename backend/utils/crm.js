@@ -38,6 +38,7 @@ async function leadGeneration(firstName,lastName,email){
                 "id": process.env.CRM_LAYOUT_ID
               },
               "Lead_Owner":process.env.CRM_LEAD_OWNER,
+              "Lead_Source":'Sign in',
               "Last_Name": lastName,
               "First_Name": firstName,
               "Email": email,
