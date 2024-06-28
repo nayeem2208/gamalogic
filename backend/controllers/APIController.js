@@ -554,16 +554,17 @@ let APIControllers = {
     
       const query = `
     INSERT INTO gl_razorpay (
-       rp_id, entity, amount, currency, status, order_id, invoice_id,
+       rp_id,user_id, entity, amount, currency, status, order_id, invoice_id,
       international, method, amount_refunded, refund_status, captured,
       description, card_id, bank, wallet, vpa, email, contact, address, fee,
       tax, error_code, error_description, error_source, error_step,
       error_reason, bank_transaction_id, created_at,payment_id
-    ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+    ) VALUES ( ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
   `;
 
   const values = [
     req.body.razorpayPaymentId || null,
+    req.user[0][0].rowid||null,
     entity || null,
     amountInRupees || null,
     currency || null,
