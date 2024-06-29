@@ -262,7 +262,7 @@ let APIControllers = {
         `https://gamalogic.com/batchresult/?apikey=${apiKey}&batchid=${req.query.batchId}`
       );
       let fileName = await req.dbConnection.query(`SELECT file_upload from useractivity_batch_link where id='${req.query.batchId}'`)
-      res.status(200).json({ datas: download.data, fileName: fileName[0][0].file_upload});
+      res.status(200).json({ datas: download.data, fileName: fileName[0][0].file_upload });
     } catch (error) {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
@@ -401,7 +401,7 @@ let APIControllers = {
       const clientId = process.env.PAYPAL_CLIENTID;
       const clientSecret = process.env.PAYPAL_CLIENTSECRET;
 
-      const url = 'https://api-m.sandbox.paypal.com/v1/oauth2/token';
+      const url = `${urls.paypalUrl}/v1/oauth2/token`;
 
       const data = new URLSearchParams({
         grant_type: 'client_credentials',
@@ -415,7 +415,7 @@ let APIControllers = {
       let payPalToken = await axios.post(url, data, { headers })
 
       //finding order details based on that order id and access token
-      const payPaldetails = await axios.get(`https://api-m.sandbox.paypal.com/v2/checkout/orders/${req.body.data.orderID}`, {
+      const payPaldetails = await axios.get(`${urls.paypalUrl}/v2/checkout/orders/${req.body.data.orderID}`, {
         headers: {
           'Authorization': `Bearer ${payPalToken.data.access_token}`
         }
@@ -515,7 +515,7 @@ let APIControllers = {
       await dbConnection.query(`UPDATE registration SET credits='${newBalance}' WHERE emailid='${req.user[0][0].emailid}'`)
 
       var instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET })
-      let resp=await instance.payments.fetch(req.body.razorpayPaymentId)
+      let resp = await instance.payments.fetch(req.body.razorpayPaymentId)
       const {
         id,
         entity,
@@ -551,7 +551,7 @@ let APIControllers = {
       const amountInRupees = amount / 100;
       const feeInRupees = fee / 100;
       const taxInRupees = tax / 100;
-    
+
       const query = `
     INSERT INTO gl_razorpay (
        rp_id,user_id, entity, amount, currency, status, order_id, invoice_id,
@@ -562,47 +562,46 @@ let APIControllers = {
     ) VALUES ( ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
   `;
 
-  const values = [
-    req.body.razorpayPaymentId || null,
-    req.user[0][0].rowid||null,
-    entity || null,
-    amountInRupees || null,
-    currency || null,
-    status || null,
-    order_id || null,
-    invoice_id || null,
-    international || null,
-    method || null,
-    amount_refunded || null,
-    refund_status || null,
-    captured || null,
-    description || null,
-    card_id || null,
-    bank || null,
-    wallet || null,
-    vpa || null,
-    email || null,
-    contact || null,
-    notes && notes.address ? notes.address : null,
-    feeInRupees || null,
-    taxInRupees || null,
-    error_code || null,
-    error_description || null,
-    error_source || null,
-    error_step || null,
-    error_reason || null,
-    acquirer_data && acquirer_data.bank_transaction_id ? acquirer_data.bank_transaction_id : null, 
-    created_at ? new Date(created_at * 1000).toISOString().slice(0, 19).replace('T', ' ') : null,
-    id
-  ];
+      const values = [
+        req.body.razorpayPaymentId || null,
+        req.user[0][0].rowid || null,
+        entity || null,
+        amountInRupees || null,
+        currency || null,
+        status || null,
+        order_id || null,
+        invoice_id || null,
+        international || null,
+        method || null,
+        amount_refunded || null,
+        refund_status || null,
+        captured || null,
+        description || null,
+        card_id || null,
+        bank || null,
+        wallet || null,
+        vpa || null,
+        email || null,
+        contact || null,
+        notes && notes.address ? notes.address : null,
+        feeInRupees || null,
+        taxInRupees || null,
+        error_code || null,
+        error_description || null,
+        error_source || null,
+        error_step || null,
+        error_reason || null,
+        acquirer_data && acquirer_data.bank_transaction_id ? acquirer_data.bank_transaction_id : null,
+        created_at ? new Date(created_at * 1000).toISOString().slice(0, 19).replace('T', ' ') : null,
+        id
+      ];
 
-  await dbConnection.query(query, values);
+      await dbConnection.query(query, values);
 
       let content = `
+      <p>Thanks for choosing Gamalogic</p>
       <p>Your payment for ₹ ${Math.round(req.body.cost)} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.</p>
-      
-      <p>If you have any questions or concerns regarding this payment, please feel free to contact us.</p>
-      `
+            `
       sendEmail(
         req.user[0][0].username,
         req.user[0][0].emailid,
