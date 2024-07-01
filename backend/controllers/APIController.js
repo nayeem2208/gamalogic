@@ -600,7 +600,7 @@ let APIControllers = {
 
       let content = `
       <p>Thanks for choosing Gamalogic</p>
-      <p>Your payment for ₹ ${Math.round(req.body.cost)} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.</p>
+      <p>Your payment for ₹${Math.round(req.body.cost)} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.</p>
             `
       sendEmail(
         req.user[0][0].username,
