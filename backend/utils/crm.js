@@ -31,22 +31,39 @@ async function leadGeneration(firstName,lastName,email){
         'Content-Type': 'application/json'
       };
       try {
-        let postData = {
-          "data": [
-            {
-              "Layout": {
-                "id": process.env.CRM_LAYOUT_ID
-              },
-              "Lead_Owner":process.env.CRM_LEAD_OWNER,
-              "Lead_Source":'Sign in',
-              "Last_Name": lastName,
-              "First_Name": firstName,
-              "Email": email,
-            },
-          ]
+        const response = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers })
+        const existingLead = response.data.data.find((lead) => lead.Email === email);
+    
+        if (existingLead) {
+          const existingLeadId = existingLead.id;
+          let postData = {
+            "data": [
+              {
+                "id": existingLeadId,
+                "Lead_Status": "Sign in after CRM Marketing",
+              }
+            ]
+          }
+          const response = await axios.put('https://www.zohoapis.com/crm/v6/Leads', postData, { headers });
         }
-        const response = await axios.post('https://www.zohoapis.com/crm/v6/Leads', postData, { headers });
-        console.log(response.data)
+        else {
+          let postData = {
+            "data": [
+              {
+                "Layout": {
+                  "id": process.env.CRM_LAYOUT_ID
+                },
+                "Lead_Owner": process.env.CRM_LEAD_OWNER,
+                "Lead_Source": 'Sign in',
+                "Last_Name": lastName,
+                "First_Name": firstName,
+                "Email": email,
+              },
+            ]
+          }
+          const response = await axios.post('https://www.zohoapis.com/crm/v6/Leads', postData, { headers });
+        }
+    
       } catch (error) {
         console.error('Error:', error.response ? error.response.data : error.message);
       }
