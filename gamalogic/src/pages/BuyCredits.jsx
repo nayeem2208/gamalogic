@@ -167,13 +167,17 @@ export default function BuyCredits() {
     }
   }, []);
 
-  // useEffect(() => {
-  //   const rangeInput = document.querySelector(".custom-range");
-  //   rangeInput.style.setProperty(
-  //     "--value",
-  //     (rangeInput.value / (creditCostMappings.length - 1)) * 100 + "%"
-  //   );
-  // }, []);
+  useEffect(() => {
+    setTimeout(() => {
+      const rangeInput = document.querySelector(".custom-range");
+      if (rangeInput) {
+        rangeInput.style.setProperty(
+          "--value",
+          (rangeInput.value / (creditCostMappings.length - 1)) * 100 + "%"
+        );
+      }
+    }, 0);
+  }, []);
 
   const handleTryAgain = () => {
     setPaymentResult({result:null,methord:null})

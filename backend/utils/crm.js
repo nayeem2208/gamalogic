@@ -3,70 +3,114 @@
 import axios from "axios";
 
 async function refreshToken() {
-    const Accounts_URL = 'https://accounts.zoho.com'; 
-    const refresh_token = process.env.CRM_REFRESH_TOKEN; 
-    const client_id = process.env.CRM_CLIENT_ID; 
-    const client_secret = process.env.CRM_CLIENT_SECRET;
+  const Accounts_URL = 'https://accounts.zoho.com';
+  const refresh_token = process.env.CRM_REFRESH_TOKEN;
+  const client_id = process.env.CRM_CLIENT_ID;
+  const client_secret = process.env.CRM_CLIENT_SECRET;
 
-    const formData = new URLSearchParams();
-    formData.append('refresh_token', refresh_token);
-    formData.append('client_id', client_id);
-    formData.append('client_secret', client_secret);
-    formData.append('grant_type', 'refresh_token');
+  const formData = new URLSearchParams();
+  formData.append('refresh_token', refresh_token);
+  formData.append('client_id', client_id);
+  formData.append('client_secret', client_secret);
+  formData.append('grant_type', 'refresh_token');
 
-    try {
-        const response = await axios.post(`${Accounts_URL}/oauth/v2/token`, formData);
-        return response.data.access_token; 
-    } catch (error) {
-        console.error('Error refreshing access token:', error.response ? error.response.data : error.message);
-        throw error;
-    }
+  try {
+    const response = await axios.post(`${Accounts_URL}/oauth/v2/token`, formData);
+    return response.data.access_token;
+  } catch (error) {
+    console.error('Error refreshing access token:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
+async function JessicaRefreshToken() {
+  const Accounts_URL = 'https://accounts.zoho.com';
+  const refresh_token = process.env.JESSICA_CRM_REFRESH_TOKEN;
+  const client_id = process.env.JESSICA_CRM_CLIENT_ID;
+  const client_secret = process.env.JESSICA_CRM_CLIENT_SECRET;
+
+  const formData = new URLSearchParams();
+  formData.append('refresh_token', refresh_token);
+  formData.append('client_id', client_id);
+  formData.append('client_secret', client_secret);
+  formData.append('grant_type', 'refresh_token');
+
+  try {
+    const response = await axios.post(`${Accounts_URL}/oauth/v2/token`, formData);
+    return response.data.access_token;
+  } catch (error) {
+    console.error('Error refreshing access token:', error.response ? error.response.data : error.message);
+    throw error;
+  }
 }
 
 
-async function leadGeneration(firstName,lastName,email){
-    let token = await refreshToken()
-      const headers = {
-        'Authorization': `Zoho-oauthtoken ${token}`,
-        'Content-Type': 'application/json'
-      };
-      try {
-        const response = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers })
-        const existingLead = response.data.data.find((lead) => lead.Email === email);
-    
-        if (existingLead) {
-          const existingLeadId = existingLead.id;
-          let postData = {
-            "data": [
-              {
-                "id": existingLeadId,
-                "Lead_Status": "Sign in after CRM Marketing",
-              }
-            ]
-          }
-          const response = await axios.put('https://www.zohoapis.com/crm/v6/Leads', postData, { headers });
-        }
-        else {
-          let postData = {
-            "data": [
-              {
-                "Layout": {
-                  "id": process.env.CRM_LAYOUT_ID
-                },
-                "Lead_Owner": process.env.CRM_LEAD_OWNER,
-                "Lead_Source": 'Sign in',
-                "Last_Name": lastName,
-                "First_Name": firstName,
-                "Email": email,
-              },
-            ]
-          }
-          const response = await axios.post('https://www.zohoapis.com/crm/v6/Leads', postData, { headers });
-        }
-    
-      } catch (error) {
-        console.error('Error:', error.response ? error.response.data : error.message);
+
+async function leadGeneration(firstName, lastName, email) {
+  let beninToken = await refreshToken()
+  const beninHeaders = {
+    'Authorization': `Zoho-oauthtoken ${beninToken}`,
+    'Content-Type': 'application/json'
+  };
+
+  let jessicaToken = await JessicaRefreshToken()
+  const jessicaHeaders = {
+    'Authorization': `Zoho-oauthtoken ${jessicaToken}`,
+    'Content-Type': 'application/json'
+  };
+
+  try {
+    const beninResponse = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers: beninHeaders })
+    const jessicaResponse = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers: jessicaHeaders })
+
+    const beninExistingLead = beninResponse.data.data.find((lead) => lead.Email === email);
+    const jessicaExistingLead = jessicaResponse.data.data.find((lead) => lead.Email === email);
+    if (!beninExistingLead && !jessicaExistingLead) {
+      let postData = {
+        "data": [
+          {
+            "Layout": {
+              "id": process.env.CRM_LAYOUT_ID
+            },
+            "Lead_Owner": process.env.CRM_LEAD_OWNER,
+            "Lead_Source": 'Sign in',
+            "Last_Name": lastName,
+            "First_Name": firstName,
+            "Email": email,
+          },
+        ]
       }
+      await axios.post('https://www.zohoapis.com/crm/v6/Leads', postData, { headers: beninHeaders });
+
+    }
+    else if (beninExistingLead) {
+      const existingLeadId = beninExistingLead.id;
+      let postData = {
+        "data": [
+          {
+            "id": existingLeadId,
+            "Lead_Status": "Sign in after CRM Marketing",
+          }
+        ]
+      }
+      await axios.put('https://www.zohoapis.com/crm/v6/Leads', postData, { headers: beninHeaders });
+    }
+    else if (jessicaExistingLead) {
+      const existingLeadId = jessicaExistingLead.id;
+      let postData = {
+        "data": [
+          {
+            "id": existingLeadId,
+            "Owner": process.env.CRM_LEAD_OWNER_ID,
+            "Lead_Status": "Sign in after CRM Marketing",
+          }
+        ]
+      }
+      await axios.put('https://www.zohoapis.com/crm/v6/Leads', postData, { headers: jessicaHeaders });
+    }
+
+  } catch (error) {
+    console.error('Error:', error.response ? error.response.data.data : error.message);
+  }
 }
 
 export default leadGeneration;

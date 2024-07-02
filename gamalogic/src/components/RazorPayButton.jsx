@@ -33,7 +33,8 @@ const RazorpayButton = ({ cost, credits, onSuccess, onFailure }) => {
       });
 
       const keyofRazorPay = import.meta.env.VITE_RAZORPAY_KEY_ID;
-      const { amount, id: order_id, currency } = result.data.order;
+      const { amount, id, currency } = result.data.order;
+      let order_id=id
       const options = {
         key: keyofRazorPay,
         amount: amount.toString(),
@@ -44,7 +45,7 @@ const RazorpayButton = ({ cost, credits, onSuccess, onFailure }) => {
         order_id,
         handler: async function (response) {
           const data = {
-            orderCreationId: order_id,
+            orderCreationId: id,
             razorpayPaymentId: response.razorpay_payment_id,
             razorpayOrderId: response.razorpay_order_id,
             razorpaySignature: response.razorpay_signature,
