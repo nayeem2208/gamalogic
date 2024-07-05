@@ -113,4 +113,32 @@ async function leadGeneration(firstName, lastName, email) {
   }
 }
 
+export const updateLeadStatus = async (email) => {
+  try {
+    let beninToken = await refreshToken()
+    const beninHeaders = {
+      'Authorization': `Zoho-oauthtoken ${beninToken}`,
+      'Content-Type': 'application/json'
+    };
+    try {
+      const beninResponse = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers: beninHeaders })  
+      const beninExistingLead = beninResponse.data.data.find((lead) => lead.Email === email);
+      const existingLeadId = beninExistingLead.id;
+      let postData = {
+        "data": [
+          {
+            "id": existingLeadId,
+            "Lead_Status": "Paid User",
+          }
+        ]
+      }
+      await axios.put('https://www.zohoapis.com/crm/v6/Leads', postData, { headers: beninHeaders });
+    } catch (error) {
+      console.log(error)
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export default leadGeneration;

@@ -12,6 +12,7 @@ import ServerError from "./ServerError";
 import { IoDownload } from "react-icons/io5";
 import InfiniteScroll from "react-infinite-scroll-component";
 import clickUpAttachment from "../utils/clickup";
+import * as XLSX from "xlsx";
 
 function FileEmailFinder() {
   let [message, setMessage] = useState("");
@@ -111,50 +112,132 @@ function FileEmailFinder() {
     const file = event.target.files[0];
     if (userDetails.confirm == 1) {
       if (file && file.type === "text/csv") {
-        try {
-          setFileForClickUp(file);
-          Papa.parse(file, {
-            header: true,
-            complete: async function (results) {
-              results.fileName = file.name;
-              results.data = results.data.map((item) => {
-                if (
-                  !Object.prototype.hasOwnProperty.call(item, "first_name") &&
-                  !Object.prototype.hasOwnProperty.call(item, "last_name") &&
-                  !Object.prototype.hasOwnProperty.call(item, "domain")
-                ) {
-                  item = {
-                    first_name: item.firstname,
-                    last_name: item.lastname,
-                    domain: item.url,
-                  };
-                }
-                return item;
-              });
-              if (results.data.length <= 100000) {
-                // if (creditBal >= (results.data.length-1 )* 10) {
-                setJsonToServer(results);
-                setShowAlert(true);
-                // } else {
-                //   toast.error("You dont have enough credits");
-                // }
-              } else {
-                toast.error(
-                  "Please select a file with not more than 100,000 email address"
-                );
-              }
-            },
-          });
-        } catch (error) {
-          setLoading(false);
-          console.error("Error uploading file:", error);
-        }
+        handleCSVFile(file);
+      } else if (file.name.toLowerCase().endsWith(".xlsx")) {
+        handleXLSXFile(file);
+      } else if (
+        file.type === "text/plain" ||
+        file.name.toLowerCase().endsWith(".txt")
+      ) {
+        handleTXTFile(file);
       } else {
-        alert("Please select a CSV file.");
+        alert("Unsupported file type. Please select a CSV, XLSX, or TXT file.");
       }
     } else {
       toast.error("Please verify your email");
     }
+  };
+
+  const handleCSVFile = async (file) => {
+    try {
+      setFileForClickUp(file);
+      Papa.parse(file, {
+        header: true,
+        complete: async function (results) {
+          results.fileName = file.name;
+          results.data = results.data.map((item) => {
+            if (
+              !Object.prototype.hasOwnProperty.call(item, "first_name") &&
+              !Object.prototype.hasOwnProperty.call(item, "last_name") &&
+              !Object.prototype.hasOwnProperty.call(item, "domain")
+            ) {
+              item = {
+                first_name: item.firstname,
+                last_name: item.lastname,
+                domain: item.url,
+              };
+            }
+            return item;
+          });
+          if (results.data.length <= 100000) {
+            setJsonToServer(results);
+            setShowAlert(true);
+          } else {
+            toast.error(
+              "Please select a file with not more than 100,000 email address"
+            );
+          }
+        },
+      });
+    } catch (error) {
+      setLoading(false);
+      console.error("Error uploading file:", error);
+    }
+  };
+
+  const handleXLSXFile = async (file) => {
+    setFileForClickUp(file);
+    const reader = new FileReader();
+
+    reader.onload = async (e) => {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      const contacts = rows
+        .filter((contact, index) => index !== 0 && contact[1] !== undefined) // Skip header row if present and check if there's a valid first name
+        .map((contact) => {
+          if (
+            !("first_name" in contact) &&
+            !("last_name" in contact) &&
+            !("domain" in contact)
+          ) {
+            return {
+              first_name: contact[0], // First column
+              last_name: contact[1], // Second column
+              domain: contact[2], // Third column
+            };
+          } else {
+            return {
+              first_name: contact.first_name || contact.firstname || "",
+              last_name: contact.last_name || contact.lastname || "",
+              domain: contact.domain || contact.url || "",
+            };
+          }
+        });
+      const fileName = file.name;
+      if (contacts.length <= 100000) {
+        setJsonToServer({ data: contacts, fileName: fileName });
+        setShowAlert(true);
+      } else {
+        toast.error(
+          "Please select an Excel file with not more than 100,000 records."
+        );
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+  };
+
+  const handleTXTFile = async (file) => {
+    setFileForClickUp(file);
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const text = e.target.result;
+      const lines = text.split("\n");
+
+      const contacts = lines
+        .filter((line) => line.trim() !== "")
+        .map((line) => {
+          const [first_name, last_name, domain] = line
+            .split(/[,\s]+/)
+            .map((item) => item.trim());
+          return { first_name, last_name, domain };
+        });
+
+      const fileName = file.name;
+      if (contacts.length <= 100000) {
+        setJsonToServer({ data: contacts, fileName: fileName });
+        setShowAlert(true);
+      } else {
+        toast.error(
+          "Please select a TXT file with not more than 100,000 records."
+        );
+      }
+    };
+    reader.readAsText(file);
   };
 
   useEffect(() => {
@@ -177,21 +260,10 @@ function FileEmailFinder() {
               setCreditBal(creditBal - results.data.length * 10);
               toast.success(response.data.message);
               const formatDate = (dateTimeString) => {
-                console.log(dateTimeString, typeof dateTimeString, "hiiiii");
-
-                // Split the string into date and time components
                 const [dateString, timeString] = dateTimeString.split("T");
-                console.log(dateString, timeString, "date and time ");
-                // Split the date string further
                 const [year, month, day] = dateString.split("-");
-
-                // Split the time string further
                 const [hours, minutes, seconds] = timeString.split(":");
-
-                // Format the month with leading zero (optional)
-                const formattedMonth = String(parseInt(month)).padStart(2, "0"); // Months are zero-indexed
-
-                // Format the date and time in the desired format
+                const formattedMonth = String(parseInt(month)).padStart(2, "0");
                 return `${formattedMonth}/${day}/${year}, ${hours}:${minutes}`;
               };
               setResultFile((prevResultFiles) => [
@@ -341,15 +413,27 @@ function FileEmailFinder() {
             Remarks: remarks,
           };
         });
-        const csvData = outputArray;
         const fileName = res.data.fileName;
-
         const parts = fileName.split(".");
         const nameWithoutExtension = parts[0];
         const finalFileName = `${nameWithoutExtension}_verified`;
+        const fileExtension = parts[parts.length - 1].toLowerCase();
 
-        const exportType = exportFromJSON.types.csv;
-        exportFromJSON({ data: csvData, fileName: finalFileName, exportType });
+        switch (fileExtension) {
+          case "csv":
+            downloadCSV(outputArray, finalFileName);
+            break;
+          case "xlsx":
+          case "xls":
+            downloadExcel(outputArray, finalFileName);
+            break;
+          case "txt":
+            downloadText(outputArray, finalFileName);
+            break;
+          default:
+            toast.error("Unsupported file format for download.");
+            break;
+        }
       } else {
         toast.error(
           `Oops! It looks like the processing isn't complete yet. Please wait until it reaches 100% before downloading.`
@@ -363,6 +447,33 @@ function FileEmailFinder() {
       }
       setLoading(false);
     }
+  };
+
+  const downloadCSV = (data, fileName) => {
+    const exportType = exportFromJSON.types.csv;
+    exportFromJSON({ data, fileName, exportType });
+  };
+
+  const downloadExcel = (data, fileName) => {
+    const exportType = exportFromJSON.types.xls;
+    exportFromJSON({ data, fileName, exportType });
+  };
+
+  const downloadText = (data, fileName) => {
+    console.log(data, "data to txt file");
+    const textData = data
+      .map(
+        (item) =>
+          `${item.Domain},${item.FirstName},${item.LastName},${item.Email_Address},${item.Remarks}`
+      )
+      .join("\n");
+    const blob = new Blob([textData], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName + ".txt");
+    document.body.appendChild(link);
+    link.click();
   };
 
   const handleAccept = (value) => {
@@ -401,7 +512,7 @@ function FileEmailFinder() {
           type="file"
           className="flex h-9 shadow-lg text-white rounded-lg font-semibold  border border-input bg-red-600 hover:bg-red-800 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-xl file:bg-red-900 hover:file:bg-red-600 file:rounded-lg file:px-4 file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
           onChange={handleFileChange}
-          accept=".csv"
+          accept=".csv, .xlsx, .txt"
         />
       </div>
       {loading && (

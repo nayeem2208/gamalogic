@@ -7,6 +7,7 @@ import sendEmail from "../utils/zeptoMail.js";
 import basicTemplate from "../EmailTemplates/BasicTemplate.js";
 import urls from "../ConstFiles/urls.js";
 import Razorpay from "razorpay";
+import { updateLeadStatus } from "../utils/crm.js";
 
 
 let APIControllers = {
@@ -384,7 +385,7 @@ let APIControllers = {
       const dbConnection = req.dbConnection;
       let user = await dbConnection.query(`SELECT rowid,credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
       let newBalance = user[0][0].credits + req.body.credits
-      await dbConnection.query(`UPDATE registration SET credits='${newBalance}' WHERE emailid='${req.user[0][0].emailid}'`)
+      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1 WHERE emailid='${req.user[0][0].emailid}'`)
 
       let content = `
       <p>Your payment for $${Number(req.body.cost).toLocaleString()} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.</p>
@@ -452,6 +453,7 @@ let APIControllers = {
 
 
       await dbConnection.query(query, values);
+      updateLeadStatus(req.user[0][0].emailid)
       res.status(200).json('Successfull')
     } catch (error) {
       console.log(error);
@@ -512,7 +514,7 @@ let APIControllers = {
       let user = await dbConnection.query(`SELECT rowid,credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
 
       let newBalance = user[0][0].credits + req.body.credits
-      await dbConnection.query(`UPDATE registration SET credits='${newBalance}' WHERE emailid='${req.user[0][0].emailid}'`)
+      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1 WHERE emailid='${req.user[0][0].emailid}'`)
 
       var instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET })
       let resp = await instance.payments.fetch(req.body.razorpayPaymentId)
@@ -608,6 +610,7 @@ let APIControllers = {
         "Payment successfull",
         basicTemplate(req.user[0][0].username, content)
       );
+      updateLeadStatus(req.user[0][0].emailid)
       res.status(200).json('Successfull')
     } catch (error) {
       console.log(error);

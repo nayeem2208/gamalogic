@@ -12,6 +12,7 @@ import { IoDownload } from "react-icons/io5";
 import { json } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 import clickUpAttachment from "../utils/clickup";
+import { handleCSVFile, handleTXTFile, handleXLSXFile } from "../utils/emailVerificationFile";
 
 function EmailVerification() {
   let [message, setMessage] = useState("");
@@ -37,6 +38,7 @@ function EmailVerification() {
     }
     fetchAllFiles(pageIndex);
   }, []);
+
 
   const fetchAllFiles = async (newPageIndex) => {
     try {
@@ -197,15 +199,26 @@ function EmailVerification() {
               status: status,
             };
           });
-        const csvData = outputArray;
         const fileName = res.data.fileName;
-
         const parts = fileName.split(".");
         const nameWithoutExtension = parts[0];
         const finalFileName = `${nameWithoutExtension}_verified`;
-
-        const exportType = exportFromJSON.types.csv;
-        exportFromJSON({ data: csvData, fileName: finalFileName, exportType });
+        const fileExtension = parts[parts.length - 1].toLowerCase();
+        switch (fileExtension) {
+          case "csv":
+            downloadCSV(outputArray, finalFileName);
+            break;
+          case "xlsx":
+          case "xls":
+            downloadExcel(outputArray, finalFileName);
+            break;
+          case "txt":
+            downloadText(outputArray, finalFileName);
+            break;
+          default:
+            toast.error("Unsupported file format for download.");
+            break;
+        }
       } else {
         toast.error(
           `Oops! It looks like the processing isn't complete yet. Please wait until it reaches 100% before downloading.`
@@ -220,41 +233,62 @@ function EmailVerification() {
     }
   };
 
+  const downloadCSV = (data, fileName) => {
+    const exportType = exportFromJSON.types.csv;
+    exportFromJSON({ data, fileName, exportType });
+  };
+
+  const downloadExcel = (data, fileName) => {
+    const exportType = exportFromJSON.types.xls;
+    exportFromJSON({ data, fileName, exportType });
+  };
+
+  const downloadText = (data, fileName) => {
+    const textData = data
+      .map((item) => `${item.emailid},${item.status}`)
+      .join("\n");
+    const blob = new Blob([textData], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName + ".txt");
+    document.body.appendChild(link);
+    link.click();
+  };
+
+
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (userDetails.confirm == 1) {
       if (file && file.type === "text/csv") {
-        try {
-          setFileForClickUp(file);
-          Papa.parse(file, {
-            // header: true,
-            complete: async function (results) {
-              const emails = results.data
-                .filter((emailArray) => emailArray[0] !== "emailid")
-                .map((emailArray) => {
-                  return { emailid: emailArray[0] };
-                });
-              const fileName = file.name;
-              if (emails.length <= 100001) {
-                // if (creditBal >= emails.length-1) {
-                setJsonToServer({ emails: emails, fileName: fileName });
-                setShowAlert(true);
-                // } else {
-                //   toast.error("You dont have enough credits");
-                // }
-              } else {
-                toast.error(
-                  "Please select a file with not more than 100,000 email address"
-                );
-              }
-            },
-          });
-        } catch (error) {
-          setLoading(false);
-          console.error("Error uploading file:", error);
-        }
+        handleCSVFile(
+          file,
+          setFileForClickUp,
+          setJsonToServer,
+          setShowAlert,
+          toast
+        );
+      } else if (file.name.toLowerCase().endsWith(".xlsx")) {
+        handleXLSXFile(
+          file,
+          setFileForClickUp,
+          setJsonToServer,
+          setShowAlert,
+          toast
+        );
+      } else if (
+        file.type === "text/plain" ||
+        file.name.toLowerCase().endsWith(".txt")
+      ) {
+        handleTXTFile(
+          file,
+          setFileForClickUp,
+          setJsonToServer,
+          setShowAlert,
+          toast
+        );
       } else {
-        alert("Please select a CSV file.");
+        alert("Unsupported file type. Please select a CSV, XLSX, or TXT file.");
       }
     } else {
       toast.error("Please verify your email");
@@ -274,27 +308,15 @@ function EmailVerification() {
           results
         );
         if ((response.status, "response.statusssssssssssssss"))
-          console.log(response, "responseeeeeeeeeeee");
         setLoad(100);
         setCreditBal(creditBal - JsonToServer.emails.length);
         setMessage(response.data.message);
         toast.success(response.data.message);
         const formatDate = (dateTimeString) => {
-          console.log(dateTimeString, typeof dateTimeString, "hiiiii");
-
-          // Split the string into date and time components
           const [dateString, timeString] = dateTimeString.split("T");
-          console.log(dateString, timeString, "date and time ");
-          // Split the date string further
           const [year, month, day] = dateString.split("-");
-
-          // Split the time string further
           const [hours, minutes, seconds] = timeString.split(":");
-
-          // Format the month with leading zero (optional)
-          const formattedMonth = String(parseInt(month)).padStart(2, "0"); // Months are zero-indexed
-
-          // Format the date and time in the desired format
+          const formattedMonth = String(parseInt(month)).padStart(2, "0"); 
           return `${formattedMonth}/${day}/${year}, ${hours}:${minutes}`;
         };
         setResultFile((prevResultFiles) => [
@@ -409,7 +431,7 @@ function EmailVerification() {
         <input
           type="file"
           className="flex h-9 shadow-lg text-white rounded-lg font-semibold  border border-input bg-red-600 hover:bg-red-800 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-xl file:bg-red-900 hover:file:bg-red-600 file:rounded-lg file:px-4 file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
-          accept=".csv"
+          accept=".csv, .xlsx, .txt"
           onChange={handleFileChange}
         />
       </form>
