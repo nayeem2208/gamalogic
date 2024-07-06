@@ -14,7 +14,7 @@ const ErrorHandler = async (controller, error, req) => {
     const url = req.route.path;
     let user
     if (req.user) {
-       user = req.user[0][0]?.rowid ;
+       user = req.user[0][0]?.rowid ||null;
     } else {
       console.error('req.user is undefined');
     }

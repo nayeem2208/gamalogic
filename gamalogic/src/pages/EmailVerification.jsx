@@ -12,7 +12,12 @@ import { IoDownload } from "react-icons/io5";
 import { json } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 import clickUpAttachment from "../utils/clickup";
-import { handleCSVFile, handleTXTFile, handleXLSXFile } from "../utils/emailVerificationFile";
+import {
+  handleCSVFile,
+  handleTXTFile,
+  handleXLSXFile,
+} from "../utils/emailVerificationFile";
+import * as XLSX from "xlsx";
 
 function EmailVerification() {
   let [message, setMessage] = useState("");
@@ -38,7 +43,6 @@ function EmailVerification() {
     }
     fetchAllFiles(pageIndex);
   }, []);
-
 
   const fetchAllFiles = async (newPageIndex) => {
     try {
@@ -209,8 +213,10 @@ function EmailVerification() {
             downloadCSV(outputArray, finalFileName);
             break;
           case "xlsx":
+            downloadExcel(outputArray, finalFileName, fileExtension);
+            break;
           case "xls":
-            downloadExcel(outputArray, finalFileName);
+            downloadExcel(outputArray, finalFileName, fileExtension);
             break;
           case "txt":
             downloadText(outputArray, finalFileName);
@@ -238,9 +244,21 @@ function EmailVerification() {
     exportFromJSON({ data, fileName, exportType });
   };
 
-  const downloadExcel = (data, fileName) => {
-    const exportType = exportFromJSON.types.xls;
-    exportFromJSON({ data, fileName, exportType });
+  const downloadExcel = (data, fileName, fileType) => {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    
+    let extension = '';
+    if (fileType === 'xlsx') {
+      extension = '.xlsx';
+    } else if (fileType === 'xls') {
+      extension = '.xls';
+    } else {
+      throw new Error(`Unsupported file type: ${fileType}`);
+    }
+    
+    XLSX.writeFile(wb, `${fileName}${extension}`);
   };
 
   const downloadText = (data, fileName) => {
@@ -256,7 +274,6 @@ function EmailVerification() {
     link.click();
   };
 
-
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (userDetails.confirm == 1) {
@@ -268,7 +285,10 @@ function EmailVerification() {
           setShowAlert,
           toast
         );
-      } else if (file.name.toLowerCase().endsWith(".xlsx")) {
+      } else if (
+        file.name.toLowerCase().endsWith(".xlsx") ||
+        file.name.toLowerCase().endsWith(".xls")
+      ) {
         handleXLSXFile(
           file,
           setFileForClickUp,
@@ -307,8 +327,7 @@ function EmailVerification() {
           "/batchEmailVerification",
           results
         );
-        if ((response.status, "response.statusssssssssssssss"))
-        setLoad(100);
+        if ((response.status, "response.statusssssssssssssss")) setLoad(100);
         setCreditBal(creditBal - JsonToServer.emails.length);
         setMessage(response.data.message);
         toast.success(response.data.message);
@@ -316,7 +335,7 @@ function EmailVerification() {
           const [dateString, timeString] = dateTimeString.split("T");
           const [year, month, day] = dateString.split("-");
           const [hours, minutes, seconds] = timeString.split(":");
-          const formattedMonth = String(parseInt(month)).padStart(2, "0"); 
+          const formattedMonth = String(parseInt(month)).padStart(2, "0");
           return `${formattedMonth}/${day}/${year}, ${hours}:${minutes}`;
         };
         setResultFile((prevResultFiles) => [
@@ -431,7 +450,7 @@ function EmailVerification() {
         <input
           type="file"
           className="flex h-9 shadow-lg text-white rounded-lg font-semibold  border border-input bg-red-600 hover:bg-red-800 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-xl file:bg-red-900 hover:file:bg-red-600 file:rounded-lg file:px-4 file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
-          accept=".csv, .xlsx, .txt"
+          accept=".csv, .xlsx, .txt,.xls"
           onChange={handleFileChange}
         />
       </form>
