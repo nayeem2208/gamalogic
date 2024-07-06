@@ -121,18 +121,20 @@ export const updateLeadStatus = async (email) => {
       'Content-Type': 'application/json'
     };
     try {
-      const beninResponse = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers: beninHeaders })  
+      const beninResponse = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email,Lead_Status', { headers: beninHeaders })
       const beninExistingLead = beninResponse.data.data.find((lead) => lead.Email === email);
-      const existingLeadId = beninExistingLead.id;
-      let postData = {
-        "data": [
-          {
-            "id": existingLeadId,
-            "Lead_Status": "Paid User",
-          }
-        ]
+      if (beninExistingLead && beninExistingLead.Lead_Status != 'Paid User') {
+        const existingLeadId = beninExistingLead.id;
+        let postData = {
+          "data": [
+            {
+              "id": existingLeadId,
+              "Lead_Status": "Paid User",
+            }
+          ]
+        }
+        await axios.put('https://www.zohoapis.com/crm/v6/Leads', postData, { headers: beninHeaders });
       }
-      await axios.put('https://www.zohoapis.com/crm/v6/Leads', postData, { headers: beninHeaders });
     } catch (error) {
       console.log(error)
     }
