@@ -319,7 +319,7 @@ const Authentication = {
             },
           });
           const userInfoResponse = await axiosInstance.get('https://api.linkedin.com/v2/userinfo')
-          const { given_name, email } = userInfoResponse;
+          const { given_name, email } = userInfoResponse.data;
           let [firstname, ...lastnameArray] = given_name.split(" ");
           let lastname = lastnameArray.join(" ");
           if (!lastname || !isNaN(lastname)) {
@@ -425,7 +425,7 @@ const Authentication = {
             },
           });
           const userInfoResponse = await axiosInstance.get('https://api.linkedin.com/v2/userinfo')
-          const { email } = userInfoResponse;
+          const { email } = userInfoResponse.data;
           let user = await dbConnection.query(
             `SELECT * FROM registration WHERE emailid='${email}'`
           );
