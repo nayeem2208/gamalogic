@@ -306,7 +306,7 @@ const Authentication = {
     try {
       const { code } = req.body;
       if (!code) throw new Error('No code provided')
-      const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_REDIRECT_URI)}`;
+      const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_SIGNUP_REDIRECT_URI)}`;
       try {
         let accessTokenResponse = await axios.get(accessTokenUrl);
         try {
@@ -347,9 +347,9 @@ const Authentication = {
               .toISOString()
               .slice(0, 19)
               .replace("T", " ");
-    
+
             let apiKey = await generateUniqueApiKey(req);
-    
+
             await dbConnection.query(
               `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname)VALUES(null,'${given_name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}')`
             );
@@ -411,7 +411,7 @@ const Authentication = {
     try {
       const { code } = req.body;
       if (!code) throw new Error('No code provided')
-      const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_REDIRECT_URI)}`;
+      const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_LOGIN_REDIRECT_URI)}`;
       try {
         let accessTokenResponse = await axios.get(accessTokenUrl);
         try {
@@ -424,45 +424,45 @@ const Authentication = {
           });
           const userInfoResponse = await axiosInstance.get('https://api.linkedin.com/v2/userinfo')
           const { email } = userInfoResponse;
-      let user = await dbConnection.query(
-        `SELECT * FROM registration WHERE emailid='${email}'`
-      );
-      if (user[0].length > 0) {
-        const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
-        let creditBal;
-        let finalFree = new Date(user[0][0].free_final);
-        let finalFreeDate = new Date(finalFree);
-        let currentDate = new Date();
-        if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
-          creditBal = user[0][0].credits_free + user[0][0].credits
-        } else {
-          creditBal = user[0][0].credits;
-        }
+          let user = await dbConnection.query(
+            `SELECT * FROM registration WHERE emailid='${email}'`
+          );
+          if (user[0].length > 0) {
+            const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
+            let creditBal;
+            let finalFree = new Date(user[0][0].free_final);
+            let finalFreeDate = new Date(finalFree);
+            let currentDate = new Date();
+            if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
+              creditBal = user[0][0].credits_free + user[0][0].credits
+            } else {
+              creditBal = user[0][0].credits;
+            }
 
-        let password = user[0][0].password != 0;
-        let ip = req.headers['cf-connecting-ip'] ||
-          req.headers['x-real-ip'] ||
-          req.headers['x-forwarded-for'] ||
-          req.socket.remoteAddress || '';
-        // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
-        // const { country_name } = response.data;
-        res.status(200).json({
-          name: user[0][0].username,
-          email: user[0][0].emailid,
-          firstname: user[0][0].firstname || null,
-          lastname: user[0][0].lastname || null,
-          credit: creditBal,
-          token,
-          confirm: 1,
-          password,
-          country_name: 'India'
-        });
-      } else {
-        res.status(400).json({
-          error:
-            "Unauthorised Access, Please register with us",
-        });
-      }
+            let password = user[0][0].password != 0;
+            let ip = req.headers['cf-connecting-ip'] ||
+              req.headers['x-real-ip'] ||
+              req.headers['x-forwarded-for'] ||
+              req.socket.remoteAddress || '';
+            // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
+            // const { country_name } = response.data;
+            res.status(200).json({
+              name: user[0][0].username,
+              email: user[0][0].emailid,
+              firstname: user[0][0].firstname || null,
+              lastname: user[0][0].lastname || null,
+              credit: creditBal,
+              token,
+              confirm: 1,
+              password,
+              country_name: 'India'
+            });
+          } else {
+            res.status(400).json({
+              error:
+                "Unauthorised Access, Please register with us",
+            });
+          }
         } catch (error) {
           console.log(error)
         }
