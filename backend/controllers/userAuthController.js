@@ -405,7 +405,12 @@ const Authentication = {
       }
     } catch (error) {
       console.log(error);
+      ErrorHandler("Linkedin Signup Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
+    } finally {
+      if (req.dbConnection) {
+        await req.dbConnection.release();
+      }
     }
   },
   linkedinSignIn: async (req, res) => {
@@ -475,8 +480,12 @@ const Authentication = {
       }
     } catch (error) {
       console.log(error);
+      ErrorHandler("Linkedin Login Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
-
+    } finally {
+      if (req.dbConnection) {
+        await req.dbConnection.release();
+      }
     }
   },
   verifyEmail: async (req, res) => {
