@@ -304,6 +304,7 @@ const Authentication = {
   },
   linkedinSignUp: async (req, res) => {
     try {
+      const dbConnection = req.dbConnection;
       const { code } = req.body;
       if (!code) throw new Error('No code provided')
       const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_SIGNUP_REDIRECT_URI)}`;
@@ -409,6 +410,7 @@ const Authentication = {
   },
   linkedinSignIn: async (req, res) => {
     try {
+      const dbConnection = req.dbConnection;
       const { code } = req.body;
       if (!code) throw new Error('No code provided')
       const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_LOGIN_REDIRECT_URI)}`;
