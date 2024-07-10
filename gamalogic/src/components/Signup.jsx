@@ -8,6 +8,7 @@ import { useUserState } from "../context/userContext";
 import { FaEye } from "react-icons/fa";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import ServerError from "../pages/ServerError";
+import LinkedInPage from "./Linkedin";
 
 function Signup() {
   let [data, setData] = useState({
@@ -32,6 +33,38 @@ function Signup() {
         "Real time Catch all email validation API | Beta Gamalogic";
     } else {
       document.title = "Real time Catch all email validation API | Gamalogic";
+    }
+  }, []);
+
+  useEffect(() => {
+    let windowUrl = window.location.href;
+    if (windowUrl.includes("code=")) {
+      let codeMatch = windowUrl.match(/code=([a-zA-Z0-9_\-]+)/);
+      if (codeMatch) {
+        const code = codeMatch[1]; 
+        const LinkedinSingup = async () => {
+          try {
+            const res = await axiosInstance.post("/linkedinSignUp", { code });
+            toast.success(
+              "Welcome to Gamalogic! You've successfully registered with us."
+            );
+            let token = res.data;
+            setUserDetails(token);
+            setCreditBal(token.credit);
+            localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+            setTutorialVideo(true);
+            navigate("/dashboard/quick-validation");
+          } catch (err) {
+            console.log(err);
+            if (err.response.status === 500) {
+              setServerError(true);
+            } else {
+              toast.error(err.response?.data?.error);
+            }
+          }
+        };
+        LinkedinSingup()
+      }
     }
   }, []);
 
@@ -293,6 +326,9 @@ function Signup() {
               }}
             />
           </div>
+          <div className="flex justify-center mt-5 ">
+              <LinkedInPage endpoint={'signup'}/>
+            </div>
           <Link to="/signin">
             <div className="flex justify-center text-xs md:text-sm text-gray-300">
               Already have an account?

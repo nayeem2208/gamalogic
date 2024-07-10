@@ -395,8 +395,9 @@ function EmailVerification() {
       <form className="mt-8 sm:mt-14 subHeading flex flex-col sm:flex-none justify-center items-center sm:justify-start sm:items-start">
         <h3>Upload Your File Here | Email Validation</h3>
         <p className="my-7  description">
-          You can upload the email address list in csv file and get results in
-          csv. Select a file to upload.
+        You can upload a file containing email addresses in CSV, Excel, or
+          text format. Depending on the file type you upload, you will receive
+          the results in the corresponding format.
         </p>
         {showAlert && (
           <div

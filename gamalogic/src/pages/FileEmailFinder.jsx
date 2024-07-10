@@ -113,7 +113,10 @@ function FileEmailFinder() {
     if (userDetails.confirm == 1) {
       if (file && file.type === "text/csv") {
         handleCSVFile(file);
-      } else if (file.name.toLowerCase().endsWith(".xlsx")||file.name.toLowerCase().endsWith(".xls")) {
+      } else if (
+        file.name.toLowerCase().endsWith(".xlsx") ||
+        file.name.toLowerCase().endsWith(".xls")
+      ) {
         handleXLSXFile(file);
       } else if (
         file.type === "text/plain" ||
@@ -424,10 +427,10 @@ function FileEmailFinder() {
             downloadCSV(outputArray, finalFileName);
             break;
           case "xlsx":
-            downloadExcel(outputArray, finalFileName,fileExtension);
+            downloadExcel(outputArray, finalFileName, fileExtension);
             break;
           case "xls":
-            downloadExcel(outputArray, finalFileName,fileExtension);
+            downloadExcel(outputArray, finalFileName, fileExtension);
             break;
           case "txt":
             downloadText(outputArray, finalFileName);
@@ -448,7 +451,7 @@ function FileEmailFinder() {
         toast.error(error.response?.data?.error);
       }
       setLoading(false);
-      console.log(error)
+      console.log(error);
     }
   };
 
@@ -460,17 +463,17 @@ function FileEmailFinder() {
   const downloadExcel = (data, fileName, fileType) => {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(data);
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-    
-    let extension = '';
-    if (fileType === 'xlsx') {
-      extension = '.xlsx';
-    } else if (fileType === 'xls') {
-      extension = '.xls';
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    let extension = "";
+    if (fileType === "xlsx") {
+      extension = ".xlsx";
+    } else if (fileType === "xls") {
+      extension = ".xls";
     } else {
       throw new Error(`Unsupported file type: ${fileType}`);
     }
-    
+
     XLSX.writeFile(wb, `${fileName}${extension}`);
   };
 
@@ -520,8 +523,9 @@ function FileEmailFinder() {
       <div className="mt-8 sm:mt-14 subHeading flex flex-col sm:flex-none justify-center items-center sm:justify-start sm:items-start">
         <h3>Upload Your File Here | Email Finder</h3>
         <p className="my-7  description">
-          You can upload the email address list in csv file and get results in
-          csv. Download a sample file to upload here Select a file to upload.
+          You can upload a file in CSV, Excel, or text format. Depending on the
+          file type you upload, you will receive the results in the
+          corresponding format.
         </p>
         <input
           type="file"

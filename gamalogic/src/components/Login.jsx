@@ -6,6 +6,7 @@ import { useUserState } from "../context/userContext";
 import { toast } from "react-toastify";
 import { FaEye } from "react-icons/fa";
 import ServerError from "../pages/ServerError";
+import LinkedInPage from "./Linkedin";
 
 function Login() {
   let [data, setData] = useState({ email: "", password: "" });
@@ -29,6 +30,35 @@ function Login() {
       document.title = "Real time Catch all email validation | Beta Gamalogic";
     } else {
       document.title = "Real time Catch all email validation | Gamalogic";
+    }
+  }, []);
+
+  useEffect(() => {
+    let windowUrl = window.location.href;
+    if (windowUrl.includes("code=")) {
+      let codeMatch = windowUrl.match(/code=([a-zA-Z0-9_\-]+)/);
+      if (codeMatch) {
+        const code = codeMatch[1]; 
+        const LinkedinSingup = async () => {
+          try {
+            const res = await axiosInstance.post("/linkedinSignIn", { code });
+            toast.success("Welcome back! You've successfully logged in");
+            let token = res.data;
+            setUserDetails(token);
+            setCreditBal(token.credit);
+            localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+            setTutorialVideo(true)
+            navigate("/dashboard/quick-validation");
+          } catch (err) {
+            if (err.response.status === 500) {
+              setServerError(true); 
+            } else {
+              toast.error(err.response?.data.error);
+            }
+          }
+        };
+        LinkedinSingup()
+      }
     }
   }, []);
 
@@ -170,7 +200,7 @@ function Login() {
               </button>
             </div>
           </form>
-          <div className="flex justify-center my-5 ">
+          <div className="flex justify-center mt-5 ">
             {" "}
             {/* <div className="bg-white text-gray-700 p-3 w-3/5 h-16 rounded-lg shadow-md shadow-gray-200 flex justify-center items-center">
               <button onClick={() => login()}>Signin with Google</button>
@@ -184,7 +214,10 @@ function Login() {
               }}
             />
           </div>
-          <div className="flex justify-center text-xs md:text-sm text-gray-300">
+          <div className="flex justify-center mt-5 ">
+              <LinkedInPage endpoint={'signin'}/>
+            </div>
+          <div className="flex justify-center text-xs md:text-sm text-gray-300 mt-5">
             <Link to="/signup">
               <div className="border-r border-cyan-400 mx-2 px-2">
                 Need an account?
