@@ -352,7 +352,7 @@ const Authentication = {
             let apiKey = await generateUniqueApiKey(req);
 
             await dbConnection.query(
-              `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname)VALUES(null,'${given_name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}')`
+              `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,is_linkedin,is_premium,firstname,lastname)VALUES(null,'${given_name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}')`
             );
             try {
               leadGeneration(firstname, lastname, email)
@@ -445,7 +445,6 @@ const Authentication = {
             } else {
               creditBal = user[0][0].credits;
             }
-
             let password = user[0][0].password != 0;
             let ip = req.headers['cf-connecting-ip'] ||
               req.headers['x-real-ip'] ||
