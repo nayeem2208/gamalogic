@@ -317,15 +317,27 @@ const Authentication = {
       const dbConnection = req.dbConnection;
       const { code } = req.body;
       if (!code) throw new Error('No code provided')
+        let token = await dbConnection.query('SELECT * FROM token WHERE id=1')
+      let currentDate = new Date();
+      let accessToken;
       const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_SIGNUP_REDIRECT_URI)}`;
+      let expiryDate = new Date(token[0][0].expiry);
+      if (expiryDate > currentDate) {
+        accessToken = token[0][0].linkedin_access_token;
+      } else {
+        let response = await axios.get(accessTokenUrl);
+        accessToken = response.data.access_token;
+        let newExpiryDate = new Date();
+        newExpiryDate.setDate(newExpiryDate.getDate() + 60); 
+        await dbConnection.query(`UPDATE token SET linkedin_access_token = '${accessToken}', expiry = '${newExpiryDate.toISOString()}' WHERE id = 1`);
+      }
       try {
-        let accessTokenResponse = await axios.get(accessTokenUrl);
         try {
           const axiosInstance = axios.create({
             timeout: 15000,
             maxRedirects: 5,
             headers: {
-              'Authorization': `Bearer ${accessTokenResponse.data.access_token}`,
+              'Authorization': `Bearer ${accessToken}`,
             },
           });
           const userInfoResponse = await axiosInstance.get('https://api.linkedin.com/v2/userinfo')
