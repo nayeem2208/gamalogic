@@ -67,9 +67,10 @@ function Signup() {
           } else {
             toast.error(err.response?.data?.error);
           }
-          // Handle errors appropriately (e.g., toast error message)
         } finally {
-          setLinkedinLoading(false); // Set loading state to false after processing
+          setLinkedinLoading(false); 
+          const newUrl = window.location.origin + window.location.pathname;
+          window.history.replaceState(null, "", newUrl);
         }
       })();
     }

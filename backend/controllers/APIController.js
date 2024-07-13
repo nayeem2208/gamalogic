@@ -99,7 +99,7 @@ let APIControllers = {
       let find = await axios.get(
         `https://gamalogic.com/email-discovery/?firstname=${firstname}&lastname=${lastname}&domain=${req.body.domain}&apikey=${apiKey}&speed_rank=0`
       );
-      res.status(200).json(find.data);
+      res.status(200).json(find?.data);
     } catch (error) {
       console.log(error);
       ErrorHandler("FindSingleEmail Controller", error, req);

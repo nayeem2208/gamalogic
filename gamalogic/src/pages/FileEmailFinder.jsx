@@ -139,18 +139,21 @@ function FileEmailFinder() {
         complete: async function (results) {
           results.fileName = file.name;
           results.data = results.data.map((item) => {
-            if (
-              !Object.prototype.hasOwnProperty.call(item, "first_name") &&
-              !Object.prototype.hasOwnProperty.call(item, "last_name") &&
-              !Object.prototype.hasOwnProperty.call(item, "domain")
-            ) {
-              item = {
-                first_name: item.firstname,
-                last_name: item.lastname,
-                domain: item.url,
+            if (!item.hasOwnProperty("first_name") && !item.hasOwnProperty("last_name") && !item.hasOwnProperty("domain")) {
+              return {
+                first_name: item[Object.keys(item)[0]], // First column if named keys are not found
+                last_name: item[Object.keys(item)[1]], // Second column if named keys are not found
+                domain: item[Object.keys(item)[2]] || '', // Third column if named keys are not found
+              };
+            } else {
+              return {
+                first_name: item.first_name || item.firstname || '',
+                last_name: item.last_name || item.lastname || '',
+                domain: item.domain || item.url || '',
               };
             }
-            return item;
+          }).filter((item) => {
+            return item.first_name && item.last_name && item.domain;
           });
           if (results.data.length <= 100000) {
             setJsonToServer(results);
@@ -405,13 +408,16 @@ function FileEmailFinder() {
           let remarks = "";
           if (obj.is_catchall == 1) {
             remarks = "Catch all Address";
-          } else {
+          } else if(obj.is_catchall==0&&obj.email_address!=0) {
             remarks = "Valid Address";
           }
+          else{
+            remarks=''
+          }
           return {
-            Domain: obj.domain,
             FirstName: obj.firstname,
             LastName: obj.lastname,
+            Domain: obj.domain,
             Email_Address: obj.email_address,
             Remarks: remarks,
           };
@@ -419,7 +425,7 @@ function FileEmailFinder() {
         const fileName = res.data.fileName;
         const parts = fileName.split(".");
         const nameWithoutExtension = parts[0];
-        const finalFileName = `${nameWithoutExtension}_verified`;
+        const finalFileName = `${nameWithoutExtension}_finder`;
         const fileExtension = parts[parts.length - 1].toLowerCase();
 
         switch (fileExtension) {
@@ -482,7 +488,7 @@ function FileEmailFinder() {
     const textData = data
       .map(
         (item) =>
-          `${item.Domain},${item.FirstName},${item.LastName},${item.Email_Address},${item.Remarks}`
+          `${item.FirstName},${item.LastName},${item.Domain},${item.Email_Address},${item.Remarks}`
       )
       .join("\n");
     const blob = new Blob([textData], { type: "text/plain;charset=utf-8" });

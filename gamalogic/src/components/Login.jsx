@@ -65,6 +65,8 @@ function Login() {
           }
         } finally {
           setLinkedinLoading(false); 
+          const newUrl = window.location.origin + window.location.pathname;
+          window.history.replaceState(null, "", newUrl);
         }
       })();
     }
