@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@azure/msal-browser": "^3.19.1",
+    "@azure/msal-react": "^2.0.21",
     "@paypal/react-paypal-js": "^8.2.0",
     "@ramonak/react-progress-bar": "^5.2.0",
     "@react-oauth/google": "^0.12.1",

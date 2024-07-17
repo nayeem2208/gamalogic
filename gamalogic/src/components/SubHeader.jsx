@@ -6,13 +6,30 @@ import { startTransition, useState } from "react";
 import { SlInfo } from "react-icons/sl";
 import axiosInstance from "../axios/axiosInstance";
 import ServerError from "../pages/ServerError";
+import { useMsal } from "@azure/msal-react";
+
 
 function SubHeader(props) {
-  let { setUserDetails, userDetails, creditBal } = useUserState();
+  let { setUserDetails, userDetails, creditBal,setLinkedinLoading } = useUserState();
   let [serverError, setServerError] = useState(false);
   let navigate = useNavigate();
+  const { instance } = useMsal();
+
+
   function logoutHandler() {
-    startTransition(() => {
+    startTransition(async() => {
+      setLinkedinLoading(true);
+      sessionStorage.clear();
+      const result = await instance.handleRedirectPromise();
+      if (result !== null && result.account !== null) {
+        try {
+          instance.logout();
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLinkedinLoading(false);
+        }
+      }
       localStorage.removeItem("Gamalogic_token");
       setUserDetails(null);
       navigate("/signin");

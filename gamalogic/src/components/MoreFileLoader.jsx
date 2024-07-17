@@ -5,17 +5,17 @@ const override = {
     margin: "0 auto",
     borderColor: "red",
   };
-  
-function LinkedinLoading() {
+
+function MoreFileLoader() {
     let [loading, setLoading] = useState(true);
-    let [color, setColor] = useState("#1da6b8");
+    let [color, setColor] = useState("#0A0E2B");
   return (
-    <div className="sweet-loading flex justify-center items-center mt-32 ">
+    <div className="sweet-loading flex justify-center items-center  ">
       <GridLoader
         color={color}
         loading={loading}
         cssOverride={override}
-        size={20}
+        size={10}
         aria-label="Loading Spinner"
         data-testid="loader"
       />
@@ -23,4 +23,4 @@ function LinkedinLoading() {
   )
 }
 
-export default LinkedinLoading
+export default MoreFileLoader

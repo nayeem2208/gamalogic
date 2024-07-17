@@ -15,12 +15,15 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUserState } from "../context/userContext";
 import { startTransition } from 'react';
+import { useMsal } from "@azure/msal-react";
+
 
 function SideBar() {
   let [uploadfileDropDown, setUploadFileDropDown] = useState(false);
   let [tutorialDropDown, setTutorialDropDown] = useState(false);
-  let {setUserDetails,userDetails}=useUserState()
+  let {setUserDetails,userDetails,setLinkedinLoading}=useUserState()
   let navigate = useNavigate();
+  const { instance } = useMsal();
 
   const location=useLocation()
   // console.log(location,'locationnnnn')
@@ -40,7 +43,19 @@ function SideBar() {
   };
 
   function logoutHandler() {
-    startTransition(() => {
+    startTransition(async() => {
+      setLinkedinLoading(true)
+      sessionStorage.clear();
+      const result = await instance.handleRedirectPromise();
+      if (result !== null && result.account !== null) {
+        try {
+          instance.logout(); 
+        } catch (error) {
+          console.log(error)
+        }finally{
+          setLinkedinLoading(false)
+        }
+      }
     localStorage.removeItem("Gamalogic_token");
     setUserDetails(null);
     navigate("/signin");

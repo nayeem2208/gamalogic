@@ -8,14 +8,16 @@ import { FaEye } from "react-icons/fa";
 import ServerError from "../pages/ServerError";
 import LinkedInPage from "./Linkedin";
 import LinkedinLoading from "./LinkedinLoading";
+import MicroSoftSignInButton from "./MicrosoftLogin";
+import { useMsal } from "@azure/msal-react";
 
 function Login() {
   let [data, setData] = useState({ email: "", password: "" });
-  let { setUserDetails, setCreditBal, setTutorialVideo } = useUserState();
+  let { setUserDetails, setCreditBal, setTutorialVideo,linkedinLoading, setLinkedinLoading } = useUserState();
   let [passwordVisible, setPasswordVisible] = useState(false);
   let [loading, setLoading] = useState(false);
   let [serverError, setServerError] = useState(false);
-  let [linkedinLoading, setLinkedinLoading] = useState(false);
+  // let [linkedinLoading, setLinkedinLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -26,6 +28,8 @@ function Login() {
   };
   const navigate = useNavigate();
   const location = useLocation();
+  const { instance } = useMsal();
+
 
   useEffect(() => {
     if (APP == "beta") {
@@ -72,11 +76,43 @@ function Login() {
     }
   }, []);
 
+  useEffect(() => {
+    const handleRedirect = async () => {
+      const result = await instance.handleRedirectPromise();
+      if (result !== null && result.account !== null) {
+        setLinkedinLoading(true);
+        (async () => {
+        try {
+          let res=await axiosInstance.post('/microsoftLogin',result)
+          toast.success("Welcome back! You've successfully logged in");
+            let token = res.data;
+            setUserDetails(token);
+            setCreditBal(token.credit);
+            localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+            setTutorialVideo(true);
+            navigate("/dashboard/quick-validation");
+        } catch (error) {
+          console.log(error.response)
+          toast.error(error.response?.data?.error)
+        }finally {
+          setLinkedinLoading(false); 
+        }
+      })();
+      } else {
+        console.log("Authentication failed or user cancelled login.");
+      }
+    };
+
+    handleRedirect();
+  }, [instance]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
+      setLinkedinLoading(true)
       let userData = await axiosInstance.post("login", data);
+      setLinkedinLoading(false)
       if (userData.data?.error == "Blocked") {
         navigate("/blocked");
       } else {
@@ -89,6 +125,7 @@ function Login() {
         navigate("/dashboard/quick-validation");
       }
     } catch (error) {
+      setLinkedinLoading(false)
       if (error.response.status === 500) {
         setServerError(true);
       } else {
@@ -112,10 +149,12 @@ function Login() {
 
   const authenticateData = async (credentialResponse) => {
     try {
+      setLinkedinLoading(true)
       // let res = await axios.post('https://poseben-backend.onrender.com/api/GoogleLogin',{credentialResponse})
       let res = await axiosInstance.post("/googleLogin", {
         credentialResponse,
       });
+      setLinkedinLoading(false)
       toast.success("Welcome back! You've successfully logged in");
       let token = res.data;
       setUserDetails(token);
@@ -124,6 +163,7 @@ function Login() {
       setTutorialVideo(true);
       navigate("/dashboard/quick-validation");
     } catch (err) {
+      setLinkedinLoading(false)
       if (err.response.status === 500) {
         setServerError(true);
       } else {
@@ -234,10 +274,13 @@ function Login() {
                 }}
               />
             </div>
-            <div className="flex justify-center mt-5 ">
+            <div className="flex justify-center mt-3 w-full">
               <LinkedInPage endpoint={"signin"} />
             </div>
-            <div className="flex justify-center text-xs md:text-sm text-gray-300 mt-5">
+            <div className="flex justify-center my-3">
+                <MicroSoftSignInButton />
+              </div>
+            <div className="flex justify-center text-xs md:text-sm text-gray-300 mt-3">
               <Link to="/signup">
                 <div className="border-r border-cyan-400 mx-2 px-2">
                   Need an account?

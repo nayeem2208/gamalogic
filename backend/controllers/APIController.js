@@ -79,7 +79,9 @@ let APIControllers = {
         let validate = await axios.get(
           `https://gamalogic.com/emailvrf/?emailid=${req.body.email}&apikey=${apiKey}&speed_rank=0`
         );
-        res.status(200).json(validate?.data?.gamalogic_emailid_vrfy[0]);
+        if (validate?.data) {
+          res.status(200).json(validate?.data?.gamalogic_emailid_vrfy[0]);
+        }
       }
     } catch (error) {
       ErrorHandler("emailValidation Controller", error, req);

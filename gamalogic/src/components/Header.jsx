@@ -16,13 +16,17 @@ import { RiProfileLine } from "react-icons/ri";
 import { SlSupport } from "react-icons/sl";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserState } from "../context/userContext";
+import { useMsal } from "@azure/msal-react";
+
 
 function Header() {
   let [dropDown, setDropDown] = useState(false);
   let [uploadfileDropDown, setUploadFileDropDown] = useState(false);
   let [tutorialDropDown, setTutorialDropDown] = useState(false);
-  let { setUserDetails } = useUserState();
+  let { setUserDetails,setLinkedinLoading } = useUserState();
   let navigate = useNavigate();
+  const { instance } = useMsal();
+
 
   const dropDownToggle = () => {
     setDropDown(!dropDown);
@@ -36,8 +40,13 @@ function Header() {
     setTutorialDropDown(!tutorialDropDown);
   };
 
-  function logoutHandler() {
+  async function logoutHandler() {
     setDropDown(false);
+    setLinkedinLoading(true)
+    const result = await instance.handleRedirectPromise();
+    if (result !== null && result.account !== null) {
+    instance.logout(); 
+    }
     localStorage.removeItem("Gamalogic_token");
     setUserDetails(null);
     navigate("/signin");

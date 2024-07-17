@@ -8,7 +8,7 @@ const UserDetailsProvider = ({ children }) => {
   let [creditBal,setCreditBal]=useState(0)
   let [tutorialVideo,setTutorialVideo]=useState(false)
   let [paymentResult,setPaymentResult]=useState({result:null,methord:null})
-
+  let [linkedinLoading, setLinkedinLoading] = useState(false);
 
   return (
     <userDetailsContext.Provider
@@ -20,7 +20,9 @@ const UserDetailsProvider = ({ children }) => {
         tutorialVideo,
         setTutorialVideo,
         paymentResult,
-        setPaymentResult
+        setPaymentResult,
+        linkedinLoading,
+        setLinkedinLoading
       }}
     >
       {children}
