@@ -50,6 +50,7 @@ function Header() {
     localStorage.removeItem("Gamalogic_token");
     setUserDetails(null);
     navigate("/signin");
+    setLinkedinLoading(false)
   }
   return (
     <div className="  items-center text-white lg:hidden ">

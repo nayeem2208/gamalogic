@@ -139,26 +139,37 @@ function FileEmailFinder() {
         header: true,
         complete: async function (results) {
           results.fileName = file.name;
-          results.data = results.data.map((item) => {
-            if (!item.hasOwnProperty("first_name") && !item.hasOwnProperty("last_name") && !item.hasOwnProperty("domain")) {
-              return {
-                first_name: item[Object.keys(item)[0]], // First column if named keys are not found
-                last_name: item[Object.keys(item)[1]], // Second column if named keys are not found
-                domain: item[Object.keys(item)[2]] || '', // Third column if named keys are not found
-              };
-            } else {
-              return {
-                first_name: item.first_name || item.firstname || '',
-                last_name: item.last_name || item.lastname || '',
-                domain: item.domain || item.url || '',
-              };
-            }
-          }).filter((item) => {
-            return item.first_name && item.last_name && item.domain;
-          });
-          if (results.data.length <= 100000) {
+          results.data = results.data
+            .map((item) => {
+              if (
+                !item.hasOwnProperty("first_name") &&
+                !item.hasOwnProperty("last_name") &&
+                !item.hasOwnProperty("domain")
+              ) {
+                return {
+                  first_name: item[Object.keys(item)[0]], // First column if named keys are not found
+                  last_name: item[Object.keys(item)[1]], // Second column if named keys are not found
+                  domain: item[Object.keys(item)[2]] || "", // Third column if named keys are not found
+                };
+              } else {
+                return {
+                  first_name: item.first_name || item.firstname || "",
+                  last_name: item.last_name || item.lastname || "",
+                  domain: item.domain || item.url || "",
+                };
+              }
+            })
+            .filter((item) => {
+              return item.first_name && item.last_name && item.domain;
+            });
+
+          if (results.data.length <= 100000 && results.data.length > 0) {
             setJsonToServer(results);
             setShowAlert(true);
+          } else if (results.data.length == 0) {
+            toast.error(
+              "Please upload a CSV file with columns: 'first_name', 'last_name', 'domain'."
+            );
           } else {
             toast.error(
               "Please select a file with not more than 100,000 email address"
@@ -204,9 +215,14 @@ function FileEmailFinder() {
           }
         });
       const fileName = file.name;
-      if (contacts.length <= 100000) {
+
+      if (contacts.length <= 100000 && contacts.length > 0) {
         setJsonToServer({ data: contacts, fileName: fileName });
         setShowAlert(true);
+      } else if (contacts.length == 0) {
+        toast.error(
+          "Please upload a Excel file with columns: 'first_name', 'last_name', 'domain'."
+        );
       } else {
         toast.error(
           "Please select an Excel file with not more than 100,000 records."
@@ -224,16 +240,25 @@ function FileEmailFinder() {
     reader.onload = async (e) => {
       const text = e.target.result;
       const lines = text.split("\n");
-
+      let err = false;
       const contacts = lines
         .filter((line) => line.trim() !== "")
         .map((line) => {
           const [first_name, last_name, domain] = line
             .split(/[,\s]+/)
             .map((item) => item.trim());
+          if (!first_name || !last_name || !domain) {
+            err = true;
+            return null;
+          }
           return { first_name, last_name, domain };
         });
-
+      if (err == true) {
+        toast.error(
+          "One or more fields contain empty values. Please check your input."
+        );
+        return;
+      }
       const fileName = file.name;
       if (contacts.length <= 100000) {
         setJsonToServer({ data: contacts, fileName: fileName });
@@ -409,11 +434,10 @@ function FileEmailFinder() {
           let remarks = "";
           if (obj.is_catchall == 1) {
             remarks = "Catch all Address";
-          } else if(obj.is_catchall==0&&obj.email_address!=0) {
+          } else if (obj.is_catchall == 0 && obj.email_address != 0) {
             remarks = "Valid Address";
-          }
-          else{
-            remarks=''
+          } else {
+            remarks = "";
           }
           return {
             FirstName: obj.firstname,
@@ -566,7 +590,7 @@ function FileEmailFinder() {
                       Loading...
                     </span>
                   </div> */}
-                  <MoreFileLoader/>
+                  <MoreFileLoader />
                 </div>
               )
             }

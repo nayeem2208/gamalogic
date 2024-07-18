@@ -59,6 +59,7 @@ function SideBar() {
     localStorage.removeItem("Gamalogic_token");
     setUserDetails(null);
     navigate("/signin");
+    setLinkedinLoading(false)
   });
 }
 

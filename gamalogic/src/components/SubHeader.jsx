@@ -33,6 +33,7 @@ function SubHeader(props) {
       localStorage.removeItem("Gamalogic_token");
       setUserDetails(null);
       navigate("/signin");
+      setLinkedinLoading(false)
     });
   }
   const HandleSendVerifyLink = async (e) => {

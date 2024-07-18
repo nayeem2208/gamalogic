@@ -10,7 +10,7 @@ import { IoInformationCircleOutline } from "react-icons/io5";
 import ServerError from "../pages/ServerError";
 import LinkedInPage from "./Linkedin";
 import LinkedinLoading from "./LinkedinLoading";
-import MicroSoftSignInButton from "./MicrosoftLogin";
+import MicroSoftSignInButton from "./MicroSoftLogin";
 import { useMsal } from "@azure/msal-react";
 
 function Signup() {
@@ -379,10 +379,10 @@ function Signup() {
                 }}
               />
             </div>
-            <div className="flex justify-center mt-3 ">
+            <div className="flex justify-center mt-2 ">
                 <LinkedInPage endpoint={"signup"} />
               </div>
-              <div className="flex justify-center my-3">
+              <div className="flex justify-center my-2">
                 <MicroSoftSignInButton />
               </div>
             <Link to="/signin">

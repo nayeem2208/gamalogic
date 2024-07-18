@@ -21,6 +21,7 @@ function LinkedInPage(data) {
       src={linkedin}
       alt="Sign in with Linked In"
       style={{ maxWidth: '180px', cursor: 'pointer' }}
+      className=' mt-2'
     />
   );
 }

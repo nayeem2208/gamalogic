@@ -8,7 +8,7 @@ import { FaEye } from "react-icons/fa";
 import ServerError from "../pages/ServerError";
 import LinkedInPage from "./Linkedin";
 import LinkedinLoading from "./LinkedinLoading";
-import MicroSoftSignInButton from "./MicrosoftLogin";
+import MicroSoftSignInButton from "./MicroSoftLogin";
 import { useMsal } from "@azure/msal-react";
 
 function Login() {
@@ -274,10 +274,10 @@ function Login() {
                 }}
               />
             </div>
-            <div className="flex justify-center mt-3 w-full">
+            <div className="flex justify-center mt-2 w-full">
               <LinkedInPage endpoint={"signin"} />
             </div>
-            <div className="flex justify-center my-3">
+            <div className="flex justify-center my-2">
                 <MicroSoftSignInButton />
               </div>
             <div className="flex justify-center text-xs md:text-sm text-gray-300 mt-3">
