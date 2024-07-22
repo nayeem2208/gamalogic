@@ -168,7 +168,7 @@ function FileEmailFinder() {
             setShowAlert(true);
           } else if (results.data.length == 0) {
             toast.error(
-              "Please upload a CSV file with columns: 'first_name', 'last_name', 'domain'."
+              "Please upload a file with columns first name, last name and domain"
             );
           } else {
             toast.error(
@@ -221,7 +221,7 @@ function FileEmailFinder() {
         setShowAlert(true);
       } else if (contacts.length == 0) {
         toast.error(
-          "Please upload a Excel file with columns: 'first_name', 'last_name', 'domain'."
+          "Please upload a file with columns first name, last name and domain"
         );
       } else {
         toast.error(
@@ -255,7 +255,7 @@ function FileEmailFinder() {
         });
       if (err == true) {
         toast.error(
-          "One or more fields contain empty values. Please check your input."
+          "Please upload a file with columns first name, last name and domain"
         );
         return;
       }

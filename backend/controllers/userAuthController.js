@@ -13,13 +13,14 @@ import basicTemplate from "../EmailTemplates/BasicTemplate.js";
 import forgotPasswordTemplate from "../EmailTemplates/forgotPasswordTemplate.js";
 import urls from "../ConstFiles/urls.js";
 import leadGeneration from "../utils/crm.js";
+import AddContacts from "../utils/campaigns.js";
 
 const Authentication = {
   sample: async (req, res) => {
     ///its for checking purpose
     try {
       let dbConnection = req.dbConnection
-      let token='123'
+      let token = '123'
       // let token = 'AQVkAFg4Qcyjcv5mhrmakhf86FMFsFbtdfDY2ZoLhMH1n5QU1ByJV0baVPGDKCq2Qw3bMo3AclLXpSH8SzzY1Pp_dnpq9MalTojwYi96rseFR-U5MVBFoVaWmOcKv8VtbqXqIigNsTRnjLqz5zazqKHEnNVCu9YGkyLYjkd7u66ZDt8orDSwmb8J_OJqU5lNWIXSYHu-5a3zkxNjapnEWCwM7jujWn8ZXUNZ5FOwyi77fSG4NYalhHUbOGaFA2uppleCoan5pcHQaHaU3sczGSc5ocBqS5IUHESD2aIog3gTxSUQbgQqRRjUBWr-N-dNllrQYkin_i2YozvH_Em2RVsudDeRDQ';
       let expiry = 5183999; // expiry in seconds
 
@@ -139,6 +140,11 @@ const Authentication = {
           leadGeneration(firstname, lastname, email)
         } catch (error) {
           ErrorHandler("registerUser Controller CRM lead Generation ", error, req);
+        }
+        try {
+          AddContacts(firstname, lastname, email)
+        } catch (error) {
+          ErrorHandler("registerUser Controller Campaigns add contacts ", error, req)
         }
         let token = generateConfirmationToken(email)
         let link = `${urls.frontendUrl}/api/verifyEmail?email=${token}`
@@ -260,7 +266,12 @@ const Authentication = {
         try {
           leadGeneration(firstname, lastname, email)
         } catch (error) {
-          ErrorHandler("registerUser Controller CRM lead Generation ", error, req);
+          ErrorHandler("Google Auth Controller CRM lead Generation ", error, req);
+        }
+        try {
+          AddContacts(firstname, lastname, email)
+        } catch (error) {
+          ErrorHandler("Google Auth Controller Campaigns add contacts ", error, req)
         }
         let user = await dbConnection.query(
           `SELECT * FROM registration WHERE emailid='${email}'`
@@ -368,6 +379,11 @@ const Authentication = {
               leadGeneration(firstname, lastname, email)
             } catch (error) {
               ErrorHandler("Linkedin registerUser Controller CRM lead Generation ", error, req);
+            }
+            try {
+              AddContacts(firstname, lastname, email)
+            } catch (error) {
+              ErrorHandler("Linkedin registerUser Controller Campaigns add contacts ", error, req)
             }
             let user = await dbConnection.query(
               `SELECT * FROM registration WHERE emailid='${email}'`
@@ -500,11 +516,11 @@ const Authentication = {
       }
     }
   },
-  microsoftSignUP:async(req,res)=>{
+  microsoftSignUP: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      let {idTokenClaims}=req.body
-      let email=idTokenClaims.preferred_username
+      let { idTokenClaims } = req.body
+      let email = idTokenClaims.preferred_username
       let given_name = idTokenClaims.name
       let [firstname, ...lastnameArray] = given_name.split(" ");
       let lastname = lastnameArray.join(" ");
@@ -543,8 +559,13 @@ const Authentication = {
         try {
           leadGeneration(firstname, lastname, email)
         } catch (error) {
-          ErrorHandler("Linkedin registerUser Controller CRM lead Generation ", error, req);
+          ErrorHandler("Microsoft Signup Controller CRM lead Generation ", error, req);
         }
+        try {
+          AddContacts(firstname,lastname,email)
+       } catch (error) {
+         ErrorHandler("Microsoft Signup Controller Campaigns add contacts ", error, req)
+       }
         let user = await dbConnection.query(
           `SELECT * FROM registration WHERE emailid='${email}'`
         );
@@ -583,55 +604,55 @@ const Authentication = {
       }
 
     } catch (error) {
-     console.log(error) 
+      console.log(error)
     }
   },
-  microsoftLogin:async(req,res)=>{
+  microsoftLogin: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      let {idTokenClaims}=req.body
-      console.log(idTokenClaims,'id token claims')
-      let email=idTokenClaims.preferred_username
+      let { idTokenClaims } = req.body
+      console.log(idTokenClaims, 'id token claims')
+      let email = idTokenClaims.preferred_username
       let user = await dbConnection.query(
-            `SELECT * FROM registration WHERE emailid='${email}'`
-          );
-          if (user[0].length > 0) {
-            const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
-            let creditBal;
-            let finalFree = new Date(user[0][0].free_final);
-            let finalFreeDate = new Date(finalFree);
-            let currentDate = new Date();
-            if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
-              creditBal = user[0][0].credits_free + user[0][0].credits
-            } else {
-              creditBal = user[0][0].credits;
-            }
+        `SELECT * FROM registration WHERE emailid='${email}'`
+      );
+      if (user[0].length > 0) {
+        const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
+        let creditBal;
+        let finalFree = new Date(user[0][0].free_final);
+        let finalFreeDate = new Date(finalFree);
+        let currentDate = new Date();
+        if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
+          creditBal = user[0][0].credits_free + user[0][0].credits
+        } else {
+          creditBal = user[0][0].credits;
+        }
 
-            let password = user[0][0].password != 0;
-            let ip = req.headers['cf-connecting-ip'] ||
-              req.headers['x-real-ip'] ||
-              req.headers['x-forwarded-for'] ||
-              req.socket.remoteAddress || '';
-            // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
-            // const { country_name } = response.data;
-            res.status(200).json({
-              name: user[0][0].username,
-              email: user[0][0].emailid,
-              firstname: user[0][0].firstname || null,
-              lastname: user[0][0].lastname || null,
-              credit: creditBal,
-              token,
-              confirm: 1,
-              password,
-              country_name: 'India'
-            });
-          } else {
-            console.log('user is not here')
-            res.status(400).json({
-              error:
-                "Unauthorised Access, Please register with us",
-            });
-          }
+        let password = user[0][0].password != 0;
+        let ip = req.headers['cf-connecting-ip'] ||
+          req.headers['x-real-ip'] ||
+          req.headers['x-forwarded-for'] ||
+          req.socket.remoteAddress || '';
+        // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
+        // const { country_name } = response.data;
+        res.status(200).json({
+          name: user[0][0].username,
+          email: user[0][0].emailid,
+          firstname: user[0][0].firstname || null,
+          lastname: user[0][0].lastname || null,
+          credit: creditBal,
+          token,
+          confirm: 1,
+          password,
+          country_name: 'India'
+        });
+      } else {
+        console.log('user is not here')
+        res.status(400).json({
+          error:
+            "Unauthorised Access, Please register with us",
+        });
+      }
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: "Internal Server Error" });

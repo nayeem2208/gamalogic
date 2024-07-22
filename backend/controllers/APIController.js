@@ -166,10 +166,12 @@ let APIControllers = {
     let dbConnection;
     try {
       dbConnection = req.dbConnection;
-      let files = await dbConnection.query(
-        `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}' ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page - 1) * 5};`
-      );
-      res.status(200).json(files[0]);
+      if (req.user[0][0] && req.user[0][0].rowid != null) {
+        let files = await dbConnection.query(
+          `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}' ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page - 1) * 5};`
+        );
+        res.status(200).json(files[0]);
+      }
     } catch (error) {
       console.error(error);
       ErrorHandler("getAlreadyCheckedBatchEmailFiles Controller", error, req);

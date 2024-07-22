@@ -10,6 +10,9 @@ const authcheck =  async (req, res, next) => {
       let parsedTokenWithoutBearer=JSON.parse(tokenWithoutBearer)
       const decoded = jwt.verify(parsedTokenWithoutBearer.token, process.env.JWT_SECRET);
       req.user = await dbConnection.query(`SELECT * FROM registration WHERE rowid='${decoded.userId}'`);
+      if (req.user.length === 0||req.user[0].length==0) {
+        throw new Error('User not found');
+      }
       next();
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
