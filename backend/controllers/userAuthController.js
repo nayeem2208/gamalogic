@@ -660,13 +660,13 @@ const Authentication = {
     }
   },
   microsoftDomainVerification:(req,res)=>{
-    return {
+    res.json({
       "associatedApplications": [
         {
           "applicationId": "4ccd9d93-d389-4fa4-a2ac-ce82f2a01999"
         }
       ]
-    }
+    });
   },
   verifyEmail: async (req, res) => {
     try {
