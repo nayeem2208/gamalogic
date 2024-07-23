@@ -19,16 +19,16 @@ const Authentication = {
   sample: async (req, res) => {
     ///its for checking purpose
     try {
-      let dbConnection = req.dbConnection
-      let token = '123'
-      // let token = 'AQVkAFg4Qcyjcv5mhrmakhf86FMFsFbtdfDY2ZoLhMH1n5QU1ByJV0baVPGDKCq2Qw3bMo3AclLXpSH8SzzY1Pp_dnpq9MalTojwYi96rseFR-U5MVBFoVaWmOcKv8VtbqXqIigNsTRnjLqz5zazqKHEnNVCu9YGkyLYjkd7u66ZDt8orDSwmb8J_OJqU5lNWIXSYHu-5a3zkxNjapnEWCwM7jujWn8ZXUNZ5FOwyi77fSG4NYalhHUbOGaFA2uppleCoan5pcHQaHaU3sczGSc5ocBqS5IUHESD2aIog3gTxSUQbgQqRRjUBWr-N-dNllrQYkin_i2YozvH_Em2RVsudDeRDQ';
-      let expiry = 5183999; // expiry in seconds
+      // let dbConnection = req.dbConnection
+      // let token = '123'
+      // // let token = 'AQVkAFg4Qcyjcv5mhrmakhf86FMFsFbtdfDY2ZoLhMH1n5QU1ByJV0baVPGDKCq2Qw3bMo3AclLXpSH8SzzY1Pp_dnpq9MalTojwYi96rseFR-U5MVBFoVaWmOcKv8VtbqXqIigNsTRnjLqz5zazqKHEnNVCu9YGkyLYjkd7u66ZDt8orDSwmb8J_OJqU5lNWIXSYHu-5a3zkxNjapnEWCwM7jujWn8ZXUNZ5FOwyi77fSG4NYalhHUbOGaFA2uppleCoan5pcHQaHaU3sczGSc5ocBqS5IUHESD2aIog3gTxSUQbgQqRRjUBWr-N-dNllrQYkin_i2YozvH_Em2RVsudDeRDQ';
+      // let expiry = 5183999; // expiry in seconds
 
-      let currentDate = new Date(); // current date
-      let expirationDate = new Date(currentDate.getTime() + expiry * 1000); // expiry in milliseconds
-      let exp = expirationDate.toISOString().slice(0, 19).replace('T', ' ');
+      // let currentDate = new Date(); // current date
+      // let expirationDate = new Date(currentDate.getTime() + expiry * 1000); // expiry in milliseconds
+      // let exp = expirationDate.toISOString().slice(0, 19).replace('T', ' ');
 
-      await dbConnection.query(`INSERT INTO TOKEN (linkedin_access_token, expiry) VALUES ('${token}', '${exp}')`);
+      // await dbConnection.query(`INSERT INTO TOKEN (linkedin_access_token, expiry) VALUES ('${token}', '${exp}')`);
       res.send('hiii its working')
     } catch (error) {
       ErrorHandler("Sample Controller", error, req);
