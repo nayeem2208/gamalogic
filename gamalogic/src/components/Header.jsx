@@ -40,6 +40,7 @@ function Header() {
 
 
   function logoutHandler() {
+    setDropDown(false)
       localStorage.removeItem("Gamalogic_token");
       setUserDetails(null);
       navigate("/signin");

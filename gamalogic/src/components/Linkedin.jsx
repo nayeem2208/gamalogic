@@ -20,7 +20,7 @@ function LinkedInPage(data) {
       onClick={handleLogin}
       src={linkedin}
       alt="Sign in with Linked In"
-      style={{ maxWidth: '180px', cursor: 'pointer' }}
+      style={{ maxWidth: '180px', cursor: 'pointer',width:'180px' }}
       className=' mt-2'
     />
   );

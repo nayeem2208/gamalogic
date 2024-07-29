@@ -224,6 +224,7 @@ function Login() {
               <button onClick={() => login()}>Signin with Google</button>
             </div> */}
               <GoogleLogin
+              style={{ maxWidth: '180px',width:'180px'}}
                 onSuccess={(credentialResponse) => {
                   authenticateData(credentialResponse);
                 }}

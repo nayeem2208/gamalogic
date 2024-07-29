@@ -332,6 +332,7 @@ function Signup() {
             <div className="flex justify-center mt-5 ">
               {" "}
               <GoogleLogin
+              style={{ maxWidth: '180px',width:'180px'}}
                 text="Sign up with Google"
                 onSuccess={(credentialResponse) => {
                   authenticateData(credentialResponse);
