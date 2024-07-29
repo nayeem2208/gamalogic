@@ -9,7 +9,6 @@ import ServerError from "../pages/ServerError";
 import LinkedInPage from "./Linkedin";
 import LinkedinLoading from "./LinkedinLoading";
 import MicroSoftSignInButton from "./MicroSoftLogin";
-import { useMsal } from "@azure/msal-react";
 
 function Login() {
   let [data, setData] = useState({ email: "", password: "" });
@@ -28,7 +27,6 @@ function Login() {
   };
   const navigate = useNavigate();
   const location = useLocation();
-  const { instance } = useMsal();
 
 
   useEffect(() => {
@@ -76,35 +74,6 @@ function Login() {
     }
   }, []);
 
-  useEffect(() => {
-    const handleRedirect = async () => {
-      const result = await instance.handleRedirectPromise();
-      if (result !== null && result.account !== null) {
-        setLinkedinLoading(true);
-        (async () => {
-        try {
-          let res=await axiosInstance.post('/microsoftLogin',result)
-          toast.success("Welcome back! You've successfully logged in");
-            let token = res.data;
-            setUserDetails(token);
-            setCreditBal(token.credit);
-            localStorage.setItem("Gamalogic_token", JSON.stringify(token));
-            setTutorialVideo(true);
-            navigate("/dashboard/quick-validation");
-        } catch (error) {
-          console.log(error.response)
-          toast.error(error.response?.data?.error)
-        }finally {
-          setLinkedinLoading(false); 
-        }
-      })();
-      } else {
-        console.log("Authentication failed or user cancelled login.");
-      }
-    };
-
-    handleRedirect();
-  }, [instance]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -135,17 +104,6 @@ function Login() {
       setLoading(false);
     }
   };
-
-  // const login = useGoogleLogin({
-  //   onSuccess: async (tokenResponse) => {
-  //     try {
-  //        authenticateData(tokenResponse);
-  //     } catch (err) {
-  //       console.error(err);
-  //       toast.error(err.response?.data.error);
-  //     }
-  //   }
-  // });
 
   const authenticateData = async (credentialResponse) => {
     try {
@@ -278,7 +236,7 @@ function Login() {
               <LinkedInPage endpoint={"signin"} />
             </div>
             <div className="flex justify-center my-2">
-                <MicroSoftSignInButton />
+                <MicroSoftSignInButton page='login'/>
               </div>
             <div className="flex justify-center text-xs md:text-sm text-gray-300 mt-3">
               <Link to="/signup">

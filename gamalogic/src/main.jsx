@@ -12,11 +12,8 @@ const msalConfig = {
       clientId: import.meta.env.VITE_MICROSOFT_CLIENT_ID,
       authority:import.meta.env.VITE_MICROSOFT_AUTHORITY,
       redirectUri: '/', 
+      postLogoutRedirectUri: '/'
   },
-  cache: {
-      cacheLocation: 'sessionStorage', 
-      storeAuthStateInCookie: false,
-  }
 };
 
 const msalInstance = new PublicClientApplication(msalConfig);

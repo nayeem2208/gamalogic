@@ -2,39 +2,23 @@ import { IoLogOutOutline } from "react-icons/io5";
 import { useUserState } from "../context/userContext";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import { startTransition, useState } from "react";
+import {  useState } from "react";
 import { SlInfo } from "react-icons/sl";
 import axiosInstance from "../axios/axiosInstance";
 import ServerError from "../pages/ServerError";
-import { useMsal } from "@azure/msal-react";
-
 
 function SubHeader(props) {
-  let { setUserDetails, userDetails, creditBal,setLinkedinLoading } = useUserState();
+  let { setUserDetails, userDetails, creditBal, setLinkedinLoading } =
+    useUserState();
   let [serverError, setServerError] = useState(false);
   let navigate = useNavigate();
-  const { instance } = useMsal();
-
 
   function logoutHandler() {
-    startTransition(async() => {
-      setLinkedinLoading(true);
-      sessionStorage.clear();
-      const result = await instance.handleRedirectPromise();
-      if (result !== null && result.account !== null) {
-        try {
-          instance.logout();
-        } catch (error) {
-          console.log(error);
-        } finally {
-          setLinkedinLoading(false);
-        }
-      }
-      localStorage.removeItem("Gamalogic_token");
-      setUserDetails(null);
-      navigate("/signin");
-      setLinkedinLoading(false)
-    });
+    setLinkedinLoading(true);
+    localStorage.removeItem("Gamalogic_token");
+    setUserDetails(null);
+    navigate("/signin");
+    setLinkedinLoading(false);
   }
   const HandleSendVerifyLink = async (e) => {
     try {
@@ -44,7 +28,7 @@ function SubHeader(props) {
     } catch (error) {
       console.log(error);
       if (error.response.status === 500) {
-        setServerError(true); 
+        setServerError(true);
       } else {
         toast.error(error.response?.data?.error);
       }
@@ -52,7 +36,7 @@ function SubHeader(props) {
   };
 
   if (serverError) {
-    return <ServerError />; 
+    return <ServerError />;
   }
   return (
     <div>
@@ -60,7 +44,7 @@ function SubHeader(props) {
         <p className="orangeUnderline ">{props.SubHeader}</p>
         <div className="flex justify-end subHeaderCredits mt-6 md:mt-0">
           <p className="bg-gray-100 rounded-lg px-4 flex items-center ">
-          {creditBal.toLocaleString('en-US')} Credits Left
+            {creditBal.toLocaleString("en-US")} Credits Left
           </p>{" "}
           <p className="ml-6 mr-2 flex items-center ">{userDetails.name}</p>
           <button onClick={logoutHandler}>
@@ -71,7 +55,7 @@ function SubHeader(props) {
       <div className="sm:hidden justify-between mt-1 ">
         <div className="flex flex-wrap justify-center subHeaderCredits mb-4 md:mt-0">
           <p className="bg-gray-100 rounded-lg px-4 flex items-center mt-3">
-            {creditBal.toLocaleString('en-US')} Credits Left
+            {creditBal.toLocaleString("en-US")} Credits Left
           </p>{" "}
           <p className="ml-6 mr-2 flex items-center mt-3">{userDetails.name}</p>
           <button onClick={logoutHandler}>

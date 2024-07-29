@@ -16,7 +16,6 @@ import { RiProfileLine } from "react-icons/ri";
 import { SlSupport } from "react-icons/sl";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserState } from "../context/userContext";
-import { useMsal } from "@azure/msal-react";
 
 
 function Header() {
@@ -25,7 +24,6 @@ function Header() {
   let [tutorialDropDown, setTutorialDropDown] = useState(false);
   let { setUserDetails,setLinkedinLoading } = useUserState();
   let navigate = useNavigate();
-  const { instance } = useMsal();
 
 
   const dropDownToggle = () => {
@@ -40,18 +38,12 @@ function Header() {
     setTutorialDropDown(!tutorialDropDown);
   };
 
-  async function logoutHandler() {
-    setDropDown(false);
-    setLinkedinLoading(true)
-    const result = await instance.handleRedirectPromise();
-    if (result !== null && result.account !== null) {
-    instance.logout(); 
-    }
-    localStorage.removeItem("Gamalogic_token");
-    setUserDetails(null);
-    navigate("/signin");
-    setLinkedinLoading(false)
-  }
+
+  function logoutHandler() {
+      localStorage.removeItem("Gamalogic_token");
+      setUserDetails(null);
+      navigate("/signin");
+}
   return (
     <div className="  items-center text-white lg:hidden ">
       <div

@@ -519,9 +519,8 @@ const Authentication = {
   microsoftSignUP: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      let { idTokenClaims } = req.body
-      let email = idTokenClaims.preferred_username
-      let given_name = idTokenClaims.name
+      let email = req.body.mail
+      let given_name = req.body.displayName
       let [firstname, ...lastnameArray] = given_name.split(" ");
       let lastname = lastnameArray.join(" ");
       if (!lastname || !isNaN(lastname)) {
@@ -562,10 +561,10 @@ const Authentication = {
           ErrorHandler("Microsoft Signup Controller CRM lead Generation ", error, req);
         }
         try {
-          AddContacts(firstname,lastname,email)
-       } catch (error) {
-         ErrorHandler("Microsoft Signup Controller Campaigns add contacts ", error, req)
-       }
+          AddContacts(firstname, lastname, email)
+        } catch (error) {
+          ErrorHandler("Microsoft Signup Controller Campaigns add contacts ", error, req)
+        }
         let user = await dbConnection.query(
           `SELECT * FROM registration WHERE emailid='${email}'`
         );
@@ -599,20 +598,24 @@ const Authentication = {
         } else {
           res
             .status(400)
-            .json({ error: "Error while adding user with google login" });
+            .json({ error: "Error while adding user with Microsoft Signup" });
         }
       }
 
     } catch (error) {
       console.log(error)
+      ErrorHandler("Microsoft Sigup Controller", error, req);
+      res.status(500).json({ error: "Internal Server Error" });
+    } finally {
+      if (req.dbConnection) {
+        await req.dbConnection.release();
+      }
     }
   },
   microsoftLogin: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      let { idTokenClaims } = req.body
-      console.log(idTokenClaims, 'id token claims')
-      let email = idTokenClaims.preferred_username
+      let email=req.body.mail
       let user = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
@@ -647,19 +650,22 @@ const Authentication = {
           country_name: 'India'
         });
       } else {
-        console.log('user is not here')
         res.status(400).json({
           error:
             "Unauthorised Access, Please register with us",
         });
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
+      ErrorHandler("Microsoft Login Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
-
+    } finally {
+      if (req.dbConnection) {
+        await req.dbConnection.release();
+      }
     }
   },
-  microsoftDomainVerification:(req,res)=>{
+  microsoftDomainVerification: (req, res) => {
     res.json({
       "associatedApplications": [
         {

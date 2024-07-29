@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance, { APP } from "../axios/axiosInstance";
 import { toast } from "react-toastify";
-import ReCAPTCHA from "react-google-recaptcha";
 import { useUserState } from "../context/userContext";
 import { FaEye } from "react-icons/fa";
 import { IoInformationCircleOutline } from "react-icons/io5";
@@ -11,7 +10,6 @@ import ServerError from "../pages/ServerError";
 import LinkedInPage from "./Linkedin";
 import LinkedinLoading from "./LinkedinLoading";
 import MicroSoftSignInButton from "./MicroSoftLogin";
-import { useMsal } from "@azure/msal-react";
 
 function Signup() {
   let [data, setData] = useState({
@@ -27,11 +25,9 @@ function Signup() {
   });
   let [loading, setLoading] = useState(false);
   let [serverError, setServerError] = useState(false);
-  // let [linkedinLoading, setLinkedinLoading] = useState(false);
 
   let navigate = useNavigate();
   let { setUserDetails, setCreditBal, setTutorialVideo,linkedinLoading, setLinkedinLoading } = useUserState();
-  const { instance } = useMsal();
 
   useEffect(() => {
     if (APP == "beta") {
@@ -79,40 +75,6 @@ function Signup() {
     }
   }, []);
 
-  useEffect(() => {
-    const handleRedirect = async () => {
-      const result = await instance.handleRedirectPromise();
-      if (result !== null && result.account !== null) {
-        setLinkedinLoading(true);
-        (async () => {
-        try {
-          let res=await axiosInstance.post('/microsoftSignUP',result)
-          toast.success("Welcome back! You've successfully logged in");
-          let token = res.data;
-          setUserDetails(token);
-          setCreditBal(token.credit);
-          localStorage.setItem("Gamalogic_token", JSON.stringify(token));
-          setTutorialVideo(true);
-          navigate("/dashboard/quick-validation");
-        } catch (err) {
-          console.error(err);
-          if (err.response.status === 500) {
-            setServerError(true);
-          } else {
-            toast.error(err.response?.data?.error);
-          }
-        }finally {
-          setLinkedinLoading(false);
-        }
-      })();
-      } else {
-        // Handle failed authentication or other scenarios
-        console.log("Authentication failed or user cancelled login.");
-      }
-    };
-
-    handleRedirect();
-  }, [instance]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -383,7 +345,7 @@ function Signup() {
                 <LinkedInPage endpoint={"signup"} />
               </div>
               <div className="flex justify-center my-2">
-                <MicroSoftSignInButton />
+              <MicroSoftSignInButton page='signup'/>
               </div>
             <Link to="/signin">
               <div className="flex justify-center text-xs md:text-sm text-gray-300 mt-4">
