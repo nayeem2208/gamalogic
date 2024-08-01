@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Sitemap: https://yourdomain.com/signin-sitemap.xml
+Sitemap: https://yourdomain.com/signup-sitemap.xml
+Sitemap: https://yourdomain.com/forgot-password-sitemap.xml

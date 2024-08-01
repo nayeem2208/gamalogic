@@ -35,6 +35,18 @@ app.use(cors({
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 app.use(express.static(path.join(__dirname, '..', 'gamalogic', 'dist')));
 
+app.get('/signin-sitemap.xml', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'gamalogic', 'public', 'signin-sitemap.xml'));
+});
+
+app.get('/signup-sitemap.xml', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'gamalogic', 'public', 'signup-sitemap.xml'));
+});
+
+app.get('/forgot-password-sitemap.xml', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'gamalogic', 'public', 'forgot-password-sitemap.xml'));
+});
+
 
 app.use('/api',userRouter)
 
