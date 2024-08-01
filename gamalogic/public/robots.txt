@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
+Sitemap: https://app.gamalogic.com/sitemap.xml
 Sitemap: https://app.gamalogic.com/signin-sitemap.xml
 Sitemap: https://app.gamalogic.com/signup-sitemap.xml
 Sitemap: https://app.gamalogic.com/forgot-password-sitemap.xml

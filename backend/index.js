@@ -47,6 +47,9 @@ app.get('/forgot-password-sitemap.xml', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'gamalogic', 'public', 'forgot-password-sitemap.xml'));
 });
 
+app.get('/sitemap.xml',(req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'gamalogic', 'public', 'sitemap.xml'));
+})
 
 app.use('/api',userRouter)
 
