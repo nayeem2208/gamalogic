@@ -330,13 +330,27 @@ const Authentication = {
       if (!code) throw new Error('No code provided')
       const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_SIGNUP_REDIRECT_URI)}`;
       try {
-        let accessTokenResponse = await axios.get(accessTokenUrl);
+        // let accessTokenResponse = await axios.get(accessTokenUrl);
+        const getAccessToken = async (url, retries = 3, delay = 5000) => {
+          for (let i = 0; i < retries; i++) {
+            try {
+              let accessTokenResponse = await axios.get(url);
+              return accessTokenResponse.data;
+            } catch (error) {
+              if (i === retries - 1) throw error;
+              await new Promise(resolve => setTimeout(resolve, delay));
+            }
+          }
+        };
+    
+        const accessTokenData = await getAccessToken(accessTokenUrl);
+
         try {
           const axiosInstance = axios.create({
             timeout: 15000,
             maxRedirects: 5,
             headers: {
-              'Authorization': `Bearer ${accessTokenResponse.data.access_token}`,
+              'Authorization': `Bearer ${accessTokenData.access_token}`,
             },
           });
           const userInfoResponse = await axiosInstance.get('https://api.linkedin.com/v2/userinfo')
@@ -447,13 +461,26 @@ const Authentication = {
       if (!code) throw new Error('No code provided')
       const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_LOGIN_REDIRECT_URI)}`;
       try {
-        let accessTokenResponse = await axios.get(accessTokenUrl);
+        // let accessTokenResponse = await axios.get(accessTokenUrl);
+        const getAccessToken = async (url, retries = 3, delay = 5000) => {
+          for (let i = 0; i < retries; i++) {
+            try {
+              let accessTokenResponse = await axios.get(url);
+              return accessTokenResponse.data;
+            } catch (error) {
+              if (i === retries - 1) throw error;
+              await new Promise(resolve => setTimeout(resolve, delay));
+            }
+          }
+        };
+    
+        const accessTokenData = await getAccessToken(accessTokenUrl);
         try {
           const axiosInstance = axios.create({
             timeout: 15000,
             maxRedirects: 5,
             headers: {
-              'Authorization': `Bearer ${accessTokenResponse.data.access_token}`,
+              'Authorization': `Bearer ${accessTokenData.access_token}`,
             },
           });
           const userInfoResponse = await axiosInstance.get('https://api.linkedin.com/v2/userinfo')
@@ -615,7 +642,7 @@ const Authentication = {
   microsoftLogin: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      let email=req.body.mail
+      let email = req.body.mail
       let user = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
