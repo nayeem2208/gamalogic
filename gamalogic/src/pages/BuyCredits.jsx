@@ -9,6 +9,7 @@ import PaymentSuccess from "../components/PaymentSuccess";
 import PaymentFailure from "../components/PaymentFailure";
 import ServerError from "./ServerError";
 import BuyCreditsRazorPay from "./BuyCreditsRazorPay";
+import Pricing from "../components/Pricing";
 
 function PayPalButton({ createOrder, onApprove, onError }) {
   const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
@@ -207,7 +208,7 @@ export default function BuyCredits() {
               contact us.
             </Link>
           </p>
-          <div className="bg-gray-100 rounded h-52 md:h-96 shadow flex flex-col justify-center items-center">
+          {/* <div className="bg-gray-100 rounded h-52 md:h-96 shadow flex flex-col justify-center items-center">
             <div className="flex w-full text-center">
               <div className="w-3/6 border-r-4 border-gray-400">
                 <p className="buyCreditsCost text-xl md:text-3xl font-medium">
@@ -235,7 +236,8 @@ export default function BuyCredits() {
                 )}
               />
             </div>
-          </div>
+          </div> */}
+          <Pricing/>
           {userDetails.confirm == 1 && (<div className="">
             <div className=" flex justify-center mt-6">
               {isLoaded ? (

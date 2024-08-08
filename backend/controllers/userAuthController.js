@@ -461,7 +461,6 @@ const Authentication = {
       if (!code) throw new Error('No code provided')
       const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_LOGIN_REDIRECT_URI)}`;
       try {
-        // let accessTokenResponse = await axios.get(accessTokenUrl);
         const getAccessToken = async (url, retries = 3, delay = 5000) => {
           for (let i = 0; i < retries; i++) {
             try {

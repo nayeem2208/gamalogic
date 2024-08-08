@@ -1,266 +1,308 @@
 .mainBody{
-    font-family: "Montserrat", sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 .underlineLi{
-    border-bottom: 0.5px solid #3d3f4e;
+  border-bottom: 0.5px solid #3d3f4e;
 }
 
 .orangeUnderline{
-    font-family: 'Ubuntu', sans-serif;
-    font-weight: 700;
-    font-size: 1.8rem !important;
-    border-bottom: 2px solid #F74C41;
-    color: #161736;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 700;
+  font-size: 1.8rem !important;
+  border-bottom: 2px solid #F74C41;
+  color: #161736;
 }
 .subHeaderCredits{
-    font-family: 'Ubuntu', sans-serif;
-    font-weight: 450;
-    color: #0A0E2B;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 450;
+  color: #0A0E2B;
 }
 
 .subHeading{
-    color: #0A0E2B;
+  color: #0A0E2B;
 }
 
 .subHeading h3{
-    font-size: 24px;
-    font-family: 'Ubuntu', sans-serif;
-    font-weight: 400;
+  font-size: 24px;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 400;
 }
 
 .subHeading .description{
-    font-size: 16px;
-    font-weight: 200;
-    font-family: "Raleway",sans-serif;
+  font-size: 16px;
+  font-weight: 200;
+  font-family: "Raleway",sans-serif;
 }
 .auth{
-    font-family: 'Ubuntu', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
 }
 .auth .description{
-    font-size: 16px;
-    font-weight: 200;
-    color: rgb(194, 192, 192);
-    font-family: "Raleway",sans-serif;
+  font-size: 16px;
+  font-weight: 200;
+  color: rgb(194, 192, 192);
+  font-family: "Raleway",sans-serif;
 }
 
 .h2-background {
-    transform: rotate(140deg);
-    left: 0;
-    right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    top: 0.7rem;
-    position: absolute;
-    width: 80px;
+  transform: rotate(140deg);
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  top: 0.7rem;
+  position: absolute;
+  width: 80px;
 }
 
 .h2-background div {
-    height: 13px;
-    width: 70px;
-    border-radius: 13px;
-    opacity: 0.15;
-    z-index: -2;
+  height: 13px;
+  width: 70px;
+  border-radius: 13px;
+  opacity: 0.15;
+  z-index: -2;
 }
 
 .h2-background .blue {
-    background-color: #3AFAFE;
+  background-color: #3AFAFE;
 }
 
 .h2-background .red {
-    background-color: #F74C41;
-    margin-bottom: .3rem;
+  background-color: #F74C41;
+  margin-bottom: .3rem;
 }
 
 .accountSettings input{
-    font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .QucikValidationtable tr {
-    border-bottom: 0.5px solid #e4e2e2; /* Adjust the color and thickness as needed */
+  border-bottom: 0.5px solid #e4e2e2; /* Adjust the color and thickness as needed */
 }
 .buyCreditsCost {
-    font-family: 'Ubuntu', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
 }
 
 .section-button:hover,
 .notfound a:hover {
-    border-color: rgba(22, 109, 110, 0.7);
+  border-color: rgba(22, 109, 110, 0.7);
 }
 
 .notfound h1 {
-    font-size: 20rem !important;
-    margin-left: -12px !important;
+  font-size: 20rem !important;
+  margin-left: -12px !important;
 }
 
 .notfound h2 {
-    font-size: 3rem !important;
+  font-size: 3rem !important;
 }
 
 
 .notfound h3 {
-    font-size: 16rem !important;
-    margin-left: -12px !important;
+  font-size: 16rem !important;
+  margin-left: -12px !important;
 }
 .notfound h4 {
-    font-size: 1.2rem !important;
+  font-size: 1.2rem !important;
 }
 
 .notfound h1 {
-    color: #0A0E2B;
-    text-shadow: -1px -1px 0px #F74C41, 1px 1px 0px #3AFAFE;
-    font-family: 'Montserrat', sans-serif;
+  color: #0A0E2B;
+  text-shadow: -1px -1px 0px #F74C41, 1px 1px 0px #3AFAFE;
+  font-family: 'Montserrat', sans-serif;
 
-    /* position: absolute; */
-    /* left: 50%;
-    top: 50%; */
-    /* -webkit-transform: translate(-50% , -50%);
-    -ms-transform: translate(-50% , -50%);
-    transform: translate(-50% , -50%); */
-    font-size: 14rem;
-    font-weight: 900;
-    /* margin-top: 0px; */
-    /* margin-bottom: 0px; */
-    margin-left: -30px;
-    letter-spacing: -20px;
+  /* position: absolute; */
+  /* left: 50%;
+  top: 50%; */
+  /* -webkit-transform: translate(-50% , -50%);
+  -ms-transform: translate(-50% , -50%);
+  transform: translate(-50% , -50%); */
+  font-size: 14rem;
+  font-weight: 900;
+  /* margin-top: 0px; */
+  /* margin-bottom: 0px; */
+  margin-left: -30px;
+  letter-spacing: -20px;
 }
 
 .notfound h3 {
-    color: #0A0E2B;
-    text-shadow: -1px -1px 0px #F74C41, 1px 1px 0px #3AFAFE;
-    font-family: 'Montserrat', sans-serif;
+  color: #0A0E2B;
+  text-shadow: -1px -1px 0px #F74C41, 1px 1px 0px #3AFAFE;
+  font-family: 'Montserrat', sans-serif;
 
-    /* position: absolute; */
-    /* left: 50%;
-    top: 50%; */
-    /* -webkit-transform: translate(-50% , -50%);
-    -ms-transform: translate(-50% , -50%);
-    transform: translate(-50% , -50%); */
-    font-size: 14rem;
-    font-weight: 900;
-    /* margin-top: 0px; */
-    /* margin-bottom: 0px; */
-    margin-left: -30px;
-    letter-spacing: -20px;
+  /* position: absolute; */
+  /* left: 50%;
+  top: 50%; */
+  /* -webkit-transform: translate(-50% , -50%);
+  -ms-transform: translate(-50% , -50%);
+  transform: translate(-50% , -50%); */
+  font-size: 14rem;
+  font-weight: 900;
+  /* margin-top: 0px; */
+  /* margin-bottom: 0px; */
+  margin-left: -30px;
+  letter-spacing: -20px;
 }
 
 .notfound h2 {
-    letter-spacing: 15px;
-    margin-top: -110px;
-    margin-bottom: 3rem;
-    font-size: 2.7rem;
-    font-weight: 700;
+  letter-spacing: 15px;
+  margin-top: -110px;
+  margin-bottom: 3rem;
+  font-size: 2.7rem;
+  font-weight: 700;
 }
 
 .notfound Link{
-    border: 2px solid #3AFAFE;
-    padding: 0.6rem 2rem;
-    border-radius: 44px;
-    transition: all 0.3s ease 0s;
+  border: 2px solid #3AFAFE;
+  padding: 0.6rem 2rem;
+  border-radius: 44px;
+  transition: all 0.3s ease 0s;
 }
 
 .notfound {
-    margin: 7rem 0 12rem;
+  margin: 7rem 0 12rem;
 }
 
 input[type="range"].custom-range {
-    -webkit-appearance: none; /* Override default styling in Safari */
-    width: 100%;
-    background: transparent; /* Remove default background */
-    margin: 0; /* Ensure there's no margin affecting layout */
-  }
-  
-  /* General styles */
-  input[type="range"].custom-range:focus {
-    outline: none; /* Remove outline */
-  }
-  
-  /* WebKit browsers */
-  input[type="range"].custom-range::-webkit-slider-runnable-track {
-    width: 100%;
-    height: 8px;
-    cursor: pointer;
-    background: linear-gradient(to right, #0A0E2B var(--value, 50%), #ddd var(--value, 50%));
-    border-radius: 5px;
-    border: 1px solid #aaa; /* Optional: Add a border */
-  }
-  
-  input[type="range"].custom-range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    background: #0A0E2B; /* Customize the thumb color */
-    cursor: pointer;
-    margin-top: -6px; /* Adjust to align with the track */
-    position: relative; /* Needed for Safari */
-    z-index: 1; /* Bring the thumb above the track */
-  }
-  
-  /* Firefox */
-  input[type="range"].custom-range::-moz-range-track {
-    width: 100%;
-    height: 8px;
-    cursor: pointer;
-    background: #ddd; /* Customize the track background color */
-    border-radius: 5px;
-    border: 1px solid #aaa; /* Optional: Add a border */
-  }
-  
-  input[type="range"].custom-range::-moz-range-progress {
-    background: #0A0E2B; /* Customize the selected track color */
-  }
-  
-  input[type="range"].custom-range::-moz-range-thumb {
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    background: #0A0E2B; /* Customize the thumb color */
-    cursor: pointer;
-  }
-  
-  /* Internet Explorer/Edge */
-  input[type="range"].custom-range::-ms-track {
-    width: 100%;
-    height: 8px;
-    cursor: pointer;
-    background: transparent; /* Transparent to show the custom track */
-    border-color: transparent;
-    color: transparent;
-  }
-  
-  input[type="range"].custom-range::-ms-fill-lower {
-    background: #0A0E2B; /* Customize the selected track color */
-    border: 1px solid #aaa; /* Optional: Add a border */
-    border-radius: 5px;
-  }
-  
-  input[type="range"].custom-range::-ms-fill-upper {
-    background: #ddd; /* Customize the track background color */
-    border: 1px solid #aaa; /* Optional: Add a border */
-    border-radius: 5px;
-  }
-  
-  input[type="range"].custom-range::-ms-thumb {
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    background: #0A0E2B; /* Customize the thumb color */
-    cursor: pointer;
-    margin-top: 0px; /* Adjust to align with the track */
-  }
-  
-  input[type="range"].custom-range:focus::-ms-fill-lower {
-    background: #0A0E2B; /* Change color when focused */
-  }
-  
-  input[type="range"].custom-range:focus::-ms-fill-upper {
-    background: #ddd; /* Change color when focused */
-  }
+  -webkit-appearance: none; /* Override default styling in Safari */
+  width: 100%;
+  background: transparent; /* Remove default background */
+  margin: 0; /* Ensure there's no margin affecting layout */
+}
 
-  .youtube-container {
-    border-radius: 8px; /* Adjust radius as needed */
-    overflow: hidden; /* Prevent overflowing content */
-  }
+/* General styles */
+input[type="range"].custom-range:focus {
+  outline: none; /* Remove outline */
+}
+
+/* WebKit browsers */
+input[type="range"].custom-range::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: linear-gradient(to right, #ff0000 var(--value, 50%), #ddd var(--value, 50%));
+  border-radius: 5px;
+  border: 1px solid #88898a; /* Optional: Add a border */
+}
+
+input[type="range"].custom-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #ff0000; /* Customize the thumb color */
+  cursor: pointer;
+  margin-top: -6px; /* Adjust to align with the track */
+  position: relative; /* Needed for Safari */
+  z-index: 1; /* Bring the thumb above the track */
+}
+
+/* Firefox */
+input[type="range"].custom-range::-moz-range-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background:linear-gradient(to right, #ff0000 var(--value, 50%), #ddd var(--value, 50%)); /* Customize the track background color */
+  border-radius: 5px;
+  border: 1px solid #525454; /* Optional: Add a border */
+}
+
+input[type="range"].custom-range::-moz-range-progress {
+  background: #ff0000; /* Customize the selected track color */
+}
+
+input[type="range"].custom-range::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #ff0000; /* Customize the thumb color */
+  cursor: pointer;
+}
+
+/* Internet Explorer/Edge */
+input[type="range"].custom-range::-ms-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: transparent; /* Transparent to show the custom track */
+  border-color: transparent;
+  color: transparent;
+}
+
+input[type="range"].custom-range::-ms-fill-lower {
+  background: #c0c0c0; /* Customize the selected track color */
+  border: 1px solid #aaa; /* Optional: Add a border */
+  border-radius: 5px;
+}
+
+input[type="range"].custom-range::-ms-fill-upper {
+  background: #ddd; /* Customize the track background color */
+  border: 1px solid #aaa; /* Optional: Add a border */
+  border-radius: 5px;
+}
+
+input[type="range"].custom-range::-ms-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #c0c0c0; /* Customize the thumb color */
+  cursor: pointer;
+  margin-top: 0px; /* Adjust to align with the track */
+}
+
+input[type="range"].custom-range:focus::-ms-fill-lower {
+  background: #c0c0c0; /* Change color when focused */
+}
+
+input[type="range"].custom-range:focus::-ms-fill-upper {
+  background: #ddd; /* Change color when focused */
+}
+
+.youtube-container {
+  border-radius: 8px; /* Adjust radius as needed */
+  overflow: hidden; /* Prevent overflowing content */
+}
+
+
+
+
+
+
+
+
+
+
+  /* styles.css or similar */
+.custom-strikethrough {
+  position: relative; /* Ensure the pseudo-element is positioned relative to the text */
+  display: inline-block; /* Ensure the pseudo-element is properly aligned */
+}
+
+.custom-strikethrough::after {
+  content: ''; /* No text content, just a line */
+  position: absolute;
+  left: 0; /* Align the line with the text */
+  top: 50%; /* Center the line vertically */
+  width: 110%; /* Width of the line; adjust as needed */
+  height: 5px; /* Thickness of the line */
+  background-color: red; /* Color of the line */
+  transform: translateY(-50%); /* Center the line vertically */
+  z-index: 1; /* Ensure the line appears above the text */
+}
+.custom-strikethrough::before {
+  content: ''; /* No text content, just a line */
+  position: absolute;
+  right: 0; /* Align the line with the text */
+  top: 50%; /* Center the line vertically */
+  width: 110%; /* Width of the line; adjust as needed */
+  height: 5px; /* Thickness of the line */
+  background-color: red; /* Color of the line */
+  transform: translateY(-50%); /* Center the line vertically */
+  z-index: 1; /* Ensure the line appears above the text */
+}
+
+
+
+  
 
 
 
