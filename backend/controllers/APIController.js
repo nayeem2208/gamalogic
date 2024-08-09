@@ -74,14 +74,22 @@ let APIControllers = {
   },
   emailValidation: async (req, res) => {
     try {
-      if (req.user?.api_key) {
-        let apiKey = req.user.api_key;
-        let validate = await axios.get(
-          `https://gamalogic.com/emailvrf/?emailid=${req.body.email}&apikey=${apiKey}&speed_rank=0`
-        );
-        if (validate?.data) {
-          res.status(200).json(validate?.data?.gamalogic_emailid_vrfy[0]);
-        }
+      if (!req.body.email || typeof req.body.email !== 'string') {
+        return res.status(400).json({ error: "Invalid email provided" });
+      }
+
+      if (!req.user || !req.user.api_key) {
+        return res.status(403).json({ error: "API key not found or user not authenticated" });
+      }
+
+      let apiKey = req.user.api_key;
+      const response = await axios.get(
+        `https://gamalogic.com/emailvrf/?emailid=${req.body.email}&apikey=${apiKey}&speed_rank=0`
+      );
+      if (response.data && response.data.gamalogic_emailid_vrfy) {
+        res.status(200).json(response.data.gamalogic_emailid_vrfy[0]);
+      } else {
+        res.status(500).json({ error: "Unexpected response from email validation service" });
       }
     } catch (error) {
       ErrorHandler("emailValidation Controller", error, req);
