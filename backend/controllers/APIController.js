@@ -626,6 +626,14 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("RazorPayUpdateCredit Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
+    }finally {
+      if (req.dbConnection) {
+        try {
+          await req.dbConnection.release();
+        } catch (releaseError) {
+          console.error('Error releasing database connection:', releaseError);
+        }
+      }
     }
   }
 };
