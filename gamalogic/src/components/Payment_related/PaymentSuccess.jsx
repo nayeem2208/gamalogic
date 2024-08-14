@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { GoVerified } from "react-icons/go";
 import { Link } from "react-router-dom";
-import { useUserState } from "../context/userContext";
-function PaymentSuccess({ data }) {
-  let { paymentResult } = useUserState();
+import { useUserState } from "../../context/userContext";
+
+
+function PaymentSuccess() {
+  let { paymentResult,paymentDetails } = useUserState();
   let [costToShow,setCostToShow]=useState(null)
+
+
   useEffect(() => {
     const creditCostMappingsPayPal = [
+      [1000, 7],
       [2500, 10],
       [5000, 15],
       [10000, 20],
@@ -22,28 +27,28 @@ function PaymentSuccess({ data }) {
     ];
 
     const creditCostMappingsOther = [
-      [2500, 847.46],
-      [5000, 1271.19],
-      [10000, 1864.41],
-      [25000, 3474.58],
-      [50000, 6355.93],
-      [75000, 8474.58],
-      [100000, 10169.49],
-      [250000, 23728.81],
-      [500000, 44067.8],
-      [750000, 63559.32],
-      [1000000, 72033.9],
-      [2500000, 186440.68],
+      [1000,651],
+      [2500, 1488],
+      [5000, 2790],
+      [10000, 3720],
+      [25000, 6975],
+      [50000, 11625],
+      [75000, 16275],
+      [100000, 18600],
+      [250000, 37200],
+      [500000, 55800],
+      [750000, 74400],
+      [1000000, 93000],
     ];
 
+
     const selectedMappings = paymentResult.methord == "payPal" ? creditCostMappingsPayPal : creditCostMappingsOther;
-    console.log(selectedMappings,'selected mappingssssss')
-    const selectedCost = selectedMappings.find(([credits]) => credits === data.selectedCredits);
+    const selectedCost = selectedMappings.find(([credits]) => credits === paymentDetails.credits);
 
     if (selectedCost) {
       setCostToShow(selectedCost[1]); 
     }
-  }, [paymentResult.methord, data.selectedCredits]);
+  }, [paymentResult.methord, paymentDetails.credits]);
 
   
   return (
@@ -62,7 +67,7 @@ function PaymentSuccess({ data }) {
             //  + ` (${costToShow.toLocaleString("en-US")} + 18%)`
               : "Loading..."}`}
             {" "} for{" "}
-            {data.selectedCredits.toLocaleString("en-US")} credits was
+            {paymentDetails.credits.toLocaleString("en-US")} credits was
             successfull.
           </p>
           <p>You can now continue using our services.</p>

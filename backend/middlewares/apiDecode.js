@@ -8,6 +8,9 @@ const APIDecode =  async (req, res, next) => {
       let parsedTokenWithoutBearer=JSON.parse(tokenWithoutBearer)
       const decoded = jwt.verify(parsedTokenWithoutBearer.token, process.env.JWT_SECRET);
       req.user = decoded
+      if(!req.user.api_key){
+        res.status(401).json({ error: "Unauthorized" });
+      }
       next();
     } catch (error) {
       if (error.name === 'TokenExpiredError') {

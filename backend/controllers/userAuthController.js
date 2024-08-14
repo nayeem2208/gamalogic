@@ -34,6 +34,17 @@ const Authentication = {
       ErrorHandler("Sample Controller", error, req);
     }
   },
+  samplePost:async (req, res) => {
+    ///its for checking purpose
+    try {
+      console.log(req.body,'req.body')
+       ErrorHandler("webhook checker", req.body, req);
+      res.send('hiiii its working')
+    } catch (error) {
+      // ErrorHandler("Sample Controller", error, req);
+      console.log(error)
+    }
+  },
   login: async (req, res) => {
     try {
       const { email, password } = req.body;

@@ -5,11 +5,11 @@ import { useEffect, useRef, useState } from "react";
 import axiosInstance, { APP } from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import { useUserState } from "../context/userContext";
-import PaymentSuccess from "../components/PaymentSuccess";
-import PaymentFailure from "../components/PaymentFailure";
+import PaymentSuccess from "../components/Payment_related/PaymentSuccess";
+import PaymentFailure from "../components/Payment_related/PaymentFailure";
 import ServerError from "./ServerError";
 import BuyCreditsRazorPay from "./BuyCreditsRazorPay";
-import Pricing from "../components/Pricing";
+import Pricing from "../components/Payment_related/Pricing";
 
 function PayPalButton({ createOrder, onApprove, onError }) {
   const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
@@ -27,20 +27,19 @@ function PayPalButton({ createOrder, onApprove, onError }) {
 
 export default function BuyCredits() {
   const [orderID, setOrderID] = useState(false);
-  const [selectedCredits, setSelectedCredits] = useState(2500);
-  const [cost, setCost] = useState(10);
   const [isLoaded, setIsLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   let [serverError, setServerError] = useState(false);
 
-  let { setCreditBal, creditBal, userDetails,paymentResult,setPaymentResult } = useUserState();
-  const costRef = useRef(cost);
-  const creditsRef = useRef(selectedCredits);
-  console.log(paymentResult,'payment resutltttttttttttt')
+  let { setCreditBal, creditBal, userDetails,paymentResult,setPaymentResult,paymentDetails } = useUserState();
+  const costRef = useRef(paymentDetails.cost);
+  const creditsRef = useRef(paymentDetails.credits);
+
   useEffect(() => {
-    costRef.current = cost;
-    creditsRef.current = selectedCredits;
-  }, [cost, selectedCredits]);
+    costRef.current = paymentDetails.cost;
+    creditsRef.current = paymentDetails.credits;
+  }, [paymentDetails]);
+
   useEffect(() => {
     const loadPayPalScript = () => {
       if (window.paypal) {
@@ -80,8 +79,6 @@ export default function BuyCredits() {
 
   useEffect(() => {
     setPaymentResult({result:null,methord:null})
-    setCost(10)
-    setSelectedCredits(2500)
     if (APP == "beta") {
       document.title = "Buy Credits | Beta Dashboard";
     } else {
@@ -89,36 +86,8 @@ export default function BuyCredits() {
     }
   }, []);
 
-  const creditCostMappings = [
-    [2500, 10],
-    [5000, 15],
-    [10000, 20],
-    [25000, 40],
-    [50000, 70],
-    [75000, 100],
-    [100000, 120],
-    [250000, 280],
-    [500000, 480],
-    [750000, 700],
-    [1000000, 960],
-    [2500000, 2200],
-  ];
-  
-
-  const handleCreditsChange = (event) => {
-    const value = event.target.value;
-    event.target.style.setProperty(
-      "--value",
-      (value / (creditCostMappings.length - 1)) * 100 + "%"
-    );
-    const index = parseInt(event.target.value);
-    const [credits, cost] = creditCostMappings[index];
-    setSelectedCredits(credits);
-    setCost(cost);
-  };
-
   const createOrder = (data, actions) => {
-    console.log(cost, "costttt is here");
+    console.log(paymentDetails,'payment details')
     return actions.order
       .create({
         purchase_units: [
@@ -159,7 +128,7 @@ export default function BuyCredits() {
   const onError = async () => {
     toast.error("Error occured with our payment ");
     setPaymentResult({result:false,methord:'payPal'})
-    await axiosInstance.post("/paymentFailedEmail", { cost });
+    await axiosInstance.post("/paymentFailedEmail", { cost:costRef.current });
   };
 
   useEffect(() => {
@@ -168,17 +137,6 @@ export default function BuyCredits() {
     }
   }, []);
 
-  useEffect(() => {
-    setTimeout(() => {
-      const rangeInput = document.querySelector(".custom-range");
-      if (rangeInput) {
-        rangeInput.style.setProperty(
-          "--value",
-          (rangeInput.value / (creditCostMappings.length - 1)) * 100 + "%"
-        );
-      }
-    }, 0);
-  }, []);
 
   const handleTryAgain = () => {
     setPaymentResult({result:null,methord:null})
@@ -208,35 +166,6 @@ export default function BuyCredits() {
               contact us.
             </Link>
           </p>
-          {/* <div className="bg-gray-100 rounded h-52 md:h-96 shadow flex flex-col justify-center items-center">
-            <div className="flex w-full text-center">
-              <div className="w-3/6 border-r-4 border-gray-400">
-                <p className="buyCreditsCost text-xl md:text-3xl font-medium">
-                  {selectedCredits.toLocaleString()}
-                </p>
-                <p>Credits</p>
-              </div>
-              <div className="w-3/6">
-                <p className="buyCreditsCost text-xl md:text-3xl font-medium">
-                  ${cost.toLocaleString("en-US")}
-                </p>
-                <p>Cost</p>
-              </div>
-            </div>
-            <div className=" w-3/5 mt-12">
-              <input
-                type="range"
-                className="w-full custom-range"
-                min="0"
-                max={creditCostMappings.length - 1}
-                step="1"
-                onChange={handleCreditsChange}
-                value={creditCostMappings.findIndex(
-                  ([credits]) => credits === selectedCredits
-                )}
-              />
-            </div>
-          </div> */}
           <Pricing/>
           {userDetails.confirm == 1 && (<div className="">
             <div className=" flex justify-center mt-6">
@@ -261,12 +190,15 @@ export default function BuyCredits() {
             </div>
             <hr className="my-3"/>
             <div className="text-center "><p className="text-xs mt-3">*RazorPay is only for Indian users</p>
-            <BuyCreditsRazorPay creditfrom={selectedCredits} /> </div></div>
+            <BuyCreditsRazorPay /> </div></div>
           )}
         </div>
       )}
-      {paymentResult.result == true && <PaymentSuccess data={{ cost, selectedCredits }} />}
+      {paymentResult.result == true && <PaymentSuccess />}
       {paymentResult.result == false && <PaymentFailure tryAgain={handleTryAgain} />}
+    
     </div>
   );
 }
+
+

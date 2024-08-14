@@ -8,6 +8,7 @@ import APIDecode from '../middlewares/apiDecode.js';
 const router=express.Router()
 
 router.get('/sampleCheck',dbMiddleware,Authentication.sample)
+router.post('/sampleCheck1',Authentication.samplePost)
 router.post('/login',dbMiddleware,Authentication.login)
 router.post('/signup',dbMiddleware,Authentication.registerUser)
 router.get('/verifyEmail',dbMiddleware,Authentication.verifyEmail)

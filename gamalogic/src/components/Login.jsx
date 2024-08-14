@@ -236,9 +236,9 @@ function Login() {
             <div className="flex justify-center mt-2 w-full">
               <LinkedInPage endpoint={"signin"} />
             </div>
-            {/* <div className="flex justify-center my-2">
+            <div className="flex justify-center my-2">
                 <MicroSoftSignInButton page='login'/>
-              </div> */}
+              </div>
             <div className="flex justify-center text-xs md:text-sm text-gray-300 mt-3">
               <Link to="/signup">
                 <div className="border-r border-cyan-400 mx-2 px-2">

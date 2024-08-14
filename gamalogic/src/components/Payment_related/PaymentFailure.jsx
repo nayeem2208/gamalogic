@@ -1,5 +1,7 @@
 import React from "react";
 import { PiWarningCircleLight } from "react-icons/pi";
+
+
 function PaymentFailure({ tryAgain }) {
   return (
       <div className="flex justify-center items-center mt-16">

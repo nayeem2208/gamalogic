@@ -514,6 +514,7 @@ let APIControllers = {
 
       res.json({ order, planId: req.body.Planid, duration: req.body.duration });
     } catch (error) {
+      console.log(error)
       res.status(500).send(error);
       ErrorHandler("RazorpayPayment Controller", error, req);
     }
@@ -621,6 +622,7 @@ let APIControllers = {
         basicTemplate(req.user[0][0].username, content)
       );
       updateLeadStatus(req.user[0][0].emailid)
+      dbConnection.release()
       res.status(200).json('Successfull')
     } catch (error) {
       console.log(error);

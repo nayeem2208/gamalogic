@@ -1,11 +1,12 @@
 import { SiRazorpay } from "react-icons/si";
 import { toast } from "react-toastify";
-import axiosInstance from "../axios/axiosInstance";
-import { useUserState } from "../context/userContext";
+import axiosInstance from "../../axios/axiosInstance";
+import { useUserState } from "../../context/userContext";
+import {APP} from '../../axios/axiosInstance'
 
 const RazorpayButton = ({ cost, credits, onSuccess, onFailure }) => {
-  const { userDetails } = useUserState();
-  const taxRate = 0.18; // 18% tax
+  const { userDetails,paymentDetails } = useUserState();
+  const taxRate = 0.18; 
 
   const loadScript = (src) => {
     return new Promise((resolve) => {
@@ -40,7 +41,7 @@ const RazorpayButton = ({ cost, credits, onSuccess, onFailure }) => {
         amount: amount.toString(),
         currency,
         name: "Gamalogic",
-        description: "Test Transaction",
+        description: APP=='beta'?'Beta transaction':`${credits} credits on ${paymentDetails.type}`,
         image: "https://gamalogic.com/static/images/favicon.ico",
         order_id,
         handler: async function (response) {

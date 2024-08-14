@@ -1,45 +1,43 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useUserState } from "../context/userContext";
-import RazorpayButton from "../components/RazorPayButton";
+import RazorpayButton from "../components/Payment_related/RazorPayButton";
 import { toast } from "react-toastify";
 
-export default function BuyCreditsRazorPay({creditfrom}) {
+export default function BuyCreditsRazorPay() {
 
-  const [selectedCredits, setSelectedCredits] = useState(2500);
   const [cost, setCost] = useState(847.46);
   let [serverError, setServerError] = useState(false);
 
-  let { setCreditBal, creditBal,setPaymentResult } = useUserState();
-  const creditsRef = useRef(selectedCredits);
+  let { setCreditBal, creditBal,setPaymentResult,paymentDetails } = useUserState();
+
   
 
   let creditCostMappings = [
-    [2500, 847.46],
-    [5000, 1271.19],
-    [10000, 1864.41],
-    [25000, 3474.58],
-    [50000, 6355.93],
-    [75000, 8474.58],
-    [100000, 10169.49],
-    [250000, 23728.81],
-    [500000, 44067.8],
-    [750000, 63559.32],
-    [1000000, 72033.9],
-    [2500000, 186440.68],
+    [1000,651],
+    [2500, 1488],
+    [5000, 2790],
+    [10000, 3720],
+    [25000, 6975],
+    [50000, 11625],
+    [75000, 16275],
+    [100000, 18600],
+    [250000, 37200],
+    [500000, 55800],
+    [750000, 74400],
+    [1000000, 93000],
   ];
 
   useEffect(() => {
     const [credits, cost] = creditCostMappings.find(
-      ([credits]) => credits === creditfrom
+      ([credits]) => credits === paymentDetails.credits
     ) || [2500, 847.46]; 
 
-    setSelectedCredits(credits);
     setCost(cost);
-  }, [creditfrom]);
+  }, [paymentDetails.credits]);
 
   const handleSuccess = () => {
     setPaymentResult({result:true,methord:'RazorPay'})
-    setCreditBal(creditBal + creditsRef.current);
+    setCreditBal(creditBal + paymentDetails.credits);
     toast.success("Payment successful!!");
   };
 
@@ -53,7 +51,7 @@ export default function BuyCreditsRazorPay({creditfrom}) {
     <div className="text-center flex justify-center ">
       <RazorpayButton
         cost={cost}
-        credits={selectedCredits}
+        credits={paymentDetails.credits}
         onSuccess={handleSuccess}
         onFailure={handleFailure}
       />

@@ -9,6 +9,7 @@ const UserDetailsProvider = ({ children }) => {
   let [tutorialVideo,setTutorialVideo]=useState(false)
   let [paymentResult,setPaymentResult]=useState({result:null,methord:null})
   let [linkedinLoading, setLinkedinLoading] = useState(false);
+  let [paymentDetails,setPaymentDetails]=useState({cost:7,type:'Pay As You Go',period:'',credits:1000})
 
   return (
     <userDetailsContext.Provider
@@ -22,7 +23,9 @@ const UserDetailsProvider = ({ children }) => {
         paymentResult,
         setPaymentResult,
         linkedinLoading,
-        setLinkedinLoading
+        setLinkedinLoading,
+        paymentDetails,
+        setPaymentDetails
       }}
     >
       {children}
