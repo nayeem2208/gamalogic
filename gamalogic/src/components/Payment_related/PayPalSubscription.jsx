@@ -16,11 +16,12 @@ const ButtonWrapper = ({ type }) => {
     setCreditBal,
     setPaymentResult,
   } = useUserState();
-  const planIdRef = useRef("P-05J49526B2037362HM23Q4BA");
+  const planIdRef = useRef("P-7NW45488DG075491MM25NWLY");
+  const paymentDetailsref=useRef({})
   const [{ options }, dispatch] = usePayPalScriptReducer();
 
   const MonthlyCreditCostMappings = [
-    [1000, 6, "P-05J49526B2037362HM23Q4BA"],
+    [1000, 6, "P-7NW45488DG075491MM25NWLY"],
     [2500, 14, "P-1EE54055GV717671BM2452WA"],
     [5000, 25, "P-9Y912572NN1022200M2474NI"],
     [10000, 30, "P-93415479X9920982AM24743Y"],
@@ -58,10 +59,19 @@ const ButtonWrapper = ({ type }) => {
       matchedPlan = MonthlyCreditCostMappings.find(
         ([credits]) => credits === paymentDetails.credits
       );
+      paymentDetailsref.current=paymentDetails
+
     } else {
       matchedPlan = AnnualCreditCostMappings.find(
         ([credits]) => credits === paymentDetails.credits
       );
+      const annualCost = paymentDetails.cost * 12;
+      const annualCredits = paymentDetails.credits * 12;
+      paymentDetailsref.current = {
+        ...paymentDetails,  // Keep existing properties
+        cost: annualCost,
+        credits: annualCredits,
+      };
     }
     if (matchedPlan) {
       planIdRef.current = matchedPlan[2];
@@ -72,6 +82,7 @@ const ButtonWrapper = ({ type }) => {
         paymentDetails.credits
       ); // Debugging line
     }
+
   }, [paymentDetails]);
 
   useEffect(() => {
@@ -92,13 +103,13 @@ const ButtonWrapper = ({ type }) => {
         subscriptionId: subscription.id,
         planId: planIdRef.current,
         payerId: data.payerID,
-        paymentDetails,
+        paymentDetails:paymentDetailsref.current,
       };
 
       // Send data to your backend
       await axiosInstance.post("/payPalSubscription", orderData);
       setPaymentResult({ result: true, methord: "payPal" });
-      setCreditBal(creditBal + paymentDetails.credits);
+      setCreditBal(creditBal + paymentDetailsref.current);
 
       console.log("Order details sent to backend successfully");
     } catch (error) {

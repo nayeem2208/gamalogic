@@ -504,6 +504,7 @@ let APIControllers = {
       const dbConnection = req.dbConnection;
       let user = req.user[0][0]
       const { subscriptionId, planId, paymentDetails } = req.body;
+      console.log(paymentDetails,'payment details')
       let newBalance = user.credits + paymentDetails.credits
       await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1 WHERE emailid='${user.emailid}'`)
 
@@ -564,7 +565,7 @@ let APIControllers = {
         user.rowid ?? null,
         paymentDetails.credits ?? null,
         paymentDetails.period === 'monthly' ? '1' : '0',
-        paymentDetails.period === 'annual' ? '1' : '0',
+        paymentDetails.period != 'monthly' ? '1' : '0',
         subscriptionId ?? null,
         planId ?? null,
         details.start_time ?? null,
@@ -615,7 +616,7 @@ let APIControllers = {
 
         let planInDataBase = await dbConnection.query(`SELECT * FROM paypal_subscription WHERE subscription_id = '${payPaldetails.data.id}'`);
 
-        if (planInDataBase.length > 0) {
+        if (planInDataBase[0].length > 0) {
           const lastPaymentTimeDb = planInDataBase[0][0].last_payment; // Assuming this is a Date string or ISO format
           const lastPaymentTimeApi = payPaldetails.data.billing_info.last_payment.time;
 

@@ -2,55 +2,63 @@ import React, { useEffect, useState } from "react";
 import { GoVerified } from "react-icons/go";
 import { Link } from "react-router-dom";
 import { useUserState } from "../../context/userContext";
-
-
 function PaymentSuccess() {
-  let { paymentResult,paymentDetails } = useUserState();
-  let [costToShow,setCostToShow]=useState(null)
-
+  let { paymentResult, paymentDetails } = useUserState();
+  let [costToShow, setCostToShow] = useState(null);
 
   useEffect(() => {
-    const creditCostMappingsPayPal = [
-      [1000, 7],
-      [2500, 10],
-      [5000, 15],
-      [10000, 20],
-      [25000, 40],
-      [50000, 70],
-      [75000, 100],
-      [100000, 120],
-      [250000, 280],
-      [500000, 480],
-      [750000, 700],
-      [1000000, 960],
-      [2500000, 2200],
+    const creditCostMappings = [
+      [1000, 651, 558, 465],
+      [2500, 1488, 1302, 1116],
+      [5000, 2790, 2325, 1860],
+      [10000, 3720, 2790, 2325],
+      [25000, 6975, 6045, 5115],
+      [50000, 11625, 8370, 6045],
+      [75000, 16275, 11625, 6975],
+      [100000, 18600, 13950, 7905],
+      [250000, 37200, 21390, 16740],
+      [500000, 55800, 37200, 32550],
+      [750000, 74400, 55800, 48825],
+      [1000000, 93000, 74400, 65100],
     ];
+    let selectedCost = null;
+    if (paymentResult.methord == "payPal") {
+      if (paymentDetails.type !== "Pay As You Go") {
+        if (paymentDetails.period === "monthly") {
+          selectedCost = paymentDetails.cost;
+        } else {
+          selectedCost = paymentDetails.cost*12;
+        }
+      }
+    } else {
+      let index = 1; // Default to 'Pay As You Go'
 
-    const creditCostMappingsOther = [
-      [1000,651],
-      [2500, 1488],
-      [5000, 2790],
-      [10000, 3720],
-      [25000, 6975],
-      [50000, 11625],
-      [75000, 16275],
-      [100000, 18600],
-      [250000, 37200],
-      [500000, 55800],
-      [750000, 74400],
-      [1000000, 93000],
-    ];
+      if (paymentDetails.type !== "Pay As You Go") {
+        if (paymentDetails.period === "monthly") {
+          index = 2;
+        } else {
+          index = 3;
+        }
+      }
 
+      const costMapping = creditCostMappings.find(
+        ([credits]) => credits === paymentDetails.credits
+      );
+      if (costMapping) {
+        selectedCost = costMapping[index];
+      }
+    }
 
-    const selectedMappings = paymentResult.methord == "payPal" ? creditCostMappingsPayPal : creditCostMappingsOther;
-    const selectedCost = selectedMappings.find(([credits]) => credits === paymentDetails.credits);
 
     if (selectedCost) {
-      setCostToShow(selectedCost[1]); 
+      setCostToShow(selectedCost);
     }
-  }, [paymentResult.methord, paymentDetails.credits]);
+  }, [paymentResult.method, paymentDetails.credits]);
 
-  
+  const displayCredits = paymentResult.methord === "payPal" && paymentDetails.period === "annually"
+  ? paymentDetails.credits * 12
+  : paymentDetails.credits;
+
   return (
     <div className="flex justify-center items-center mt-16">
       <div className="payment-success">
@@ -63,11 +71,22 @@ function PaymentSuccess() {
         <div className="text-center flex flex-col justify-center my-6">
           <h3 className="text-5xl">Payment Success!</h3>
           <p className="my-2">
-            Your payment of {paymentResult.methord === "payPal" ? `$${costToShow !== null ? costToShow.toLocaleString("en-US") : "Loading..."}` : `₹${costToShow !== null ? (Math.round(costToShow + (costToShow * 18 / 100))).toLocaleString("en-US")
-            //  + ` (${costToShow.toLocaleString("en-US")} + 18%)`
-              : "Loading..."}`}
-            {" "} for{" "}
-            {paymentDetails.credits.toLocaleString("en-US")} credits was
+            Your payment of{" "}
+            {paymentResult.methord === "payPal"
+              ? `$${
+                  costToShow !== null
+                    ? costToShow.toLocaleString("en-US")
+                    : "Loading..."
+                }`
+              : `₹${
+                  costToShow !== null
+                    ? Math.round(
+                        costToShow + (costToShow * 18) / 100
+                      ).toLocaleString("en-US")
+                    : //  + ` (${costToShow.toLocaleString("en-US")} + 18%)`
+                      "Loading..."
+                }`}{" "}
+            for {displayCredits.toLocaleString("en-US")}  credits was
             successfull.
           </p>
           <p>You can now continue using our services.</p>
