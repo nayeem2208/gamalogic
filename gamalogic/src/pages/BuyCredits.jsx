@@ -10,6 +10,8 @@ import PaymentFailure from "../components/Payment_related/PaymentFailure";
 import ServerError from "./ServerError";
 import BuyCreditsRazorPay from "./BuyCreditsRazorPay";
 import Pricing from "../components/Payment_related/Pricing";
+import PayPalSubscription from "../components/Payment_related/PayPalSubscription";
+import BuyCreditsRazorPaySubsciption from "../components/Payment_related/RazorPaySubscription";
 
 function PayPalButton({ createOrder, onApprove, onError }) {
   const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
@@ -167,36 +169,61 @@ export default function BuyCredits() {
             </Link>
           </p>
           <Pricing/>
-          {userDetails.confirm == 1 && (<div className="">
-            <div className=" flex justify-center mt-6">
-              {isLoaded ? (
-                <div className="w-5/6 sm:w-3/6 md:w-2/6  z-0">
-                  <PayPalButton
-                    createOrder={(data, actions) => createOrder(data, actions)}
-                    onApprove={onApprove}
-                    onError={onError}
-                  />
+          {userDetails.confirm == 1 &&
+            paymentDetails.type == "Pay As You Go" && (
+              <div className="">
+                <div className=" flex justify-center mt-6">
+                  {isLoaded ? (
+                    <div className="w-5/6 sm:w-3/6 md:w-2/6  z-0">
+                      <PayPalButton
+                        createOrder={(data, actions) =>
+                          createOrder(data, actions)
+                        }
+                        onApprove={onApprove}
+                        onError={onError}
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <button className="bg-yellow-400 px-24 py-2 font-bold rounded  italic text-blue-900">
+                        Pay<span className="text-sky-600">Pal</span>
+                      </button>
+                      <p className="font-semibold text-sm">
+                        The safer,easier way to pay{" "}
+                      </p>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="text-center">
-                  <button className="bg-yellow-400 px-24 py-2 font-bold rounded  italic text-blue-900">
-                    Pay<span className="text-sky-600">Pal</span>
-                  </button>
-                  <p className="font-semibold text-sm">
-                    The safer,easier way to pay{" "}
+                <hr className="my-3" />
+                <div className="text-center ">
+                  <p className="text-xs mt-3">
+                    *RazorPay is only for Indian users
                   </p>
+                  <BuyCreditsRazorPay />{" "}
                 </div>
-              )}
-            </div>
-            <hr className="my-3"/>
-            <div className="text-center "><p className="text-xs mt-3">*RazorPay is only for Indian users</p>
-            <BuyCreditsRazorPay /> </div></div>
-          )}
+              </div>
+            )}
+          {userDetails.confirm == 1 &&
+            paymentDetails.type != "Pay As You Go" && (
+              <div className="flex  justify-center">
+                <div className="w-full flex flex-col justify-center items-center">
+                  <PayPalSubscription />
+                  <hr className="my-hr my-3" />
+                  <div className="text-center ">
+                    <p className="text-xs mt-3">
+                      *RazorPay is only for Indian users
+                    </p>
+                    <BuyCreditsRazorPaySubsciption />{" "}
+                  </div>
+                </div>
+              </div>
+            )}
         </div>
       )}
       {paymentResult.result == true && <PaymentSuccess />}
-      {paymentResult.result == false && <PaymentFailure tryAgain={handleTryAgain} />}
-    
+      {paymentResult.result == false && (
+        <PaymentFailure tryAgain={handleTryAgain} />
+      )}
     </div>
   );
 }

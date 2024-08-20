@@ -263,7 +263,7 @@ function Subscription() {
   
         {/* Checkmark List */}
         <div className="w-5/6 md:w-3/5 flex flex-col items-start my-4 text-sm md:text-base">
-        <div className=" flex my-2 md:items-center ">
+          <div className=" flex my-2 md:items-center ">
             <IoMdCheckmarkCircle className="h-6 w-6 md:h-8 md:w-8 md:min-w-8  min-w-6 text-green-600 mr-3" />
             <p className="text-left">Unused credits carry over and never expire.</p>
           </div>

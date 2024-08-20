@@ -8,6 +8,7 @@ import basicTemplate from "../EmailTemplates/BasicTemplate.js";
 import urls from "../ConstFiles/urls.js";
 import Razorpay from "razorpay";
 import { updateLeadStatus } from "../utils/crm.js";
+import paypalPrice from "../utils/payPalPriceRange.js";
 
 
 let APIControllers = {
@@ -498,6 +499,158 @@ let APIControllers = {
       }
     }
   },
+  payPalSubscription: async (req, res) => {
+    try {
+      const dbConnection = req.dbConnection;
+      let user = req.user[0][0]
+      const { subscriptionId, planId, paymentDetails } = req.body;
+      let newBalance = user.credits + paymentDetails.credits
+      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1 WHERE emailid='${user.emailid}'`)
+
+      let content = `
+      <p>Your payment for $${Number(Math.round(paymentDetails.cost)).toLocaleString()} for ${Number(paymentDetails.credits).toLocaleString()} credits has been successfully processed.</p>
+      
+      <p>If you have any questions or concerns regarding this payment, please feel free to contact us.</p>
+      `
+      sendEmail(
+        user.username,
+        user.emailid,
+        "Payment successfull",
+        basicTemplate(user.username, content)
+      );
+      //finding access token from paypal
+      const clientId = process.env.PAYPAL_CLIENTID;
+      const clientSecret = process.env.PAYPAL_CLIENTSECRET;
+
+      const url = `${urls.paypalUrl}/v1/oauth2/token`;
+
+      const data = new URLSearchParams({
+        grant_type: 'client_credentials',
+      });
+
+      const headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+      };
+
+      let payPalToken = await axios.post(url, data, { headers })
+
+      //finding order details based on that order id and access token
+      const payPaldetails = await axios.get(`${urls.paypalUrl}/v1/billing/subscriptions/${subscriptionId}`, {
+        headers: {
+          'Authorization': `Bearer ${payPalToken.data.access_token}`
+        }
+      });
+      let details = payPaldetails.data;
+      const formatAddress = (address) => {
+        return [
+          address.address_line_1 || null,
+          address.admin_area_2 || null,
+          address.admin_area_1 || null,
+          address.postal_code || null,
+          address.country_code || null
+        ].filter(part => part).join(', ');
+      };
+
+      const address = formatAddress(details.subscriber.shipping_address.address);
+      let query = `
+         INSERT INTO paypal_subscription (
+        userid, credits, is_monthly, is_annual, subscription_id, plan_id, start_time, quantity,
+        name, address, email_address, payer_id, last_payment, next_billing_time
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+
+      let values = [
+        user.rowid ?? null,
+        paymentDetails.credits ?? null,
+        paymentDetails.period === 'monthly' ? '1' : '0',
+        paymentDetails.period === 'annual' ? '1' : '0',
+        subscriptionId ?? null,
+        planId ?? null,
+        details.start_time ?? null,
+        details.quantity ?? null,
+        `${details.subscriber.name.given_name} ${details.subscriber.name.surname}` ?? null,
+        address ?? null,
+        details.subscriber.email_address ?? null,
+        details.subscriber.payer_id ?? null,
+        details.billing_info.last_payment.time ?? null,
+        details.billing_info.next_billing_time ?? null
+      ];
+      updateLeadStatus(req.user[0][0].emailid)
+
+      await dbConnection.query(query, values);
+      res.status(200).json('Successfull')
+      dbConnection.release()
+    } catch (error) {
+      console.log(error);
+      ErrorHandler("Paypal subscription Controller", error, req);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
+  payPalWebHook: async (req, res) => {
+    try {
+      const dbConnection = req.dbConnection; // Ensure this is correctly set up
+      const { event_type, resource } = req.body;
+
+      if (event_type === 'PAYMENT.SALE.COMPLETED') {
+        const clientId = process.env.PAYPAL_CLIENTID;
+        const clientSecret = process.env.PAYPAL_CLIENTSECRET;
+
+        const url = `${urls.paypalUrl}/v1/oauth2/token`;
+        const data = new URLSearchParams({ grant_type: 'client_credentials' });
+        const headers = {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+        };
+
+        let payPalToken = await axios.post(url, data, { headers });
+
+        // Fetch PayPal subscription details
+        const payPaldetails = await axios.get(`${urls.paypalUrl}/v1/billing/subscriptions/${resource.billing_agreement_id}`, {
+          headers: { 'Authorization': `Bearer ${payPalToken.data.access_token}` }
+        });
+
+        const foundItem = paypalPrice.find(([credits, id]) => id === payPaldetails.data.plan_id);
+        let credit = foundItem ? foundItem[0] : null;
+
+        let planInDataBase = await dbConnection.query(`SELECT * FROM paypal_subscription WHERE subscription_id = '${payPaldetails.data.id}'`);
+
+        if (planInDataBase.length > 0) {
+          const lastPaymentTimeDb = planInDataBase[0][0].last_payment; // Assuming this is a Date string or ISO format
+          const lastPaymentTimeApi = payPaldetails.data.billing_info.last_payment.time;
+
+          // Convert to Date objects for comparison
+          const lastPaymentDateDb = new Date(lastPaymentTimeDb);
+          const lastPaymentDateApi = new Date(lastPaymentTimeApi);
+
+          const isSameDay = lastPaymentDateDb.toDateString() === lastPaymentDateApi.toDateString();
+
+          if (!isSameDay) {
+            await dbConnection.query(
+              `UPDATE paypal_subscription SET last_payment ='${lastPaymentTimeApi}' WHERE subscription_id ='${payPaldetails.data.id}'`,
+            );
+
+            let user = await dbConnection.query(`SELECT rowid, credits FROM registration WHERE rowid = $1`, [planInDataBase.rows[0].userid]);
+            let newBalance = user.rows[0].credits + credit;
+
+            await dbConnection.query(`UPDATE registration SET credits = $1, is_premium = 1 WHERE rowid = $2`, [newBalance, planInDataBase.rows[0].userid]);
+            console.log('Database updated');
+          } else {
+            console.log('Dates are the same. No update needed.');
+          }
+        } else {
+          console.log('No record found in database for the given plan_id.');
+        }
+      }
+      res.status(200).send('Webhook processed successfully');
+      dbConnection.release()
+
+    } catch (error) {
+      console.log(error);
+      ErrorHandler("Paypal webhook Controller", error, req);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
   RazorpayPayment: async (req, res) => {
     try {
       const instance = new Razorpay({
@@ -629,6 +782,153 @@ let APIControllers = {
       ErrorHandler("RazorPayUpdateCredit Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     }finally {
+      if (req.dbConnection) {
+        try {
+          await req.dbConnection.release();
+        } catch (releaseError) {
+          console.error('Error releasing database connection:', releaseError);
+        }
+      }
+    }
+  },
+  razorPaySubscriptin: async (req, res) => {
+    try {
+      let instance = new Razorpay(
+        {
+          key_id: process.env.RAZORPAY_KEY_ID,
+          key_secret: process.env.RAZORPAY_SECRET
+        }
+      );
+      const options = {
+        plan_id: 'plan_OlAsJTdkA47ryc',
+        customer_notify: 1,
+        start_at: Math.floor(Date.now() / 1000) + 60,
+        total_count: 50,
+        payment_capture: 1
+      };
+      console.log(options, 'optionssssssss')
+      const subscription = await instance.subscriptions.create(options);
+      res.json(subscription);
+    } catch (error) {
+      console.log(error, 'error adich mooone')
+      res.status(500).send(error);
+    }
+  },
+  razorPaySubscriptionSuccess: async (req, res) => {
+    try {
+      const dbConnection = req.dbConnection;
+      let user = await dbConnection.query(`SELECT rowid,credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
+
+      let newBalance = user[0][0].credits + req.body.credits
+      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1 WHERE emailid='${req.user[0][0].emailid}'`)
+
+      var instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET })
+      let resp = await instance.payments.fetch(req.body.razorpayPaymentId)
+      console.log(resp, 'resppppppppppppp')
+      if (!resp) {
+        console.log('error fetching response  ')
+        return res.status(500).json({ error: 'Error fetching payment response' });
+      }
+      const {
+        id,
+        entity,
+        amount,
+        currency,
+        status,
+        order_id,
+        invoice_id,
+        international,
+        method,
+        amount_refunded,
+        refund_status,
+        captured,
+        description,
+        card_id,
+        bank,
+        wallet,
+        vpa,
+        email,
+        contact,
+        notes,
+        fee,
+        tax,
+        error_code,
+        error_description,
+        error_source,
+        error_step,
+        error_reason,
+        acquirer_data,
+        created_at
+      } = resp;
+
+      const amountInRupees = amount / 100;
+      const feeInRupees = fee / 100;
+      const taxInRupees = tax / 100;
+
+      const query = `
+    INSERT INTO gl_razorpay (
+       rp_id,user_id,entity, amount, currency, status, order_id, invoice_id,
+      international, method, amount_refunded, refund_status, captured,
+      description, card_id, bank, wallet, vpa, email, contact, address, fee,
+      tax, error_code, error_description, error_source, error_step,
+      error_reason, bank_transaction_id, created_at,payment_id
+    ) VALUES ( ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+  `;
+
+      const values = [
+        req.body.razorpayPaymentId || null,
+        req.user[0][0].rowid || null,
+        entity || null,
+        amountInRupees || null,
+        currency || null,
+        status || null,
+        order_id || null,
+        invoice_id || null,
+        international || null,
+        method || null,
+        amount_refunded || null,
+        refund_status || null,
+        captured || null,
+        description || null,
+        card_id || null,
+        bank || null,
+        wallet || null,
+        vpa || null,
+        email || null,
+        contact || null,
+        notes && notes.address ? notes.address : null,
+        feeInRupees || null,
+        taxInRupees || null,
+        error_code || null,
+        error_description || null,
+        error_source || null,
+        error_step || null,
+        error_reason || null,
+        acquirer_data && acquirer_data.bank_transaction_id ? acquirer_data.bank_transaction_id : null,
+        created_at ? new Date(created_at * 1000).toISOString().slice(0, 19).replace('T', ' ') : null,
+        id
+      ];
+
+      await dbConnection.query(query, values);
+
+      let content = `
+      <p>Your payment for ₹ ${Math.round(req.body.cost)} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.</p>
+      
+      <p>If you have any questions or concerns regarding this payment, please feel free to contact us.</p>
+      `
+      sendEmail(
+        req.user[0][0].username,
+        req.user[0][0].emailid,
+        "Payment successfull",
+        basicTemplate(req.user[0][0].username, content)
+      );
+      updateLeadStatus(req.user[0][0].emailid)
+      res.status(200).json('Successfull')
+    } catch (error) {
+      console.log(error);
+      ErrorHandler("RazorPaySubscriptionUpdateCredit Controller", error, req);
+      res.status(500).json({ error: "Internal Server Error" });
+    } finally {
       if (req.dbConnection) {
         try {
           await req.dbConnection.release();
