@@ -630,9 +630,9 @@ let APIControllers = {
         };
 
         let payPalToken = await axios.post(url, data, { headers });
-
+        let subId=event_type === 'PAYMENT.SALE.COMPLETED'?resource.billing_agreement_id:req.body.resource.id
         // Fetch PayPal subscription details
-        const payPaldetails = await axios.get(`${urls.paypalUrl}/v1/billing/subscriptions/${resource.billing_agreement_id}`, {
+        const payPaldetails = await axios.get(`${urls.paypalUrl}/v1/billing/subscriptions/${subId}`, {
           headers: { 'Authorization': `Bearer ${payPalToken.data.access_token}` }
         });
 
@@ -640,6 +640,7 @@ let APIControllers = {
         let credit = foundItem ? foundItem[0] : null;
 
         let planInDataBase = await dbConnection.query(`SELECT * FROM paypal_subscription WHERE subscription_id = '${payPaldetails.data.id}'`);
+        console.log(planInDataBase[0].length,'length of plan base',planInDataBase)
         if (event_type === 'PAYMENT.SALE.COMPLETED') {
           if (planInDataBase[0].length > 0) {
             const lastPaymentTimeDb = planInDataBase[0][0].last_payment; // Assuming this is a Date string or ISO format
@@ -656,10 +657,10 @@ let APIControllers = {
                 `UPDATE paypal_subscription SET last_payment ='${lastPaymentTimeApi}' WHERE subscription_id ='${payPaldetails.data.id}'`,
               );
 
-              let user = await dbConnection.query(`SELECT rowid, credits FROM registration WHERE rowid = $1`, [planInDataBase.rows[0].userid]);
+              let user = await dbConnection.query(`SELECT rowid, credits FROM registration WHERE rowid = $1`, [planInDataBase[0][0].userid]);
               let newBalance = user.rows[0].credits + credit;
 
-              await dbConnection.query(`UPDATE registration SET credits = $1, is_premium = 1 WHERE rowid = $2`, [newBalance, planInDataBase.rows[0].userid]);
+              await dbConnection.query(`UPDATE registration SET credits = $1, is_premium = 1 WHERE rowid = $2`, [newBalance, planInDataBase[0][0].userid]);
               console.log('Database updated');
             } else {
               console.log('Dates are the same. No update needed.');
@@ -668,19 +669,35 @@ let APIControllers = {
           } else {
             console.log('No record found in database for the given plan_id.');
           }
-        } else {
+        }else{
+
           await dbConnection.query(
             `UPDATE paypal_subscription SET is_active='${0}' WHERE subscription_id ='${payPaldetails.data.id}'`,
           );
-          await dbConnection.query(`UPDATE registration SET  is_monthy=0,is_annual=0,subscription_stop_time=$1	 WHERE rowid = $2`, [req.body.create_time, planInDataBase.rows[0].userid]);
+          // console.log(req.body.resource?.create_time,'time and userid' ,planInDataBase[0][0].userid)
+          await dbConnection.query(
+            `UPDATE registration SET is_monthly = 0, is_annual = 0, subscription_stop_time = ? WHERE rowid = ?`,
+            [resource.create_time, planInDataBase[0][0].userid]
+          );
+          let data = paypalPrice.find(([credit, id]) => id == resource.plan_id)
+          let content = `
+        <p>We regret to inform you that your subscription has been successfully cancelled. Your payment of $${Number(Math.round(resource.billing_info.last_payment.amount.value)).toLocaleString()} for ${Number(data[0]).toLocaleString()} credits has been processed, and the subscription has been stopped.</p>
+        
+        <p>If you have any questions or concerns regarding this cancellation or your account, please feel free to contact us.</p>
+        `
+        let user = await dbConnection.query(`SELECT * from registration WHERE rowid='${planInDataBase[0][0].userid}'`)
+          sendEmail(
+            user[0][0].username,
+            user[0][0].emailid,
+            "Subscription Cancellation",
+            basicTemplate(user[0][0].username, content)
+          );
 
         }
       }
       res.status(200).send('Webhook processed successfully');
-      dbConnection.release()
     } catch (error) {
       console.log(error);
-      ErrorHandler("Paypal webhook Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     }
   },

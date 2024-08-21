@@ -68,7 +68,7 @@ function PaymentSuccess() {
             className="font-extralight text-green-500 "
           />
         </div>
-        {paymentDetails.methord=='Pay As You Go'?<div className="text-center flex flex-col justify-center my-6">
+        {paymentDetails.type=='Pay As You Go'?<div className="text-center flex flex-col justify-center my-6">
           <h3 className="text-5xl">Payment Success!</h3>
           <p className="my-2">
             Your payment of{" "}
