@@ -501,12 +501,10 @@ let APIControllers = {
   },
   payPalSubscription: async (req, res) => {
     try {
+      console.log(req.body, 'req. bodyyyyyyyyyy')
       const dbConnection = req.dbConnection;
       let user = req.user[0][0]
       const { subscriptionId, planId, paymentDetails } = req.body;
-      console.log(paymentDetails,'payment details')
-      let newBalance = user.credits + paymentDetails.credits
-      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1 WHERE emailid='${user.emailid}'`)
       let content
       if (paymentDetails.period == 'monthly') {
         content = `
@@ -522,6 +520,7 @@ let APIControllers = {
         <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
         `
       }
+
       sendEmail(
         user.username,
         user.emailid,
@@ -552,6 +551,22 @@ let APIControllers = {
         }
       });
       let details = payPaldetails.data;
+      let newBalance = user.credits + paymentDetails.credits
+      const periodColumn = paymentDetails.period === 'monthly' ? 'is_monthly' : 'is_annual';
+      const registrationRuery = `
+  UPDATE registration 
+  SET credits = '${newBalance}', 
+      is_premium = 1, 
+      ${periodColumn} = 1 ,
+      subscription_start_time='${details.start_time}',
+      last_payment_time='${details.billing_info.last_payment.time}'
+  WHERE emailid = '${user.emailid}'
+`;
+
+      await dbConnection.query(registrationRuery);
+
+      // await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1 WHERE emailid='${user.emailid}'`)
+
       const formatAddress = (address) => {
         return [
           address.address_line_1 || null,
@@ -566,8 +581,8 @@ let APIControllers = {
       let query = `
          INSERT INTO paypal_subscription (
         userid, credits, is_monthly, is_annual, subscription_id, plan_id, start_time, quantity,
-        name, address, email_address, payer_id, last_payment, next_billing_time
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        name, address, email_address, payer_id, last_payment, next_billing_time,is_active
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
       `;
 
       let values = [
@@ -584,7 +599,8 @@ let APIControllers = {
         details.subscriber.email_address ?? null,
         details.subscriber.payer_id ?? null,
         details.billing_info.last_payment.time ?? null,
-        details.billing_info.next_billing_time ?? null
+        details.billing_info.next_billing_time ?? null,
+        1
       ];
       updateLeadStatus(req.user[0][0].emailid)
 
@@ -602,7 +618,7 @@ let APIControllers = {
       const dbConnection = req.dbConnection; // Ensure this is correctly set up
       const { event_type, resource } = req.body;
 
-      if (event_type === 'PAYMENT.SALE.COMPLETED') {
+      if (event_type === 'PAYMENT.SALE.COMPLETED' || event_type === 'BILLING.SUBSCRIPTION.CANCELLED') {
         const clientId = process.env.PAYPAL_CLIENTID;
         const clientSecret = process.env.PAYPAL_CLIENTSECRET;
 
@@ -624,37 +640,44 @@ let APIControllers = {
         let credit = foundItem ? foundItem[0] : null;
 
         let planInDataBase = await dbConnection.query(`SELECT * FROM paypal_subscription WHERE subscription_id = '${payPaldetails.data.id}'`);
+        if (event_type === 'PAYMENT.SALE.COMPLETED') {
+          if (planInDataBase[0].length > 0) {
+            const lastPaymentTimeDb = planInDataBase[0][0].last_payment; // Assuming this is a Date string or ISO format
+            const lastPaymentTimeApi = payPaldetails.data.billing_info.last_payment.time;
 
-        if (planInDataBase[0].length > 0) {
-          const lastPaymentTimeDb = planInDataBase[0][0].last_payment; // Assuming this is a Date string or ISO format
-          const lastPaymentTimeApi = payPaldetails.data.billing_info.last_payment.time;
+            // Convert to Date objects for comparison
+            const lastPaymentDateDb = new Date(lastPaymentTimeDb);
+            const lastPaymentDateApi = new Date(lastPaymentTimeApi);
 
-          // Convert to Date objects for comparison
-          const lastPaymentDateDb = new Date(lastPaymentTimeDb);
-          const lastPaymentDateApi = new Date(lastPaymentTimeApi);
+            const isSameDay = lastPaymentDateDb.toDateString() === lastPaymentDateApi.toDateString();
 
-          const isSameDay = lastPaymentDateDb.toDateString() === lastPaymentDateApi.toDateString();
+            if (!isSameDay) {
+              await dbConnection.query(
+                `UPDATE paypal_subscription SET last_payment ='${lastPaymentTimeApi}' WHERE subscription_id ='${payPaldetails.data.id}'`,
+              );
 
-          if (!isSameDay) {
-            await dbConnection.query(
-              `UPDATE paypal_subscription SET last_payment ='${lastPaymentTimeApi}' WHERE subscription_id ='${payPaldetails.data.id}'`,
-            );
+              let user = await dbConnection.query(`SELECT rowid, credits FROM registration WHERE rowid = $1`, [planInDataBase.rows[0].userid]);
+              let newBalance = user.rows[0].credits + credit;
 
-            let user = await dbConnection.query(`SELECT rowid, credits FROM registration WHERE rowid = $1`, [planInDataBase.rows[0].userid]);
-            let newBalance = user.rows[0].credits + credit;
+              await dbConnection.query(`UPDATE registration SET credits = $1, is_premium = 1 WHERE rowid = $2`, [newBalance, planInDataBase.rows[0].userid]);
+              console.log('Database updated');
+            } else {
+              console.log('Dates are the same. No update needed.');
+            }
 
-            await dbConnection.query(`UPDATE registration SET credits = $1, is_premium = 1 WHERE rowid = $2`, [newBalance, planInDataBase.rows[0].userid]);
-            console.log('Database updated');
           } else {
-            console.log('Dates are the same. No update needed.');
+            console.log('No record found in database for the given plan_id.');
           }
         } else {
-          console.log('No record found in database for the given plan_id.');
+          await dbConnection.query(
+            `UPDATE paypal_subscription SET is_active='${0}' WHERE subscription_id ='${payPaldetails.data.id}'`,
+          );
+          await dbConnection.query(`UPDATE registration SET  is_monthy=0,is_annual=0,subscription_stop_time=$1	 WHERE rowid = $2`, [req.body.create_time, planInDataBase.rows[0].userid]);
+
         }
       }
       res.status(200).send('Webhook processed successfully');
       dbConnection.release()
-
     } catch (error) {
       console.log(error);
       ErrorHandler("Paypal webhook Controller", error, req);
@@ -791,7 +814,7 @@ let APIControllers = {
       console.log(error);
       ErrorHandler("RazorPayUpdateCredit Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
-    }finally {
+    } finally {
       if (req.dbConnection) {
         try {
           await req.dbConnection.release();
