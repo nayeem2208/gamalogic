@@ -507,12 +507,21 @@ let APIControllers = {
       console.log(paymentDetails,'payment details')
       let newBalance = user.credits + paymentDetails.credits
       await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1 WHERE emailid='${user.emailid}'`)
-
-      let content = `
-      <p>Your payment for $${Number(Math.round(paymentDetails.cost)).toLocaleString()} for ${Number(paymentDetails.credits).toLocaleString()} credits has been successfully processed.</p>
-      
-      <p>If you have any questions or concerns regarding this payment, please feel free to contact us.</p>
-      `
+      let content
+      if (paymentDetails.period == 'monthly') {
+        content = `
+        <p>Your payment of $${Number(Math.round(paymentDetails.cost)).toLocaleString()} for ${Number(paymentDetails.credits).toLocaleString()} credits has been successfully processed.Additionally, we have activated your monthly subscription for ${Number(paymentDetails.credits).toLocaleString()} credits.</p>
+        
+        <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
+        `
+      }
+      else {
+        content = `
+        <p>Your payment of $${Number(Math.round(paymentDetails.cost)).toLocaleString()} for ${Number(paymentDetails.credits).toLocaleString()} credits has been successfully processed.Additionally, we have activated your Annual subscription for ${Number(paymentDetails.credits).toLocaleString()} credits.</p>
+        
+        <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
+        `
+      }
       sendEmail(
         user.username,
         user.emailid,

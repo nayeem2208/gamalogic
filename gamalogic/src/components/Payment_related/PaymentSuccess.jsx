@@ -21,7 +21,7 @@ function PaymentSuccess() {
       [750000, 74400, 55800, 48825],
       [1000000, 93000, 74400, 65100],
     ];
-    let selectedCost = null;
+    let selectedCost =paymentDetails.cost
     if (paymentResult.methord == "payPal") {
       if (paymentDetails.type !== "Pay As You Go") {
         if (paymentDetails.period === "monthly") {
@@ -68,7 +68,7 @@ function PaymentSuccess() {
             className="font-extralight text-green-500 "
           />
         </div>
-        <div className="text-center flex flex-col justify-center my-6">
+        {paymentDetails.methord=='Pay As You Go'?<div className="text-center flex flex-col justify-center my-6">
           <h3 className="text-5xl">Payment Success!</h3>
           <p className="my-2">
             Your payment of{" "}
@@ -94,7 +94,35 @@ function PaymentSuccess() {
           <Link to="/" className="underline font-semibold my-2">
             START VALIDATING
           </Link>
-        </div>
+        </div>:
+        <div className="text-center flex flex-col justify-center my-6">
+        <h3 className="text-5xl">Payment Success!</h3>
+        <p className="my-2">
+          Your payment of{" "}
+          {paymentResult.methord === "payPal"
+            ? `$${
+                costToShow !== null
+                  ? costToShow.toLocaleString("en-US")
+                  : "Loading..."
+              }`
+            : `₹${
+                costToShow !== null
+                  ? Math.round(
+                      costToShow + (costToShow * 18) / 100
+                    ).toLocaleString("en-US")
+                  : //  + ` (${costToShow.toLocaleString("en-US")} + 18%)`
+                    "Loading..."
+              }`}{" "}
+          for {displayCredits.toLocaleString("en-US")}  credits was
+          successfull and your {paymentDetails.period=='monthly'?'monthly':'annual'} subscription has been activated.
+        </p>
+        <p>You can now continue enjoying our services with your monthly credits.</p>
+
+        <Link to="/" className="underline font-semibold my-2">
+          START VALIDATING
+        </Link>
+      </div>
+        }
       </div>
     </div>
   );
