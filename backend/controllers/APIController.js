@@ -708,12 +708,12 @@ let APIControllers = {
           }
         } else {
 
-          await dbConnection.query(
-            `UPDATE paypal_subscription SET is_active='${0}' WHERE subscription_id ='${payPaldetails.data.id}'`,
-          );
+          // await dbConnection.query(
+          //   `UPDATE paypal_subscription SET is_active='${0}' WHERE subscription_id ='${payPaldetails.data.id}'`,
+          // );
           // console.log(req.body.resource?.create_time,'time and userid' ,planInDataBase[0][0].userid)
           await dbConnection.query(
-            `UPDATE registration SET is_monthly = 0, is_annual = 0, subscription_stop_time = ? WHERE rowid = ?`,
+            `UPDATE registration SET is_monthly = 0, is_annual = 0,is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
             [resource.create_time, planInDataBase[0][0].userid]
           );
           let data = paypalPrice.find(([credit, id]) => id == resource.plan_id)
