@@ -396,7 +396,7 @@ let APIControllers = {
       const dbConnection = req.dbConnection;
       let user = await dbConnection.query(`SELECT rowid,credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
       let newBalance = user[0][0].credits + req.body.credits
-      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1 WHERE emailid='${req.user[0][0].emailid}'`)
+      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1 WHERE emailid='${req.user[0][0].emailid}'`)
 
       let content = `
       <p>Your payment for $${Number(req.body.cost).toLocaleString()} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.</p>
@@ -559,7 +559,8 @@ let APIControllers = {
       is_premium = 1, 
       ${periodColumn} = 1 ,
       subscription_start_time='${details.start_time}',
-      last_payment_time='${details.billing_info.last_payment.time}'
+      last_payment_time='${details.billing_info.last_payment.time}',
+      is_active=1
   WHERE emailid = '${user.emailid}'
 `;
 
@@ -576,13 +577,13 @@ let APIControllers = {
           address.country_code || null
         ].filter(part => part).join(', ');
       };
-
+      let gross_amount = Math.round(details.billing_info.last_payment.amount.value)
       const address = formatAddress(details.subscriber.shipping_address.address);
       let query = `
          INSERT INTO paypal_subscription (
-        userid, credits, is_monthly, is_annual, subscription_id, plan_id, start_time, quantity,
+        userid, credits, is_monthly, is_annual,gross_amount, subscription_id, plan_id, start_time, quantity,
         name, address, email_address, payer_id, last_payment, next_billing_time,is_active
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+      ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
       `;
 
       let values = [
@@ -590,6 +591,7 @@ let APIControllers = {
         paymentDetails.credits ?? null,
         paymentDetails.period === 'monthly' ? '1' : '0',
         paymentDetails.period != 'monthly' ? '1' : '0',
+        gross_amount || null,
         subscriptionId ?? null,
         planId ?? null,
         details.start_time ?? null,
@@ -630,7 +632,7 @@ let APIControllers = {
         };
 
         let payPalToken = await axios.post(url, data, { headers });
-        let subId=event_type === 'PAYMENT.SALE.COMPLETED'?resource.billing_agreement_id:req.body.resource.id
+        let subId = event_type === 'PAYMENT.SALE.COMPLETED' ? resource.billing_agreement_id : req.body.resource.id
         // Fetch PayPal subscription details
         const payPaldetails = await axios.get(`${urls.paypalUrl}/v1/billing/subscriptions/${subId}`, {
           headers: { 'Authorization': `Bearer ${payPalToken.data.access_token}` }
@@ -640,7 +642,7 @@ let APIControllers = {
         let credit = foundItem ? foundItem[0] : null;
 
         let planInDataBase = await dbConnection.query(`SELECT * FROM paypal_subscription WHERE subscription_id = '${payPaldetails.data.id}'`);
-        console.log(planInDataBase[0].length,'length of plan base',planInDataBase)
+        console.log(planInDataBase[0].length, 'length of plan base', planInDataBase)
         if (event_type === 'PAYMENT.SALE.COMPLETED') {
           if (planInDataBase[0].length > 0) {
             const lastPaymentTimeDb = planInDataBase[0][0].last_payment; // Assuming this is a Date string or ISO format
@@ -653,10 +655,45 @@ let APIControllers = {
             const isSameDay = lastPaymentDateDb.toDateString() === lastPaymentDateApi.toDateString();
 
             if (!isSameDay) {
-              await dbConnection.query(
-                `UPDATE paypal_subscription SET last_payment ='${lastPaymentTimeApi}' WHERE subscription_id ='${payPaldetails.data.id}'`,
-              );
+              let details = payPaldetails.data;
+              const formatAddress = (address) => {
+                return [
+                  address.address_line_1 || null,
+                  address.admin_area_2 || null,
+                  address.admin_area_1 || null,
+                  address.postal_code || null,
+                  address.country_code || null
+                ].filter(part => part).join(', ');
+              };
+              let gross_amount = Math.round(details.billing_info.last_payment.amount.value)
+              const address = formatAddress(details.subscriber.shipping_address.address);
+              let query = `
+                 INSERT INTO paypal_subscription (
+                userid, credits, is_monthly, is_annual,gross_amount, subscription_id, plan_id, start_time, quantity,
+                name, address, email_address, payer_id, last_payment, next_billing_time,is_active
+              ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+              `;
 
+              let values = [
+                user.rowid ?? null,
+                paymentDetails.credits ?? null,
+                paymentDetails.period === 'monthly' ? '1' : '0',
+                paymentDetails.period === 'annual' ? '1' : '0',
+                gross_amount || null,
+                subscriptionId ?? null,
+                planId ?? null,
+                details.start_time ?? null,
+                details.quantity ?? null,
+                `${details.subscriber.name.given_name} ${details.subscriber.name.surname}` ?? null,
+                address ?? null,
+                details.subscriber.email_address ?? null,
+                details.subscriber.payer_id ?? null,
+                details.billing_info.last_payment.time ?? null,
+                details.billing_info.next_billing_time ?? null,
+                1
+              ];
+
+              await dbConnection.query(query, values);
               let user = await dbConnection.query(`SELECT rowid, credits FROM registration WHERE rowid = $1`, [planInDataBase[0][0].userid]);
               let newBalance = user.rows[0].credits + credit;
 
@@ -669,7 +706,7 @@ let APIControllers = {
           } else {
             console.log('No record found in database for the given plan_id.');
           }
-        }else{
+        } else {
 
           await dbConnection.query(
             `UPDATE paypal_subscription SET is_active='${0}' WHERE subscription_id ='${payPaldetails.data.id}'`,
@@ -685,7 +722,7 @@ let APIControllers = {
         
         <p>If you have any questions or concerns regarding this cancellation or your account, please feel free to contact us.</p>
         `
-        let user = await dbConnection.query(`SELECT * from registration WHERE rowid='${planInDataBase[0][0].userid}'`)
+          let user = await dbConnection.query(`SELECT * from registration WHERE rowid='${planInDataBase[0][0].userid}'`)
           sendEmail(
             user[0][0].username,
             user[0][0].emailid,
