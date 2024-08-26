@@ -644,7 +644,7 @@ let APIControllers = {
         let planInDataBase = await dbConnection.query(`SELECT * FROM paypal_subscription WHERE subscription_id = '${payPaldetails.data.id}'`);
         if (event_type === 'PAYMENT.SALE.COMPLETED') {
           if (planInDataBase[0].length > 0) {
-            ErrorHandler("update paypal webhook checker", error, req);
+            ErrorHandler("update paypal webhook checker", req.body, req);
             const lastPaymentTimeDb = planInDataBase[0][0].last_payment; // Assuming this is a Date string or ISO format
             const lastPaymentTimeApi = payPaldetails.data.billing_info.last_payment.time;
 
@@ -912,7 +912,6 @@ let APIControllers = {
 
       var instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET })
       let resp = await instance.payments.fetch(req.body.razorpayPaymentId)
-      console.log(resp, 'resppppppppppppp')
       if (!resp) {
         console.log('error fetching response  ')
         return res.status(500).json({ error: 'Error fetching payment response' });

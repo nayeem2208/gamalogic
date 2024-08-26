@@ -51,10 +51,11 @@ const RazorPaySubscriptionButton = ({  credits, onSuccess, onFailure }) => {
         image: "https://gamalogic.com/static/images/favicon.ico",
         // order_id,
         handler: async function (response) {
+          console.log(response,'razorpayRespose')
           const data = {
             // orderCreationId: order_id,
             razorpayPaymentId: response.razorpay_payment_id,
-            razorpayOrderId: response.razorpay_order_id,
+            razorpaySubscriptionId: razorpay_subscription_id,
             razorpaySignature: response.razorpay_signature,
             // cost: totalAmount,
             credits
