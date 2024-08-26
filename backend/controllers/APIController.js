@@ -642,9 +642,9 @@ let APIControllers = {
         let credit = foundItem ? foundItem[0] : null;
 
         let planInDataBase = await dbConnection.query(`SELECT * FROM paypal_subscription WHERE subscription_id = '${payPaldetails.data.id}'`);
-        console.log(planInDataBase[0].length, 'length of plan base', planInDataBase)
         if (event_type === 'PAYMENT.SALE.COMPLETED') {
           if (planInDataBase[0].length > 0) {
+            ErrorHandler("update paypal webhook checker", error, req);
             const lastPaymentTimeDb = planInDataBase[0][0].last_payment; // Assuming this is a Date string or ISO format
             const lastPaymentTimeApi = payPaldetails.data.billing_info.last_payment.time;
 
@@ -735,6 +735,7 @@ let APIControllers = {
       res.status(200).send('Webhook processed successfully');
     } catch (error) {
       console.log(error);
+      ErrorHandler("Paypal Webhook Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     }
   },

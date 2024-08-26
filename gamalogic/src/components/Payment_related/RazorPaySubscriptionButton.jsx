@@ -3,10 +3,17 @@ import { toast } from "react-toastify";
 import axiosInstance from "../../axios/axiosInstance";
 import { useUserState } from "../../context/userContext";
 import {APP} from '../../axios/axiosInstance'
+import { useEffect, useRef } from "react";
 
 const RazorPaySubscriptionButton = ({  credits, onSuccess, onFailure }) => {
   const { userDetails,paymentDetails } = useUserState();
+  let paymentDetailsRef = useRef(paymentDetails);
   const taxRate = 0.18; // 18% tax
+
+  useEffect(() => {
+    paymentDetailsRef.current = paymentDetails;
+  }, [paymentDetails]);
+
 
   const loadScript = (src) => {
     return new Promise((resolve) => {
@@ -29,6 +36,7 @@ const RazorPaySubscriptionButton = ({  credits, onSuccess, onFailure }) => {
     //   const totalAmount = cost + (cost * taxRate); // Calculate total amount including tax
       const result = await axiosInstance.post("/razorPaySubscription", {
         // amount: totalAmount, // Amount in paise (1 INR = 100 paise)
+        paymentDetails: paymentDetailsRef.current,
         currency: "INR",
         receipt: `receipt_${Date.now()}`,
       });
