@@ -644,17 +644,22 @@ let APIControllers = {
         let planInDataBase = await dbConnection.query(`SELECT * FROM paypal_subscription WHERE subscription_id = '${payPaldetails.data.id}'`);
         if (event_type === 'PAYMENT.SALE.COMPLETED') {
           if (planInDataBase[0].length > 0) {
-            ErrorHandler("update paypal webhook checker", req.body, req);
-            const lastPaymentTimeDb = planInDataBase[0][0].last_payment; // Assuming this is a Date string or ISO format
-            const lastPaymentTimeApi = payPaldetails.data.billing_info.last_payment.time;
+            // const lastPaymentTimeDb = planInDataBase[0][0].last_payment; // Assuming this is a Date string or ISO format
+            // const lastPaymentTimeApi = payPaldetails.data.billing_info.last_payment.time;
 
-            // Convert to Date objects for comparison
-            const lastPaymentDateDb = new Date(lastPaymentTimeDb);
-            const lastPaymentDateApi = new Date(lastPaymentTimeApi);
+            // // Convert to Date objects for comparison
+            // const lastPaymentDateDb = new Date(lastPaymentTimeDb);
+            // const lastPaymentDateApi = new Date(lastPaymentTimeApi);
 
-            const isSameDay = lastPaymentDateDb.toDateString() === lastPaymentDateApi.toDateString();
+            // const isSameDay = lastPaymentDateDb.toDateString() === lastPaymentDateApi.toDateString();
+            const existingEntry = planInDataBase[0][0];
+            const existingEntryCreationDate = new Date(existingEntry.start_time).toISOString().split('T')[0]; // Extract date part
+            const currentDate = new Date().toISOString().split('T')[0]; 
+            let isSameDay=existingEntryCreationDate === currentDate
+
 
             if (!isSameDay) {
+              ErrorHandler("update paypal webhook checker step 1", req.body, req);
               let details = payPaldetails.data;
               const formatAddress = (address) => {
                 return [
@@ -692,7 +697,6 @@ let APIControllers = {
                 details.billing_info.next_billing_time ?? null,
                 1
               ];
-
               await dbConnection.query(query, values);
               let user = await dbConnection.query(`SELECT rowid, credits FROM registration WHERE rowid = $1`, [planInDataBase[0][0].userid]);
               let newBalance = user.rows[0].credits + credit;
@@ -700,6 +704,7 @@ let APIControllers = {
               await dbConnection.query(`UPDATE registration SET credits = $1, is_premium = 1 WHERE rowid = $2`, [newBalance, planInDataBase[0][0].userid]);
               console.log('Database updated');
             } else {
+              ErrorHandler("update paypal webhook checker step 2", req.body, req);
               console.log('Dates are the same. No update needed.');
             }
 
