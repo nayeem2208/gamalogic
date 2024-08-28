@@ -9,6 +9,7 @@ import urls from "../ConstFiles/urls.js";
 import Razorpay from "razorpay";
 import { updateLeadStatus } from "../utils/crm.js";
 import paypalPrice from "../utils/payPalPriceRange.js";
+import RazorpayPrice from "../utils/RazorPayPriceRange.js";
 
 
 let APIControllers = {
