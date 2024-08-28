@@ -508,14 +508,14 @@ let APIControllers = {
       let content
       if (paymentDetails.period == 'monthly') {
         content = `
-        <p>Your payment of $${Number(Math.round(paymentDetails.cost)).toLocaleString()} for ${Number(paymentDetails.credits).toLocaleString()} credits has been successfully processed.Additionally, we have activated your monthly subscription for ${Number(paymentDetails.credits).toLocaleString()} credits.</p>
+        <p>Your payment of $${Number(Math.round(paymentDetails.cost)).toLocaleString()} for ${Number(paymentDetails.credits).toLocaleString()} credits has been successfully processed. Additionally, we have activated your monthly subscription for ${Number(paymentDetails.credits).toLocaleString()} credits.</p>
         
         <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
         `
       }
       else {
         content = `
-        <p>Your payment of $${Number(Math.round(paymentDetails.cost)).toLocaleString()} for ${Number(paymentDetails.credits).toLocaleString()} credits has been successfully processed.Additionally, we have activated your Annual subscription for ${Number(paymentDetails.credits).toLocaleString()} credits.</p>
+        <p>Your payment of $${Number(Math.round(paymentDetails.cost)).toLocaleString()} for ${Number(paymentDetails.credits).toLocaleString()} credits has been successfully processed. Additionally, we have activated your Annual subscription for ${Number(paymentDetails.credits).toLocaleString()} credits.</p>
         
         <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
         `
@@ -652,12 +652,11 @@ let APIControllers = {
             // const lastPaymentDateApi = new Date(lastPaymentTimeApi);
 
             // const isSameDay = lastPaymentDateDb.toDateString() === lastPaymentDateApi.toDateString();
+
             const existingEntry = planInDataBase[0][0];
             const existingEntryCreationDate = new Date(existingEntry.start_time).toISOString().split('T')[0]; // Extract date part
-            const currentDate = new Date().toISOString().split('T')[0]; 
-            let isSameDay=existingEntryCreationDate === currentDate
-
-
+            const currentDate = new Date().toISOString().split('T')[0];
+            let isSameDay = existingEntryCreationDate === currentDate
             if (!isSameDay) {
               ErrorHandler("update paypal webhook checker step 1", req.body, req);
               let details = payPaldetails.data;
@@ -672,6 +671,11 @@ let APIControllers = {
               };
               let gross_amount = Math.round(details.billing_info.last_payment.amount.value)
               const address = formatAddress(details.subscriber.shipping_address.address);
+
+              const paymentDetails = paypalPrice.find(([planCredits, id, planPeriod]) => {
+                return id == planInDataBase[0][0].plan_id
+              });
+              console.log(paymentDetails, 'ismonthly')
               let query = `
                  INSERT INTO paypal_subscription (
                 userid, credits, is_monthly, is_annual,gross_amount, subscription_id, plan_id, start_time, quantity,
@@ -680,13 +684,13 @@ let APIControllers = {
               `;
 
               let values = [
-                user.rowid ?? null,
-                paymentDetails.credits ?? null,
-                paymentDetails.period === 'monthly' ? '1' : '0',
-                paymentDetails.period === 'annual' ? '1' : '0',
+                planInDataBase[0][0].userid ?? null,
+                paymentDetails[0] ?? null,
+                paymentDetails[2] === 'monthly' ? '1' : '0',
+                paymentDetails[2] === 'annually' ? '1' : '0',
                 gross_amount || null,
-                subscriptionId ?? null,
-                planId ?? null,
+                subId ?? null,
+                paymentDetails[1] ?? null,
                 details.start_time ?? null,
                 details.quantity ?? null,
                 `${details.subscriber.name.given_name} ${details.subscriber.name.surname}` ?? null,
@@ -697,7 +701,13 @@ let APIControllers = {
                 details.billing_info.next_billing_time ?? null,
                 1
               ];
+              // console.log('ivda vare ellam sheri aaahn')
+
               await dbConnection.query(query, values);
+              // await dbConnection.query(
+              //   `UPDATE paypal_subscription SET last_payment ='${lastPaymentTimeApi}' WHERE subscription_id ='${payPaldetails.data.id}'`,
+              // );
+
               let user = await dbConnection.query(`SELECT rowid, credits FROM registration WHERE rowid = $1`, [planInDataBase[0][0].userid]);
               let newBalance = user.rows[0].credits + credit;
 
@@ -740,7 +750,6 @@ let APIControllers = {
       res.status(200).send('Webhook processed successfully');
     } catch (error) {
       console.log(error);
-      ErrorHandler("Paypal Webhook Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     }
   },
