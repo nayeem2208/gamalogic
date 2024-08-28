@@ -895,6 +895,26 @@ let APIControllers = {
   },
   razorPaySubscriptin: async (req, res) => {
     try {
+      const { credits, period } = req.body.paymentDetails;
+
+      if (typeof credits !== 'number' || typeof period !== 'string') {
+        throw new Error('Invalid payment details');
+      }
+
+      const planid = RazorpayPrice.find(([planCredits, id, planPeriod]) => {
+        if (period === 'monthly') {
+          return credits === planCredits && period === planPeriod;
+        } else {
+          // For annual plans, check against credits multiplied by 12
+          console.log('its reaching here')
+          return credits * 12 === planCredits && period === planPeriod;
+        }
+      });
+
+      if (!planid) {
+        throw new Error('Plan not found');
+      }
+
       let instance = new Razorpay(
         {
           key_id: process.env.RAZORPAY_KEY_ID,
@@ -902,11 +922,10 @@ let APIControllers = {
         }
       );
       const options = {
-        plan_id: 'plan_OlAsJTdkA47ryc',
+        plan_id: planid[1],
         customer_notify: 1,
-        start_at: Math.floor(Date.now() / 1000) + 60,
+        // start_at: Math.floor(Date.now() / 1000) + 60,
         total_count: 50,
-        payment_capture: 1
       };
       console.log(options, 'optionssssssss')
       const subscription = await instance.subscriptions.create(options);
