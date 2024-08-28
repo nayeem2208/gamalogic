@@ -972,7 +972,7 @@ let APIControllers = {
 
 
       let content = `
-      <p>Your payment for ₹ ${Math.round(req.body.cost)} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.</p>
+      <p>Your payment for ₹ ${amount} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.</p>
       
       <p>If you have any questions or concerns regarding this payment, please feel free to contact us.</p>
       `
