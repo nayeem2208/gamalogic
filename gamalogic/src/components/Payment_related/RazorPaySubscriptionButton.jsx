@@ -40,7 +40,6 @@ const RazorPaySubscriptionButton = ({  credits, onSuccess, onFailure }) => {
         currency: "INR",
         receipt: `receipt_${Date.now()}`,
       });
-      console.log(result,'resulttttttttt')
       const keyofRazorPay = import.meta.env.VITE_RAZORPAY_KEY_ID;
     //   const { amount, id: order_id, currency } = result.data.order;
       const options = {
@@ -51,7 +50,6 @@ const RazorPaySubscriptionButton = ({  credits, onSuccess, onFailure }) => {
         image: "https://gamalogic.com/static/images/favicon.ico",
         // order_id,
         handler: async function (response) {
-          console.log(response,'razorpayRespose')
           const data = {
             // orderCreationId: order_id,
             razorpayPaymentId: response.razorpay_payment_id,
@@ -63,7 +61,6 @@ const RazorPaySubscriptionButton = ({  credits, onSuccess, onFailure }) => {
         console.log(response,'responsessssssssssssssssssssssss')
           try {
             const result = await axiosInstance.post("/RazorPaySubscriptionPaymentSuccess", data);
-            console.log(result,'result from success')
           toast(result.data.msg);
           onSuccess();
           } catch (error) {
@@ -98,7 +95,8 @@ const RazorPaySubscriptionButton = ({  credits, onSuccess, onFailure }) => {
       onClick={displayRazorpay}
       className="bg-slate-100 hover:bg-slate-300 flex shadow-lg rounded-lg px-24 py-2 font-bold mt-3 italic text-blue-950"
     >
-      <SiRazorpay className="text-sky-600"/>RazorPay
+     <SiRazorpay className="text-sky-600" />
+     RazorPay <span className="text-xs font-normal ml-2 ">Subscribe</span>
     </button>
   );
 };
