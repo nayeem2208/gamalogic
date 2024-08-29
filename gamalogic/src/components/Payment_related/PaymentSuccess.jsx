@@ -107,9 +107,11 @@ function PaymentSuccess() {
               }`
             : `₹${
                 costToShow !== null
-                  ? Math.round(
-                      costToShow + (costToShow * 18) / 100
-                    ).toLocaleString("en-US")
+                  ? 
+                  // Math.round(
+                  //     costToShow + (costToShow * 18) / 100
+                  //   ).toLocaleString("en-US")
+                  costToShow.toLocaleString("en-US")
                   : //  + ` (${costToShow.toLocaleString("en-US")} + 18%)`
                     "Loading..."
               }`}{" "}

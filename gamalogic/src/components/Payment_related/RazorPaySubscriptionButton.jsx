@@ -53,12 +53,12 @@ const RazorPaySubscriptionButton = ({  credits, onSuccess, onFailure }) => {
           const data = {
             // orderCreationId: order_id,
             razorpayPaymentId: response.razorpay_payment_id,
-            razorpaySubscriptionId: razorpay_subscription_id,
+            razorpaySubscriptionId: response.razorpay_subscription_id,
             razorpaySignature: response.razorpay_signature,
             // cost: totalAmount,
+            paymentDetails:paymentDetailsRef.current,
             credits
           };
-        console.log(response,'responsessssssssssssssssssssssss')
           try {
             const result = await axiosInstance.post("/RazorPaySubscriptionPaymentSuccess", data);
           toast(result.data.msg);

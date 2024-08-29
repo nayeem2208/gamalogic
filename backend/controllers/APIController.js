@@ -561,7 +561,8 @@ let APIControllers = {
       ${periodColumn} = 1 ,
       subscription_start_time='${details.start_time}',
       last_payment_time='${details.billing_info.last_payment.time}',
-      is_active=1
+      is_active=1,
+      is_pay_as_you_go=0
   WHERE emailid = '${user.emailid}'
 `;
 
@@ -781,7 +782,7 @@ let APIControllers = {
       let user = await dbConnection.query(`SELECT rowid,credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
 
       let newBalance = user[0][0].credits + req.body.credits
-      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1 WHERE emailid='${req.user[0][0].emailid}'`)
+      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1 WHERE emailid='${req.user[0][0].emailid}'`)
 
       var instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET })
       let resp = await instance.payments.fetch(req.body.razorpayPaymentId)
@@ -942,7 +943,6 @@ let APIControllers = {
       let user = await dbConnection.query(`SELECT rowid,credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
 
       let newBalance = user[0][0].credits + req.body.credits
-      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1 WHERE emailid='${req.user[0][0].emailid}'`)
 
       var instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET })
       let resp = await instance.payments.fetch(req.body.razorpayPaymentId)
@@ -952,6 +952,12 @@ let APIControllers = {
         console.log('error fetching response  ')
         return res.status(500).json({ error: 'Error fetching payment response' });
       }
+
+      const periodColumn = req.body.paymentDetails.period === 'monthly' ? 'is_monthly' : 'is_annual';
+      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1 ,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
+      last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
+      is_active=1,is_pay_as_you_go=0 WHERE emailid='${req.user[0][0].emailid}'`)
+
       const query = `
     INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
