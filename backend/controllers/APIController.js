@@ -996,12 +996,21 @@ let APIControllers = {
 
       await dbConnection.query(query, values);
 
-
-      let content = `
-      <p>Your payment for ₹ ${amount} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.</p>
-      
-      <p>If you have any questions or concerns regarding this payment, please feel free to contact us.</p>
-      `
+      let content
+      if (req.body.paymentDetails.period  == 'monthly') {
+        content = `
+        <p>Your payment of ₹ ${amount} for ${Number(req.body.paymentDetails.credits).toLocaleString()} credits has been successfully processed. Additionally, we have activated your monthly subscription for ${Number(req.body.paymentDetails.credits).toLocaleString()} credits.</p>
+        
+        <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
+        `
+      }
+      else {
+        content = `
+        <p>Your payment of ₹ ${amount} for ${Number(req.body.paymentDetails.credits).toLocaleString()} credits has been successfully processed. Additionally, we have activated your Annual subscription for ${Number(req.body.paymentDetails.credits).toLocaleString()} credits.</p>
+        
+        <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
+        `
+      }
       sendEmail(
         req.user[0][0].username,
         req.user[0][0].emailid,
