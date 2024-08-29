@@ -8,6 +8,8 @@ import { useUserState } from "../../context/userContext";
 import axiosInstance from "../../axios/axiosInstance";
 
 const ButtonWrapper = ({ type }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   const {
     paymentDetails,
     setPaymentDetails,
@@ -49,6 +51,40 @@ const ButtonWrapper = ({ type }) => {
     [750000, 6300, "P-5RP18690UV262063EM3BUD5Q"],
     [1000000, 8400, "P-3XJ08785U0027370EM3BUEZY"],
   ];
+
+  useEffect(() => {
+    const loadPayPalScript = () => {
+      if (window.paypal) {
+        setIsLoaded(true);
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = `https://www.paypal.com/sdk/js?client-id=${
+        import.meta.env.VITE_PAYPAL_CLIENT_ID
+      }`;
+      script.onload = () => {
+        setIsLoaded(true);
+      };
+      script.onerror = () => {
+        toast.error("Failed to load PayPal script");
+      };
+      document.body.appendChild(script);
+    };
+
+    loadPayPalScript();
+
+    return () => {
+      const paypalScript = document.querySelector(
+        `script[src="https://www.paypal.com/sdk/js?client-id=${
+          import.meta.env.VITE_PAYPAL_CLIENT_ID
+        }"]`
+      );
+      if (paypalScript && document.body.contains(paypalScript)) {
+        document.body.removeChild(paypalScript);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     let matchedPlan;

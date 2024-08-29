@@ -927,7 +927,7 @@ let APIControllers = {
         plan_id: planid[1],
         customer_notify: 1,
         // start_at: Math.floor(Date.now() / 1000) + 60,
-        total_count: 50,
+        total_count:period=='monthly'? 50:4,
       };
       console.log(options, 'optionssssssss')
       const subscription = await instance.subscriptions.create(options);
