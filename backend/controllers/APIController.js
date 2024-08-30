@@ -643,23 +643,19 @@ let APIControllers = {
         const foundItem = paypalPrice.find(([credits, id]) => id === payPaldetails.data.plan_id);
         let credit = foundItem ? foundItem[0] : null;
 
-        let planInDataBase = await dbConnection.query(`SELECT * FROM paypal_subscription WHERE subscription_id = '${payPaldetails.data.id}'`);
+        let planInDataBase = await dbConnection.query(`SELECT * FROM paypal_subscription WHERE subscription_id = '${payPaldetails.data.id}' ORDER BY id DESC 
+          LIMIT 1`);
         if (event_type === 'PAYMENT.SALE.COMPLETED') {
           if (planInDataBase[0].length > 0) {
-            // const lastPaymentTimeDb = planInDataBase[0][0].last_payment; // Assuming this is a Date string or ISO format
-            // const lastPaymentTimeApi = payPaldetails.data.billing_info.last_payment.time;
-
-            // // Convert to Date objects for comparison
-            // const lastPaymentDateDb = new Date(lastPaymentTimeDb);
-            // const lastPaymentDateApi = new Date(lastPaymentTimeApi);
-
-            // const isSameDay = lastPaymentDateDb.toDateString() === lastPaymentDateApi.toDateString();
 
             const existingEntry = planInDataBase[0][0];
             const existingEntryCreationDate = new Date(existingEntry.start_time).toISOString().split('T')[0]; // Extract date part
             const currentDate = new Date().toISOString().split('T')[0];
             let isSameDay = existingEntryCreationDate === currentDate
-            if (!isSameDay) {
+
+            let time_stamp = new Date().toISOString().split('T')[0] === new Date(existingEntry.time_stamp).toISOString().split('T')[0]
+
+            if (!isSameDay && !time_stamp) {
               ErrorHandler("update paypal webhook checker step 1", req.body, req);
               let details = payPaldetails.data;
               const formatAddress = (address) => {
@@ -681,8 +677,8 @@ let APIControllers = {
               let query = `
                  INSERT INTO paypal_subscription (
                 userid, credits, is_monthly, is_annual,gross_amount, subscription_id, plan_id, start_time, quantity,
-                name, address, email_address, payer_id, last_payment, next_billing_time,is_active
-              ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+                name, address, email_address, payer_id, last_payment, next_billing_time,is_active,time_stamp
+              ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
               `;
 
               let values = [
@@ -701,20 +697,41 @@ let APIControllers = {
                 details.subscriber.payer_id ?? null,
                 details.billing_info.last_payment.time ?? null,
                 details.billing_info.next_billing_time ?? null,
-                1
+                1,
+                new Date().toISOString()
               ];
               // console.log('ivda vare ellam sheri aaahn')
 
               await dbConnection.query(query, values);
-              // await dbConnection.query(
-              //   `UPDATE paypal_subscription SET last_payment ='${lastPaymentTimeApi}' WHERE subscription_id ='${payPaldetails.data.id}'`,
-              // );
+              let user = await dbConnection.query(`SELECT username,emailid,credits FROM registration WHERE rowid = '${planInDataBase[0][0].userid}'`);
+              let newBalance = user[0][0].credits + credit;
 
-              let user = await dbConnection.query(`SELECT rowid, credits FROM registration WHERE rowid = $1`, [planInDataBase[0][0].userid]);
-              let newBalance = user.rows[0].credits + credit;
+              await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1 WHERE rowid = '${planInDataBase[0][0].userid}'`);
+              let content
+              if (paymentDetails[2] == 'monthly') {
+                content = `
+                <p>Your subscription has been renewed successfully.We have processed your payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed. Additionally, we have activated your monthly subscription for ${Number(credit).toLocaleString()} credits.</p>
+                
+                <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
+                `
+              }
+              else {
+                content = `
+                <p>Your subscription has been renewed successfully.We have processed your payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed. Additionally, we have activated your Annual subscription for ${Number(credit).toLocaleString()} credits.</p>
+                
+                <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
+                `
+              }
+              sendEmail(
+                user[0][0].username,          // await dbConnection.query(
+                //   `UPDATE paypal_subscription SET is_active='${0}' WHERE subscription_id ='${payPaldetails.data.id}'`,
+                // );
+                // console.log(req.body.resource?.create_time,'time and userid' ,planInDataBase[0][0].userid)
 
-              await dbConnection.query(`UPDATE registration SET credits = $1, is_premium = 1 WHERE rowid = $2`, [newBalance, planInDataBase[0][0].userid]);
-              console.log('Database updated');
+                user[0][0].emailid,
+                "Payment successfull",
+                basicTemplate(user[0][0].username, content)
+              );
             } else {
               ErrorHandler("update paypal webhook checker step 2", req.body, req);
               console.log('Dates are the same. No update needed.');
@@ -724,11 +741,7 @@ let APIControllers = {
             console.log('No record found in database for the given plan_id.');
           }
         } else {
-
-          // await dbConnection.query(
-          //   `UPDATE paypal_subscription SET is_active='${0}' WHERE subscription_id ='${payPaldetails.data.id}'`,
-          // );
-          // console.log(req.body.resource?.create_time,'time and userid' ,planInDataBase[0][0].userid)
+          //handling the subscription cancellation part
           await dbConnection.query(
             `UPDATE registration SET is_monthly = 0, is_annual = 0,is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
             [resource.create_time, planInDataBase[0][0].userid]
@@ -927,7 +940,7 @@ let APIControllers = {
         plan_id: planid[1],
         customer_notify: 1,
         // start_at: Math.floor(Date.now() / 1000) + 60,
-        total_count:period=='monthly'? 50:4,
+        total_count: period == 'monthly' ? 50 : 4,
       };
       console.log(options, 'optionssssssss')
       const subscription = await instance.subscriptions.create(options);
@@ -997,7 +1010,7 @@ let APIControllers = {
       await dbConnection.query(query, values);
 
       let content
-      if (req.body.paymentDetails.period  == 'monthly') {
+      if (req.body.paymentDetails.period == 'monthly') {
         content = `
         <p>Your payment of ₹ ${amount} for ${Number(req.body.paymentDetails.credits).toLocaleString()} credits has been successfully processed. Additionally, we have activated your monthly subscription for ${Number(req.body.paymentDetails.credits).toLocaleString()} credits.</p>
         
