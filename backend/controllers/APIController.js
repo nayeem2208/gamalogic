@@ -647,7 +647,7 @@ let APIControllers = {
           LIMIT 1`);
         if (event_type === 'PAYMENT.SALE.COMPLETED') {
           if (planInDataBase[0].length > 0) {
-
+            console.log('inside plan base')
             const existingEntry = planInDataBase[0][0];
             const existingEntryCreationDate = new Date(existingEntry.start_time).toISOString().split('T')[0]; // Extract date part
             const currentDate = new Date().toISOString().split('T')[0];
@@ -656,6 +656,7 @@ let APIControllers = {
             let time_stamp = new Date().toISOString().split('T')[0] === new Date(existingEntry.time_stamp).toISOString().split('T')[0]
 
             if (!isSameDay && !time_stamp) {
+              console.log('inside sameday')
               ErrorHandler("update paypal webhook checker step 1", req.body, req);
               let details = payPaldetails.data;
               const formatAddress = (address) => {
@@ -740,7 +741,8 @@ let APIControllers = {
           } else {
             console.log('No record found in database for the given plan_id.');
           }
-        } else {
+        } else if (event_type == 'BILLING.SUBSCRIPTION.CANCELLED') {
+          console.log('inside cancellation part')
           //handling the subscription cancellation part
           await dbConnection.query(
             `UPDATE registration SET is_monthly = 0, is_annual = 0,is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
@@ -760,6 +762,9 @@ let APIControllers = {
             basicTemplate(user[0][0].username, content)
           );
 
+        }
+        else{
+          console.log('inside else part not cancellation or updation')
         }
       }
       res.status(200).send('Webhook processed successfully');
