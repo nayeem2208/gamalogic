@@ -525,7 +525,7 @@ let APIControllers = {
       sendEmail(
         user.username,
         user.emailid,
-        "Payment successfull",
+        "Gamalogic Monthly Subscription Payment successful",
         basicTemplate(user.username, content)
       );
       //finding access token from paypal
@@ -711,26 +711,22 @@ let APIControllers = {
               let content
               if (paymentDetails[2] == 'monthly') {
                 content = `
-                <p>Your subscription has been renewed successfully.We have processed your payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed. Additionally, we have activated your monthly subscription for ${Number(credit).toLocaleString()} credits.</p>
+                <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed.</p>
                 
                 <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
                 `
               }
               else {
                 content = `
-                <p>Your subscription has been renewed successfully.We have processed your payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed. Additionally, we have activated your Annual subscription for ${Number(credit).toLocaleString()} credits.</p>
+                <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed.</p>
                 
                 <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
                 `
               }
               sendEmail(
-                user[0][0].username,          // await dbConnection.query(
-                //   `UPDATE paypal_subscription SET is_active='${0}' WHERE subscription_id ='${payPaldetails.data.id}'`,
-                // );
-                // console.log(req.body.resource?.create_time,'time and userid' ,planInDataBase[0][0].userid)
-
+                user[0][0].username,         
                 user[0][0].emailid,
-                "Payment successfull",
+                "Gamalogic Monthly Subscription Payment successful",
                 basicTemplate(user[0][0].username, content)
               );
             } else {
@@ -750,15 +746,17 @@ let APIControllers = {
           );
           let data = paypalPrice.find(([credit, id]) => id == resource.plan_id)
           let content = `
-        <p>We regret to inform you that your subscription has been successfully cancelled. Your payment of $${Number(Math.round(resource.billing_info.last_payment.amount.value)).toLocaleString()} for ${Number(data[0]).toLocaleString()} credits has been processed, and the subscription has been stopped.</p>
-        
-        <p>If you have any questions or concerns regarding this cancellation or your account, please feel free to contact us.</p>
-        `
+          <p>We're sorry to see you go! Your monthly subscription has been successfully cancelled.</p>
+          
+          <p>If you have any questions or need assistance with your account, please don't hesitate to reach out.</p>
+  
+          <p>Thank you for choosing us, and we hope to serve you again in the future!</p>
+          `
           let user = await dbConnection.query(`SELECT * from registration WHERE rowid='${planInDataBase[0][0].userid}'`)
           sendEmail(
             user[0][0].username,
             user[0][0].emailid,
-            "Subscription Cancellation",
+            "Gamalogic Monthly Subscription Cancellation",
             basicTemplate(user[0][0].username, content)
           );
 
