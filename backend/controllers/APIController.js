@@ -516,16 +516,16 @@ let APIControllers = {
       }
       else {
         content = `
-        <p>Your payment of $${Number(Math.round(paymentDetails.cost)).toLocaleString()} for ${Number(paymentDetails.credits).toLocaleString()} credits has been successfully processed. Additionally, we have activated your Annual subscription for ${Number(paymentDetails.credits).toLocaleString()} credits.</p>
+        <p>We are pleased to inform you that your payment of $${Number(Math.round(paymentDetails.cost)).toLocaleString()} for the annual subscription has been successfully processed, and ${Number(paymentDetails.credits).toLocaleString()} credits have been added to your account for this month.</p>
         
-        <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
+        <p>If you have any questions or need further assistance regarding your payment or subscription, please don't hesitate to reach out to us.</p>
         `
       }
-
+      let isMonthlyInEmail=paymentDetails.period === 'monthly'?'Monthly':'Annual'
       sendEmail(
         user.username,
         user.emailid,
-        "Gamalogic Monthly Subscription Payment successful",
+        `Gamalogic '${isMonthlyInEmail}' Subscription Payment successful`,
         basicTemplate(user.username, content)
       );
       //finding access token from paypal
@@ -640,7 +640,7 @@ let APIControllers = {
           headers: { 'Authorization': `Bearer ${payPalToken.data.access_token}` }
         });
 
-        const foundItem = paypalPrice.find(([credits, id]) => id === payPaldetails.data.plan_id);
+        const foundItem = paypalPrice.find(([credits, id,planPeriod]) => id === payPaldetails.data.plan_id);
         let credit = foundItem ? foundItem[0] : null;
 
         let planInDataBase = await dbConnection.query(`SELECT * FROM paypal_subscription WHERE subscription_id = '${payPaldetails.data.id}' ORDER BY id DESC 
@@ -723,10 +723,11 @@ let APIControllers = {
                 <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
                 `
               }
+              let isMonthlyInEmail=paymentDetails[2] == 'monthly'?'Monthly':'Annual'  
               sendEmail(
                 user[0][0].username,         
                 user[0][0].emailid,
-                "Gamalogic Monthly Subscription Payment successful",
+                `Gamalogic '${isMonthlyInEmail}' Subscription Payment successful`,
                 basicTemplate(user[0][0].username, content)
               );
             } else {
@@ -740,23 +741,36 @@ let APIControllers = {
         } else if (event_type == 'BILLING.SUBSCRIPTION.CANCELLED') {
           console.log('inside cancellation part')
           //handling the subscription cancellation part
+          
           await dbConnection.query(
             `UPDATE registration SET is_monthly = 0, is_annual = 0,is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
             [resource.create_time, planInDataBase[0][0].userid]
           );
-          let data = paypalPrice.find(([credit, id]) => id == resource.plan_id)
-          let content = `
-          <p>We're sorry to see you go! Your monthly subscription has been successfully cancelled.</p>
-          
-          <p>If you have any questions or need assistance with your account, please don't hesitate to reach out.</p>
-  
-          <p>Thank you for choosing us, and we hope to serve you again in the future!</p>
-          `
+          let data = paypalPrice.find(([credit, id,period]) => id == resource.plan_id)
+          let isMonthlyInEmail=data[2] == 'monthly'?'Monthly':'Annual'  
+          let content
+          if(data[2] == 'monthly'){
+            content = `
+            <p>We're sorry to see you go! Your monthly subscription has been successfully cancelled.</p>
+            
+            <p>If you have any questions or need assistance with your account, please don't hesitate to reach out.</p>
+    
+            <p>Thank you for choosing us, and we hope to serve you again in the future!</p>
+            `
+          }else{
+            content = `
+            <p>We're sorry to see you go! Your annual subscription has been successfully cancelled.</p>
+            
+            <p>If you have any questions or need assistance with your account, please don't hesitate to reach out.</p>
+    
+            <p>Thank you for choosing us, and we hope to serve you again in the future!</p>
+            `
+          }
           let user = await dbConnection.query(`SELECT * from registration WHERE rowid='${planInDataBase[0][0].userid}'`)
           sendEmail(
             user[0][0].username,
             user[0][0].emailid,
-            "Gamalogic Monthly Subscription Cancellation",
+            `Gamalogic '${isMonthlyInEmail}' Subscription Cancellation`,
             basicTemplate(user[0][0].username, content)
           );
 
