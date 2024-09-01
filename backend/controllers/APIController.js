@@ -522,10 +522,11 @@ let APIControllers = {
         `
       }
       let isMonthlyInEmail=paymentDetails.period === 'monthly'?'Monthly':'Annual'
+      let sub=`Gamalogic '${isMonthlyInEmail}' Subscription Payment successful`
       sendEmail(
         user.username,
         user.emailid,
-        `Gamalogic '${isMonthlyInEmail}' Subscription Payment successful`,
+        sub,
         basicTemplate(user.username, content)
       );
       //finding access token from paypal
@@ -724,10 +725,11 @@ let APIControllers = {
                 `
               }
               let isMonthlyInEmail=paymentDetails[2] == 'monthly'?'Monthly':'Annual'  
+              let sub=`Gamalogic '${isMonthlyInEmail}' Subscription Payment successful`
               sendEmail(
                 user[0][0].username,         
                 user[0][0].emailid,
-                `Gamalogic '${isMonthlyInEmail}' Subscription Payment successful`,
+                sub,
                 basicTemplate(user[0][0].username, content)
               );
             } else {
@@ -767,10 +769,11 @@ let APIControllers = {
             `
           }
           let user = await dbConnection.query(`SELECT * from registration WHERE rowid='${planInDataBase[0][0].userid}'`)
+          let sub=`Gamalogic '${isMonthlyInEmail}' Subscription Cancellation`
           sendEmail(
             user[0][0].username,
             user[0][0].emailid,
-            `Gamalogic '${isMonthlyInEmail}' Subscription Cancellation`,
+            sub,
             basicTemplate(user[0][0].username, content)
           );
 
