@@ -585,8 +585,8 @@ let APIControllers = {
       let query = `
          INSERT INTO paypal_subscription (
         userid, credits, is_monthly, is_annual,gross_amount, subscription_id, plan_id, start_time, quantity,
-        name, address, email_address, payer_id, last_payment, next_billing_time,is_active
-      ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+        name, address, email_address, payer_id, last_payment, next_billing_time,is_active,time_stamp
+      ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
       `;
 
       let values = [
@@ -605,7 +605,8 @@ let APIControllers = {
         details.subscriber.payer_id ?? null,
         details.billing_info.last_payment.time ?? null,
         details.billing_info.next_billing_time ?? null,
-        1
+        1,
+        new Date().toISOString()
       ];
       updateLeadStatus(req.user[0][0].emailid)
 
