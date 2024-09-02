@@ -522,7 +522,7 @@ let APIControllers = {
         `
       }
       let isMonthlyInEmail=paymentDetails.period === 'monthly'?'Monthly':'Annual'
-      let sub=`Gamalogic '${isMonthlyInEmail}' Subscription Payment successful`
+      let sub=`Gamalogic ${isMonthlyInEmail} Subscription Payment successful`
       sendEmail(
         user.username,
         user.emailid,
@@ -725,7 +725,7 @@ let APIControllers = {
                 `
               }
               let isMonthlyInEmail=paymentDetails[2] == 'monthly'?'Monthly':'Annual'  
-              let sub=`Gamalogic '${isMonthlyInEmail}' Subscription Payment successful`
+              let sub=`Gamalogic ${isMonthlyInEmail} Subscription Payment successful`
               sendEmail(
                 user[0][0].username,         
                 user[0][0].emailid,
@@ -769,7 +769,7 @@ let APIControllers = {
             `
           }
           let user = await dbConnection.query(`SELECT * from registration WHERE rowid='${planInDataBase[0][0].userid}'`)
-          let sub=`Gamalogic '${isMonthlyInEmail}' Subscription Cancellation`
+          let sub=`Gamalogic ${isMonthlyInEmail} Subscription Cancellation`
           sendEmail(
             user[0][0].username,
             user[0][0].emailid,
