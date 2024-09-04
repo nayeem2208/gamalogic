@@ -38,7 +38,7 @@ const ButtonWrapper = ({ type }) => {
   ];
 
   const AnnualCreditCostMappings = [
-    [1000, 60, "P-4T618071TT039610MM3BROHY"],
+    [1000, 60, "P-7NW45488DG075491MM25NWLY"],
     [2500, 144, "P-1CU327045R943371FM3BRPVI"],
     [5000, 240, "P-1LG25877VL011492YM3BRRBY"],
     [10000, 300, "P-88916218AL1394515M3BSW3A"],
@@ -102,7 +102,7 @@ const ButtonWrapper = ({ type }) => {
         ([credits]) => credits === paymentDetails.credits
       );
       const annualCost = paymentDetails.cost * 12;
-      const annualCredits = paymentDetails.credits * 12;
+      const annualCredits = paymentDetails.credits 
       paymentDetailsref.current = {
         ...paymentDetails,  // Keep existing properties
         cost: annualCost,
@@ -164,7 +164,6 @@ const ButtonWrapper = ({ type }) => {
             plan_id: planIdRef.current,
           })
           .then((orderId) => {
-            console.log(planIdRef.current, "plan id");
             return orderId;
           });
       }}

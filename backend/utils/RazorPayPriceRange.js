@@ -1,5 +1,5 @@
 let RazorpayPrice = [
-    [1000, "plan_OlAqTZSrvQJrZy", "monthly"],
+    [1000, "plan_OlAsJTdkA47ryc", "monthly"],
     [2500, "plan_OlAqxHhXfdM0Pt", "monthly"],
     [5000, "plan_OocUfqjIJngDRx", "monthly"],
     [10000, "plan_OocVUaa6qg7K4j", "monthly"],

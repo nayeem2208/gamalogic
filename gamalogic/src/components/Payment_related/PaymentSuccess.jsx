@@ -55,9 +55,7 @@ function PaymentSuccess() {
     }
   }, [paymentResult.method, paymentDetails.credits]);
 
-  const displayCredits = paymentResult.methord === "payPal" && paymentDetails.period === "annually"
-  ? paymentDetails.credits * 12
-  : paymentDetails.credits;
+  const displayCredits = paymentDetails.credits;
 
   return (
     <div className="flex justify-center items-center mt-16">
