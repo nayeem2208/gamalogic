@@ -563,7 +563,8 @@ let APIControllers = {
       subscription_start_time='${details.start_time}',
       last_payment_time='${details.billing_info.last_payment.time}',
       is_active=1,
-      is_pay_as_you_go=0
+      is_pay_as_you_go=0,
+      subscription_stop_time=NULL
   WHERE emailid = '${user.emailid}'
 `;
 
