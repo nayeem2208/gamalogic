@@ -96,7 +96,7 @@ const RazorPaySubscriptionButton = ({  credits, onSuccess, onFailure }) => {
       className="bg-slate-100 flex justify-center items-center hover:bg-slate-300  shadow-lg rounded-lg px-24 py-2 font-bold mt-3 italic text-blue-950"
     >
      <SiRazorpay className="text-sky-600" />
-     RazorPay <span className="text-xs font-normal ml-2 ">Subscribe</span>
+     RazorPay 
     </button>
   );
 };

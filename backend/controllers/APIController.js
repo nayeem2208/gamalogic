@@ -1068,5 +1068,14 @@ let APIControllers = {
       }
     }
   },
+  razorPayWebhook:async(req,res)=>{
+    try {
+      console.log(req.body,'body in webhoook')
+      ErrorHandler("RazorPayWebhook checker 11111", req.body, req);
+    } catch (error) {
+      console.log(error)
+      ErrorHandler("RazorPayWebhook Controller", error, req);
+    }
+  }
 };
 export default APIControllers;

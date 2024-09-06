@@ -169,7 +169,7 @@ const ButtonWrapper = ({ type }) => {
       }}
       onApprove={handleApprove}
       style={{
-        label: "subscribe",
+        // label: "subscribe",
       }}
     />
   );
@@ -180,6 +180,7 @@ function PayPalSubscription() {
   return (
     <div className="w-5/6 sm:w-3/6 md:w-2/6 mt-3 z-0 relative">
       <PayPalScriptProvider
+      deferLoading={true}
         options={{
           clientId: paypalClientId,
           components: "buttons",
