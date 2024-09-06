@@ -50,6 +50,7 @@ router.post('/Razorpay',dbMiddleware,authcheck,APIControllers.RazorpayPayment)
 router.post('/RazorPayPaymentSuccess',dbMiddleware,authcheck,APIControllers.razorPayPaymentSuccess)
 router.post('/razorPaySubscription',dbMiddleware,authcheck,APIControllers.razorPaySubscriptin)
 router.post('/RazorPaySubscriptionPaymentSuccess',dbMiddleware,authcheck,APIControllers.razorPaySubscriptionSuccess)
+router.post('/RazorPayWebhook',dbMiddleware,APIControllers.razorPayWebhook)
 
 
 export default router;

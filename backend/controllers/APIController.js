@@ -1072,6 +1072,7 @@ let APIControllers = {
     try {
       console.log(req.body,'body in webhoook')
       ErrorHandler("RazorPayWebhook checker 11111", req.body, req);
+      res.status(200)
     } catch (error) {
       console.log(error)
       ErrorHandler("RazorPayWebhook Controller", error, req);
