@@ -749,6 +749,7 @@ let APIControllers = {
             [stopTime, planInDataBase[0][0].userid]
           );
           let data = paypalPrice.find(([credit, id,period]) => id == resource.plan_id)
+          console.log(data,'data of cancelation part ')
           let isMonthlyInEmail=data[2] == 'monthly'?'Monthly':'Annual'  
           let content
           if(data[2] == 'monthly'){
