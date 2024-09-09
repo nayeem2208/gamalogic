@@ -748,6 +748,7 @@ let APIControllers = {
             `UPDATE registration SET is_monthly = 0, is_annual = 0,is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
             [stopTime, planInDataBase[0][0].userid]
           );
+          console.log(resource,'resource in cancelation part')
           let data = paypalPrice.find(([credit, id,period]) => id == resource.plan_id)
           console.log(data,'data of cancelation part ')
           let isMonthlyInEmail=data[2] == 'monthly'?'Monthly':'Annual'  
