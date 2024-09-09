@@ -586,8 +586,8 @@ let APIControllers = {
       let query = `
          INSERT INTO paypal_subscription (
         userid, credits, is_monthly, is_annual,gross_amount, subscription_id, plan_id, start_time, quantity,
-        name, address, email_address, payer_id, last_payment, next_billing_time,is_active,time_stamp
-      ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+        name, address, email_address, payer_id, last_payment, next_billing_time,time_stamp
+      ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
       `;
 
       let values = [
@@ -606,7 +606,6 @@ let APIControllers = {
         details.subscriber.payer_id ?? null,
         details.billing_info.last_payment.time ?? null,
         details.billing_info.next_billing_time ?? null,
-        1,
         new Date().toISOString()
       ];
       updateLeadStatus(req.user[0][0].emailid)
@@ -681,8 +680,8 @@ let APIControllers = {
               let query = `
                  INSERT INTO paypal_subscription (
                 userid, credits, is_monthly, is_annual,gross_amount, subscription_id, plan_id, start_time, quantity,
-                name, address, email_address, payer_id, last_payment, next_billing_time,is_active,time_stamp
-              ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+                name, address, email_address, payer_id, last_payment, next_billing_time,time_stamp
+              ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
               `;
 
               let values = [
@@ -701,7 +700,6 @@ let APIControllers = {
                 details.subscriber.payer_id ?? null,
                 details.billing_info.last_payment.time ?? null,
                 details.billing_info.next_billing_time ?? null,
-                1,
                 new Date().toISOString()
               ];
               // console.log('ivda vare ellam sheri aaahn')
@@ -745,10 +743,10 @@ let APIControllers = {
         } else if (event_type == 'BILLING.SUBSCRIPTION.CANCELLED') {
           console.log('inside cancellation part')
           //handling the subscription cancellation part
-          
+          let stopTime=new Date().toISOString()
           await dbConnection.query(
             `UPDATE registration SET is_monthly = 0, is_annual = 0,is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
-            [resource.create_time, planInDataBase[0][0].userid]
+            [stopTime, planInDataBase[0][0].userid]
           );
           let data = paypalPrice.find(([credit, id,period]) => id == resource.plan_id)
           let isMonthlyInEmail=data[2] == 'monthly'?'Monthly':'Annual'  
