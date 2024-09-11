@@ -1082,8 +1082,8 @@ let APIControllers = {
       console.log(subscriptionDetails[0][0], 'subscription details')
       let userDetails = await dbConnection.query(`SELECT * FROM registration WHERE rowid='${subscriptionDetails[0][0].customer_id}'`)
       console.log(userDetails[0][0], 'userDetails')
-      let planDetails = RazorpayPrice.find(([credit, id, period]) => id == subscriptionDetails[0][0].id)
-      console.log(planDetails``, 'plan details')
+      let planDetails = RazorpayPrice.find(([credit, id, period]) => id == subscriptionDetails[0][0].plan_id)
+      console.log(planDetails, 'plan details')
       if (event === 'subscription.cancelled') {
         let isMonthlyInEmail = planDetails[2] == 'monthly' ? 'Monthly' : 'Annual'
         let content
