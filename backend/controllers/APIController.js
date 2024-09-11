@@ -990,8 +990,8 @@ let APIControllers = {
 
       const periodColumn = req.body.paymentDetails.period === 'monthly' ? 'is_monthly' : 'is_annual';
       await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1 ,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
-      last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
-      last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',is_active=1,is_pay_as_you_go=0 WHERE emailid='${req.user[0][0].emailid}'`)
+      last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',is_active=1,is_pay_as_you_go=0,subscription_stop_time=NULL
+ WHERE emailid='${req.user[0][0].emailid}'`)
 
       const query = `
     INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id)
@@ -1107,7 +1107,7 @@ let APIControllers = {
         sendEmail(
           userDetails[0][0].username,
           userDetails[0][0].emailid,
-          `Gamalogic '${isMonthlyInEmail}' Subscription Cancellation`,
+          `Gamalogic ${isMonthlyInEmail} Subscription Cancellation`,
           basicTemplate(userDetails[0][0].username, content)
         );
         let stopTime = new Date().toISOString()
