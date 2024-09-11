@@ -521,8 +521,8 @@ let APIControllers = {
         <p>If you have any questions or need further assistance regarding your payment or subscription, please don't hesitate to reach out to us.</p>
         `
       }
-      let isMonthlyInEmail=paymentDetails.period === 'monthly'?'Monthly':'Annual'
-      let sub=`Gamalogic ${isMonthlyInEmail} Subscription Payment successful`
+      let isMonthlyInEmail = paymentDetails.period === 'monthly' ? 'Monthly' : 'Annual'
+      let sub = `Gamalogic ${isMonthlyInEmail} Subscription Payment successful`
       sendEmail(
         user.username,
         user.emailid,
@@ -642,7 +642,7 @@ let APIControllers = {
           headers: { 'Authorization': `Bearer ${payPalToken.data.access_token}` }
         });
 
-        const foundItem = paypalPrice.find(([credits, id,planPeriod]) => id === payPaldetails.data.plan_id);
+        const foundItem = paypalPrice.find(([credits, id, planPeriod]) => id === payPaldetails.data.plan_id);
         let credit = foundItem ? foundItem[0] : null;
 
         let planInDataBase = await dbConnection.query(`SELECT * FROM paypal_subscription WHERE subscription_id = '${payPaldetails.data.id}' ORDER BY id DESC 
@@ -707,7 +707,7 @@ let APIControllers = {
               await dbConnection.query(query, values);
               let user = await dbConnection.query(`SELECT username,emailid,credits FROM registration WHERE rowid = '${planInDataBase[0][0].userid}'`);
               let newBalance = user[0][0].credits + credit;
-              let lastPayment_registration=details.billing_info.last_payment.time ??new Date().toISOString()
+              let lastPayment_registration = details.billing_info.last_payment.time ?? new Date().toISOString()
               await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
               let content
               if (paymentDetails[2] == 'monthly') {
@@ -724,10 +724,10 @@ let APIControllers = {
                 <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
                 `
               }
-              let isMonthlyInEmail=paymentDetails[2] == 'monthly'?'Monthly':'Annual'  
-              let sub=`Gamalogic ${isMonthlyInEmail} Subscription Payment successful`
+              let isMonthlyInEmail = paymentDetails[2] == 'monthly' ? 'Monthly' : 'Annual'
+              let sub = `Gamalogic ${isMonthlyInEmail} Subscription Payment successful`
               sendEmail(
-                user[0][0].username,         
+                user[0][0].username,
                 user[0][0].emailid,
                 sub,
                 basicTemplate(user[0][0].username, content)
@@ -743,17 +743,17 @@ let APIControllers = {
         } else if (event_type == 'BILLING.SUBSCRIPTION.CANCELLED') {
           console.log('inside cancellation part')
           //handling the subscription cancellation part
-          let stopTime=new Date().toISOString()
+          let stopTime = new Date().toISOString()
           await dbConnection.query(
             `UPDATE registration SET is_monthly = 0, is_annual = 0,is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
             [stopTime, planInDataBase[0][0].userid]
           );
           // console.log(resource,'resource in cancelation part')
-          let data = paypalPrice.find(([credit, id,period]) => id == resource.plan_id)
+          let data = paypalPrice.find(([credit, id, period]) => id == resource.plan_id)
           // console.log(data,'data of cancelation part ')
-          let isMonthlyInEmail=data[2] == 'monthly'?'Monthly':'Annual'  
+          let isMonthlyInEmail = data[2] == 'monthly' ? 'Monthly' : 'Annual'
           let content
-          if(data[2] == 'monthly'){
+          if (data[2] == 'monthly') {
             content = `
             <p>We're sorry to see you go! Your monthly subscription has been successfully cancelled.</p>
             
@@ -761,7 +761,7 @@ let APIControllers = {
     
             <p>Thank you for choosing us, and we hope to serve you again in the future!</p>
             `
-          }else{
+          } else {
             content = `
             <p>We're sorry to see you go! Your annual subscription has been successfully cancelled.</p>
             
@@ -771,7 +771,7 @@ let APIControllers = {
             `
           }
           let user = await dbConnection.query(`SELECT * from registration WHERE rowid='${planInDataBase[0][0].userid}'`)
-          let sub=`Gamalogic ${isMonthlyInEmail} Subscription Cancellation`
+          let sub = `Gamalogic ${isMonthlyInEmail} Subscription Cancellation`
           sendEmail(
             user[0][0].username,
             user[0][0].emailid,
@@ -780,7 +780,7 @@ let APIControllers = {
           );
 
         }
-        else{
+        else {
           console.log('inside else part not cancellation or updation')
         }
       }
@@ -991,7 +991,7 @@ let APIControllers = {
       const periodColumn = req.body.paymentDetails.period === 'monthly' ? 'is_monthly' : 'is_annual';
       await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1 ,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
       last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
-      is_active=1,is_pay_as_you_go=0 WHERE emailid='${req.user[0][0].emailid}'`)
+      last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',is_active=1,is_pay_as_you_go=0 WHERE emailid='${req.user[0][0].emailid}'`)
 
       const query = `
     INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id)
@@ -1068,11 +1068,10 @@ let APIControllers = {
       }
     }
   },
-  razorPayWebhook:async(req,res)=>{
+  razorPayWebhook: async (req, res) => {
     ErrorHandler("RazorPayWebhook checker 11111", req.body, req);
     try {
       const dbConnection = req.dbConnection;
-
       const event = req.body.event;
       const payload = req.body.payload;
       console.log(event, 'event')
@@ -1111,6 +1110,13 @@ let APIControllers = {
           `Gamalogic '${isMonthlyInEmail}' Subscription Cancellation`,
           basicTemplate(userDetails[0][0].username, content)
         );
+        let stopTime = new Date().toISOString()
+
+        await dbConnection.query(
+          `UPDATE registration SET is_monthly = 0, is_annual = 0,is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
+          [stopTime, userDetails[0][0].userid]
+        );
+        console.log('subscription cancelled succesfully.............')
       }
       res.status(200).send('Webhook processed successfully');
 
@@ -1118,7 +1124,7 @@ let APIControllers = {
       console.log(error)
       res.status(500).json({ error: "Internal Server Error" });
 
-    }finally {
+    } finally {
       if (req.dbConnection) {
         try {
           await req.dbConnection.release();
