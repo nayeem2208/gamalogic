@@ -1114,7 +1114,7 @@ let APIControllers = {
 
         await dbConnection.query(
           `UPDATE registration SET is_monthly = 0, is_annual = 0,is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
-          [stopTime, userDetails[0][0].userid]
+          [stopTime, userDetails[0][0].rowid]
         );
         console.log('subscription cancelled succesfully.............')
       }
