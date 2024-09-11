@@ -1069,13 +1069,63 @@ let APIControllers = {
     }
   },
   razorPayWebhook:async(req,res)=>{
+    ErrorHandler("RazorPayWebhook checker 11111", req.body, req);
     try {
-      console.log(req.body,'body in webhoook')
-      ErrorHandler("RazorPayWebhook checker 11111", req.body, req);
-      res.status(200)
+      const dbConnection = req.dbConnection;
+
+      const event = req.body.event;
+      const payload = req.body.payload;
+      console.log(event, 'event')
+      console.log(payload, 'payloadd')
+      let subId = payload?.subscription?.entity?.id
+      console.log(subId, 'subidd')
+      let subscriptionDetails = await dbConnection.query(`SELECT * FROM razorpay_subscription Where subscription_id='${subId}'`)
+      console.log(subscriptionDetails, 'subscription details')
+      let userDetails = await dbConnection.query(`SELECT * FROM registration WHERE rowid='${subscriptionDetails[0][0].customer_id}'`)
+      console.log(userDetails, 'userDetails')
+      let planDetails = RazorpayPrice.find(([credit, id, period]) => id == subscriptionDetails[0][0].id)
+      console.log(planDetails, 'plan details')
+      if (event === 'subscription.cancelled') {
+        let isMonthlyInEmail = data[2] == 'monthly' ? 'Monthly' : 'Annual'
+        let content
+        if (isMonthlyInEmail) {
+          content = `
+        <p>We're sorry to see you go! Your monthly subscription has been successfully cancelled.</p>
+        
+        <p>If you have any questions or need assistance with your account, please don't hesitate to reach out.</p>
+
+        <p>Thank you for choosing us, and we hope to serve you again in the future!</p>
+        `
+        } else {
+          content = `
+        <p>We're sorry to see you go! Your annual subscription has been successfully cancelled.</p>
+        
+        <p>If you have any questions or need assistance with your account, please don't hesitate to reach out.</p>
+
+        <p>Thank you for choosing us, and we hope to serve you again in the future!</p>
+        `
+        }
+        sendEmail(
+          userDetails[0][0].username,
+          userDetails[0][0].emailid,
+          `Gamalogic '${isMonthlyInEmail}' Subscription Cancellation`,
+          basicTemplate(userDetails[0][0].username, content)
+        );
+      }
+      res.status(200).send('Webhook processed successfully');
+
     } catch (error) {
       console.log(error)
-      ErrorHandler("RazorPayWebhook Controller", error, req);
+      res.status(500).json({ error: "Internal Server Error" });
+
+    }finally {
+      if (req.dbConnection) {
+        try {
+          await req.dbConnection.release();
+        } catch (releaseError) {
+          console.error('Error releasing database connection:', releaseError);
+        }
+      }
     }
   }
 };
