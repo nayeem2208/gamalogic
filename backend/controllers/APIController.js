@@ -1084,11 +1084,13 @@ let APIControllers = {
       let planDetails = RazorpayPrice.find(([credit, id, period]) => id == subscriptionDetails[0][0].plan_id)
       console.log(planDetails, 'plan details')
       if (event === 'subscription.charged') {
-        let dateMatch=subscriptionDetails[0][0].timestamp.split('T')[0]==new Date().toISOString().split('T')[0]
-        console.log(dateMatch,'date match')
-        if(dateMatch){
+        const chargeDate = new Date(subscriptionDetails[0].timestamp).toISOString().split('T')[0];
+        const today = new Date().toISOString().split('T')[0];
+        const dateMatch = chargeDate === today;
+        console.log(dateMatch, 'date match')
+        if (dateMatch) {
           let newBalance = userDetails[0][0].credits + planDetails[0]
-          
+
         }
 
         // const existingEntryCreationDate = new Date(subscriptionDetails[0][0].start_time).toISOString().split('T')[0]; // Extract date part
