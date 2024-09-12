@@ -1077,7 +1077,8 @@ let APIControllers = {
       const payload = req.body.payload;
       let subId = payload?.subscription?.entity?.id
 
-      let subscriptionDetails = await dbConnection.query(`SELECT * FROM razorpay_subscription Where subscription_id='${subId}'`)
+      let subscriptionDetails = await dbConnection.query(`SELECT * FROM razorpay_subscription Where subscription_id='${subId}'ORDER BY glid DESC 
+          LIMIT 1`)
 
       let userDetails = await dbConnection.query(`SELECT * FROM registration WHERE rowid='${subscriptionDetails[0][0].customer_id}'`)
 
@@ -1088,51 +1089,94 @@ let APIControllers = {
         const chargeDate = new Date(subscriptionDetails[0][0].timestamp).toISOString().split('T')[0];
         const today = new Date().toISOString().split('T')[0];
         const dateMatch = chargeDate != today;
-        console.log(today,chargeDate,'date of db and now')
+        console.log(today, chargeDate, 'date of db and now')
         console.log(dateMatch, 'date match')
 
 
         if (dateMatch) {
           let newBalance = userDetails[0][0].credits + planDetails[0]
 
-          let paymentId=payload?.payment?.entity?.id
-          console.log(paymentId,'payement id')
+          let paymentId = payload?.payment?.entity?.id
+          console.log(paymentId, 'payement id')
 
           var instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET })
           let resp = await instance.payments.fetch(paymentId)
-          console.log(resp,'resppp')
+          console.log(resp, 'resppp')
 
           let subscriptinDetails = await instance.subscriptions.fetch(subId)
-          console.log(subscriptinDetails,'subbbbbb detailssss')
-    
+          console.log(subscriptinDetails, 'subbbbbb detailssss')
+
           if (!resp) {
             console.log('error fetching response  ')
             return res.status(500).json({ error: 'Error fetching payment response' });
           }
-          await dbConnection.query(`UPDATE registration SET credits = '${newBalance}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
-          // let content
-          // if (planDetails[2] == 'monthly') {
-          //   content = `
-          //   <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.</p>
-            
-          //   <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
-          //   `
-          // }
-          // else {
-          //   content = `
-          //   <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.</p>
-            
-          //   <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
-          //   `
-          // }
-          // let isMonthlyInEmail = paymentDetails[2] == 'monthly' ? 'Monthly' : 'Annual'
-          // sendEmail(
-          //   user[0][0].username,
-          //   user[0][0].emailid,
-          //   `Gamalogic '${isMonthlyInEmail}' Subscription Payment successful`,
-          //   basicTemplate(user[0][0].username, content)
-          // );
 
+          await dbConnection.query(`UPDATE registration SET credits = '${newBalance}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
+          let content
+
+          let amount = resp.amount / 100
+          let fee = Math.round(resp.fee / 100)
+          let tax = resp.tax / 100
+          const query = `
+          INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+        `;
+
+          const values = [
+            resp.id || null,
+            amount || null,
+            fee || null,
+            tax || null,
+            resp.order_id || null,
+            resp.method || null,
+            resp.amount_refunded || null,
+            resp.refund_status || null,
+            resp.description || null,
+            resp.card_id || null,
+            resp.bank || null,
+            resp.wallet || null,
+            resp.vpa || null,
+            resp.email || null,
+            resp.contact || null,
+            resp.token_id || null,
+            resp.notes?.address || null,
+            resp.acquirer_data?.rrn || null,
+            resp.acquirer_data?.upi_transaction_id || null,
+            new Date(subscriptinDetails.created_at * 1000).toISOString() || null,
+            resp.upi?.vpa || null,
+            subscriptinDetails.entity || null,
+            subscriptinDetails.plan_id || null,
+            userDetails[0][0].rowid,
+            subscriptinDetails.status || null,
+            subscriptinDetails.id || null,
+          ]
+
+          await dbConnection.query(query, values);
+          if (planDetails[2] == 'monthly') {
+            content = `
+            <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(amount)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.</p>
+            
+            <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
+            `
+          }
+          else {
+            content = `
+            <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(amount)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.</p>
+            
+            <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
+            `
+          }
+          let isMonthlyInEmail = planDetails[2] == 'monthly' ? 'Monthly' : 'Annual'
+          sendEmail(
+            userDetails[0][0].username,
+            userDetails[0][0].emailid,
+            `Gamalogic ${isMonthlyInEmail} Subscription Payment successful`,
+            basicTemplate(userDetails[0][0].username, content)
+          );
+
+        }
+        else{
+          console.log('date is match so updation is not needed')
         }
 
         // const existingEntryCreationDate = new Date(subscriptionDetails[0][0].start_time).toISOString().split('T')[0]; // Extract date part
