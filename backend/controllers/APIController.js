@@ -1110,8 +1110,8 @@ let APIControllers = {
               console.log('error fetching response  ')
               return res.status(500).json({ error: 'Error fetching payment response' });
             }
-
-            await dbConnection.query(`UPDATE registration SET credits = '${newBalance}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
+            let last_payment=new Date().toISOString()
+            await dbConnection.query(`UPDATE registration SET credits = '${newBalance}',last_payment_time='${last_payment}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
             let content
 
             let amount = resp.amount / 100
