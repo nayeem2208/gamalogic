@@ -994,7 +994,7 @@ let APIControllers = {
  WHERE emailid='${req.user[0][0].emailid}'`)
 
       const query = `
-    INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id)
+    INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id,timestamp)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
   `;
       let amount = resp.amount / 100
@@ -1027,6 +1027,7 @@ let APIControllers = {
         req.user[0][0].rowid,
         subscriptinDetails.status || null,
         subscriptinDetails.id || null,
+        new Date().toISOString()
       ]
 
       await dbConnection.query(query, values);
@@ -1074,17 +1075,26 @@ let APIControllers = {
       const dbConnection = req.dbConnection;
       const event = req.body.event;
       const payload = req.body.payload;
-      console.log(event, 'event')
-      console.log(payload, 'payloadd')
       let subId = payload?.subscription?.entity?.id
-      console.log(subId, 'subidd')
+
       let subscriptionDetails = await dbConnection.query(`SELECT * FROM razorpay_subscription Where subscription_id='${subId}'`)
-      console.log(subscriptionDetails[0][0], 'subscription details')
+
       let userDetails = await dbConnection.query(`SELECT * FROM registration WHERE rowid='${subscriptionDetails[0][0].customer_id}'`)
-      console.log(userDetails[0][0], 'userDetails')
+
       let planDetails = RazorpayPrice.find(([credit, id, period]) => id == subscriptionDetails[0][0].plan_id)
       console.log(planDetails, 'plan details')
-      if (event === 'subscription.cancelled') {
+      if (event === 'subscription.charged') {
+        let dateMatch=subscriptionDetails[0][0].timestamp.split('T')[0]==new Date().toISOString().split('T')[0]
+        console.log(dateMatch,'date match')
+        if(dateMatch){
+          let newBalance = userDetails[0][0].credits + planDetails[0]
+          
+        }
+
+        // const existingEntryCreationDate = new Date(subscriptionDetails[0][0].start_time).toISOString().split('T')[0]; // Extract date part
+
+      }
+      else if (event === 'subscription.cancelled') {
         let isMonthlyInEmail = planDetails[2] == 'monthly' ? 'Monthly' : 'Annual'
         let content
         if (isMonthlyInEmail) {
