@@ -1083,14 +1083,55 @@ let APIControllers = {
 
       let planDetails = RazorpayPrice.find(([credit, id, period]) => id == subscriptionDetails[0][0].plan_id)
       console.log(planDetails, 'plan details')
+
       if (event === 'subscription.charged') {
         const chargeDate = new Date(subscriptionDetails[0][0].timestamp).toISOString().split('T')[0];
         const today = new Date().toISOString().split('T')[0];
-        const dateMatch = chargeDate === today;
+        const dateMatch = chargeDate != today;
         console.log(today,chargeDate,'date of db and now')
         console.log(dateMatch, 'date match')
+
+
         if (dateMatch) {
           let newBalance = userDetails[0][0].credits + planDetails[0]
+
+          let paymentId=payload?.payment?.entity?.id
+          console.log(paymentId,'payement id')
+
+          var instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET })
+          let resp = await instance.payments.fetch(paymentId)
+          console.log(resp,'resppp')
+
+          let subscriptinDetails = await instance.subscriptions.fetch(subId)
+          console.log(subscriptinDetails,'subbbbbb detailssss')
+    
+          if (!resp) {
+            console.log('error fetching response  ')
+            return res.status(500).json({ error: 'Error fetching payment response' });
+          }
+          await dbConnection.query(`UPDATE registration SET credits = '${newBalance}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
+          // let content
+          // if (planDetails[2] == 'monthly') {
+          //   content = `
+          //   <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.</p>
+            
+          //   <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
+          //   `
+          // }
+          // else {
+          //   content = `
+          //   <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.</p>
+            
+          //   <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
+          //   `
+          // }
+          // let isMonthlyInEmail = paymentDetails[2] == 'monthly' ? 'Monthly' : 'Annual'
+          // sendEmail(
+          //   user[0][0].username,
+          //   user[0][0].emailid,
+          //   `Gamalogic '${isMonthlyInEmail}' Subscription Payment successful`,
+          //   basicTemplate(user[0][0].username, content)
+          // );
 
         }
 
