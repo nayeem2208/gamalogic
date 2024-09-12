@@ -1079,7 +1079,7 @@ let APIControllers = {
 
       let subscriptionDetails = await dbConnection.query(`SELECT * FROM razorpay_subscription Where subscription_id='${subId}'ORDER BY glid DESC 
           LIMIT 1`)
-      if (subscriptionDetails[0][0].length>0) {
+      if (subscriptionDetails[0].length>0) {
         let userDetails = await dbConnection.query(`SELECT * FROM registration WHERE rowid='${subscriptionDetails[0][0].customer_id}'`)
 
         let planDetails = RazorpayPrice.find(([credit, id, period]) => id == subscriptionDetails[0][0].plan_id)
