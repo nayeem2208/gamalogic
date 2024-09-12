@@ -995,7 +995,7 @@ let APIControllers = {
 
       const query = `
     INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id,timestamp)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
   `;
       let amount = resp.amount / 100
       let fee = Math.round(resp.fee / 100)
@@ -1087,6 +1087,7 @@ let APIControllers = {
         const chargeDate = new Date(subscriptionDetails[0][0].timestamp).toISOString().split('T')[0];
         const today = new Date().toISOString().split('T')[0];
         const dateMatch = chargeDate === today;
+        console.log(today,chargeDate,'date of db and now')
         console.log(dateMatch, 'date match')
         if (dateMatch) {
           let newBalance = userDetails[0][0].credits + planDetails[0]
