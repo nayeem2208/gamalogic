@@ -1118,8 +1118,8 @@ let APIControllers = {
             let fee = Math.round(resp.fee / 100)
             let tax = resp.tax / 100
             const query = `
-          INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+          INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id,timestamp)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
         `;
 
             const values = [
@@ -1149,6 +1149,8 @@ let APIControllers = {
               userDetails[0][0].rowid,
               subscriptinDetails.status || null,
               subscriptinDetails.id || null,
+              new Date().toISOString()
+
             ]
 
             await dbConnection.query(query, values);
