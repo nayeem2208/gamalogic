@@ -45,7 +45,12 @@ function PaymentSuccess() {
         ([credits]) => credits === paymentDetails.credits
       );
       if (costMapping) {
-        selectedCost = costMapping[index];
+        if (paymentDetails.period === "annually") {
+        selectedCost = costMapping[index]*12;
+        }
+        else{
+          selectedCost = costMapping[index];
+        }
       }
     }
 

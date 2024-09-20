@@ -1,7 +1,7 @@
 let RazorpayPrice 
 if (process.env.APP == 'Beta') {
     RazorpayPrice= [
-    [1000, "plan_OlAsJTdkA47ryc", "monthly"],
+    [1000, "plan_OlAqTZSrvQJrZy", "monthly"],
     [2500, "plan_OlAqxHhXfdM0Pt", "monthly"],
     [5000, "plan_OocUfqjIJngDRx", "monthly"],
     [10000, "plan_OocVUaa6qg7K4j", "monthly"],

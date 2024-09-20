@@ -438,8 +438,8 @@ let APIControllers = {
           INSERT INTO gl_paypal (
               userid, order_id, order_time, email, name, payer_paypal_id, amount,
               currency, recipient_name, line1, city, country_code, postal_code, state,
-              paypal_fee, net_amount, gross_amount, gross_currency
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              paypal_fee, net_amount, gross_amount, gross_currency,credits
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
       `;
 
       let values = [
@@ -460,7 +460,8 @@ let APIControllers = {
         details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.paypal_fee?.value ?? null,
         details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.net_amount?.value ?? null,
         details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.gross_amount?.value ?? null,
-        details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.gross_amount?.currency_code ?? null
+        details?.purchase_units?.[0]?.payments?.captures?.[0]?.seller_receivable_breakdown?.gross_amount?.currency_code ?? null,
+        req.body.credits
       ];
 
 
@@ -863,8 +864,8 @@ let APIControllers = {
       international, method, amount_refunded, refund_status, captured,
       description, card_id, bank, wallet, vpa, email, contact, address, fee,
       tax, error_code, error_description, error_source, error_step,
-      error_reason, bank_transaction_id, created_at,payment_id
-    ) VALUES ( ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+      error_reason, bank_transaction_id, created_at,payment_id,credits
+    ) VALUES ( ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
   `;
 
       const values = [
@@ -898,7 +899,8 @@ let APIControllers = {
         error_reason || null,
         acquirer_data && acquirer_data.bank_transaction_id ? acquirer_data.bank_transaction_id : null,
         created_at ? new Date(created_at * 1000).toISOString().slice(0, 19).replace('T', ' ') : null,
-        id
+        id,
+        req.body.credits
       ];
 
       await dbConnection.query(query, values);
