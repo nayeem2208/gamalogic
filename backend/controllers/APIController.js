@@ -1044,10 +1044,11 @@ let APIControllers = {
       }
       else {
         content = `
-        <p>Your payment of ₹ ${amount} for ${Number(req.body.paymentDetails.credits).toLocaleString()} credits has been successfully processed. Additionally, we have activated your Annual subscription for ${Number(req.body.paymentDetails.credits).toLocaleString()} credits.</p>
+        <p>We are pleased to inform you that your payment of ₹ ${amount} for the annual subscription has been successfully processed, and ${Number(req.body.paymentDetails.credits).toLocaleString()} credits have been added to your account for this month.</p>
         
-        <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
+        <p>If you have any questions or need further assistance regarding your payment or subscription, please don't hesitate to reach out to us.</p>
         `
+        
       }
       sendEmail(
         req.user[0][0].username,
