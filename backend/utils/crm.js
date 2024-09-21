@@ -1,6 +1,7 @@
 // refreshToken.js
 
 import axios from "axios";
+import ErrorHandler from "./errorHandler";
 
 async function refreshToken() {
   const Accounts_URL = 'https://accounts.zoho.com';
@@ -49,7 +50,7 @@ async function leadGeneration(firstName, lastName, email) {
   let beninToken = await refreshToken()
   const beninHeaders = {
     'Authorization': `Zoho-oauthtoken ${beninToken}`,
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json'  
   };
 
   let jessicaToken = await JessicaRefreshToken()
@@ -109,7 +110,8 @@ async function leadGeneration(firstName, lastName, email) {
     }
 
   } catch (error) {
-    console.error('Error:', error.response ? error.response.data.data : error.message);
+    console.error('Error:', error);
+    ErrorHandler(" CRM lead Generation function error", error, req);
   }
 }
 
