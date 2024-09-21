@@ -1,7 +1,7 @@
 // refreshToken.js
 
 import axios from "axios";
-import ErrorHandler from "./errorHandler";
+import ErrorHandler from "./errorHandler.js";
 
 async function refreshToken() {
   const Accounts_URL = 'https://accounts.zoho.com';
