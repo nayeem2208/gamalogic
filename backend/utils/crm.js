@@ -111,7 +111,7 @@ async function leadGeneration(firstName, lastName, email) {
 
   } catch (error) {
     console.error('Error:', error);
-    ErrorHandler(" CRM lead Generation function error", error, req);
+    ErrorHandler(" CRM lead Generation function error", error, {});
   }
 }
 

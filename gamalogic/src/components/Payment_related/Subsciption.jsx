@@ -7,7 +7,7 @@ import { useUserState } from "../../context/userContext";
 
 
 function Subscription() {
-    const [isMonthly, setIsMonthly] = useState(true);
+    const [isMonthly, setIsMonthly] = useState(false);
     const [selectedCredits, setSelectedCredits] = useState(1000);
     const [cost, setCost] = useState(6);
     const [save, setSave] = useState(14);

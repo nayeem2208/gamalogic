@@ -14,6 +14,7 @@ import { RiProfileLine } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUserState } from "../context/userContext";
+import { GrMoney } from "react-icons/gr";
 
 
 function SideBar() {
@@ -139,6 +140,12 @@ function SideBar() {
           <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
           Buy Credits
         </li></Link>
+        <Link to="/dashboard/affiliate">
+              <li className="my-4 flex">
+                <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />
+                Earn
+              </li>
+            </Link>
         <Link to='/dashboard/support'><li className="my-4 flex">
           <SlSupport className="text-teal-800 mt-2 mx-2 text-lg" /> Support
         </li></Link>

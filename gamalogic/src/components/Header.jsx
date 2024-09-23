@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CgFileDocument } from "react-icons/cg";
-import { GrDocumentVerified } from "react-icons/gr";
+import { GrDocumentVerified ,GrMoney} from "react-icons/gr";
 import {
   IoCloseSharp,
   IoLogOutOutline,
@@ -159,6 +159,12 @@ function Header() {
               <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
               Buy Credits
             </li>
+            </Link>
+            <Link to="/dashboard/affiliate">
+              <li className="py-2 flex underlineLi">
+                <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />
+                Earn
+              </li>
             </Link>
             <Link to='/dashboard/support' onClick={dropDownToggle}>
             <li className="py-2 flex underlineLi">
