@@ -36,14 +36,15 @@ function Affiliate() {
       <SubHeader SubHeader={"Affiliate"} />
       {userDetails.confirm == 1 ? (
         <div className="mt-6 sm:mt-14 text-bgblue subHeading">
-          <h3>Earn Money with Us!</h3>
+          <h3>Sharing is caring</h3>
           <p className="my-7 description">
-            Become an affiliate and start earning through purchases made using
-            your referral. Simply share your referral link and earn commissions.
+          Join our affiliate program and start earning from every purchase made through your referral link!
           </p>
-          <button className="bg-bgblue text-white py-2  px-4 rounded-md mt-6 text-sm font-medium" onClick={handleAffiliateClick}>
+          <a target="_blank" href="https://gamalogicorrg.zohothrive.com/thrive/publicpages/affiliate-registration/gamalogicorrg/ed466b862665a168670e0dba804fa1a672c37a4ddeb5b4ba957fb2f72c0e836b" className="bg-bgblue text-white py-2  px-4 rounded-md mt-6 text-sm font-medium" 
+        //   onClick={handleAffiliateClick}
+          >
             BECOME AN AFFILIATE
-          </button>
+          </a>
         </div>
       ) : (
         <p className="my-10 text-red-600 font-semibold text-lg">

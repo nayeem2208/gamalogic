@@ -12,6 +12,7 @@ import paypalPrice from "../utils/payPalPriceRange.js";
 import RazorpayPrice from "../utils/RazorPayPriceRange.js";
 import jwt from "jsonwebtoken";
 import crypto from 'crypto'
+import PurchaseApi from "../utils/thrive.js";
 
 
 let APIControllers = {
@@ -1268,5 +1269,9 @@ let APIControllers = {
 
     }
   },
+  ThriveTest:async(req,res)=>{
+    let data=await PurchaseApi('nayeem2281998@gmail.com',1800,'abc100',30957)
+    console.log('data',data,'dataaaaaaaaaaaaaaaaaaaa')
+  }
 };
 export default APIControllers;

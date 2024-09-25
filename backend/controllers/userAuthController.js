@@ -252,6 +252,28 @@ const Authentication = {
       if (userExists[0].length > 0) {
         res.status(400).json({ error: "User already exists" });
       } else {
+        if (req.body.widgetCode && req.body.thriveRefId) {
+          const url = `https://thrive.zoho.com/thrive/webhooks/${req.body.widgetCode}/mapreferral`;
+
+          const headers = {
+            'thrive-secret-hash': 'b599a641bc6e680d90b0041b463c36ec',
+            'Content-Type': 'application/json',
+          };
+
+          const data = {
+            email: email,
+            widget_code: req.body.widgetCode,
+            thrive_ref_id: req.body.thriveRefId,
+            first_name: firstname,
+            last_name: lastname,
+          };
+          try {
+            
+            const response = await axios.post(url, data, { headers });
+          } catch (error) {
+            ErrorHandler("Google Auth Controller Thrive signin section", error, req);
+          }
+        }
         const userAgent = req.headers["user-agent"];
         let ip = req.headers['cf-connecting-ip'] ||
           req.headers['x-real-ip'] ||
@@ -378,6 +400,28 @@ const Authentication = {
           if (userExists[0].length > 0) {
             res.status(400).json({ error: "User already exists" });
           } else {
+            if (req.body.widgetCode && req.body.thriveRefId) {
+              const url = `https://thrive.zoho.com/thrive/webhooks/${req.body.widgetCode}/mapreferral`;
+    
+              const headers = {
+                'thrive-secret-hash': 'b599a641bc6e680d90b0041b463c36ec',
+                'Content-Type': 'application/json',
+              };
+    
+              const data = {
+                email: email,
+                widget_code: req.body.widgetCode,
+                thrive_ref_id: req.body.thriveRefId,
+                first_name: firstname,
+                last_name: lastname,
+              };
+              try {
+                
+                const response = await axios.post(url, data, { headers });
+              } catch (error) {
+                ErrorHandler("Linkedin signup Controller Thrive signin section", error, req);
+              }
+            }
             const userAgent = req.headers["user-agent"];
             let ip = req.headers['cf-connecting-ip'] ||
               req.headers['x-real-ip'] ||
@@ -570,6 +614,28 @@ const Authentication = {
       if (userExists[0].length > 0) {
         res.status(400).json({ error: "User already exists" });
       } else {
+        if (req.body.widgetCode && req.body.thriveRefId) {
+          const url = `https://thrive.zoho.com/thrive/webhooks/${req.body.widgetCode}/mapreferral`;
+
+          const headers = {
+            'thrive-secret-hash': 'b599a641bc6e680d90b0041b463c36ec',
+            'Content-Type': 'application/json',
+          };
+
+          const data = {
+            email: email,
+            widget_code: req.body.widgetCode,
+            thrive_ref_id: req.body.thriveRefId,
+            first_name: firstname,
+            last_name: lastname,
+          };
+          try {
+            
+            const response = await axios.post(url, data, { headers });
+          } catch (error) {
+            ErrorHandler("Google Auth Controller Thrive signin section", error, req);
+          }
+        }
         const userAgent = req.headers["user-agent"];
         let ip = req.headers['cf-connecting-ip'] ||
           req.headers['x-real-ip'] ||
@@ -740,6 +806,27 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
       );
       if (verifiedUser.length > 0) {
+        if (req.body.widgetCode && req.body.thriveRefId) {
+          const url = `https://thrive.zoho.com/thrive/webhooks/${req.body.widgetCode}/mapreferral`;
+
+          const headers = {
+            'thrive-secret-hash': 'b599a641bc6e680d90b0041b463c36ec',
+            'Content-Type': 'application/json',
+          };
+
+          const data = {
+            email: userEmail,
+            widget_code: req.body.widgetCode,
+            thrive_ref_id: req.body.thriveRefId,
+            first_name: firstname,
+            last_name: lastname,
+          };
+          try {
+            const response = await axios.post(url, data, { headers });
+          } catch (error) {
+            ErrorHandler("verifyEmail Controller thrive signup section", error, req);
+          }
+        }
         let token = generateToken(res, verifiedUser[0][0].rowid, verifiedUser[0][0].api_key);
         let creditBal;
         let finalFree = new Date(verifiedUser[0][0].free_final);

@@ -163,7 +163,7 @@ function Header() {
             <Link to="/dashboard/affiliate">
               <li className="py-2 flex underlineLi">
                 <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />
-                Earn
+                Become an Affiliate
               </li>
             </Link>
             <Link to='/dashboard/support' onClick={dropDownToggle}>

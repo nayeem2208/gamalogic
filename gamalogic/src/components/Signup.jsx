@@ -25,6 +25,8 @@ function Signup() {
   });
   let [loading, setLoading] = useState(false);
   let [serverError, setServerError] = useState(false);
+  const [thriveRefId, setThriveRefId] = useState(null);
+  const [widgetCode, setWidgetCode] = useState(null);
 
   let navigate = useNavigate();
   let { setUserDetails, setCreditBal, setTutorialVideo,linkedinLoading, setLinkedinLoading } = useUserState();
@@ -40,7 +42,7 @@ function Signup() {
 
   useEffect(() => {
     let windowUrl = window.location.href;
-    if (windowUrl.includes("code=")) {
+    if(windowUrl.includes("code=") && !windowUrl.includes("widget_code=")) {
       setLinkedinLoading(true); // Set loading state to true
 
       (async () => {
@@ -74,6 +76,17 @@ function Signup() {
       })();
     }
   }, []);
+
+  
+  useEffect(() => {
+    let urlParams = new URLSearchParams(window.location.search);
+    let refId = urlParams.get('thrive_ref_id');
+    let widget = urlParams.get('widget_code');
+
+    if (refId) setThriveRefId(refId);
+    if (widget) setWidgetCode(widget);
+  }, []);
+  console.log(thriveRefId,'ref id is here ',widgetCode,'widget codeeeee')
 
 
   const handleInputChange = (e) => {
@@ -161,7 +174,7 @@ function Signup() {
     try {
       setLinkedinLoading(true)
       let res = await axiosInstance.post("/googleSignup", {
-        credentialResponse,
+        credentialResponse,thriveRefId,widgetCode
       });
       setLinkedinLoading(false)
 

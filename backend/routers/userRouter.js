@@ -53,5 +53,6 @@ router.post('/RazorPaySubscriptionPaymentSuccess',dbMiddleware,authcheck,APICont
 router.post('/RazorPayWebhook',dbMiddleware,APIControllers.razorPayWebhook)
 
 router.get('/affiliateUserId',dbMiddleware,APIControllers.affilateUserId)
+router.post('/thriveTest',APIControllers.ThriveTest)
 
 export default router;

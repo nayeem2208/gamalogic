@@ -143,7 +143,7 @@ function SideBar() {
         <Link to="/dashboard/affiliate">
               <li className="my-4 flex">
                 <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />
-                Earn
+                Become an Affiliate
               </li>
             </Link>
         <Link to='/dashboard/support'><li className="my-4 flex">
