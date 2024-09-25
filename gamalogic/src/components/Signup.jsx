@@ -51,7 +51,7 @@ function Signup() {
           if (codeMatch) {
             const code = codeMatch[1];
             const res = await axiosInstance.post("/linkedinSignUp", {
-              code,
+              code,thriveRefId,widgetCode
             });
             toast.success("Welcome back! You've successfully logged in");
             let token = res.data;
@@ -126,7 +126,7 @@ function Signup() {
                 if (passwordPattern.test(data.password)) {
                   setLinkedinLoading(true)
                   let userData = await axiosInstance.post("signup", {
-                    data,
+                    data,thriveRefId,widgetCode
                   });
                   setLinkedinLoading(false)
                   console.log(userData, "userdata");
@@ -359,7 +359,9 @@ function Signup() {
                 <LinkedInPage endpoint={"signup"} />
               </div>
               <div className="flex justify-center my-2">
-              <MicroSoftSignInButton page='signup'/>
+              <MicroSoftSignInButton page='signup'
+              thriveRefId={thriveRefId} 
+              widgetCode={widgetCode} />
               </div>
             <Link to="/signin">
               <div className="flex justify-center text-xs md:text-sm text-gray-300 mt-4">
