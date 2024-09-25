@@ -273,6 +273,7 @@ const Authentication = {
       if (userExists[0].length > 0) {
         res.status(400).json({ error: "User already exists" });
       } else {
+        console.log(req.body.widgetCode ,req.body.thriveRefId,'widget and refidddddd')
         if (req.body.widgetCode && req.body.thriveRefId) {
           const url = `https://thrive.zoho.com/thrive/webhooks/${req.body.widgetCode}/mapreferral`;
 
@@ -380,7 +381,7 @@ const Authentication = {
   linkedinSignUp: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      const { code } = req.body;
+      const { code ,widgetCode,thriveRefId} = req.body;
       if (!code) throw new Error('No code provided')
       const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_SIGNUP_REDIRECT_URI)}`;
       try {
@@ -421,8 +422,8 @@ const Authentication = {
           if (userExists[0].length > 0) {
             res.status(400).json({ error: "User already exists" });
           } else {
-            if (req.body.widgetCode && req.body.thriveRefId) {
-              const url = `https://thrive.zoho.com/thrive/webhooks/${req.body.widgetCode}/mapreferral`;
+            if (widgetCode && thriveRefId) {
+              const url = `https://thrive.zoho.com/thrive/webhooks/${widgetCode}/mapreferral`;
     
               const headers = {
                 'thrive-secret-hash': 'b599a641bc6e680d90b0041b463c36ec',
@@ -431,8 +432,8 @@ const Authentication = {
     
               const data = {
                 email: email,
-                widget_code: req.body.widgetCode,
-                thrive_ref_id: req.body.thriveRefId,
+                widget_code: widgetCode,
+                thrive_ref_id: thriveRefId,
                 first_name: firstname,
                 last_name: lastname,
               };
