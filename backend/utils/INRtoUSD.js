@@ -3,7 +3,6 @@ import axios from "axios";
 export default async function InrToUsdConverter(amount) {
     try {
         const response=await axios('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/inr.json')
-        console.log(response, 'resppp')
 
         const exchangeRate = response.data.inr.usd;
 
