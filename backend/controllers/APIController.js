@@ -1201,6 +1201,15 @@ let APIControllers = {
             ]
 
             await dbConnection.query(query, values);
+
+            try {
+              let DollarRate=await InrToUsdConverter(amount)
+              console.log(DollarRate,'rate in dollar ')
+              let response=await PurchaseApi(userDetails[0][0].emailid,DollarRate,resp.order_id || null,userDetails[0][0]?.rowid ?? null)
+              console.log(response,'resppppppp')
+            } catch (error) {
+              ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+            }
             if (planDetails[2] == 'monthly') {
               content = `
             <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(amount)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.</p>
