@@ -980,7 +980,7 @@ let APIControllers = {
           return credits === planCredits && period === planPeriod;
         } else {
           // For annual plans, check against credits multiplied by 12
-          console.log('its reaching here')
+          // console.log('its reaching here')
           return credits * 12 === planCredits && period === planPeriod;
         }
       });
@@ -1071,8 +1071,9 @@ let APIControllers = {
 
       try {
         let DollarRate=await InrToUsdConverter(amount)
-        let resp=await PurchaseApi(req.user[0][0].emailid,DollarRate,resp.order_id || null,req.user[0][0]?.rowid ?? null)
-        console.log(resp,'resppppppp')
+        console.log(DollarRate,'rate in dollar ')
+        let response=await PurchaseApi(req.user[0][0].emailid,DollarRate,resp.order_id || null,req.user[0][0]?.rowid ?? null)
+        console.log(response,'resppppppp')
       } catch (error) {
         ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
       }
@@ -1116,7 +1117,7 @@ let APIControllers = {
     }
   },
   razorPayWebhook: async (req, res) => {
-    ErrorHandler("RazorPayWebhook checker 11111", req.body, req);
+    // ErrorHandler("RazorPayWebhook checker 11111", req.body, req);
     try {
       const dbConnection = req.dbConnection;
       const event = req.body.event;
