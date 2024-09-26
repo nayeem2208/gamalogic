@@ -928,6 +928,7 @@ let APIControllers = {
       updateLeadStatus(req.user[0][0].emailid)
       try {
         let DollarRate=await InrToUsdConverter(amountInRupees)
+        console.log(DollarRate,'dollarRate')
         let resp=await PurchaseApi(req.user[0][0].emailid,DollarRate,order_id || null,req.user[0][0]?.rowid ?? null)
         console.log(resp,'resppppppp')
       } catch (error) {
