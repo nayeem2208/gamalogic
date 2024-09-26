@@ -13,6 +13,7 @@ import RazorpayPrice from "../utils/RazorPayPriceRange.js";
 import jwt from "jsonwebtoken";
 import crypto from 'crypto'
 import PurchaseApi from "../utils/thrive.js";
+import InrToUsdConverter from "../utils/INRtoUSD.js";
 
 
 let APIControllers = {
@@ -925,6 +926,13 @@ let APIControllers = {
         basicTemplate(req.user[0][0].username, content)
       );
       updateLeadStatus(req.user[0][0].emailid)
+      try {
+        let DollarRate=await InrToUsdConverter(amountInRupees)
+        let resp=await PurchaseApi(req.user[0][0].emailid,DollarRate,order_id || null,req.user[0][0]?.rowid ?? null)
+        console.log(resp,'resppppppp')
+      } catch (error) {
+        ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+      }
       dbConnection.release()
       res.status(200).json('Successfull')
     } catch (error) {
