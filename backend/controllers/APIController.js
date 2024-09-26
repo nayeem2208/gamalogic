@@ -678,7 +678,7 @@ let APIControllers = {
 
             if (!isSameDay && !time_stamp) {
               console.log('inside sameday')
-              ErrorHandler("update paypal webhook checker step 1", req.body, req);
+              // ErrorHandler("update paypal webhook checker step 1", req.body, req);
               let details = payPaldetails.data;
               const formatAddress = (address) => {
                 return [
@@ -724,10 +724,20 @@ let APIControllers = {
               // console.log('ivda vare ellam sheri aaahn')
 
               await dbConnection.query(query, values);
+
               let user = await dbConnection.query(`SELECT username,emailid,credits FROM registration WHERE rowid = '${planInDataBase[0][0].userid}'`);
               let newBalance = user[0][0].credits + credit;
               let lastPayment_registration = details.billing_info.last_payment.time ?? new Date().toISOString()
               await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
+              try {
+                let orderId = subId + new Date().toISOString().split('T')[0];
+                console.log(orderId,'orderIdddddd')
+                let resp=await PurchaseApi(user[0][0].emailid,gross_amount || null,orderId,user[0][0]?.rowid ?? null)
+                console.log(resp,'resppppppp')
+              } catch (error) {
+                ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+                console.log(error)
+              }
               let content
               if (paymentDetails[2] == 'monthly') {
                 content = `
@@ -752,7 +762,7 @@ let APIControllers = {
                 basicTemplate(user[0][0].username, content)
               );
             } else {
-              ErrorHandler("update paypal webhook checker step 2", req.body, req);
+              // ErrorHandler("update paypal webhook checker step 2", req.body, req);
               console.log('Dates are the same. No update needed.');
             }
 
@@ -1058,6 +1068,14 @@ let APIControllers = {
       ]
 
       await dbConnection.query(query, values);
+
+      try {
+        let DollarRate=await InrToUsdConverter(amount)
+        let resp=await PurchaseApi(req.user[0][0].emailid,DollarRate,resp.order_id || null,req.user[0][0]?.rowid ?? null)
+        console.log(resp,'resppppppp')
+      } catch (error) {
+        ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+      }
 
       let content
       if (req.body.paymentDetails.period == 'monthly') {
