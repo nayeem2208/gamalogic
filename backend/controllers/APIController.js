@@ -620,7 +620,13 @@ let APIControllers = {
         new Date().toISOString()
       ];
       updateLeadStatus(req.user[0][0].emailid)
-
+      try {
+        let orderId = subscriptionId + new Date().toISOString().split('T')[0];
+        let resp=await PurchaseApi(req.user[0][0].emailid,gross_amount || null,orderId,user[0][0]?.rowid ?? null)
+        console.log(resp,'resppppppp')
+      } catch (error) {
+        ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+      }
       await dbConnection.query(query, values);
       res.status(200).json('Successfull')
       dbConnection.release()
