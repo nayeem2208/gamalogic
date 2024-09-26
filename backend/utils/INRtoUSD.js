@@ -1,5 +1,6 @@
 import CC from 'currency-converter-lt';
 
+
 export default async function InrToUsdConverter(amount) {
   try {
     let currencyConverter = new CC({ from: "INR", to: "USD", amount: amount });
