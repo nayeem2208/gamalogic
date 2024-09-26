@@ -29,7 +29,13 @@ function Signup() {
   const [widgetCode, setWidgetCode] = useState(null);
 
   let navigate = useNavigate();
-  let { setUserDetails, setCreditBal, setTutorialVideo,linkedinLoading, setLinkedinLoading } = useUserState();
+  let {
+    setUserDetails,
+    setCreditBal,
+    setTutorialVideo,
+    linkedinLoading,
+    setLinkedinLoading,
+  } = useUserState();
 
   useEffect(() => {
     if (APP == "beta") {
@@ -42,7 +48,7 @@ function Signup() {
 
   useEffect(() => {
     let windowUrl = window.location.href;
-    if(windowUrl.includes("code=") && !windowUrl.includes("widget_code=")) {
+    if (windowUrl.includes("code=") && !windowUrl.includes("widget_code=")) {
       setLinkedinLoading(true); // Set loading state to true
 
       (async () => {
@@ -50,8 +56,12 @@ function Signup() {
           let codeMatch = windowUrl.match(/code=([a-zA-Z0-9_\-]+)/);
           if (codeMatch) {
             const code = codeMatch[1];
+            const refData = JSON.parse(localStorage.getItem("refCode"));
+            console.log(refData,'refData is hereeeeeeeeeeee')
             const res = await axiosInstance.post("/linkedinSignUp", {
-              code,thriveRefId,widgetCode
+              code,
+              thriveRefId: refData?.refId || null,
+              widgetCode: refData?.widget || null,
             });
             toast.success("Welcome back! You've successfully logged in");
             let token = res.data;
@@ -69,7 +79,7 @@ function Signup() {
             toast.error(err.response?.data?.error);
           }
         } finally {
-          setLinkedinLoading(false); 
+          setLinkedinLoading(false);
           const newUrl = window.location.origin + window.location.pathname;
           window.history.replaceState(null, "", newUrl);
         }
@@ -77,17 +87,20 @@ function Signup() {
     }
   }, []);
 
-  
   useEffect(() => {
     let urlParams = new URLSearchParams(window.location.search);
-    let refId = urlParams.get('thrive_ref_id');
-    let widget = urlParams.get('widget_code');
+    let refId = urlParams.get("thrive_ref_id");
+    let widget = urlParams.get("widget_code");
+    if (refId && widget) {
+      setThriveRefId(refId);
+      setWidgetCode(widget);
 
-    if (refId) setThriveRefId(refId);
-    if (widget) setWidgetCode(widget);
+      // Save both values together as an object
+      const refData = { refId, widget };
+      localStorage.setItem("refCode", JSON.stringify(refData));
+    }
   }, []);
-  console.log(thriveRefId,'ref id is here ',widgetCode,'widget codeeeee')
-
+  console.log(thriveRefId, "ref id is here ", widgetCode, "widget codeeeee");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -124,11 +137,13 @@ function Signup() {
             if (data.password == data.confirmPassword) {
               if (emailPattern.test(data.email)) {
                 if (passwordPattern.test(data.password)) {
-                  setLinkedinLoading(true)
+                  setLinkedinLoading(true);
                   let userData = await axiosInstance.post("signup", {
-                    data,thriveRefId,widgetCode
+                    data,
+                    thriveRefId,
+                    widgetCode,
                   });
-                  setLinkedinLoading(false)
+                  setLinkedinLoading(false);
                   console.log(userData, "userdata");
                   toast.success(userData?.data);
                   navigate("/VerifyYourEmail", {
@@ -158,7 +173,7 @@ function Signup() {
         toast.error("Please provide all required information.");
       }
     } catch (error) {
-      setLinkedinLoading(false)
+      setLinkedinLoading(false);
       console.log(error);
       if (error.response.status === 500) {
         setServerError(true);
@@ -172,11 +187,13 @@ function Signup() {
 
   const authenticateData = async (credentialResponse) => {
     try {
-      setLinkedinLoading(true)
+      setLinkedinLoading(true);
       let res = await axiosInstance.post("/googleSignup", {
-        credentialResponse,thriveRefId,widgetCode
+        credentialResponse,
+        thriveRefId,
+        widgetCode,
       });
-      setLinkedinLoading(false)
+      setLinkedinLoading(false);
 
       toast.success(
         "Welcome to Gamalogic! You've successfully registered with us."
@@ -188,7 +205,7 @@ function Signup() {
       setTutorialVideo(true);
       navigate("/dashboard/quick-validation");
     } catch (err) {
-      setLinkedinLoading(false)
+      setLinkedinLoading(false);
       if (err.response.status === 500) {
         setServerError(true);
       } else {
@@ -345,7 +362,7 @@ function Signup() {
             <div className="flex justify-center mt-5 ">
               {" "}
               <GoogleLogin
-              style={{ maxWidth: '180px',width:'180px'}}
+                style={{ maxWidth: "180px", width: "180px" }}
                 text="Sign up with Google"
                 onSuccess={(credentialResponse) => {
                   authenticateData(credentialResponse);
@@ -356,13 +373,15 @@ function Signup() {
               />
             </div>
             <div className="flex justify-center mt-2 ">
-                <LinkedInPage endpoint={"signup"} />
-              </div>
-              <div className="flex justify-center my-2">
-              <MicroSoftSignInButton page='signup'
-              thriveRefId={thriveRefId} 
-              widgetCode={widgetCode} />
-              </div>
+              <LinkedInPage endpoint={"signup"} />
+            </div>
+            <div className="flex justify-center my-2">
+              <MicroSoftSignInButton
+                page="signup"
+                thriveRefId={thriveRefId}
+                widgetCode={widgetCode}
+              />
+            </div>
             <Link to="/signin">
               <div className="flex justify-center text-xs md:text-sm text-gray-300 mt-4">
                 Already have an account?

@@ -27,6 +27,7 @@ function QuickValidation() {
     } else {
       document.title = "Quick Validation | Dashboard";
     }
+    localStorage.removeItem("refCode");
   }, []);
 
   const submitHandler = async (e) => {
