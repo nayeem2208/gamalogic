@@ -623,7 +623,7 @@ let APIControllers = {
       try {
         let orderId = subscriptionId + new Date().toISOString().split('T')[0];
         console.log(orderId,'orderIdddddd')
-        let resp=await PurchaseApi(req.user[0][0].emailid,gross_amount || null,orderId,user[0][0]?.rowid ?? null)
+        let resp=await PurchaseApi(req.user[0][0].emailid,gross_amount || null,orderId,req.user[0][0]?.rowid ?? null)
         console.log(resp,'resppppppp')
       } catch (error) {
         ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
