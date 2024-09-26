@@ -28,6 +28,7 @@ async function refreshToken() {
 // Function to make the purchase API call
 async function PurchaseApi(email, amount, orderId) {
     try {
+        console.log(email,amount,orderId,'data to thrive ')
         // Get the access token by refreshing it
         const accessToken = await refreshToken();
 

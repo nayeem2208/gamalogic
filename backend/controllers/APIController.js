@@ -471,7 +471,8 @@ let APIControllers = {
       await dbConnection.query(query, values);
       updateLeadStatus(req.user[0][0].emailid)
       try {
-        await PurchaseApi(req.user[0][0].emailid,details?.purchase_units?.[0]?.amount?.value ?? null,req.body?.data?.orderID ?? null,user[0][0]?.rowid ?? null)
+        let resp=await PurchaseApi(req.user[0][0].emailid,details?.purchase_units?.[0]?.amount?.value ?? null,req.body?.data?.orderID ?? null,user[0][0]?.rowid ?? null)
+        console.log(resp,'resppppppp')
       } catch (error) {
         ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
       }
