@@ -422,7 +422,9 @@ const Authentication = {
           if (userExists[0].length > 0) {
             res.status(400).json({ error: "User already exists" });
           } else {
+            console.log(widgetCode,thriveRefId,'widget and ref code in linkedinnnnnnnnnnnnnnnnnnnn')
             if (widgetCode && thriveRefId) {
+              console.log('its inside thrive')
               const url = `https://thrive.zoho.com/thrive/webhooks/${widgetCode}/mapreferral`;
     
               const headers = {
@@ -440,6 +442,7 @@ const Authentication = {
               try {
                 
                 const response = await axios.post(url, data, { headers });
+                console.log(response,'response of thirve code in linkedin ')
               } catch (error) {
                 ErrorHandler("Linkedin signup Controller Thrive signin section", error, req);
               }
