@@ -1201,8 +1201,9 @@ let APIControllers = {
             ]
 
             await dbConnection.query(query, values);
-
+            console.log('outside thriveeeeee')
             try {
+              console.log('inside thriveeeeeeeee')
               let DollarRate=await InrToUsdConverter(amount)
               console.log(DollarRate,'rate in dollar ')
               let response=await PurchaseApi(userDetails[0][0].emailid,DollarRate,resp.order_id || null,userDetails[0][0]?.rowid ?? null)
