@@ -1212,14 +1212,14 @@ let APIControllers = {
             }
             if (planDetails[2] == 'monthly') {
               content = `
-            <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(amount)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.</p>
+            <p>Your subscription has been renewed successfully. We have processed your payment of ₹${Number(Math.round(amount)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.</p>
             
             <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
             `
             }
             else {
               content = `
-            <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(amount)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.</p>
+            <p>Your subscription has been renewed successfully. We have processed your payment of ₹${Number(Math.round(amount)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.</p>
             
             <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
             `
