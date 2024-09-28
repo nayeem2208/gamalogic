@@ -1205,7 +1205,8 @@ let APIControllers = {
             console.log('outside thriveeeeee')
             try {
               console.log('inside thriveeeeeeeee')
-              let DollarRate=await InrToUsdSubscriptionConverter(planDetails[0],planDetails[2])
+              let creditToConvert=planDetails[0]/12
+              let DollarRate=await InrToUsdSubscriptionConverter(creditToConvert,planDetails[2])
               console.log(DollarRate,'rate in dollar ')
               let response=await PurchaseApi(userDetails[0][0].emailid,DollarRate,resp.order_id || null,userDetails[0][0]?.rowid ?? null)
               console.log(response,'resppppppp')
