@@ -3,6 +3,7 @@ import axios from "axios";
 
 export default async function InrToUsdSubscriptionConverter(creditOfRazorpay,period) {
     try {
+        console.log(creditOfRazorpay,period,'credit and period')
         let creditCostMappings
         let MonthlyCreditCostMappings = [
             [1000, 6, "P-7NW45488DG075491MM25NWLY"],
