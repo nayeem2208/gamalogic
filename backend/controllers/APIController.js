@@ -14,6 +14,7 @@ import jwt from "jsonwebtoken";
 import crypto from 'crypto'
 import PurchaseApi from "../utils/thrive.js";
 import InrToUsdConverter from "../utils/INRtoUSD.js";
+import InrToUsdSubscriptionConverter from "../utils/INRtoUSDSubscription.js";
 
 
 let APIControllers = {
@@ -1070,7 +1071,7 @@ let APIControllers = {
       await dbConnection.query(query, values);
 
       try {
-        let DollarRate=await InrToUsdConverter(req.body.credits)
+        let DollarRate=await InrToUsdSubscriptionConverter(req.body.credits,periodColumn)
         console.log(DollarRate,'rate in dollar ')
         let response=await PurchaseApi(req.user[0][0].emailid,DollarRate,resp.order_id || null,req.user[0][0]?.rowid ?? null)
         console.log(response,'resppppppp')
@@ -1204,7 +1205,7 @@ let APIControllers = {
             console.log('outside thriveeeeee')
             try {
               console.log('inside thriveeeeeeeee')
-              let DollarRate=await InrToUsdConverter(planDetails[0])
+              let DollarRate=await InrToUsdSubscriptionConverter(planDetails[0],planDetails[2])
               console.log(DollarRate,'rate in dollar ')
               let response=await PurchaseApi(userDetails[0][0].emailid,DollarRate,resp.order_id || null,userDetails[0][0]?.rowid ?? null)
               console.log(response,'resppppppp')
