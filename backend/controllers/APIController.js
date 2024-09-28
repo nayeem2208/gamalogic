@@ -400,7 +400,7 @@ let APIControllers = {
   PayPalUpdateCredit: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      let user = await dbConnection.query(`SELECT rowid,credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
+      let user = await dbConnection.query(`SELECT rowid,credits,is_referer_by from registration WHERE emailid='${req.user[0][0].emailid}'`)
       let newBalance = user[0][0].credits + req.body.credits
       await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1 WHERE emailid='${req.user[0][0].emailid}'`)
 
@@ -472,11 +472,13 @@ let APIControllers = {
 
       await dbConnection.query(query, values);
       updateLeadStatus(req.user[0][0].emailid)
-      try {
-        let resp=await PurchaseApi(req.user[0][0].emailid,details?.purchase_units?.[0]?.amount?.value ?? null,req.body?.data?.orderID ?? null,user[0][0]?.rowid ?? null)
-        console.log(resp,'resppppppp')
-      } catch (error) {
-        ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+      if (user[0][0].is_referer_by == 1) {
+        try {
+          let resp = await PurchaseApi(req.user[0][0].emailid, details?.purchase_units?.[0]?.amount?.value ?? null, req.body?.data?.orderID ?? null, user[0][0]?.rowid ?? null)
+          console.log(resp, 'resppppppp')
+        } catch (error) {
+          ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+        }
       }
       res.status(200).json('Successfull')
     } catch (error) {
@@ -621,14 +623,16 @@ let APIControllers = {
         new Date().toISOString()
       ];
       updateLeadStatus(req.user[0][0].emailid)
-      try {
-        let orderId = subscriptionId + new Date().toISOString().split('T')[0];
-        console.log(orderId,'orderIdddddd')
-        let resp=await PurchaseApi(req.user[0][0].emailid,gross_amount || null,orderId,req.user[0][0]?.rowid ?? null)
-        console.log(resp,'resppppppp')
-      } catch (error) {
-        ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
-        console.log(error)
+      if (user.is_referer_by == 1) {
+        try {
+          let orderId = subscriptionId + new Date().toISOString().split('T')[0];
+          console.log(orderId, 'orderIdddddd')
+          let resp = await PurchaseApi(req.user[0][0].emailid, gross_amount || null, orderId, req.user[0][0]?.rowid ?? null)
+          console.log(resp, 'resppppppp')
+        } catch (error) {
+          ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+          console.log(error)
+        }
       }
       await dbConnection.query(query, values);
       res.status(200).json('Successfull')
@@ -726,19 +730,22 @@ let APIControllers = {
 
               await dbConnection.query(query, values);
 
-              let user = await dbConnection.query(`SELECT username,emailid,credits FROM registration WHERE rowid = '${planInDataBase[0][0].userid}'`);
+              let user = await dbConnection.query(`SELECT username,emailid,credits,is_referer_by FROM registration WHERE rowid = '${planInDataBase[0][0].userid}'`);
               let newBalance = user[0][0].credits + credit;
               let lastPayment_registration = details.billing_info.last_payment.time ?? new Date().toISOString()
               await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
-              try {
-                let orderId = subId + new Date().toISOString().split('T')[0];
-                console.log(orderId,'orderIdddddd')
-                let resp=await PurchaseApi(user[0][0].emailid,gross_amount || null,orderId,user[0][0]?.rowid ?? null)
-                console.log(resp,'resppppppp')
-              } catch (error) {
-                ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
-                console.log(error)
+              if (user[0][0].is_referer_by == 1) {
+                try {
+                  let orderId = subId + new Date().toISOString().split('T')[0];
+                  console.log(orderId, 'orderIdddddd')
+                  let resp = await PurchaseApi(user[0][0].emailid, gross_amount || null, orderId, user[0][0]?.rowid ?? null)
+                  console.log(resp, 'resppppppp')
+                } catch (error) {
+                  ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+                  console.log(error)
+                }
               }
+
               let content
               if (paymentDetails[2] == 'monthly') {
                 content = `
@@ -945,12 +952,14 @@ let APIControllers = {
         basicTemplate(req.user[0][0].username, content)
       );
       updateLeadStatus(req.user[0][0].emailid)
-      try {
-        let DollarRate=await InrToUsdConverter(req.body.credits)
-        let resp=await PurchaseApi(req.user[0][0].emailid,DollarRate,order_id || null,req.user[0][0]?.rowid ?? null)
-        console.log(resp,'resppppppp')
-      } catch (error) {
-        ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+      if (req.user[0][0].is_referer_by == 1) {
+        try {
+          let DollarRate = await InrToUsdConverter(req.body.credits)
+          let resp = await PurchaseApi(req.user[0][0].emailid, DollarRate, order_id || null, req.user[0][0]?.rowid ?? null)
+          console.log(resp, 'resppppppp')
+        } catch (error) {
+          ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+        }
       }
       dbConnection.release()
       res.status(200).json('Successfull')
@@ -1069,16 +1078,16 @@ let APIControllers = {
       ]
 
       await dbConnection.query(query, values);
-
-      try {
-        let DollarRate=await InrToUsdSubscriptionConverter(req.body.credits,periodColumn)
-        console.log(DollarRate,'rate in dollar ')
-        let response=await PurchaseApi(req.user[0][0].emailid,DollarRate,resp.order_id || null,req.user[0][0]?.rowid ?? null)
-        console.log(response,'resppppppp')
-      } catch (error) {
-        ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+      if (req.user[0][0].is_referer_by == 1) {
+        try {
+          let DollarRate = await InrToUsdSubscriptionConverter(req.body.credits, periodColumn)
+          console.log(DollarRate, 'rate in dollar ')
+          let response = await PurchaseApi(req.user[0][0].emailid, DollarRate, resp.order_id || null, req.user[0][0]?.rowid ?? null)
+          console.log(response, 'resppppppp')
+        } catch (error) {
+          ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+        }
       }
-
       let content
       if (req.body.paymentDetails.period == 'monthly') {
         content = `
@@ -1093,7 +1102,7 @@ let APIControllers = {
         
         <p>If you have any questions or need further assistance regarding your payment or subscription, please don't hesitate to reach out to us.</p>
         `
-        
+
       }
       sendEmail(
         req.user[0][0].username,
@@ -1127,7 +1136,7 @@ let APIControllers = {
 
       let subscriptionDetails = await dbConnection.query(`SELECT * FROM razorpay_subscription Where subscription_id='${subId}'ORDER BY glid DESC 
           LIMIT 1`)
-      if (subscriptionDetails[0].length>0) {
+      if (subscriptionDetails[0].length > 0) {
         let userDetails = await dbConnection.query(`SELECT * FROM registration WHERE rowid='${subscriptionDetails[0][0].customer_id}'`)
 
         let planDetails = RazorpayPrice.find(([credit, id, period]) => id == subscriptionDetails[0][0].plan_id)
@@ -1158,7 +1167,7 @@ let APIControllers = {
               console.log('error fetching response  ')
               return res.status(500).json({ error: 'Error fetching payment response' });
             }
-            let last_payment=new Date().toISOString()
+            let last_payment = new Date().toISOString()
             await dbConnection.query(`UPDATE registration SET credits = '${newBalance}',last_payment_time='${last_payment}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
             let content
 
@@ -1203,15 +1212,17 @@ let APIControllers = {
 
             await dbConnection.query(query, values);
             console.log('outside thriveeeeee')
-            try {
-              console.log('inside thriveeeeeeeee')
-              let creditToConvert=planDetails[0]/12
-              let DollarRate=await InrToUsdSubscriptionConverter(creditToConvert,planDetails[2])
-              console.log(DollarRate,'rate in dollar ')
-              let response=await PurchaseApi(userDetails[0][0].emailid,DollarRate,resp.order_id || null,userDetails[0][0]?.rowid ?? null)
-              console.log(response,'resppppppp')
-            } catch (error) {
-              ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+            if (userDetails[0][0].is_referer_by == 1) {
+              try {
+                console.log('inside thriveeeeeeeee')
+                let creditToConvert = planDetails[0] / 12
+                let DollarRate = await InrToUsdSubscriptionConverter(creditToConvert, planDetails[2])
+                console.log(DollarRate, 'rate in dollar ')
+                let response = await PurchaseApi(userDetails[0][0].emailid, DollarRate, resp.order_id || null, userDetails[0][0]?.rowid ?? null)
+                console.log(response, 'resppppppp')
+              } catch (error) {
+                ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+              }
             }
             if (planDetails[2] == 'monthly') {
               content = `
@@ -1313,8 +1324,8 @@ let APIControllers = {
         let algorithm = "sha256"
         let secret = "751d130a591084bee673100be55e8c7f";
         let HMACDigest = crypto.createHmac(algorithm, secret).update(digestRaw).digest("hex")
-        console.log(HMACDigest,'hmdigest')
-        res.status(200).json({ user: req.user,HMACDigest })
+        console.log(HMACDigest, 'hmdigest')
+        res.status(200).json({ user: req.user, HMACDigest })
       } catch (error) {
         res.status(401).json({ error: "Unauthorized" });
         console.log(error)
@@ -1322,9 +1333,9 @@ let APIControllers = {
 
     }
   },
-  ThriveTest:async(req,res)=>{
-    let data=await PurchaseApi('nayeem2281998@gmail.com',1800,'abc100',30957)
-    console.log('data',data,'dataaaaaaaaaaaaaaaaaaaa')
+  ThriveTest: async (req, res) => {
+    let data = await PurchaseApi('nayeem2281998@gmail.com', 1800, 'abc100', 30957)
+    console.log('data', data, 'dataaaaaaaaaaaaaaaaaaaa')
   }
 };
 export default APIControllers;
