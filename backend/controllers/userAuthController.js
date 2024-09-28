@@ -168,7 +168,7 @@ const Authentication = {
         let referenceCode=req.body.thriveRefId!=null?req.body.thriveRefId:null
         let isReferedBy=req.body.thriveRefId!=null?1:0
         await dbConnection.query(
-          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by,referer_by)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}')`
+          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0,'${firstname}','${lastname}','${isReferedBy}')`
         );
         try {
           leadGeneration(firstname, lastname, email)
@@ -316,9 +316,10 @@ const Authentication = {
           .replace("T", " ");
 
         let apiKey = await generateUniqueApiKey(req);
-
+        let referenceCode=req.body.thriveRefId!=null?req.body.thriveRefId:null
+        let isReferedBy=req.body.thriveRefId!=null?1:0
         await dbConnection.query(
-          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname)VALUES(null,'${name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}')`
+          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by)VALUES(null,'${name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}')`
         );
         try {
           leadGeneration(firstname, lastname, email)
@@ -464,9 +465,10 @@ const Authentication = {
               .replace("T", " ");
 
             let apiKey = await generateUniqueApiKey(req);
-
+            let referenceCode=thriveRefId!=null?thriveRefId:null
+            let isReferedBy=thriveRefId!=null?1:0
             await dbConnection.query(
-              `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,is_linkedin,is_premium,firstname,lastname)VALUES(null,'${given_name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}')`
+              `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,is_linkedin,is_premium,firstname,lastname,is_referer_by)VALUES(null,'${given_name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}')`
             );
             try {
               leadGeneration(firstname, lastname, email)
@@ -678,9 +680,10 @@ const Authentication = {
           .replace("T", " ");
 
         let apiKey = await generateUniqueApiKey(req);
-
+        let referenceCode=req.body.thriveRefId!=null?req.body.thriveRefId:null
+        let isReferedBy=req.body.thriveRefId!=null?1:0
         await dbConnection.query(
-          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,is_microsoft,is_premium,firstname,lastname)VALUES(null,'${given_name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}')`
+          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,is_microsoft,is_premium,firstname,lastname,is_referer_by)VALUES(null,'${given_name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}')`
         );
         try {
           leadGeneration(firstname, lastname, email)
