@@ -945,7 +945,7 @@ let APIControllers = {
       );
       updateLeadStatus(req.user[0][0].emailid)
       try {
-        let DollarRate=await InrToUsdConverter(amountInRupees)
+        let DollarRate=await InrToUsdConverter(req.body.credits)
         let resp=await PurchaseApi(req.user[0][0].emailid,DollarRate,order_id || null,req.user[0][0]?.rowid ?? null)
         console.log(resp,'resppppppp')
       } catch (error) {
@@ -1070,7 +1070,7 @@ let APIControllers = {
       await dbConnection.query(query, values);
 
       try {
-        let DollarRate=await InrToUsdConverter(amount)
+        let DollarRate=await InrToUsdConverter(req.body.credits)
         console.log(DollarRate,'rate in dollar ')
         let response=await PurchaseApi(req.user[0][0].emailid,DollarRate,resp.order_id || null,req.user[0][0]?.rowid ?? null)
         console.log(response,'resppppppp')
@@ -1204,7 +1204,7 @@ let APIControllers = {
             console.log('outside thriveeeeee')
             try {
               console.log('inside thriveeeeeeeee')
-              let DollarRate=await InrToUsdConverter(amount)
+              let DollarRate=await InrToUsdConverter(planDetails[0])
               console.log(DollarRate,'rate in dollar ')
               let response=await PurchaseApi(userDetails[0][0].emailid,DollarRate,resp.order_id || null,userDetails[0][0]?.rowid ?? null)
               console.log(response,'resppppppp')

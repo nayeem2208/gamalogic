@@ -1,17 +1,32 @@
 import axios from "axios";
 
-export default async function InrToUsdConverter(amount) {
+export default async function InrToUsdConverter(creditOfRazorpay) {
     try {
-        const response=await axios('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/inr.json')
+        const creditCostMappings = [
+            [1000, 7],
+            [2500, 16],
+            [5000, 30],
+            [10000, 40],
+            [25000, 75],
+            [50000, 125],
+            [75000, 175],
+            [100000, 200],
+            [250000, 400],
+            [500000, 600],
+            [750000, 800],
+            [1000000, 1000],
+          ];
 
-        const exchangeRate = response.data.inr.usd;
+          const matchDollar = creditCostMappings.find(([credit, _]) => credit === creditOfRazorpay);
 
-        if (!exchangeRate) {
-            throw new Error(`Invalid target currency: ${targetCurrency}`);
-        }
-
-        const convertedAmount = amount * exchangeRate;
-        return convertedAmount;
+          if (matchDollar) {
+            const [credit, dollar] = matchDollar;
+            console.log(`Matched Credit: ${credit}, Dollar: ${dollar}`);
+            return dollar; // Return the dollar amount
+          } else {
+            console.log("No match found");
+            return null; // Return null if no match is found
+          }
     } catch (error) {
         console.error('Error converting INR to USD:', error);
 
