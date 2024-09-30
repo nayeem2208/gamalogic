@@ -46,7 +46,7 @@ async function JessicaRefreshToken() {
 
 
 
-async function leadGeneration(firstName, lastName, email) {
+async function leadGeneration(firstName, lastName, email,source) {
   let beninToken = await refreshToken()
   const beninHeaders = {
     'Authorization': `Zoho-oauthtoken ${beninToken}`,
@@ -73,7 +73,7 @@ async function leadGeneration(firstName, lastName, email) {
               "id": process.env.CRM_LAYOUT_ID
             },
             "Lead_Owner": process.env.CRM_LEAD_OWNER,
-            "Lead_Source": 'Sign in',
+            "Lead_Source": source,
             "Last_Name": lastName,
             "First_Name": firstName,
             "Email": email,
