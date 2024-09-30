@@ -32,8 +32,25 @@ app.use(cors({
   origin: 'https://app.gamalogic.com'
 }));
 
+const noCache = (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+};
+
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
-app.use(express.static(path.join(__dirname, '..', 'gamalogic', 'dist')));
+// app.use(express.static(path.join(__dirname, '..', 'gamalogic', 'dist')));
+app.use(express.static(path.join(__dirname, '..', 'gamalogic', 'dist'), {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-store'); // Disable caching for HTML files
+    } else {
+      res.setHeader('Cache-Control', 'max-age=31536000'); // Cache other assets (JS, CSS, etc.) for 1 year
+    }
+  }
+}));
+
 
 app.get('/signin-sitemap.xml', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'gamalogic', 'public', 'signin-sitemap.xml'));
