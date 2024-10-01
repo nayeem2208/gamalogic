@@ -1215,7 +1215,12 @@ let APIControllers = {
             if (userDetails[0][0].is_referer_by == 1) {
               try {
                 console.log('inside thriveeeeeeeee')
-                let creditToConvert = planDetails[0] / 12
+                let creditToConvert
+                if (planDetails[2] === 'monthly' || planDetails[2] === 'is_monthly') {
+                  creditToConvert = planDetails[0];  
+              } else {
+                  creditToConvert = planDetails[0] / 12; 
+              }
                 let DollarRate = await InrToUsdSubscriptionConverter(creditToConvert, planDetails[2])
                 console.log(DollarRate, 'rate in dollar ')
                 let response = await PurchaseApi(userDetails[0][0].emailid, DollarRate, resp.order_id || null, userDetails[0][0]?.rowid ?? null)
