@@ -134,7 +134,7 @@ const Authentication = {
           const url = `https://thrive.zoho.com/thrive/webhooks/${req.body.widgetCode}/mapreferral`;
 
           const headers = {
-            'thrive-secret-hash': 'b599a641bc6e680d90b0041b463c36ec',
+            'thrive-secret-hash': '91527c80d95b01f901a87e28cdece52d',
             'Content-Type': 'application/json',
           };
 
@@ -282,7 +282,7 @@ const Authentication = {
           const url = `https://thrive.zoho.com/thrive/webhooks/${req.body.widgetCode}/mapreferral`;
 
           const headers = {
-            'thrive-secret-hash': 'b599a641bc6e680d90b0041b463c36ec',
+            'thrive-secret-hash': '91527c80d95b01f901a87e28cdece52d',
             'Content-Type': 'application/json',
           };
 
@@ -432,7 +432,7 @@ const Authentication = {
               const url = `https://thrive.zoho.com/thrive/webhooks/${widgetCode}/mapreferral`;
     
               const headers = {
-                'thrive-secret-hash': 'b599a641bc6e680d90b0041b463c36ec',
+                'thrive-secret-hash': '91527c80d95b01f901a87e28cdece52d',
                 'Content-Type': 'application/json',
               };
     
@@ -648,7 +648,7 @@ const Authentication = {
           const url = `https://thrive.zoho.com/thrive/webhooks/${req.body.widgetCode}/mapreferral`;
 
           const headers = {
-            'thrive-secret-hash': 'b599a641bc6e680d90b0041b463c36ec',
+            'thrive-secret-hash': '91527c80d95b01f901a87e28cdece52d',
             'Content-Type': 'application/json',
           };
 
