@@ -147,6 +147,7 @@ const Authentication = {
           };
           try {
             const response = await axios.post(url, data, { headers });
+            console.log(response,'response of registration')
           } catch (error) {
             ErrorHandler("verifyEmail Controller thrive signup section", error, req);
           }
