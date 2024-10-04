@@ -37,7 +37,7 @@ const MicroSoftSignInButton = (props) => {
       if (props.page == "login") {
         try {
           const res = await axiosInstance.post("/microsoftLogin", userDetails);
-          toast.success("Welcome back! You've successfully logged in");
+          toast.success("Welcome to Gamalogic! You've successfully registered with us.");
           const token = res.data;
           setUserDetails(token);
           setCreditBal(token.credit);

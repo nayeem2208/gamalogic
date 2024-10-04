@@ -80,8 +80,8 @@ async function leadGeneration(firstName, lastName, email,source) {
           },
         ]
       }
-      await axios.post('https://www.zohoapis.com/crm/v6/Leads', postData, { headers: beninHeaders });
-
+      let res=await axios.post('https://www.zohoapis.com/crm/v6/Leads', postData, { headers: beninHeaders });
+      console.log(res.data,'response from crm lead generation')
     }
     else if (beninExistingLead) {
       const existingLeadId = beninExistingLead.id;

@@ -475,7 +475,7 @@ const Authentication = {
               `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,is_linkedin,is_premium,firstname,lastname,is_referer_by,referer_by)VALUES(null,'${given_name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}')`
             );
             try {
-              leadGeneration(firstname, lastname, email)
+              leadGeneration(firstname, lastname, email,source)
             } catch (error) {
               ErrorHandler("Linkedin registerUser Controller CRM lead Generation ", error, req);
             }

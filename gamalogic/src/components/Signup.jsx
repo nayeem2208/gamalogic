@@ -63,7 +63,7 @@ function Signup() {
               thriveRefId: refData?.refId || null,
               widgetCode: refData?.widget || null,
             });
-            toast.success("Welcome back! You've successfully logged in");
+            toast.success("Welcome to Gamalogic! You've successfully registered with us.");
             let token = res.data;
             setUserDetails(token);
             setCreditBal(token.credit);
