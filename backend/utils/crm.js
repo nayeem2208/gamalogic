@@ -46,7 +46,7 @@ async function JessicaRefreshToken() {
 
 
 
-async function leadGeneration(firstName, lastName, email,source) {
+async function leadGeneration(firstName, lastName, email,source,req) {
   let beninToken = await refreshToken()
   const beninHeaders = {
     'Authorization': `Zoho-oauthtoken ${beninToken}`,
@@ -111,6 +111,7 @@ async function leadGeneration(firstName, lastName, email,source) {
 
   } catch (error) {
     console.error('Error in leadGeneration:', error);
+    ErrorHandler("registerUser Controller CRM lead Generation ", error, req);
     throw new Error(`Lead generation failed for ${email}. Error: ${error.message}`);
   }
 }

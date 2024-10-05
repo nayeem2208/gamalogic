@@ -173,7 +173,7 @@ const Authentication = {
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by,referer_by)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}')`
         );
         try {
-          leadGeneration(firstname, lastname, email,source)
+          leadGeneration(firstname, lastname, email,source,req)
         } catch (error) {
           ErrorHandler("registerUser Controller CRM lead Generation ", error, req);
         }
