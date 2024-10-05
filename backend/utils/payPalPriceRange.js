@@ -8,11 +8,11 @@ if (process.env.APP == 'Beta') {
         [25000, "P-7G385911N36588604M25ADCQ", "monthly"],
         [50000, "P-0T292263UG2509001M25ADUY", "monthly"],
         [75000, "P-2RF042105E1959722M25AEHQ", "monthly"],
-        [100000, "P-4EE36151CK288270NM25AE4A", "monthly"],
+        [100000, "P-1J380710H8242232LM4ASSXI", "monthly"],
         [250000, "P-5PM81472KH310021MM25AFKY", "monthly"],
         [500000, "P-1TT15318H0322951PM25AF3I", "monthly"],
         [750000, "P-2700077055079150VM25AGJI", "monthly"],
-        [1000000, "P-4U4028875R361382AM3BRMRQ", "monthly"],
+        [1000000, "P-67S29215LN183245PM4ASNIY", "monthly"],
         [12000, "P-7NW45488DG075491MM25NWLY", "annually"],
         [30000, "P-1CU327045R943371FM3BRPVI", "annually"],
         [60000, "P-9Y912572NN1022200M2474NI", "annually"],
@@ -20,12 +20,13 @@ if (process.env.APP == 'Beta') {
         [300000, "P-4HH18885DY070713EM3BSXSY", "annually"],
         [600000, "P-5EG25322401701724M3BT4RI", "annually"],
         [900000, "P-59T20254AP482644UM3BT5GA", "annually"],
-        [1200000, "P-2D194344DY3417204M3BUBTI", "annually"],
+        [1200000, "P-83C1282346824020HM4ASTVY", "annually"],
         [3000000, "P-71956783FR6971015M3BUCPY", "annually"],
         [6000000, "P-7AX199510N4348730M3BUDHI", "annually"],
         [9000000, "P-5RP18690UV262063EM3BUD5Q", "annually"],
-        [12000000, "P-3XJ08785U0027370EM3BUEZY", "annually"],
+        [12000000, "P-24657049SD194790MM4ASOTI", "annually"],
     ]
+
 }
 else{
     paypalPrice = [
