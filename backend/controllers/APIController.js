@@ -1151,7 +1151,7 @@ let APIControllers = {
 
 
           if (dateMatch) {
-            let newBalance = userDetails[0][0].credits + planDetails[0]
+            let newBalance = userDetails[0][0].credits + (planDetails[2] == 'monthly' ? planDetails[0] : planDetails[0] / 12);
 
             let paymentId = payload?.payment?.entity?.id
             console.log(paymentId, 'payement id')
