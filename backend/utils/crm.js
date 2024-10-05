@@ -46,11 +46,11 @@ async function JessicaRefreshToken() {
 
 
 
-async function leadGeneration(firstName, lastName, email,source,req) {
+async function leadGeneration(firstName, lastName, email, source, req) {
   let beninToken = await refreshToken()
   const beninHeaders = {
     'Authorization': `Zoho-oauthtoken ${beninToken}`,
-    'Content-Type': 'application/json'  
+    'Content-Type': 'application/json'
   };
 
   let jessicaToken = await JessicaRefreshToken()
@@ -65,8 +65,10 @@ async function leadGeneration(firstName, lastName, email,source,req) {
     // console.log(beninResponseByEmail,'beninResponse by emaillllllllllllll')
     const jessicaResponse = await axios.get(`https://www.zohoapis.com/crm/v6/Leads/search?email=${email}`, { headers: jessicaHeaders });
 
-    console.log(beninResponse.data.data,'benin response by email dataaaaaaaaaaa')
-    console.log(jessicaResponse.data.data,'jessica responseeeeeeeeeeeee')
+    const beninExistingLead = beninResponse?.data?.data?.length ? beninResponse.data.data[0] : null;
+    const jessicaExistingLead = jessicaResponse?.data?.data?.length ? jessicaResponse.data.data[0] : null;
+    console.log(beninResponse.data.data, 'benin response by email dataaaaaaaaaaa')
+    console.log(jessicaResponse.data.data, 'jessica responseeeeeeeeeeeee')
     // const jessicaResponse = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers: jessicaHeaders })
     // console.log(beninResponse,'beinin responseeeeeeeeeeeeeeeee')
     // console.log(jessicaResponse,'jessica responseeeeeeeeeeeeeeeeee')
@@ -89,8 +91,8 @@ async function leadGeneration(firstName, lastName, email,source,req) {
           },
         ]
       }
-      let res=await axios.post('https://www.zohoapis.com/crm/v6/Leads', postData, { headers: beninHeaders });
-      console.log(res.data,'response from crm lead generation')
+      let res = await axios.post('https://www.zohoapis.com/crm/v6/Leads', postData, { headers: beninHeaders });
+      console.log(res.data, 'response from crm lead generation')
     }
     else if (beninExistingLead) {
       const existingLeadId = beninExistingLead.id;
