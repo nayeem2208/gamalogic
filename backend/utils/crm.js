@@ -61,7 +61,7 @@ async function leadGeneration(firstName, lastName, email,source,req) {
 
   try {
     const beninResponse = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers: beninHeaders })
-    const beninResponseByEmail = await axios.get(`https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email&Email=${email}`, { headers: beninHeaders });
+    const beninResponseByEmail = await axios.get(`https://www.zohoapis.com/crm/v6/Leads?search?email=${email}`, { headers: beninHeaders });
     console.log(beninResponseByEmail,'beninResponse by emaillllllllllllll')
     const jessicaResponse = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers: jessicaHeaders })
     console.log(beninResponse,'beinin responseeeeeeeeeeeeeeeee')
