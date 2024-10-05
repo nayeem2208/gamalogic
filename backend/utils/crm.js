@@ -60,22 +60,12 @@ async function leadGeneration(firstName, lastName, email, source, req) {
   };
 
   try {
-    // const beninResponse = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers: beninHeaders })
     const beninResponse = await axios.get(`https://www.zohoapis.com/crm/v6/Leads/search?email=${email}`, { headers: beninHeaders });
-    // console.log(beninResponseByEmail,'beninResponse by emaillllllllllllll')
     const jessicaResponse = await axios.get(`https://www.zohoapis.com/crm/v6/Leads/search?email=${email}`, { headers: jessicaHeaders });
 
     const beninExistingLead = beninResponse?.data?.data?.length ? beninResponse.data.data[0] : null;
     const jessicaExistingLead = jessicaResponse?.data?.data?.length ? jessicaResponse.data.data[0] : null;
-    console.log(beninResponse.data.data, 'benin response by email dataaaaaaaaaaa')
-    console.log(jessicaResponse.data.data, 'jessica responseeeeeeeeeeeee')
-    // const jessicaResponse = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers: jessicaHeaders })
-    // console.log(beninResponse,'beinin responseeeeeeeeeeeeeeeee')
-    // console.log(jessicaResponse,'jessica responseeeeeeeeeeeeeeeeee')
-    // const beninExistingLead = beninResponseByEmail.data.data.find((lead) => lead.Email === email);
-    // console.log(beninExistingLead,'benin leeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeead')
-    // const jessicaExistingLead = jessicaResponse.data.data.find((lead) => lead.Email === email);
-    // console.log(jessicaExistingLead,'jessica leeeeeeeeeeeeeeeeeeeeeeeeeeeead')
+
     if (!beninExistingLead && !jessicaExistingLead) {
       let postData = {
         "data": [
@@ -96,11 +86,12 @@ async function leadGeneration(firstName, lastName, email, source, req) {
     }
     else if (beninExistingLead) {
       const existingLeadId = beninExistingLead.id;
+      let status=source=='Affiliate Referrer'?'Affiliate Referrer':"Sign in after CRM Marketing"
       let postData = {
         "data": [
           {
             "id": existingLeadId,
-            "Lead_Status": "Sign in after CRM Marketing",
+            "Lead_Status": status,
           }
         ]
       }
@@ -108,12 +99,13 @@ async function leadGeneration(firstName, lastName, email, source, req) {
     }
     else if (jessicaExistingLead) {
       const existingLeadId = jessicaExistingLead.id;
+      let status=source=='Affiliate Referrer'?'Affiliate Referrer':"Sign in after CRM Marketing"
       let postData = {
         "data": [
           {
             "id": existingLeadId,
             "Owner": process.env.CRM_LEAD_OWNER_ID,
-            "Lead_Status": "Sign in after CRM Marketing",
+            "Lead_Status": status,
           }
         ]
       }
