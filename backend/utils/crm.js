@@ -60,17 +60,20 @@ async function leadGeneration(firstName, lastName, email,source,req) {
   };
 
   try {
-    const beninResponse = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers: beninHeaders })
-    const beninResponseByEmail = await axios.get(`https://www.zohoapis.com/crm/v6/Leads/search?email=${email}`, { headers: beninHeaders });
-    console.log(beninResponseByEmail,'beninResponse by emaillllllllllllll')
-    console.log(beninResponseByEmail.data.data,'benin response by email dataaaaaaaaaaa')
-    const jessicaResponse = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers: jessicaHeaders })
-    console.log(beninResponse,'beinin responseeeeeeeeeeeeeeeee')
-    console.log(jessicaResponse,'jessica responseeeeeeeeeeeeeeeeee')
-    const beninExistingLead = beninResponseByEmail.data.data.find((lead) => lead.Email === email);
-    console.log(beninExistingLead,'benin leeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeead')
-    const jessicaExistingLead = jessicaResponse.data.data.find((lead) => lead.Email === email);
-    console.log(jessicaExistingLead,'jessica leeeeeeeeeeeeeeeeeeeeeeeeeeeead')
+    // const beninResponse = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers: beninHeaders })
+    const beninResponse = await axios.get(`https://www.zohoapis.com/crm/v6/Leads/search?email=${email}`, { headers: beninHeaders });
+    // console.log(beninResponseByEmail,'beninResponse by emaillllllllllllll')
+    const jessicaResponse = await axios.get(`https://www.zohoapis.com/crm/v6/Leads/search?email=${email}`, { headers: jessicaHeaders });
+
+    console.log(beninResponse.data.data,'benin response by email dataaaaaaaaaaa')
+    console.log(jessicaResponse.data.data,'jessica responseeeeeeeeeeeee')
+    // const jessicaResponse = await axios.get('https://www.zohoapis.com/crm/v6/Leads?fields=Last_Name,Email', { headers: jessicaHeaders })
+    // console.log(beninResponse,'beinin responseeeeeeeeeeeeeeeee')
+    // console.log(jessicaResponse,'jessica responseeeeeeeeeeeeeeeeee')
+    // const beninExistingLead = beninResponseByEmail.data.data.find((lead) => lead.Email === email);
+    // console.log(beninExistingLead,'benin leeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeead')
+    // const jessicaExistingLead = jessicaResponse.data.data.find((lead) => lead.Email === email);
+    // console.log(jessicaExistingLead,'jessica leeeeeeeeeeeeeeeeeeeeeeeeeeeead')
     if (!beninExistingLead && !jessicaExistingLead) {
       let postData = {
         "data": [
