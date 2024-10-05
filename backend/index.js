@@ -74,6 +74,12 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'gamalogic', 'dist', 'index.html'));
 });
 
+app.use((err, req, res, next) => {
+  console.error(err.stack); // Log the error details
+  res.status(500).json({ message: 'Something went wrong on the server.', error: err.message });
+});
+
+
 
 mySqlPool
   .query("SELECT 1")

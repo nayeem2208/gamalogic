@@ -110,8 +110,8 @@ async function leadGeneration(firstName, lastName, email,source) {
     }
 
   } catch (error) {
-    console.error('Error:', error);
-    // ErrorHandler(" CRM lead Generation function error", error, error);
+    console.error('Error in leadGeneration:', error);
+    throw new Error(`Lead generation failed for ${email}. Error: ${error.message}`);
   }
 }
 
