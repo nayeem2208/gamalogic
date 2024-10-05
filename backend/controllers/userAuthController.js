@@ -19,6 +19,8 @@ const Authentication = {
   sample: async (req, res) => {
     ///its for checking purpose
     try {
+      let source='Sign in'
+      leadGeneration('BCOS', 'Healthcare', 'info@bcoshealthcare.com',source,req)
       // let dbConnection = req.dbConnection
       // let token = '123'
       // // let token = 'AQVkAFg4Qcyjcv5mhrmakhf86FMFsFbtdfDY2ZoLhMH1n5QU1ByJV0baVPGDKCq2Qw3bMo3AclLXpSH8SzzY1Pp_dnpq9MalTojwYi96rseFR-U5MVBFoVaWmOcKv8VtbqXqIigNsTRnjLqz5zazqKHEnNVCu9YGkyLYjkd7u66ZDt8orDSwmb8J_OJqU5lNWIXSYHu-5a3zkxNjapnEWCwM7jujWn8ZXUNZ5FOwyi77fSG4NYalhHUbOGaFA2uppleCoan5pcHQaHaU3sczGSc5ocBqS5IUHESD2aIog3gTxSUQbgQqRRjUBWr-N-dNllrQYkin_i2YozvH_Em2RVsudDeRDQ';
