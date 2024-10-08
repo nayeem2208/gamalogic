@@ -1311,37 +1311,13 @@ let APIControllers = {
       }
     }
   },
-  affilateUserId: async (req, res) => {
-    const dbConnection = req.dbConnection;
-    const token = req.headers.authorization;
-    if (token) {
-      try {
-
-        const tokenWithoutBearer = token.replace("Bearer ", "");
-        let parsedTokenWithoutBearer = JSON.parse(tokenWithoutBearer)
-        const decoded = jwt.verify(parsedTokenWithoutBearer.token, process.env.JWT_SECRET);
-        req.user = decoded
-
-        let userEmail = await dbConnection.query(`SELECT emailid FROM registration WHERE rowid='${req.user.userId}'`)
-        console.log(userEmail, 'useremail')
-        let email_id = userEmail[0][0].emailid
-        let customer_id = req.user.userId
-        let digestRaw = email_id + customer_id
-        let algorithm = "sha256"
-        let secret = "751d130a591084bee673100be55e8c7f";
-        let HMACDigest = crypto.createHmac(algorithm, secret).update(digestRaw).digest("hex")
-        console.log(HMACDigest, 'hmdigest')
-        res.status(200).json({ user: req.user, HMACDigest })
-      } catch (error) {
-        res.status(401).json({ error: "Unauthorized" });
-        console.log(error)
-      }
-
+  loyalityWebhook:async(req,res)=>{
+    try {
+      console.log(req.body)
+      res.status(200)
+    } catch (error) {
+      res.status(500)
     }
-  },
-  ThriveTest: async (req, res) => {
-    let data = await PurchaseApi('nayeem2281998@gmail.com', 1800, 'abc100', 30957)
-    console.log('data', data, 'dataaaaaaaaaaaaaaaaaaaa')
   }
 };
 export default APIControllers;

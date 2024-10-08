@@ -13,24 +13,7 @@ function Affiliate() {
       document.title = "Affiliate | Dashboard";
     }
   }, []);
-  // console.log(userDetails,'userDetails')
-  // const handleAffiliateClick = async() => {
 
-  //   let user=await axiosInstance.get('/affiliateUserId')
-  //   console.log(user.data.user,'user is here')
-  //   // Set the data to be sent to Zoho Thrive
-  //   window.ztUserData = {
-  //     za_email_id: userDetails.email, 
-  //     user_unique_id: user.data.user.userId, 
-  //     thrive_digest: user.data.HMACDigest, // Server generated HMAC
-  //     signUpPage: 'https://beta.gamalogic.com/signup', // Sign-up URL
-  //     signInPage: 'https://beta.gamalogic.com/signin', // Login URL
-  //   };
-
-  //   // Optionally delay the widget load (0-40 seconds)
-  //   window.ztWidgetDelay = 3 || 0;
-
-  // };
   return (
     <div className="affiliate-container px-6 md:px-20 py-8 accountSettings text-center sm:text-start">
       <SubHeader SubHeader={"Affiliate"} />
