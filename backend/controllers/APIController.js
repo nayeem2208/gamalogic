@@ -731,7 +731,7 @@ let APIControllers = {
               await dbConnection.query(query, values);
 
               let user = await dbConnection.query(`SELECT username,emailid,credits,is_referer_by FROM registration WHERE rowid = '${planInDataBase[0][0].userid}'`);
-              let creditsToAdd=paymentDetails[2] === 'monthly' ? paymentDetails[0] : paymentDetails[0]/2
+              let creditsToAdd=paymentDetails[2] =='monthly' ? paymentDetails[0] : (paymentDetails[0]/12)
               let newBalance = user[0][0].credits + creditsToAdd;
               let lastPayment_registration = details.billing_info.last_payment.time ?? new Date().toISOString()
               await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
