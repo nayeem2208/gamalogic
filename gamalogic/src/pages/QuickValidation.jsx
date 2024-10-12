@@ -67,14 +67,16 @@ function QuickValidation() {
     setTutorialVideo(false);
   };
   const selectVideoId = () => {
-    let ids = ["9CnyAJZiQ38", "_ualvh37g9Y"];
+    let ids = ["9CnyAJZiQ38", "_ualvh37g9Y", null];
     let urls = [
       "https://blog.gamalogic.com/email-validation-google-sheets-add-on/",
       "https://blog.gamalogic.com/find-email-address-using-name-and-company-on-google-sheets-add-on/",
+      null
     ];
     let texts = [
       "Learn how to integrate the Gamalogic email validation add-on with Google Sheets",
       "Learn more to integrate Gamalogic to find email address list on Google sheets",
+      null
     ];
     const index = Math.floor(Math.random() * ids.length);
     return { id: ids[index], url: urls[index], texts: texts[index] };

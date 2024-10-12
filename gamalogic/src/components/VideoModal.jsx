@@ -2,14 +2,49 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactModal from "react-modal";
 import YouTube from "react-youtube";
 import { IoClose } from "react-icons/io5";
+// import { IoMdCheckmarkCircle } from "react-icons/io";
+import { FaSackDollar } from "react-icons/fa6";
+import { MdOutlinePhonelinkSetup } from "react-icons/md";
+import { BiMoneyWithdraw } from "react-icons/bi";
 
-const VideoModal = ({ videoId,url,texts, isOpen, onClose }) => {
+const VideoModal = ({ videoId, url, texts, isOpen, onClose }) => {
   const [modalIsOpen, setModalIsOpen] = useState(isOpen);
+  const [modalHeight, setModalHeight] = useState("35vh");
   const playerRef = useRef(null);
-  console.log(videoId, "video idddddddddddddddddddd");
+
   useEffect(() => {
     setModalIsOpen(isOpen);
   }, [isOpen]); // Update modal state based on isOpen prop
+
+
+  // let modalHeight = videoId == null ? "35vh" : "63vh";
+  const backgroundOpacity = videoId ? 0 : 0.05;
+  useEffect(() => {
+    const updateModalHeight = () => {
+      const screenWidth = window.innerWidth;
+      const screenHeight=window.innerHeight
+      if (screenWidth < 640) {
+        setModalHeight(videoId == null ? "69vh" : "65vh");
+      } 
+      else if(screenHeight<900&&screenWidth>640){
+        setModalHeight(videoId == null ? "45vh" : "65vh");
+      }
+      else {
+        setModalHeight(videoId == null ? "40vh" : "58vh");
+      }
+    };
+
+    // Update modal height on initial load
+    updateModalHeight();
+
+    // Listen for window resize events
+    window.addEventListener("resize", updateModalHeight);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", updateModalHeight);
+    };
+  }, [videoId]);
 
   const customStyles = {
     content: {
@@ -21,13 +56,13 @@ const VideoModal = ({ videoId,url,texts, isOpen, onClose }) => {
       transform: "translate(-50%, -50%)",
       backgroundColor: "#e2e8f0",
       border: "none",
-      borderRadius:15,
+      borderRadius: 15,
       padding: 6,
       //   width: "60%",
-      height: "63vh",
+      height: modalHeight,
       width: "90%", // Set a base width for responsiveness
       maxWidth: "650px",
-      maxHeight: "calc(100vh - 100px)",
+      maxHeight: "calc(150vh - 100px)",
     },
     overlay: {
       backgroundColor: "rgba(0, 0, 0, 0.6)",
@@ -40,33 +75,78 @@ const VideoModal = ({ videoId,url,texts, isOpen, onClose }) => {
       onRequestClose={onClose}
       style={customStyles}
     >
-      <div className="video-modal-content ">
+      <div className="video-modal-content relative">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url("/IMG_2720.svg")',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: backgroundOpacity,
+            zIndex: -1,
+          }}
+        ></div>
         <div className="w-full  flex justify-end md:pr-4">
           <button onClick={onClose} className="text-right my-2 font-semibold ">
             <IoClose className="h-6 w-6 hover:text-red-500" />
           </button>
         </div>
-        
-        <div className="youtube-container mx-3">
-          <YouTube
-            videoId={videoId}
-            opts={{
-              width: "100%",
-              height: "340vw",
-              playerVars: { autoplay: 1, controls: 0 },
-            }}
-          />
-        </div>
-        <div className="text-center">
-          <p className="text-xs md:text-sm my-2 ">
-            {texts}
-          </p>
-          <a href={url} target="_blank" rel="noopener noreferrer">
-            <button className="bg-bgblue hover:bg-teal-600 text-white py-1 px-4 rounded-md ml-2 w-3/6 h-9 text-sm font-medium transition-colors duration-300">
-              Learn more
-            </button>
-          </a>
-        </div>
+
+        {videoId ? (
+          <>
+            <div className="youtube-container mx-3">
+              <YouTube
+                videoId={videoId}
+                opts={{
+                  width: "100%",
+                  height: "340vw",
+                  playerVars: { autoplay: 1, controls: 0 },
+                }}
+              />
+            </div>
+            <div className="text-center">
+              <p className="text-xs md:text-sm my-2 ">{texts}</p>
+              <a href={url} target="_blank" rel="noopener noreferrer">
+                <button className="bg-bgblue hover:bg-teal-600 text-white py-1 px-4 rounded-md ml-2 w-3/6 h-9 text-sm font-medium transition-colors duration-300">
+                  Learn more
+                </button>
+              </a>
+            </div>
+          </>
+        ) : (
+          <div className=" flex flex-col justify-center items-center px-4 lg:px-10 ">
+            <h2 className="text-xl font-semibold mb-5">
+              Get Instant Commissions with Our Affiliate Program!
+            </h2>
+            <p className="px-2">
+              Want to make money promoting top-tier products? Get started now
+              and earn, just like our top affiliates.
+            </p>
+            <ul className="my-6 md:flex justify-between items-start">
+              <li className=" my-3 md:my-0 mx-0 md:mx-4 w-3/12  font-semibold flex flex-col justify-center items-center text-center">
+                <BiMoneyWithdraw className="h-6 w-6 md:h-10 md:w-10 md:min-w-8  min-w-6 text-green-600 mb-3" />
+                Instant payouts
+              </li>
+              <li className=" my-3 md:my-0 mx-0 md:mx-4 w-3/12  font-semibold flex flex-col justify-center items-center text-center">
+                <FaSackDollar className="h-6 w-6 md:h-10 md:w-10 md:min-w-8  min-w-6 text-green-600 mb-3" />
+                High commission rates
+              </li>
+              <li className=" my-3 md:my-0 mx-0 md:mx-4 w-3/12  font-semibold flex flex-col justify-center items-center text-center">
+                <MdOutlinePhonelinkSetup className="h-6 w-6 md:h-10 md:w-10 md:min-w-8  min-w-6 text-green-600 mb-3" />
+                Easy setup in minutes
+              </li>
+            </ul>
+            <a
+              href="https://app.gamalogic.com/dashboard/affiliate"
+              rel="noopener noreferrer"
+              className="w-full flex justify-center"
+            >
+              <button className="bg-bgblue hover:bg-teal-600 text-white py-1 px-4 rounded-md ml-2 w-3/6 h-9 text-sm font-medium transition-colors duration-300">
+                Learn more
+              </button>
+            </a>
+          </div>
+        )}
       </div>
     </ReactModal>
   );
