@@ -15,6 +15,7 @@ import urls from "../ConstFiles/urls.js";
 import leadGeneration from "../utils/crm.js";
 import AddContacts from "../utils/campaigns.js";
 
+
 const Authentication = {
   sample: async (req, res) => {
     ///its for checking purpose
@@ -559,33 +560,54 @@ const Authentication = {
       //       }
       //     }
       //   };
+      // const getLinkedInAccessToken = async () => {
+      //   const url = 'https://www.linkedin.com/oauth/v2/accessToken';
+      
+      //   // URL-encoded request body parameters
+      //   const data = {
+      //     grant_type: 'client_credentials',
+      //     client_id: process.env.LINKEDIN_CLIENTID, // replace with your LinkedIn app's client ID
+      //     client_secret:  process.env.LINKEDIN_CLIENT_SECRET // replace with your LinkedIn app's client secret
+      //   };
+      
+      //   try {
+      //     // Sending the POST request
+      //     const response = await axios.post(url, qs.stringify(data), {
+      //       headers: {
+      //         'Content-Type': 'application/x-www-form-urlencoded',
+      //       }
+      //     });
+      
+      //     // Handling the response
+      //     console.log('Access Token:', response.data.access_token);
+      //     console.log('Expires In (seconds):', response.data.expires_in);
+      //     return response.data;
+      
+      //   } catch (error) {
+      //     console.error('Error fetching access token:', error.response ? error.response.data : error.message);
+      //   }
+      // }
       const getLinkedInAccessToken = async () => {
         const url = 'https://www.linkedin.com/oauth/v2/accessToken';
       
-        // URL-encoded request body parameters
-        const data = {
-          grant_type: 'client_credentials',
-          client_id: process.env.LINKEDIN_CLIENTID, // replace with your LinkedIn app's client ID
-          client_secret:  process.env.LINKEDIN_CLIENT_SECRET // replace with your LinkedIn app's client secret
-        };
+        const params = new URLSearchParams();
+        params.append('grant_type', 'client_credentials');
+        params.append('client_id', process.env.LINKEDIN_CLIENTID); // replace with your client ID
+        params.append('client_secret', process.env.LINKEDIN_CLIENT_SECRET); // replace with your client secret
       
         try {
-          // Sending the POST request
-          const response = await axios.post(url, qs.stringify(data), {
+          const response = await axios.post(url, params, {
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
             }
           });
       
-          // Handling the response
           console.log('Access Token:', response.data.access_token);
-          console.log('Expires In (seconds):', response.data.expires_in);
-          return response.data;
-      
+          console.log('Expires In:', response.data.expires_in);
         } catch (error) {
           console.error('Error fetching access token:', error.response ? error.response.data : error.message);
         }
-      }
+      };
       const accessTokenData = await getLinkedInAccessToken();
 
         // const accessTokenData = await getAccessToken(accessTokenUrl);
