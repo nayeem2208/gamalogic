@@ -783,7 +783,7 @@ let APIControllers = {
           //handling the subscription cancellation part
           let stopTime = new Date().toISOString()
           await dbConnection.query(
-            `UPDATE registration SET is_monthly = 0, is_annual = 0,is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
+            `UPDATE registration SET is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
             [stopTime, planInDataBase[0][0].userid]
           );
           // console.log(resource,'resource in cancelation part')
@@ -1037,7 +1037,7 @@ let APIControllers = {
       }
 
       const periodColumn = req.body.paymentDetails.period === 'monthly' ? 'is_monthly' : 'is_annual';
-      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1 ,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
+      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1,is_pay_as_you_go=0, ,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
       last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',is_active=1,is_pay_as_you_go=0,subscription_stop_time=NULL
  WHERE emailid='${req.user[0][0].emailid}'`)
 
@@ -1289,7 +1289,7 @@ let APIControllers = {
           let stopTime = new Date().toISOString()
 
           await dbConnection.query(
-            `UPDATE registration SET is_monthly = 0, is_annual = 0,is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
+            `UPDATE registration SET is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
             [stopTime, userDetails[0][0].rowid]
           );
           console.log('subscription cancelled succesfully.............')
