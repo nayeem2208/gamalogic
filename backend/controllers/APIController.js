@@ -1037,7 +1037,7 @@ let APIControllers = {
       }
 
       const periodColumn = req.body.paymentDetails.period === 'monthly' ? 'is_monthly' : 'is_annual';
-      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1,is_pay_as_you_go=0, ,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
+      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1,is_pay_as_you_go=0,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
       last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',is_active=1,is_pay_as_you_go=0,subscription_stop_time=NULL
  WHERE emailid='${req.user[0][0].emailid}'`)
 
