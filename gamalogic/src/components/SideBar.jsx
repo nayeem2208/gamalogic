@@ -5,7 +5,7 @@ import {
   IoSearchOutline,
   IoSettingsOutline,
 } from "react-icons/io5";
-import { LuKey, LuFileUp } from "react-icons/lu";
+import { LuKey, LuFileUp, LuHistory } from "react-icons/lu";
 import { CgFileDocument } from "react-icons/cg";
 import { PiCurrencyDollarSimpleBold } from "react-icons/pi";
 import { SlSupport } from "react-icons/sl";
@@ -140,6 +140,12 @@ function SideBar() {
           <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
           Buy Credits
         </li></Link>
+        <Link to="/dashboard/billing">
+              <li className="my-4 flex">
+                <LuHistory className="text-teal-800 mt-2 mx-2 text-lg" />
+                Billing
+              </li>
+            </Link>
         <Link to="/dashboard/affiliate">
               <li className="my-4 flex">
                 <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />

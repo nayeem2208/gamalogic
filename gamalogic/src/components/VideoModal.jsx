@@ -6,41 +6,71 @@ import { IoClose } from "react-icons/io5";
 import { FaSackDollar } from "react-icons/fa6";
 import { MdOutlinePhonelinkSetup } from "react-icons/md";
 import { BiMoneyWithdraw } from "react-icons/bi";
+import { APP } from "../axios/axiosInstance";
 
 const VideoModal = ({ videoId, url, texts, isOpen, onClose }) => {
   const [modalIsOpen, setModalIsOpen] = useState(isOpen);
   const [modalHeight, setModalHeight] = useState("35vh");
+  const [scWidth, setScWidth] = useState(null);
   const playerRef = useRef(null);
 
   useEffect(() => {
     setModalIsOpen(isOpen);
   }, [isOpen]); // Update modal state based on isOpen prop
 
-
   // let modalHeight = videoId == null ? "35vh" : "63vh";
   const backgroundOpacity = videoId ? 0 : 0.05;
   useEffect(() => {
     const updateModalHeight = () => {
       const screenWidth = window.innerWidth;
-      const screenHeight=window.innerHeight
+      setScWidth(screenWidth);
+      const screenHeight = window.innerHeight;
+
       if (screenWidth < 640) {
-        setModalHeight(videoId == null ? "69vh" : "65vh");
-      } 
-      else if(screenHeight<900&&screenWidth>640){
-        setModalHeight(videoId == null ? "45vh" : "65vh");
-      }
-      else {
-        setModalHeight(videoId == null ? "40vh" : "58vh");
+        if (videoId === null) {
+          setModalHeight("69vh");
+        } else if (videoId === "imageModal") {
+          setModalHeight("58vh");
+        } else {
+          setModalHeight("75vh");
+        }
+      }else if(screenHeight<750&&screenWidth>1200){
+        if (videoId === null) {
+          setModalHeight("50vh");
+        } else if (videoId === "imageModal") {
+          setModalHeight("65vh");
+        } else {
+          setModalHeight("65vh");
+        }
+      } else if (
+        screenWidth < 640 &&
+        screenWidth > 450 &&
+        videoId == "imageModal"
+      ) {
+        setModalHeight("68vh");
+      } else if (screenHeight < 900 && screenWidth > 640) {
+        if (videoId === null) {
+          setModalHeight("47vh");
+        } else if (videoId === "imageModal") {
+          setModalHeight("58vh");
+        } else {
+          setModalHeight("65vh");
+        }
+      } else {
+        if (videoId === null) {
+          setModalHeight("40vh");
+        } else if (videoId === "imageModal") {
+          setModalHeight("58vh");
+        } else {
+          setModalHeight("58vh");
+        }
       }
     };
 
-    // Update modal height on initial load
     updateModalHeight();
 
-    // Listen for window resize events
     window.addEventListener("resize", updateModalHeight);
 
-    // Cleanup the event listener on component unmount
     return () => {
       window.removeEventListener("resize", updateModalHeight);
     };
@@ -68,14 +98,17 @@ const VideoModal = ({ videoId, url, texts, isOpen, onClose }) => {
       backgroundColor: "rgba(0, 0, 0, 0.6)",
     },
   };
-
+  const affiliateUrl =
+  APP === "beta"
+    ? "https://beta.gamalogic.com/dashboard/affiliate"
+    : "https://app.gamalogic.com/dashboard/affiliate";
   return (
     <ReactModal
       isOpen={modalIsOpen}
       onRequestClose={onClose}
       style={customStyles}
     >
-      <div className="video-modal-content relative">
+      <div className="video-modal-content relative ">
         <div
           className="absolute inset-0"
           style={{
@@ -91,8 +124,61 @@ const VideoModal = ({ videoId, url, texts, isOpen, onClose }) => {
             <IoClose className="h-6 w-6 hover:text-red-500" />
           </button>
         </div>
-
-        {videoId ? (
+        {videoId === "imageModal" ? (
+          // Show image when videoId is "imageModal"
+          <div className="flex flex-col justify-center items-center h-full w-full ">
+            <img
+              src={
+                scWidth < 640 ? "/imageModalMobile.jpg" : "/imageModalPc.jpg"
+              }
+              // src="/imageModalMobile.jpg"
+              alt="Informational aaa"
+              className="rounded-md max-w-full max-h-full object-cover"
+            />
+             <a
+              href={affiliateUrl}
+              rel="noopener noreferrer"
+              className="w-full flex justify-center my-3"
+            >
+              <button className="bg-bgblue hover:bg-teal-600 text-white py-1 px-4 rounded-md ml-2 w-3/6 h-9 text-sm font-medium transition-colors duration-300">
+                Learn more
+              </button>
+            </a>
+          </div>
+        ) : videoId === null ? (
+          <div className=" flex flex-col justify-center items-center px-4 lg:px-10 ">
+            <h2 className="text-xl font-semibold mb-5">
+              Get Instant Commissions with Our Affiliate Program!
+            </h2>
+            <p className="px-2">
+              Want to make money promoting top-tier products? Get started now
+              and earn, just like our top affiliates.
+            </p>
+            <ul className="my-6 md:flex justify-between items-start">
+              <li className=" my-3 md:my-0 mx-0 md:mx-4 md:w-3/12  font-semibold flex flex-col justify-center items-center text-center">
+                <BiMoneyWithdraw className="h-6 w-6 md:h-10 md:w-10 md:min-w-8  min-w-6 text-green-600 mb-3" />
+                Instant payouts
+              </li>
+              <li className=" my-3 md:my-0 mx-0 md:mx-4 md:w-3/12  font-semibold flex flex-col justify-center items-center text-center">
+                <FaSackDollar className="h-6 w-6 md:h-10 md:w-10 md:min-w-8  min-w-6 text-green-600 mb-3" />
+                High commission rates
+              </li>
+              <li className=" my-3 md:my-0 mx-0 md:mx-4 md:w-3/12  font-semibold flex flex-col justify-center items-center text-center">
+                <MdOutlinePhonelinkSetup className="h-6 w-6 md:h-10 md:w-10 md:min-w-8  min-w-6 text-green-600 mb-3" />
+                Easy setup in minutes
+              </li>
+            </ul>
+            <a
+              href={affiliateUrl}
+              rel="noopener noreferrer"
+              className="w-full flex justify-center"
+            >
+              <button className="bg-bgblue hover:bg-teal-600 text-white py-1 px-4 rounded-md ml-2 w-3/6 h-9 text-sm font-medium transition-colors duration-300">
+                Learn more
+              </button>
+            </a>
+          </div>
+        ) : (
           <>
             <div className="youtube-container mx-3">
               <YouTube
@@ -113,39 +199,6 @@ const VideoModal = ({ videoId, url, texts, isOpen, onClose }) => {
               </a>
             </div>
           </>
-        ) : (
-          <div className=" flex flex-col justify-center items-center px-4 lg:px-10 ">
-            <h2 className="text-xl font-semibold mb-5">
-              Get Instant Commissions with Our Affiliate Program!
-            </h2>
-            <p className="px-2">
-              Want to make money promoting top-tier products? Get started now
-              and earn, just like our top affiliates.
-            </p>
-            <ul className="my-6 md:flex justify-between items-start">
-              <li className=" my-3 md:my-0 mx-0 md:mx-4 w-3/12  font-semibold flex flex-col justify-center items-center text-center">
-                <BiMoneyWithdraw className="h-6 w-6 md:h-10 md:w-10 md:min-w-8  min-w-6 text-green-600 mb-3" />
-                Instant payouts
-              </li>
-              <li className=" my-3 md:my-0 mx-0 md:mx-4 w-3/12  font-semibold flex flex-col justify-center items-center text-center">
-                <FaSackDollar className="h-6 w-6 md:h-10 md:w-10 md:min-w-8  min-w-6 text-green-600 mb-3" />
-                High commission rates
-              </li>
-              <li className=" my-3 md:my-0 mx-0 md:mx-4 w-3/12  font-semibold flex flex-col justify-center items-center text-center">
-                <MdOutlinePhonelinkSetup className="h-6 w-6 md:h-10 md:w-10 md:min-w-8  min-w-6 text-green-600 mb-3" />
-                Easy setup in minutes
-              </li>
-            </ul>
-            <a
-              href="https://app.gamalogic.com/dashboard/affiliate"
-              rel="noopener noreferrer"
-              className="w-full flex justify-center"
-            >
-              <button className="bg-bgblue hover:bg-teal-600 text-white py-1 px-4 rounded-md ml-2 w-3/6 h-9 text-sm font-medium transition-colors duration-300">
-                Learn more
-              </button>
-            </a>
-          </div>
         )}
       </div>
     </ReactModal>

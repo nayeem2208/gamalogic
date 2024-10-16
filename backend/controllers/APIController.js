@@ -1318,6 +1318,20 @@ let APIControllers = {
     } catch (error) {
       res.status(500)
     }
+  },
+  getPlanDetails:async(req,res)=>{
+    try {
+      let userDetails={
+        isPremium:req.user[0][0].is_premium,
+        isPayAsYouGo:req.user[0][0].is_pay_as_you_go,
+        isMonthly:req.user[0][0].is_monthly,
+        isAnnual:req.user[0][0].is_annual,
+        freeTrialExpiry:req.user[0][0].free_final,
+      }
+      res.status(200).json(userDetails)
+    } catch (error) {
+      console.log(error)
+    }
   }
 };
 export default APIControllers;

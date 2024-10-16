@@ -9,7 +9,7 @@ import {
   IoSearchOutline,
   IoSettingsOutline,
 } from "react-icons/io5";
-import { LuFileUp, LuKey } from "react-icons/lu";
+import { LuFileUp, LuHistory, LuKey } from "react-icons/lu";
 import { MdArrowDropDown, MdOutlineFindInPage } from "react-icons/md";
 import { PiCurrencyDollarSimpleBold } from "react-icons/pi";
 import { RiProfileLine } from "react-icons/ri";
@@ -160,7 +160,13 @@ function Header() {
               Buy Credits
             </li>
             </Link>
-            <Link to="/dashboard/affiliate">
+            <Link to="/dashboard/billing" onClick={dropDownToggle}>
+              <li className="py-2 flex underlineLi">
+              <LuHistory className="text-teal-800 mt-2 mx-2 text-lg" />
+                Billing
+              </li>
+            </Link>
+            <Link to="/dashboard/affiliate" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
                 <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />
                 Become an Affiliate
