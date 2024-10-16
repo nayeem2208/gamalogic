@@ -545,22 +545,50 @@ const Authentication = {
     try {
       const dbConnection = req.dbConnection;
       const { code } = req.body;
-      if (!code) throw new Error('No code provided')
-      const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_LOGIN_REDIRECT_URI)}`;
-      try {
-        const getAccessToken = async (url, retries = 3, delay = 5000) => {
-          for (let i = 0; i < retries; i++) {
-            try {
-              let accessTokenResponse = await axios.get(url);
-              return accessTokenResponse.data;
-            } catch (error) {
-              if (i === retries - 1) throw error;
-              await new Promise(resolve => setTimeout(resolve, delay));
-            }
-          }
+      // if (!code) throw new Error('No code provided')
+      // const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_LOGIN_REDIRECT_URI)}`;
+      // try {
+      //   const getAccessToken = async (url, retries = 3, delay = 5000) => {
+      //     for (let i = 0; i < retries; i++) {
+      //       try {
+      //         let accessTokenResponse = await axios.get(url);
+      //         return accessTokenResponse.data;
+      //       } catch (error) {
+      //         if (i === retries - 1) throw error;
+      //         await new Promise(resolve => setTimeout(resolve, delay));
+      //       }
+      //     }
+      //   };
+      const getLinkedInAccessToken = async () => {
+        const url = 'https://www.linkedin.com/oauth/v2/accessToken';
+      
+        // URL-encoded request body parameters
+        const data = {
+          grant_type: 'client_credentials',
+          client_id: process.env.LINKEDIN_CLIENTID, // replace with your LinkedIn app's client ID
+          client_secret:  process.env.LINKEDIN_CLIENT_SECRET // replace with your LinkedIn app's client secret
         };
-    
-        const accessTokenData = await getAccessToken(accessTokenUrl);
+      
+        try {
+          // Sending the POST request
+          const response = await axios.post(url, qs.stringify(data), {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            }
+          });
+      
+          // Handling the response
+          console.log('Access Token:', response.data.access_token);
+          console.log('Expires In (seconds):', response.data.expires_in);
+          return response.data;
+      
+        } catch (error) {
+          console.error('Error fetching access token:', error.response ? error.response.data : error.message);
+        }
+      }
+      const accessTokenData = await getLinkedInAccessToken();
+
+        // const accessTokenData = await getAccessToken(accessTokenUrl);
         try {
           const axiosInstance = axios.create({
             timeout: 15000,
@@ -615,10 +643,10 @@ const Authentication = {
         }
 
 
-      } catch (error) {
-        console.log(error)
-        ErrorHandler("Linkedin Login Controller,Access Token", error, req);
-      }
+      // } catch (error) {
+      //   console.log(error)
+      //   ErrorHandler("Linkedin Login Controller,Access Token", error, req);
+      // }
     } catch (error) {
       console.log(error);
       ErrorHandler("Linkedin Login Controller", error, req);
