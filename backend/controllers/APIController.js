@@ -569,6 +569,7 @@ let APIControllers = {
       let details = payPaldetails.data;
       let newBalance = user.credits + paymentDetails.credits
       const periodColumn = paymentDetails.period === 'monthly' ? 'is_monthly' : 'is_annual';
+      // const nonPeriodColumn = paymentDetails.period === 'monthly' ? 'is_annual' : 'is_monthly'
       const registrationRuery = `
   UPDATE registration 
   SET credits = '${newBalance}', 
@@ -707,11 +708,11 @@ let APIControllers = {
                 name, address, email_address, payer_id, last_payment, next_billing_time,time_stamp
               ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
               `;
-              let creditsToAdd=paymentDetails[2] =='monthly' ? paymentDetails[0] : (paymentDetails[0]/12)
+              let creditsToAdd = paymentDetails[2] == 'monthly' ? paymentDetails[0] : (paymentDetails[0] / 12)
 
               let values = [
                 planInDataBase[0][0].userid ?? null,
-                creditsToAdd?? null,
+                creditsToAdd ?? null,
                 paymentDetails[2] === 'monthly' ? '1' : '0',
                 paymentDetails[2] === 'annually' ? '1' : '0',
                 gross_amount || null,
@@ -1042,8 +1043,8 @@ let APIControllers = {
  WHERE emailid='${req.user[0][0].emailid}'`)
 
       const query = `
-    INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id,timestamp)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
+    INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id,timestamp,${periodColumn})
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)
   `;
       let amount = resp.amount / 100
       let fee = Math.round(resp.fee / 100)
@@ -1075,7 +1076,8 @@ let APIControllers = {
         req.user[0][0].rowid,
         subscriptinDetails.status || null,
         subscriptinDetails.id || null,
-        new Date().toISOString()
+        new Date().toISOString(),
+        1
       ]
 
       await dbConnection.query(query, values);
@@ -1218,10 +1220,10 @@ let APIControllers = {
                 console.log('inside thriveeeeeeeee')
                 let creditToConvert
                 if (planDetails[2] === 'monthly' || planDetails[2] === 'is_monthly') {
-                  creditToConvert = planDetails[0];  
-              } else {
-                  creditToConvert = planDetails[0] / 12; 
-              }
+                  creditToConvert = planDetails[0];
+                } else {
+                  creditToConvert = planDetails[0] / 12;
+                }
                 let DollarRate = await InrToUsdSubscriptionConverter(creditToConvert, planDetails[2])
                 console.log(DollarRate, 'rate in dollar ')
                 let response = await PurchaseApi(userDetails[0][0].emailid, DollarRate, resp.order_id || null, userDetails[0][0]?.rowid ?? null)
@@ -1311,7 +1313,7 @@ let APIControllers = {
       }
     }
   },
-  loyalityWebhook:async(req,res)=>{
+  loyalityWebhook: async (req, res) => {
     try {
       console.log(req.body)
       res.status(200)
@@ -1319,14 +1321,14 @@ let APIControllers = {
       res.status(500)
     }
   },
-  getPlanDetails:async(req,res)=>{
+  getPlanDetails: async (req, res) => {
     try {
-      let userDetails={
-        isPremium:req.user[0][0].is_premium,
-        isPayAsYouGo:req.user[0][0].is_pay_as_you_go,
-        isMonthly:req.user[0][0].is_monthly,
-        isAnnual:req.user[0][0].is_annual,
-        freeTrialExpiry:req.user[0][0].free_final,
+      let userDetails = {
+        isPremium: req.user[0][0].is_premium,
+        isPayAsYouGo: req.user[0][0].is_pay_as_you_go,
+        isMonthly: req.user[0][0].is_monthly,
+        isAnnual: req.user[0][0].is_annual,
+        freeTrialExpiry: req.user[0][0].free_final,
       }
       res.status(200).json(userDetails)
     } catch (error) {
