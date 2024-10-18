@@ -75,6 +75,21 @@ const Authentication = {
           let finalFree = new Date(user[0][0].free_final);
           let finalFreeDate = new Date(finalFree);
           let currentDate = new Date();
+          let expired
+          if(user[0][0].is_premium==0){
+            if(finalFree<currentDate){
+              expired={
+                status:true,
+                reason:'date'
+              }
+            }
+            else if(user[0][0].credits_free<=0){
+              expired={
+                status:true,
+                reason:'credit'
+              }
+            }
+          }
           if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
             creditBal = user[0][0].credits_free + user[0][0].credits
           } else {
@@ -97,7 +112,8 @@ const Authentication = {
             token,
             confirm: user[0][0].confirmed,
             password,
-            country_name: 'USA'
+            country_name: 'USA',
+            expired
           });
 
         } else {
@@ -221,6 +237,21 @@ const Authentication = {
         let finalFree = new Date(user[0][0].free_final);
         let finalFreeDate = new Date(finalFree);
         let currentDate = new Date();
+        let expired
+        if(user[0][0].is_premium==0){
+          if(finalFree<currentDate){
+            expired={
+              status:true,
+              reason:'date'
+            }
+          }
+          else if(user[0][0].credits_free<=0){
+            expired={
+              status:true,
+              reason:'credit'
+            }
+          }
+        }
         if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
           creditBal = user[0][0].credits_free + user[0][0].credits
         } else {
@@ -243,7 +274,8 @@ const Authentication = {
           token,
           confirm: 1,
           password,
-          country_name: 'USA'
+          country_name: 'USA',
+          expired
         });
       } else {
         res.status(400).json({
@@ -598,6 +630,21 @@ const Authentication = {
             let finalFree = new Date(user[0][0].free_final);
             let finalFreeDate = new Date(finalFree);
             let currentDate = new Date();
+            let expired
+            if(user[0][0].is_premium==0){
+              if(finalFree<currentDate){
+                expired={
+                  status:true,
+                  reason:'date'
+                }
+              }
+              else if(user[0][0].credits_free<=0){
+                expired={
+                  status:true,
+                  reason:'credit'
+                }
+              }
+            }
             if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
               creditBal = user[0][0].credits_free + user[0][0].credits
             } else {
@@ -619,7 +666,8 @@ const Authentication = {
               token,
               confirm: 1,
               password,
-              country_name: 'India'
+              country_name: 'India',
+              expired
             });
           } else {
             res.status(400).json({
@@ -780,6 +828,21 @@ const Authentication = {
         let finalFree = new Date(user[0][0].free_final);
         let finalFreeDate = new Date(finalFree);
         let currentDate = new Date();
+        let expired
+        if(user[0][0].is_premium==0){
+          if(finalFree<currentDate){
+            expired={
+              status:true,
+              reason:'date'
+            }
+          }
+          else if(user[0][0].credits_free<=0){
+            expired={
+              status:true,
+              reason:'credit'
+            }
+          }
+        }
         if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
           creditBal = user[0][0].credits_free + user[0][0].credits
         } else {
@@ -802,7 +865,8 @@ const Authentication = {
           token,
           confirm: 1,
           password,
-          country_name: 'India'
+          country_name: 'India',
+          expired
         });
       } else {
         res.status(400).json({

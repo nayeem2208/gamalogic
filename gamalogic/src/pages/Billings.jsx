@@ -84,33 +84,7 @@ function Billings() {
       <SubHeader SubHeader={"Billing"} />
       {userDetails.confirm == 1 ? (
         <div className="mt-6 sm:mt-14 text-bgblue subHeading">
-          {billingDetails?.isPremium == 0 && freeTrialExpired && (
-            <div className="my-8 flex bg-red-100 border border-red-400 rounded-lg p-2 text-sm 2xl:text-base">
-              <SlInfo className="text-red-500 mx-1 mt-1" />
-              <p>
-              Your free trial has expired! To continue using our services, please purchase additional credits.
-                <Link to="/dashboard/buy-credits">
-                  <button className="text-bgblue font-semibold ml-1">
-                    Buy Credits
-                  </button>
-                </Link>
-              </p>
-            </div>
-          )}
-          {(billingDetails?.isPremium == 0 && billingDetails.freeCredits<=0) && (
-            <div className="my-8 flex bg-red-100 border border-red-400 rounded-lg p-2 text-sm 2xl:text-base">
-              <SlInfo className="text-red-500 mx-1 mt-1" />
-              <p>
-                You have used all your free credits! To continue using our
-                services, please purchase additional credits.
-                <Link to="/dashboard/buy-credits">
-                  <button className="text-bgblue font-semibold ml-1">
-                    Buy Credits
-                  </button>
-                </Link>
-              </p>
-            </div>
-          )}
+          
           {billingDetails ? (
             billingDetails.isPremium == 1 ? (
               <div className="p-6 bg-white rounded-lg shadow-md">
@@ -328,6 +302,35 @@ function Billings() {
                         {new Date(
                           billingDetails.freeTrialExpiry
                         ).toLocaleDateString()}
+                      </p>
+                      <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
+                        <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
+                          Expired
+                        </span>
+                        <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:-translate-x-full h-full"></span>
+                        <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-x-full h-full"></span>
+
+                        <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
+                        <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
+                      </button>
+                    </div>
+                    <Link to="/dashboard/buy-credits">
+                      <button class="overflow-hidden md:mt-12 w-64 p-2 h-12 bg-bgblue text-white border-none rounded-md text-sm font-medium cursor-pointer relative z-10 group">
+                        PURCHASE CREDITS
+                        <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-300 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
+                        <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-800 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"></span>
+                        <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-900 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-1000 duration-500 origin-left"></span>
+                        <span class="group-hover:opacity-100 group-hover:duration-1000 duration-100 opacity-0 absolute  left-6 z-10">
+                          BECOME PREMIUM USER
+                        </span>
+                      </button>
+                    </Link>
+                  </div>
+                ) : billingDetails.freeCredits <= 0 ? (
+                  <div>
+                    <div className="md:flex justify-between  items-center">
+                      <p className="text-red-500 font-semibold">
+                      You have used all your free credits!
                       </p>
                       <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
                         <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">

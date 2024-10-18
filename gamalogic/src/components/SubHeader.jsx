@@ -79,6 +79,37 @@ function SubHeader(props) {
           </p>
         </div>
       )}
+       {userDetails.expired?.status == true &&
+        userDetails.expired?.reason == "date" && (
+          <div className="my-8 flex bg-red-100 border border-red-400 rounded-lg p-2 text-sm 2xl:text-base">
+            <SlInfo className="text-red-500 mx-1 mt-1" />
+            <p>
+              Your free trial has expired! To continue using our services,
+              please purchase additional credits.
+              <Link to="/dashboard/buy-credits">
+                <button className="text-bgblue font-semibold ml-1">
+                  Buy Credits
+                </button>
+              </Link>
+            </p>
+          </div>
+        )}
+
+      {userDetails.expired?.status == true &&
+        userDetails.expired?.reason == "credit" && (
+          <div className="my-8 flex bg-red-100 border border-red-400 rounded-lg p-2 text-sm 2xl:text-base">
+            <SlInfo className="text-red-500 mx-1 mt-1" />
+            <p>
+              You have used all your free credits! To continue using our
+              services, please purchase additional credits.
+              <Link to="/dashboard/buy-credits">
+                <button className="text-bgblue font-semibold ml-1">
+                  Buy Credits
+                </button>
+              </Link>
+            </p>
+          </div>
+        )}
     </div>
   );
 }
