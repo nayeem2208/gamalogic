@@ -5,6 +5,7 @@ import axiosInstance, { APP } from "../axios/axiosInstance";
 import { RiVipCrownFill } from "react-icons/ri";
 import LoadingBar from "react-top-loading-bar";
 import { Link } from "react-router-dom";
+import { SlInfo } from "react-icons/sl";
 
 function Billings() {
   let { setUserDetails, userDetails } = useUserState();
@@ -13,7 +14,7 @@ function Billings() {
   let [load, setLoad] = useState(30);
   let [loading, setLoading] = useState(false);
 
-  console.log(billingDetails,'billing detailssss')
+  console.log(billingDetails, "billing detailssss");
 
   useEffect(() => {
     async function getPlan() {
@@ -83,6 +84,33 @@ function Billings() {
       <SubHeader SubHeader={"Billing"} />
       {userDetails.confirm == 1 ? (
         <div className="mt-6 sm:mt-14 text-bgblue subHeading">
+          {billingDetails?.isPremium == 0 && freeTrialExpired && (
+            <div className="my-8 flex bg-red-100 border border-red-400 rounded-lg p-2 text-sm 2xl:text-base">
+              <SlInfo className="text-red-500 mx-1 mt-1" />
+              <p>
+              Your free trial has expired! To continue using our services, please purchase additional credits.
+                <Link to="/dashboard/buy-credits">
+                  <button className="text-bgblue font-semibold ml-1">
+                    Buy Credits
+                  </button>
+                </Link>
+              </p>
+            </div>
+          )}
+          {(billingDetails?.isPremium == 0 && billingDetails.freeCredits<=0) && (
+            <div className="my-8 flex bg-red-100 border border-red-400 rounded-lg p-2 text-sm 2xl:text-base">
+              <SlInfo className="text-red-500 mx-1 mt-1" />
+              <p>
+                You have used all your free credits! To continue using our
+                services, please purchase additional credits.
+                <Link to="/dashboard/buy-credits">
+                  <button className="text-bgblue font-semibold ml-1">
+                    Buy Credits
+                  </button>
+                </Link>
+              </p>
+            </div>
+          )}
           {billingDetails ? (
             billingDetails.isPremium == 1 ? (
               <div className="p-6 bg-white rounded-lg shadow-md">
@@ -97,12 +125,13 @@ function Billings() {
                     onLoaderFinished={() => {}}
                   />
                 )}
-                {(billingDetails.isPayAsYouGo == 1 && billingDetails.isActive!=1) ? (
+                {billingDetails.isPayAsYouGo == 1 &&
+                billingDetails.isActive != 1 ? (
                   <div>
                     <div className="md:flex justify-between  items-center">
                       <p>You are in a Pay-as-you-go plan</p>
                       {billingDetails.credits > 0 ? (
-                        <button className="cursor-pointer relative group overflow-hidden border-2 px-5 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
+                        <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
                           <span className="font-bold text-white text-sm relative z-10 group-hover:text-green-500 duration-500">
                             Active
                           </span>
@@ -113,7 +142,7 @@ function Billings() {
                           <span className="absolute delay-300 top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-y-full h-full"></span>
                         </button>
                       ) : (
-                        <button className="cursor-pointer relative group overflow-hidden border-2 px-5 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
+                        <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
                           <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
                             Expired
                           </span>
@@ -145,7 +174,7 @@ function Billings() {
                       <div className="md:flex justify-between  items-center">
                         <p>You are on a Monthly Subscription</p>
                         {billingDetails.isActive == 1 ? (
-                          <button className="cursor-pointer relative group overflow-hidden border-2 px-5 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
+                          <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
                             <span className="font-bold text-white text-sm relative z-10 group-hover:text-green-500 duration-500">
                               Active
                             </span>
@@ -156,7 +185,7 @@ function Billings() {
                             <span className="absolute delay-300 top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-y-full h-full"></span>
                           </button>
                         ) : (
-                          <button className="cursor-pointer relative group overflow-hidden border-2 px-5 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
+                          <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
                             <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
                               Expired
                             </span>
@@ -168,12 +197,12 @@ function Billings() {
                           </button>
                         )}
                       </div>
-                    ) :billingDetails.planDetails?.is_annual == 1 ? (
+                    ) : billingDetails.planDetails?.is_annual == 1 ? (
                       // annuall subscription.........................
                       <div className="md:flex justify-between  items-center">
                         <p>You are on an Annual Subscription</p>
                         {billingDetails.isActive == 1 ? (
-                          <button className="cursor-pointer relative group overflow-hidden border-2 px-5 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
+                          <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
                             <span className="font-bold text-white text-sm relative z-10 group-hover:text-green-500 duration-500">
                               Active
                             </span>
@@ -184,7 +213,7 @@ function Billings() {
                             <span className="absolute delay-300 top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-y-full h-full"></span>
                           </button>
                         ) : (
-                          <button className="cursor-pointer relative group overflow-hidden border-2 px-5 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
+                          <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
                             <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
                               Expired
                             </span>
@@ -196,8 +225,8 @@ function Billings() {
                           </button>
                         )}
                       </div>
-                    ):(
-                      ''
+                    ) : (
+                      ""
                     )}
                     <div className="flex flex-col justify-center  md:p-4 w-full md:mt-12">
                       <h2 className="my-4 text-xl font-semibold text-center">
@@ -221,9 +250,7 @@ function Billings() {
                           </div>
                           <div className="flex justify-between">
                             <span className="font-medium">Credits:</span>
-                            <span>
-                              {billingDetails.planDetails?.credits}
-                            </span>
+                            <span>{billingDetails.planDetails?.credits}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="font-medium">Period:</span>
@@ -233,24 +260,25 @@ function Billings() {
                                 : `Annual`}
                             </span>
                           </div>
-                          {(billingDetails.planDetails?.next_billing_time&&billingDetails.isActive==1) && (
-                            <div className="flex justify-between">
-                              <span className="font-medium">
-                                Next Billing Time:
-                              </span>
-                              <span>
-                                {billingDetails.planDetails?.next_billing_time
-                                  ? new Date(
-                                      billingDetails.planDetails?.next_billing_time
-                                    ).toLocaleDateString()
-                                  : "N/A"}
-                              </span>
-                            </div>
-                          )}
+                          {billingDetails.planDetails?.next_billing_time &&
+                            billingDetails.isActive == 1 && (
+                              <div className="flex justify-between">
+                                <span className="font-medium">
+                                  Next Billing Time:
+                                </span>
+                                <span>
+                                  {billingDetails.planDetails?.next_billing_time
+                                    ? new Date(
+                                        billingDetails.planDetails?.next_billing_time
+                                      ).toLocaleDateString()
+                                    : "N/A"}
+                                </span>
+                              </div>
+                            )}
                           {billingDetails.isActive == 0 && (
                             <div className="flex justify-between">
                               <span className="font-medium">
-                              Subscription Stopped Time:
+                                Subscription Stopped Time:
                               </span>
                               <span>
                                 {billingDetails.isActive == 0
@@ -269,7 +297,7 @@ function Billings() {
                               This subscription has been stopped.
                             </div>
                             <Link to="/dashboard/buy-credits">
-                              <button class="overflow-hidden md:mt-12 w-64 p-2 h-12 bg-bgblue text-white border-none rounded-md text-sm font-medium cursor-pointer relative z-10 group">
+                              <button class="overflow-hidden my-6 md:mt-12 w-64 p-2 h-12 bg-bgblue text-white border-none rounded-md text-sm font-medium cursor-pointer relative z-10 group">
                                 PURCHASE CREDITS
                                 <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-300 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
                                 <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-800 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"></span>
@@ -301,7 +329,7 @@ function Billings() {
                           billingDetails.freeTrialExpiry
                         ).toLocaleDateString()}
                       </p>
-                      <button className="cursor-pointer relative group overflow-hidden border-2 px-5 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
+                      <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
                         <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
                           Expired
                         </span>
@@ -333,7 +361,7 @@ function Billings() {
                           billingDetails.freeTrialExpiry
                         ).toLocaleDateString()}
                       </p>
-                      <button className="cursor-pointer relative group overflow-hidden border-2 px-5 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
+                      <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
                         <span className="font-bold text-white text-sm relative z-10 group-hover:text-green-500 duration-500">
                           Active
                         </span>
@@ -365,7 +393,7 @@ function Billings() {
         </div>
       ) : (
         <p className="my-10 text-red-600 font-semibold text-lg">
-          You should verify your email to view account settings.
+          You should verify your email to view billing.
         </p>
       )}
     </div>

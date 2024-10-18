@@ -1385,6 +1385,7 @@ let APIControllers = {
         freeTrialExpiry: req.user[0][0].free_final,
         isActive: req.user[0][0].is_active,
         credits: req.user[0][0].credits,
+        freeCredits:req.user[0][0].credits_free,
         subStopTime: req.user[0][0].subscription_stop_time,
         planDetails: planDetails
       };
