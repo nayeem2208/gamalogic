@@ -1,6 +1,6 @@
 import { IoLogOutOutline } from "react-icons/io5";
 import { useUserState } from "../context/userContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import {  useState } from "react";
 import { SlInfo } from "react-icons/sl";

@@ -76,7 +76,7 @@ const Authentication = {
           let finalFreeDate = new Date(finalFree);
           let currentDate = new Date();
           let expired
-          if(user[0][0].is_premium==0){
+          if(user[0][0].is_premium==0&&user[0][0].confirmed==1){
             if(finalFree<currentDate){
               expired={
                 status:true,
@@ -238,7 +238,7 @@ const Authentication = {
         let finalFreeDate = new Date(finalFree);
         let currentDate = new Date();
         let expired
-        if(user[0][0].is_premium==0){
+        if(user[0][0].is_premium==0&&user[0][0].confirmed==1){
           if(finalFree<currentDate){
             expired={
               status:true,
@@ -631,7 +631,7 @@ const Authentication = {
             let finalFreeDate = new Date(finalFree);
             let currentDate = new Date();
             let expired
-            if(user[0][0].is_premium==0){
+            if(user[0][0].is_premium==0&&user[0][0].confirmed==1){
               if(finalFree<currentDate){
                 expired={
                   status:true,
@@ -829,7 +829,7 @@ const Authentication = {
         let finalFreeDate = new Date(finalFree);
         let currentDate = new Date();
         let expired
-        if(user[0][0].is_premium==0){
+        if(user[0][0].is_premium==0&&user[0][0].confirmed==1){
           if(finalFree<currentDate){
             expired={
               status:true,
