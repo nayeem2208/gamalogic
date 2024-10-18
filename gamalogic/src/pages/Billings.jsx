@@ -13,6 +13,8 @@ function Billings() {
   let [load, setLoad] = useState(30);
   let [loading, setLoading] = useState(false);
 
+  console.log(billingDetails,'billing detailssss')
+
   useEffect(() => {
     async function getPlan() {
       try {
@@ -95,7 +97,7 @@ function Billings() {
                     onLoaderFinished={() => {}}
                   />
                 )}
-                {(billingDetails.isPayAsYouGo == 1&&billingDetails.isActive==0) ? (
+                {(billingDetails.isPayAsYouGo == 1 && billingDetails.isActive!=1) ? (
                   <div>
                     <div className="md:flex justify-between  items-center">
                       <p>You are in a Pay-as-you-go plan</p>
@@ -139,7 +141,7 @@ function Billings() {
                   </div>
                 ) : (
                   <div>
-                    {billingDetails.planDetails.is_monthly == 1 ? (
+                    {billingDetails.planDetails?.is_monthly == 1 ? (
                       <div className="md:flex justify-between  items-center">
                         <p>You are on a Monthly Subscription</p>
                         {billingDetails.isActive == 1 ? (
@@ -166,7 +168,7 @@ function Billings() {
                           </button>
                         )}
                       </div>
-                    ) : (
+                    ) :billingDetails.planDetails?.is_annual == 1 ? (
                       // annuall subscription.........................
                       <div className="md:flex justify-between  items-center">
                         <p>You are on an Annual Subscription</p>
@@ -194,6 +196,8 @@ function Billings() {
                           </button>
                         )}
                       </div>
+                    ):(
+                      ''
                     )}
                     <div className="flex flex-col justify-center  md:p-4 w-full md:mt-12">
                       <h2 className="my-4 text-xl font-semibold text-center">
@@ -201,7 +205,7 @@ function Billings() {
                       </h2>
                       <div className={`rounded-lg shadow-lg w-full  md:p-6 `}>
                         <h2 className={` font-semibold mb-4 `}>
-                          {billingDetails.planDetails.source === "paypal"
+                          {billingDetails.planDetails?.source === "paypal"
                             ? "PayPal Subscription"
                             : "Razorpay Subscription"}
                         </h2>
@@ -210,28 +214,34 @@ function Billings() {
                           <div className="flex justify-between">
                             <span className="font-medium">Amount:</span>
                             <span>
-                              {billingDetails.planDetails.gross_amount
-                                ? `$${billingDetails.planDetails.gross_amount}`
-                                : `₹${billingDetails.planDetails.amount}`}
+                              {billingDetails.planDetails?.gross_amount
+                                ? `$${billingDetails.planDetails?.gross_amount}`
+                                : `₹${billingDetails.planDetails?.amount}`}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="font-medium">Credits:</span>
+                            <span>
+                              {billingDetails.planDetails?.credits}
                             </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="font-medium">Period:</span>
                             <span>
-                              {billingDetails.planDetails.is_monthly == 1
+                              {billingDetails.planDetails?.is_monthly == 1
                                 ? `Monthly`
                                 : `Annual`}
                             </span>
                           </div>
-                          {(billingDetails.planDetails.next_billing_time&&billingDetails.isActive==1) && (
+                          {(billingDetails.planDetails?.next_billing_time&&billingDetails.isActive==1) && (
                             <div className="flex justify-between">
                               <span className="font-medium">
                                 Next Billing Time:
                               </span>
                               <span>
-                                {billingDetails.planDetails.next_billing_time
+                                {billingDetails.planDetails?.next_billing_time
                                   ? new Date(
-                                      billingDetails.planDetails.next_billing_time
+                                      billingDetails.planDetails?.next_billing_time
                                     ).toLocaleDateString()
                                   : "N/A"}
                               </span>
@@ -240,7 +250,7 @@ function Billings() {
                           {billingDetails.isActive == 0 && (
                             <div className="flex justify-between">
                               <span className="font-medium">
-                                Subscription Stop Time:
+                              Subscription Stopped Time:
                               </span>
                               <span>
                                 {billingDetails.isActive == 0

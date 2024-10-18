@@ -1323,7 +1323,7 @@ let APIControllers = {
   },
   getPlanDetails: async (req, res) => {
     try {
-      console.log(req.user[0][0], 'user is hereeeee');
+      // console.log(req.user[0][0], 'user is hereeeee');
       const dbConnection = req.dbConnection;
 
       let planDetails;
@@ -1339,41 +1339,42 @@ let APIControllers = {
             WHERE customer_id='${req.user[0][0].rowid}' 
             ORDER BY glid DESC
           `);
-          console.log(paypalSub[0].length,'paypal sub lenght')
-          console.log(razorPaySub[0].length,'razorPaySub  lenght')
-          if (paypalSub[0].length === 0 && razorPaySub[0].length > 0) {
+        if (paypalSub[0].length === 0 && razorPaySub[0].length > 0) {
+          let plan = RazorpayPrice.find(([credit, id, period]) => id == razorPaySub[0][0].plan_id)
+          let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12
+          planDetails = {
+            ...razorPaySub[0][0],
+            source: 'razorpay',
+            credits: credit
+          };
+        }
+        else if (razorPaySub[0].length === 0 && paypalSub[0].length > 0) {
+          planDetails = {
+            ...paypalSub[0][0],
+            source: 'paypal'
+          };
+        }
+        else if (razorPaySub[0].length > 0 && paypalSub[0].length > 0) {
+          console.log(new Date(razorPaySub[0][0].timestamp).getTime(), 'rzp timeeeeeeeeeeee', new Date(paypalSub[0][0].time_stamp).getTime())
+          if (new Date(razorPaySub[0][0].timestamp).getTime() > new Date(paypalSub[0][0].time_stamp).getTime()) {
+            let plan = RazorpayPrice.find(([credit, id, period]) => id == razorPaySub[0][0].plan_id)
+            let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12
+
             planDetails = {
               ...razorPaySub[0][0],
-              source: 'razorpay'
+              source: 'razorpay',
+              credits: credit
             };
-            console.log('check p 1')
-          }
-          else if (razorPaySub[0].length === 0 && paypalSub[0].length > 0) {
+          } else {
             planDetails = {
               ...paypalSub[0][0],
               source: 'paypal'
             };
-            console.log('check p 2')
           }
-          else if (razorPaySub[0].length > 0 && paypalSub[0].length > 0) {
-            console.log(new Date(razorPaySub[0][0].timestamp).getTime(),'rzp timeeeeeeeeeeee',new Date(paypalSub[0][0].time_stamp).getTime())
-            if (new Date(razorPaySub[0][0].timestamp).getTime() > new Date(paypalSub[0][0].time_stamp).getTime()) {
-              planDetails = {
-                ...razorPaySub[0][0],
-                source: 'razorpay'
-              };
-              console.log('check p 3')
-            } else {
-              planDetails = {
-                ...paypalSub[0][0],
-                source: 'paypal'
-              };
-              console.log('check p 4')
-            }
-          }
-          else {
-            planDetails = null;
-          }
+        }
+        else {
+          planDetails = null;
+        }
       }
 
       let userDetails = {
@@ -1384,11 +1385,11 @@ let APIControllers = {
         freeTrialExpiry: req.user[0][0].free_final,
         isActive: req.user[0][0].is_active,
         credits: req.user[0][0].credits,
-        subStopTime:req.user[0][0].subscription_stop_time,
+        subStopTime: req.user[0][0].subscription_stop_time,
         planDetails: planDetails
       };
 
-      console.log(userDetails,'user details to pass ')
+      console.log(userDetails, 'user details to pass ')
 
       res.status(200).json(userDetails);
     } catch (error) {
