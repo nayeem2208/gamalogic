@@ -55,7 +55,7 @@ router.post('/RazorPayWebhook',dbMiddleware,APIControllers.razorPayWebhook)
 router.get('/getPlanDetails',dbMiddleware,authcheck,APIControllers.getPlanDetails)
 
 
-// router.get('/affiliateUserId',dbMiddleware,APIControllers.affilateUserId)
+router.get('/affiliateUserId',dbMiddleware,authcheck,APIControllers.affilateUserId)
 router.post('/loyalityProgram',APIControllers.loyalityWebhook)
 
 export default router;

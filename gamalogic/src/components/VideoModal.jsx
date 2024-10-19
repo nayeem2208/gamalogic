@@ -107,6 +107,7 @@ const VideoModal = ({ videoId, url, texts, isOpen, onClose }) => {
       isOpen={modalIsOpen}
       onRequestClose={onClose}
       style={customStyles}
+      appElement={document.getElementById('root')} 
     >
       <div className="video-modal-content relative ">
         <div

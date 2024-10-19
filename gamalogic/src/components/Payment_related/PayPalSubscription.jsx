@@ -17,6 +17,8 @@ const ButtonWrapper = ({ type }) => {
     paymentResult,
     setCreditBal,
     setPaymentResult,
+    setUserDetails,
+    userDetails,
   } = useUserState();
   const planIdRef = useRef("P-7NW45488DG075491MM25NWLY");
   const paymentDetailsref=useRef({})
@@ -190,6 +192,21 @@ const ButtonWrapper = ({ type }) => {
       await axiosInstance.post("/payPalSubscription", orderData);
       setPaymentResult({ result: true, methord: "payPal" });
       setCreditBal(creditBal + paymentDetailsref.current);
+      if (userDetails.expired?.status == true) {
+        const storedToken = localStorage.getItem("Gamalogic_token");
+        if (storedToken) {
+          let token;
+          try {
+            token = JSON.parse(storedToken);
+          } catch (error) {
+            token = storedToken;
+          }
+          token.expired = null;
+          localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+          setUserDetails(token);
+        }
+      }
+      toast.success("Payment successful!!");
 
       console.log("Order details sent to backend successfully");
     } catch (error) {

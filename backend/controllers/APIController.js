@@ -1355,7 +1355,7 @@ let APIControllers = {
           };
         }
         else if (razorPaySub[0].length > 0 && paypalSub[0].length > 0) {
-          console.log(new Date(razorPaySub[0][0].timestamp).getTime(), 'rzp timeeeeeeeeeeee', new Date(paypalSub[0][0].time_stamp).getTime())
+          // console.log(new Date(razorPaySub[0][0].timestamp).getTime(), 'rzp timeeeeeeeeeeee', new Date(paypalSub[0][0].time_stamp).getTime())
           if (new Date(razorPaySub[0][0].timestamp).getTime() > new Date(paypalSub[0][0].time_stamp).getTime()) {
             let plan = RazorpayPrice.find(([credit, id, period]) => id == razorPaySub[0][0].plan_id)
             let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12
@@ -1385,18 +1385,44 @@ let APIControllers = {
         freeTrialExpiry: req.user[0][0].free_final,
         isActive: req.user[0][0].is_active,
         credits: req.user[0][0].credits,
-        freeCredits:req.user[0][0].credits_free,
+        freeCredits: req.user[0][0].credits_free,
         subStopTime: req.user[0][0].subscription_stop_time,
         planDetails: planDetails
       };
 
-      console.log(userDetails, 'user details to pass ')
+      // console.log(userDetails, 'user details to pass ')
 
       res.status(200).json(userDetails);
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: 'Error fetching plan details' });
     }
-  }
+    finally {
+      if (req.dbConnection) {
+        await req.dbConnection.release();
+      }
+    }
+  },
+  affilateUserId: async (req, res) => {
+    // const dbConnection = req.dbConnection;
+    // const token = req.headers.authorization;
+    // if (token) {
+    try {
+      console.log(req.user[0][0],'body of ztuser')
+      let email_id = req.user[0][0].emailid
+      let customer_id = req.user[0][0].rowid
+      let digestRaw = email_id + customer_id
+      let algorithm = "sha256"
+      let secret = "91527c80d95b01f901a87e28cdece52d";
+      let HMACDigest = crypto.createHmac(algorithm, secret).update(digestRaw).digest("hex")
+      console.log(HMACDigest, 'hmdigest')
+      res.status(200).json({ user: req.user[0][0], HMACDigest })
+    } catch (error) {
+      res.status(401).json({ error: "Unauthorized" });
+      console.log(error)
+    }
+
+    // }
+  },
 };
 export default APIControllers;

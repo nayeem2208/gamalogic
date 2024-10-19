@@ -33,7 +33,15 @@ export default function BuyCredits() {
   const [loading, setLoading] = useState(true);
   let [serverError, setServerError] = useState(false);
 
-  let { setCreditBal, creditBal, userDetails,paymentResult,setPaymentResult,paymentDetails } = useUserState();
+  let {
+    setCreditBal,
+    creditBal,
+    setUserDetails,
+    userDetails,
+    paymentResult,
+    setPaymentResult,
+    paymentDetails,
+  } = useUserState();
   const costRef = useRef(paymentDetails.cost);
   const creditsRef = useRef(paymentDetails.credits);
 
@@ -80,7 +88,7 @@ export default function BuyCredits() {
   }, []);
 
   useEffect(() => {
-    setPaymentResult({result:null,methord:null})
+    setPaymentResult({ result: null, methord: null });
     if (APP == "beta") {
       document.title = "Buy Credits | Beta Dashboard";
     } else {
@@ -89,7 +97,7 @@ export default function BuyCredits() {
   }, []);
 
   const createOrder = (data, actions) => {
-    console.log(paymentDetails,'payment details')
+    console.log(paymentDetails, "payment details");
     return actions.order
       .create({
         purchase_units: [
@@ -116,8 +124,22 @@ export default function BuyCredits() {
           cost: costRef.current,
           data,
         });
-        setPaymentResult({result:true,methord:'payPal'})
+        setPaymentResult({ result: true, methord: "payPal" });
         setCreditBal(creditBal + creditsRef.current);
+        if (userDetails.expired?.status == true) {
+          const storedToken = localStorage.getItem("Gamalogic_token");
+          if (storedToken) {
+            let token;
+            try {
+              token = JSON.parse(storedToken);
+            } catch (error) {
+              token = storedToken;
+            }
+            token.expired = null;
+            localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+            setUserDetails(token);
+          }
+        }
       } catch (error) {
         if (error.response && error.response.status === 500) {
           setServerError(true);
@@ -129,33 +151,29 @@ export default function BuyCredits() {
   };
   const onError = async () => {
     toast.error("Error occured with our payment ");
-    setPaymentResult({result:false,methord:'payPal'})
-    await axiosInstance.post("/paymentFailedEmail", { cost:costRef.current });
+    setPaymentResult({ result: false, methord: "payPal" });
+    await axiosInstance.post("/paymentFailedEmail", { cost: costRef.current });
   };
 
   useEffect(() => {
-    if (paymentResult.resutl==true) {
+    if (paymentResult.resutl == true) {
       toast.success("Payment successful!!");
     }
   }, []);
 
-
   const handleTryAgain = () => {
-    setPaymentResult({result:null,methord:null})
+    setPaymentResult({ result: null, methord: null });
   };
-
 
   if (serverError) {
     return <ServerError />;
   }
 
-     
-  
   const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
   return (
     <div className=" px-6 md:px-20 py-8 text-center sm:text-start">
       <SubHeader SubHeader={"Buy Credits"} />
-      {paymentResult.result==null && (
+      {paymentResult.result == null && (
         <div className="mt-6 sm:mt-14 text-bgblue subHeading">
           <h3>Pricing</h3>
           <p className="my-7 description">
@@ -168,7 +186,7 @@ export default function BuyCredits() {
               contact us.
             </Link>
           </p>
-          <Pricing/>
+          <Pricing />
           {userDetails.confirm == 1 &&
             paymentDetails.type == "Pay As You Go" && (
               <div className="">
@@ -227,5 +245,3 @@ export default function BuyCredits() {
     </div>
   );
 }
-
-

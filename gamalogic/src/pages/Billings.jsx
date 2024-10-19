@@ -6,6 +6,8 @@ import { RiVipCrownFill } from "react-icons/ri";
 import LoadingBar from "react-top-loading-bar";
 import { Link } from "react-router-dom";
 import { SlInfo } from "react-icons/sl";
+import { CalendarDate } from "calendar-date";
+
 
 function Billings() {
   let { setUserDetails, userDetails } = useUserState();
@@ -14,7 +16,7 @@ function Billings() {
   let [load, setLoad] = useState(30);
   let [loading, setLoading] = useState(false);
 
-  console.log(billingDetails, "billing detailssss");
+  // console.log(billingDetails, "billing detailssss");
 
   useEffect(() => {
     async function getPlan() {
@@ -55,15 +57,30 @@ function Billings() {
         // };
         setLoad(100);
 
-        console.log(res.data, "ressssss");
-        setBillingDetails(res.data);
-
         const freeTrialExpiryDate = new Date(res.data.freeTrialExpiry);
         const currentDate = new Date();
 
         if (currentDate > freeTrialExpiryDate) {
           setFreeTrialExpired(true);
         }
+        if (res.data?.planDetails?.source === "razorpay") {
+          let dateOfPay = res.data?.planDetails?.time_stamp?.split("T")[0]||res.data?.planDetails?.timestamp?.split("T")[0]
+          let nextBillingDate;
+  
+          if (res.data?.planDetails?.is_monthly === "1") {
+            nextBillingDate = new CalendarDate(dateOfPay).addMonths(1);
+          } else {
+            nextBillingDate = new CalendarDate(dateOfPay).addMonths(12);
+          }
+  
+          const formattedNextBillingDate = new Date(
+            nextBillingDate.unixTimestampInSeconds * 1000
+          ).toISOString();
+  
+          res.data.planDetails.next_billing_time = formattedNextBillingDate; 
+        }
+        setBillingDetails(res.data);
+
       } catch (error) {
         console.error("Error fetching plan:", error);
       }
@@ -244,7 +261,7 @@ function Billings() {
                                   {billingDetails.planDetails?.next_billing_time
                                     ? new Date(
                                         billingDetails.planDetails?.next_billing_time
-                                      ).toLocaleDateString()
+                                      ).toLocaleDateString("en-GB")
                                     : "N/A"}
                                 </span>
                               </div>
@@ -258,7 +275,7 @@ function Billings() {
                                 {billingDetails.isActive == 0
                                   ? new Date(
                                       billingDetails.subStopTime
-                                    ).toLocaleDateString()
+                                    ).toLocaleDateString("en-GB")
                                   : "Active"}
                               </span>
                             </div>
@@ -301,7 +318,7 @@ function Billings() {
                         Your free trial credits have expired on{" "}
                         {new Date(
                           billingDetails.freeTrialExpiry
-                        ).toLocaleDateString()}
+                        ).toLocaleDateString("en-GB")}
                       </p>
                       <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
                         <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
@@ -362,7 +379,7 @@ function Billings() {
                         Your free trial credits will expire on{" "}
                         {new Date(
                           billingDetails.freeTrialExpiry
-                        ).toLocaleDateString()}
+                        ).toLocaleDateString("en-GB")}
                       </p>
                       <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
                         <span className="font-bold text-white text-sm relative z-10 group-hover:text-green-500 duration-500">
