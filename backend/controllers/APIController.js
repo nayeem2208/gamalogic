@@ -1342,10 +1342,12 @@ let APIControllers = {
         if (paypalSub[0].length === 0 && razorPaySub[0].length > 0) {
           let plan = RazorpayPrice.find(([credit, id, period]) => id == razorPaySub[0][0].plan_id)
           let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12
+          let amount=await InrToUsdSubscriptionConverter(credit, plan[2])
           planDetails = {
             ...razorPaySub[0][0],
             source: 'razorpay',
-            credits: credit
+            credits: credit,
+            gross_amount:amount
           };
         }
         else if (razorPaySub[0].length === 0 && paypalSub[0].length > 0) {
@@ -1359,11 +1361,14 @@ let APIControllers = {
           if (new Date(razorPaySub[0][0].timestamp).getTime() > new Date(paypalSub[0][0].time_stamp).getTime()) {
             let plan = RazorpayPrice.find(([credit, id, period]) => id == razorPaySub[0][0].plan_id)
             let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12
+            let amount=await InrToUsdSubscriptionConverter(credit, plan[2])
 
             planDetails = {
               ...razorPaySub[0][0],
               source: 'razorpay',
-              credits: credit
+              credits: credit,
+              gross_amount:amount
+
             };
           } else {
             planDetails = {
