@@ -372,9 +372,9 @@ function Signup() {
                 }}
               />
             </div>
-            <div className="flex justify-center mt-2 ">
+            {/* <div className="flex justify-center mt-2 ">
               <LinkedInPage endpoint={"signup"} />
-            </div>
+            </div> */}
             <div className="flex justify-center my-2">
               <MicroSoftSignInButton
                 page="signup"

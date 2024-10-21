@@ -15,6 +15,7 @@ import crypto from 'crypto'
 import PurchaseApi from "../utils/thrive.js";
 import InrToUsdConverter from "../utils/INRtoUSD.js";
 import InrToUsdSubscriptionConverter from "../utils/INRtoUSDSubscription.js";
+import BillingInrToUsdSubscriptionConverter from "../utils/BillingInrToUsd.js";
 
 
 let APIControllers = {
@@ -1341,14 +1342,33 @@ let APIControllers = {
           `);
         if (paypalSub[0].length === 0 && razorPaySub[0].length > 0) {
           let plan = RazorpayPrice.find(([credit, id, period]) => id == razorPaySub[0][0].plan_id)
-          let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12
-          let amount=await InrToUsdSubscriptionConverter(credit, plan[2])
-          planDetails = {
-            ...razorPaySub[0][0],
-            source: 'razorpay',
-            credits: credit,
-            gross_amount:amount
-          };
+          // let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12
+          // let amount=await BillingInrToUsdSubscriptionConverter(credit, plan[2])
+          // planDetails = {
+          //   ...razorPaySub[0][0],
+          //   source: 'razorpay',
+          //   credits: credit,
+          //   gross_amount:amount
+          // };
+          if (plan) {
+            let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12;
+            let amount = await BillingInrToUsdSubscriptionConverter(credit, plan[2]);
+            
+            planDetails = {
+              ...razorPaySub[0][0],
+              source: 'razorpay',
+              credits: credit,
+              gross_amount: amount
+            };
+          } else {
+            console.error("No matching plan found for Razorpay subscription");
+            planDetails = {
+              ...razorPaySub[0][0],
+              source: 'razorpay',
+              credits: 0,  
+              gross_amount: 0  
+            };
+          }
         }
         else if (razorPaySub[0].length === 0 && paypalSub[0].length > 0) {
           planDetails = {
@@ -1360,16 +1380,37 @@ let APIControllers = {
           // console.log(new Date(razorPaySub[0][0].timestamp).getTime(), 'rzp timeeeeeeeeeeee', new Date(paypalSub[0][0].time_stamp).getTime())
           if (new Date(razorPaySub[0][0].timestamp).getTime() > new Date(paypalSub[0][0].time_stamp).getTime()) {
             let plan = RazorpayPrice.find(([credit, id, period]) => id == razorPaySub[0][0].plan_id)
-            let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12
-            let amount=await InrToUsdSubscriptionConverter(credit, plan[2])
+            // let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12
+            // let amount=await BillingInrToUsdSubscriptionConverter(credit, plan[2])
 
-            planDetails = {
-              ...razorPaySub[0][0],
-              source: 'razorpay',
-              credits: credit,
-              gross_amount:amount
+            // planDetails = {
+            //   ...razorPaySub[0][0],
+            //   source: 'razorpay',
+            //   credits: credit,
+            //   gross_amount:amount
 
-            };
+            // };
+
+            //added this code cos plan cant find if the payment in done in test and checking in live.and vise versa
+            if (plan) {
+              let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12;
+              let amount = await BillingInrToUsdSubscriptionConverter(credit, plan[2]);
+              
+              planDetails = {
+                ...razorPaySub[0][0],
+                source: 'razorpay',
+                credits: credit,
+                gross_amount: amount
+              };
+            } else {
+              console.error("No matching plan found for Razorpay subscription");
+              planDetails = {
+                ...razorPaySub[0][0],
+                source: 'razorpay',
+                credits: 0,  
+                gross_amount: 0  
+              };
+            }
           } else {
             planDetails = {
               ...paypalSub[0][0],

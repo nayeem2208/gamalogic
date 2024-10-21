@@ -7,7 +7,6 @@ function Body() {
   let navigate = useNavigate();
   let { setUserDetails, userDetails, setCreditBal, creditBal } = useUserState();
 
-
   useEffect(() => {
     const storedToken = localStorage.getItem("Gamalogic_token");
     if (storedToken) {
@@ -18,12 +17,25 @@ function Body() {
         parsedToken = storedToken;
       }
       setUserDetails(parsedToken);
+      // if (!window.ztUserData) {
+      //   window.ztUserData = {};
+      //   window.ztUserData["za_email_id"] = parsedToken.email;
+      //   window.ztUserData["user_unique_id"] = parsedToken.id;
+      //   window.ztUserData["thrive_digest"] = parsedToken.HMACDigest;
+      //   window.ztUserData["signUpPage"] = `${
+      //     import.meta.env.VITE_FRONTEND_URL
+      //   }/signup`;
+      //   window.ztUserData["signInPage"] = `${
+      //     import.meta.env.VITE_FRONTEND_URL
+      //   }/signin`;
+      // }
     } else {
       setUserDetails(null);
       navigate("/signin");
     }
   }, [navigate]);
 
+  // console.log(window.ztUserData,'zt user data',navigate)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,42 +43,23 @@ function Body() {
         const response = await axiosInstance.get("/getCreditBalance");
         setCreditBal(response.data);
       } catch (error) {
-        if (error.response && error.response.status === 401 && error.response.data.error === "TokenExpired") {
-          localStorage.removeItem('Gamalogic_token');
-          setUserDetails(null)
+        if (
+          error.response &&
+          error.response.status === 401 &&
+          error.response.data.error === "TokenExpired"
+        ) {
+          localStorage.removeItem("Gamalogic_token");
+          setUserDetails(null);
           toast.error(error.response.data.message);
           navigate("/signin");
         }
         console.error("Error fetching credit balance:", error);
       }
     };
-  
-      fetchData();
+
+    fetchData();
   }, [creditBal]);
 
-  // useEffect(()=>{
-  //   console.log('heyyyyyoooo')
-  //   async function fetchThriveDigest(){
-  //     let user=await axiosInstance.get('/affiliateUserId')
-  //     console.log(user,'user is here')
-  //     window.ztUserData = window.ztUserData || {}; 
-  //     window.ztUserData['za_email_id'] = user.data.user.emailid;  
-  //     window.ztUserData['user_unique_id'] =user.data.user.rowid;
-  //     window.ztUserData['thrive_digest'] = user.data.HMACDigest;
-  //     window.ztUserData['signUpPage'] = 'https://beta.gamalogic.com/signup';
-  //     window.ztUserData['signInPage'] = 'https://beta.gamalogic.com/signin';
-  //     // window.ztUserData['ztWidgetDelay'] = 0;
-  //     console.log(window.ztUserData,'window zt user dataaaaaaaa')
-
-  //     // const script = document.createElement('script');
-  //     // script.id = 'thrive_script';
-  //     // script.src = 'https://thrive.zohopublic.com/thrive/publicpages/thrivewidget';
-  //     // document.body.appendChild(script);
-  //   }
-  //   fetchThriveDigest()
-
-
-  // },[userDetails])
   return (
     <div className="w-full h-screen overflow-y-auto pb-12">
       {userDetails && <Outlet />}

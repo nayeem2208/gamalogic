@@ -93,12 +93,6 @@ function Login() {
         let token = userData.data;
         setUserDetails(token);
         setCreditBal(token.credit);
-        window.ztUserData = window.ztUserData || {};
-        window.ztUserData["za_email_id"] = token.emailid;
-        window.ztUserData["user_unique_id"] = token.rowid;
-        window.ztUserData["thrive_digest"] = user.data.HMACDigest;
-        window.ztUserData["signUpPage"] = "https://beta.gamalogic.com/signup";
-        window.ztUserData["signInPage"] = "https://beta.gamalogic.com/signin";
         localStorage.setItem("Gamalogic_token", JSON.stringify(token));
         setTutorialVideo(true);
         navigate("/dashboard/quick-validation");
@@ -243,9 +237,9 @@ function Login() {
                 }}
               />
             </div>
-            <div className="flex justify-center mt-2 w-full">
+            {/* <div className="flex justify-center mt-2 w-full">
               <LinkedInPage endpoint={"signin"} />
-            </div>
+            </div> */}
             <div className="flex justify-center my-2">
               <MicroSoftSignInButton page="login" />
             </div>
