@@ -119,7 +119,8 @@ const Authentication = {
             password,
             country_name: 'USA',
             expired,
-            HMACDigest
+            HMACDigest,
+            id:user[0][0].rowid
           });
 
         } else {
@@ -286,7 +287,8 @@ const Authentication = {
           password,
           country_name: 'USA',
           expired,
-          HMACDigest
+          HMACDigest,
+          id:user[0][0].rowid
         });
       } else {
         res.status(400).json({
@@ -413,7 +415,8 @@ const Authentication = {
             confirm: 1,
             password,
             country_name: 'USA',
-            HMACDigest
+            HMACDigest,
+            id:user[0][0].rowid
           });
         } else {
           res
@@ -564,7 +567,8 @@ const Authentication = {
                 token,
                 confirm: 1,
                 password,
-                HMACDigest
+                HMACDigest,
+                id:user[0][0].rowid
               });
             } else {
               res
@@ -688,7 +692,8 @@ const Authentication = {
               password,
               country_name: 'India',
               expired,
-              HMACDigest
+              HMACDigest,
+              id:user[0][0].rowid
             });
           } else {
             res.status(400).json({
@@ -720,6 +725,9 @@ const Authentication = {
     try {
       const dbConnection = req.dbConnection;
       let email = req.body.mail
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
       let given_name = req.body.displayName
       let [firstname, ...lastnameArray] = given_name.split(" ");
       let lastname = lastnameArray.join(" ");
@@ -820,7 +828,8 @@ const Authentication = {
             token,
             confirm: 1,
             password,
-            HMACDigest
+            HMACDigest,
+            id:user[0][0].rowid
           });
         } else {
           res
@@ -842,7 +851,11 @@ const Authentication = {
   microsoftLogin: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
+
       let email = req.body.mail
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
       let user = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
@@ -893,7 +906,10 @@ const Authentication = {
           password,
           country_name: 'India',
           expired,
-          HMACDigest
+          HMACDigest,
+          id:user[0][0].rowid
+
+
         });
       } else {
         res.status(400).json({

@@ -12,7 +12,13 @@ import MicroSoftSignInButton from "./MicroSoftLogin";
 
 function Login() {
   let [data, setData] = useState({ email: "", password: "" });
-  let { setUserDetails, setCreditBal, setTutorialVideo,linkedinLoading, setLinkedinLoading } = useUserState();
+  let {
+    setUserDetails,
+    setCreditBal,
+    setTutorialVideo,
+    linkedinLoading,
+    setLinkedinLoading,
+  } = useUserState();
   let [passwordVisible, setPasswordVisible] = useState(false);
   let [loading, setLoading] = useState(false);
   let [serverError, setServerError] = useState(false);
@@ -27,7 +33,6 @@ function Login() {
   };
   const navigate = useNavigate();
   const location = useLocation();
-
 
   useEffect(() => {
     if (APP == "beta") {
@@ -66,7 +71,7 @@ function Login() {
             toast.error(err.response?.data?.error);
           }
         } finally {
-          setLinkedinLoading(false); 
+          setLinkedinLoading(false);
           const newUrl = window.location.origin + window.location.pathname;
           window.history.replaceState(null, "", newUrl);
         }
@@ -74,14 +79,13 @@ function Login() {
     }
   }, []);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      setLinkedinLoading(true)
+      setLinkedinLoading(true);
       let userData = await axiosInstance.post("login", data);
-      setLinkedinLoading(false)
+      setLinkedinLoading(false);
       if (userData.data?.error == "Blocked") {
         navigate("/blocked");
       } else {
@@ -89,12 +93,18 @@ function Login() {
         let token = userData.data;
         setUserDetails(token);
         setCreditBal(token.credit);
+        window.ztUserData = window.ztUserData || {};
+        window.ztUserData["za_email_id"] = token.emailid;
+        window.ztUserData["user_unique_id"] = token.rowid;
+        window.ztUserData["thrive_digest"] = user.data.HMACDigest;
+        window.ztUserData["signUpPage"] = "https://beta.gamalogic.com/signup";
+        window.ztUserData["signInPage"] = "https://beta.gamalogic.com/signin";
         localStorage.setItem("Gamalogic_token", JSON.stringify(token));
         setTutorialVideo(true);
         navigate("/dashboard/quick-validation");
       }
     } catch (error) {
-      setLinkedinLoading(false)
+      setLinkedinLoading(false);
       if (error.response.status === 500) {
         setServerError(true);
       } else {
@@ -107,12 +117,12 @@ function Login() {
 
   const authenticateData = async (credentialResponse) => {
     try {
-      setLinkedinLoading(true)
+      setLinkedinLoading(true);
       // let res = await axios.post('https://poseben-backend.onrender.com/api/GoogleLogin',{credentialResponse})
       let res = await axiosInstance.post("/googleLogin", {
         credentialResponse,
       });
-      setLinkedinLoading(false)
+      setLinkedinLoading(false);
       toast.success("Welcome back! You've successfully logged in");
       let token = res.data;
       setUserDetails(token);
@@ -121,7 +131,7 @@ function Login() {
       setTutorialVideo(true);
       navigate("/dashboard/quick-validation");
     } catch (err) {
-      setLinkedinLoading(false)
+      setLinkedinLoading(false);
       if (err.response.status === 500) {
         setServerError(true);
       } else {
@@ -224,7 +234,7 @@ function Login() {
               <button onClick={() => login()}>Signin with Google</button>
             </div> */}
               <GoogleLogin
-              style={{ maxWidth: '180px',width:'180px'}}
+                style={{ maxWidth: "180px", width: "180px" }}
                 onSuccess={(credentialResponse) => {
                   authenticateData(credentialResponse);
                 }}
@@ -237,8 +247,8 @@ function Login() {
               <LinkedInPage endpoint={"signin"} />
             </div>
             <div className="flex justify-center my-2">
-                <MicroSoftSignInButton page='login'/>
-              </div>
+              <MicroSoftSignInButton page="login" />
+            </div>
             <div className="flex justify-center text-xs md:text-sm text-gray-300 mt-3">
               <Link to="/signup">
                 <div className="border-r border-cyan-400 mx-2 px-2">
