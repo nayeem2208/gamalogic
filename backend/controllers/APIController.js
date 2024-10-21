@@ -1325,7 +1325,7 @@ let APIControllers = {
     const dbConnection = req.dbConnection;
     try {
       // console.log(req.user[0][0], 'user is hereeeee');
-
+      console.log('check 1')
       let planDetails;
       if (req.user[0][0].is_premium == 1 && (req.user[0][0].is_monthly == 1 || req.user[0][0].is_annual == 1)) {
         let paypalSub = await dbConnection.query(`
@@ -1396,7 +1396,7 @@ let APIControllers = {
       };
 
       // console.log(userDetails, 'user details to pass ')
-
+      console.log('check last')
       res.status(200).json(userDetails);
     } catch (error) {
       console.log(error);
