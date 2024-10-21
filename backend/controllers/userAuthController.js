@@ -14,7 +14,7 @@ import forgotPasswordTemplate from "../EmailTemplates/forgotPasswordTemplate.js"
 import urls from "../ConstFiles/urls.js";
 import leadGeneration from "../utils/crm.js";
 import AddContacts from "../utils/campaigns.js";
-import hmacDigestFunction from "../utils/HMACDigest";
+import hmacDigestFunction from "../utils/HMACDigest.js";
 
 const Authentication = {
   sample: async (req, res) => {
