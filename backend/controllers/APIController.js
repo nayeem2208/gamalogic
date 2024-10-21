@@ -1322,9 +1322,9 @@ let APIControllers = {
     }
   },
   getPlanDetails: async (req, res) => {
+    const dbConnection = req.dbConnection;
     try {
       // console.log(req.user[0][0], 'user is hereeeee');
-      const dbConnection = req.dbConnection;
 
       let planDetails;
       if (req.user[0][0].is_premium == 1 && (req.user[0][0].is_monthly == 1 || req.user[0][0].is_annual == 1)) {
@@ -1403,8 +1403,8 @@ let APIControllers = {
       res.status(500).json({ message: 'Error fetching plan details' });
     }
     finally {
-      if (req.dbConnection) {
-        await req.dbConnection.release();
+      if (dbConnection) {
+        await dbConnection.release();
       }
     }
   },

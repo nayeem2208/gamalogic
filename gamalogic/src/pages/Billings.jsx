@@ -7,6 +7,14 @@ import LoadingBar from "react-top-loading-bar";
 import { Link } from "react-router-dom";
 import { SlInfo } from "react-icons/sl";
 import { CalendarDate } from "calendar-date";
+import GridLoader from "react-spinners/GridLoader";
+
+const override = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "red",
+};
+
 
 
 function Billings() {
@@ -15,6 +23,11 @@ function Billings() {
   let [billingDetails, setBillingDetails] = useState(null);
   let [load, setLoad] = useState(30);
   let [loading, setLoading] = useState(false);
+  // let [loading, setLoading] = useState(true);
+  let [color, setColor] = useState("#1da6b8");
+
+
+
 
   // console.log(billingDetails, "billing detailssss");
 
@@ -23,40 +36,7 @@ function Billings() {
       try {
         setLoading(true);
         let res = await axiosInstance.get("/getPlanDetails");
-        // let res = {
-        //   data: {
-        //     isPremium: 1,
-        //     isPayAsYouGo: "0",
-        //     isMonthly: "1",
-        //     isAnnual: "0",
-        //     freeTrialExpiry: "2024-10-17T05:10:55.000Z",
-        //     isActive: "0",
-        //     credits: 9000,
-        //     subStopTime: "2024-10-16T10:56:14.472Z",
-        //     planDetails: {
-        //       id: 24,
-        //       userid: "31138",
-        //       credits: "5000",
-        //       is_monthly: "0",
-        //       is_annual: "1",
-        //       gross_amount: "240",
-        //       subscription_id: "I-KK6FPURFLAHV",
-        //       plan_id: "P-1LG25877VL011492YM3BRRBY",
-        //       start_time: "2024-10-16T10:22:57Z",
-        //       quantity: "1",
-        //       name: "John Doe",
-        //       address: "1 Main St, San Jose, CA, 95131, US",
-        //       email_address: "sb-knucz30778477@personal.example.com",
-        //       payer_id: "GCR7XAFX9UEW8",
-        //       last_payment: "2024-10-16T10:23:26Z",
-        //       next_billing_time: "2025-10-16T10:00:00Z",
-        //       time_stamp: "2024-10-16T10:23:29.474Z",
-        //       source: "paypal",
-        //     },
-        //   },
-        // };
         setLoad(100);
-
         const freeTrialExpiryDate = new Date(res.data.freeTrialExpiry);
         const currentDate = new Date();
 
@@ -408,7 +388,16 @@ function Billings() {
               </div>
             )
           ) : (
-            <p>Loading billing details...</p>
+            <div className=" h-96 flex items-center">
+            <GridLoader
+            color={color}
+            loading={loading}
+            cssOverride={override}
+            size={20}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+          </div>
           )}
         </div>
       ) : (
