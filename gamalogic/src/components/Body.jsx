@@ -44,29 +44,29 @@ function Body() {
       fetchData();
   }, [creditBal]);
 
-  useEffect(()=>{
-    console.log('heyyyyyoooo')
-    async function fetchThriveDigest(){
-      let user=await axiosInstance.get('/affiliateUserId')
-      console.log(user,'user is here')
-      window.ztUserData = window.ztUserData || {}; 
-      window.ztUserData['za_email_id'] = user.data.user.emailid;  
-      window.ztUserData['user_unique_id'] =user.data.user.rowid;
-      window.ztUserData['thrive_digest'] = user.data.HMACDigest;
-      window.ztUserData['signUpPage'] = 'https://beta.gamalogic.com/signup';
-      window.ztUserData['signInPage'] = 'https://beta.gamalogic.com/signin';
-      // window.ztUserData['ztWidgetDelay'] = 0;
-      console.log(window.ztUserData,'window zt user dataaaaaaaa')
+  // useEffect(()=>{
+  //   console.log('heyyyyyoooo')
+  //   async function fetchThriveDigest(){
+  //     let user=await axiosInstance.get('/affiliateUserId')
+  //     console.log(user,'user is here')
+  //     window.ztUserData = window.ztUserData || {}; 
+  //     window.ztUserData['za_email_id'] = user.data.user.emailid;  
+  //     window.ztUserData['user_unique_id'] =user.data.user.rowid;
+  //     window.ztUserData['thrive_digest'] = user.data.HMACDigest;
+  //     window.ztUserData['signUpPage'] = 'https://beta.gamalogic.com/signup';
+  //     window.ztUserData['signInPage'] = 'https://beta.gamalogic.com/signin';
+  //     // window.ztUserData['ztWidgetDelay'] = 0;
+  //     console.log(window.ztUserData,'window zt user dataaaaaaaa')
 
-      // const script = document.createElement('script');
-      // script.id = 'thrive_script';
-      // script.src = 'https://thrive.zohopublic.com/thrive/publicpages/thrivewidget';
-      // document.body.appendChild(script);
-    }
-    fetchThriveDigest()
+  //     // const script = document.createElement('script');
+  //     // script.id = 'thrive_script';
+  //     // script.src = 'https://thrive.zohopublic.com/thrive/publicpages/thrivewidget';
+  //     // document.body.appendChild(script);
+  //   }
+  //   fetchThriveDigest()
 
 
-  },[userDetails])
+  // },[userDetails])
   return (
     <div className="w-full h-screen overflow-y-auto pb-12">
       {userDetails && <Outlet />}

@@ -14,6 +14,7 @@ import forgotPasswordTemplate from "../EmailTemplates/forgotPasswordTemplate.js"
 import urls from "../ConstFiles/urls.js";
 import leadGeneration from "../utils/crm.js";
 import AddContacts from "../utils/campaigns.js";
+import hmacDigestFunction from "../utils/HMACDigest";
 
 const Authentication = {
   sample: async (req, res) => {
@@ -101,6 +102,10 @@ const Authentication = {
             req.headers['x-forwarded-for'] ||
             req.socket.remoteAddress || '';
 
+            const HMACDigest=hmacDigestFunction(user[0][0].emailid,user[0][0].rowid)
+
+      
+
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
           res.json({
@@ -113,7 +118,8 @@ const Authentication = {
             confirm: user[0][0].confirmed,
             password,
             country_name: 'USA',
-            expired
+            expired,
+            HMACDigest
           });
 
         } else {
@@ -263,6 +269,10 @@ const Authentication = {
           req.headers['x-real-ip'] ||
           req.headers['x-forwarded-for'] ||
           req.socket.remoteAddress || '';
+
+          const HMACDigest=hmacDigestFunction(user[0][0].emailid,user[0][0].rowid)
+
+
         // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
         // const { country_name } = response.data;
         res.status(200).json({
@@ -275,7 +285,8 @@ const Authentication = {
           confirm: 1,
           password,
           country_name: 'USA',
-          expired
+          expired,
+          HMACDigest
         });
       } else {
         res.status(400).json({
@@ -388,6 +399,8 @@ const Authentication = {
             basicTemplate(user[0][0].username, content)
           );
           let password = false
+          const HMACDigest=hmacDigestFunction(user[0][0].emailid,user[0][0].rowid)
+
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
           res.json({
@@ -399,7 +412,8 @@ const Authentication = {
             token,
             confirm: 1,
             password,
-            country_name: 'USA'
+            country_name: 'USA',
+            HMACDigest
           });
         } else {
           res
@@ -538,6 +552,9 @@ const Authentication = {
                 basicTemplate(user[0][0].username, content)
               );
               let password = false
+
+              const HMACDigest=hmacDigestFunction(user[0][0].emailid,user[0][0].rowid)
+
               res.json({
                 name: user[0][0].username,
                 email: user[0][0].emailid,
@@ -547,6 +564,7 @@ const Authentication = {
                 token,
                 confirm: 1,
                 password,
+                HMACDigest
               });
             } else {
               res
@@ -657,6 +675,8 @@ const Authentication = {
               req.socket.remoteAddress || '';
             // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
             // const { country_name } = response.data;
+            const HMACDigest=hmacDigestFunction(user[0][0].emailid,user[0][0].rowid)
+
             res.status(200).json({
               name: user[0][0].username,
               email: user[0][0].emailid,
@@ -667,7 +687,8 @@ const Authentication = {
               confirm: 1,
               password,
               country_name: 'India',
-              expired
+              expired,
+              HMACDigest
             });
           } else {
             res.status(400).json({
@@ -788,6 +809,8 @@ const Authentication = {
             basicTemplate(user[0][0].username, content)
           );
           let password = false
+          const HMACDigest=hmacDigestFunction(user[0][0].emailid,user[0][0].rowid)
+
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
@@ -797,6 +820,7 @@ const Authentication = {
             token,
             confirm: 1,
             password,
+            HMACDigest
           });
         } else {
           res
@@ -856,6 +880,8 @@ const Authentication = {
           req.socket.remoteAddress || '';
         // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
         // const { country_name } = response.data;
+        const HMACDigest=hmacDigestFunction(user[0][0].emailid,user[0][0].rowid)
+
         res.status(200).json({
           name: user[0][0].username,
           email: user[0][0].emailid,
@@ -866,7 +892,8 @@ const Authentication = {
           confirm: 1,
           password,
           country_name: 'India',
-          expired
+          expired,
+          HMACDigest
         });
       } else {
         res.status(400).json({
