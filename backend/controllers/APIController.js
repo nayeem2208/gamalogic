@@ -15,7 +15,6 @@ import crypto from 'crypto'
 import PurchaseApi from "../utils/thrive.js";
 import InrToUsdConverter from "../utils/INRtoUSD.js";
 import InrToUsdSubscriptionConverter from "../utils/INRtoUSDSubscription.js";
-import BillingInrToUsdSubscriptionConverter from "../utils/BillingInrToUsd.js";
 
 
 let APIControllers = {
