@@ -248,16 +248,18 @@ const Authentication = {
         let currentDate = new Date();
         let expired
         if (user[0][0].is_premium == 0 && user[0][0].confirmed == 1) {
-          if (finalFree < currentDate) {
-            expired = {
-              status: true,
-              reason: 'date'
+          if (user[0][0].credits <= 0) {
+            if (finalFree < currentDate) {
+              expired = {
+                status: true,
+                reason: 'date'
+              }
             }
-          }
-          else if (user[0][0].credits_free <= 0) {
-            expired = {
-              status: true,
-              reason: 'credit'
+            else if (user[0][0].credits_free <= 0) {
+              expired = {
+                status: true,
+                reason: 'credit'
+              }
             }
           }
         }
@@ -278,6 +280,7 @@ const Authentication = {
 
         // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
         // const { country_name } = response.data;
+        console.log(expired,'expireddddddddd')
         res.status(200).json({
           name: user[0][0].username,
           email: user[0][0].emailid,
