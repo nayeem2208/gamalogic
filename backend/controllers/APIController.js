@@ -1175,7 +1175,13 @@ let APIControllers = {
             let last_payment = new Date().toISOString()
             await dbConnection.query(`UPDATE registration SET credits = '${newBalance}',last_payment_time='${last_payment}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
             let content
-            let DollarRate = await InrToUsdSubscriptionConverter(creditToConvert, planDetails[2])
+            let creditToConvert
+            if (planDetails[2] === 'monthly' || planDetails[2] === 'is_monthly') {
+              creditToConvert = planDetails[0];
+            } else {
+              creditToConvert = planDetails[0] / 12;
+            }
+            let DollarRateForDB = await InrToUsdSubscriptionConverter(creditToConvert, planDetails[2])
 
 
             let amount = resp.amount / 100
@@ -1215,7 +1221,7 @@ let APIControllers = {
               subscriptinDetails.id || null,
               new Date().toISOString(),
               planDetails[2] == 'monthly' ? planDetails[0] : planDetails[0] / 12,
-              DollarRate
+              DollarRateForDB
 
             ]
 
@@ -1223,13 +1229,8 @@ let APIControllers = {
             console.log('outside thriveeeeee')
             if (userDetails[0][0].is_referer_by == 1) {
               try {
-                console.log('inside thriveeeeeeeee')
-                let creditToConvert
-                if (planDetails[2] === 'monthly' || planDetails[2] === 'is_monthly') {
-                  creditToConvert = planDetails[0];
-                } else {
-                  creditToConvert = planDetails[0] / 12;
-                }
+
+                let DollarRate = await InrToUsdSubscriptionConverter(creditToConvert, planDetails[2])
                 console.log(DollarRate, 'rate in dollar ')
                 let response = await PurchaseApi(userDetails[0][0].emailid, DollarRate, resp.order_id || null, userDetails[0][0]?.rowid ?? null)
                 console.log(response, 'resppppppp')
