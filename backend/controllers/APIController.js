@@ -1043,9 +1043,10 @@ let APIControllers = {
       last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',is_active=1,is_pay_as_you_go=0,subscription_stop_time=NULL
  WHERE emailid='${req.user[0][0].emailid}'`)
 
+      let DollarRate = await InrToUsdSubscriptionConverter(req.body.credits, periodColumn)
       const query = `
-    INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id,timestamp,${periodColumn})
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)
+    INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id,timestamp,${periodColumn},amount_usd,credits)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)
   `;
       let amount = resp.amount / 100
       let fee = Math.round(resp.fee / 100)
@@ -1078,14 +1079,14 @@ let APIControllers = {
         subscriptinDetails.status || null,
         subscriptinDetails.id || null,
         new Date().toISOString(),
-        1
+        1,
+        DollarRate,
+        req.body.credits
       ]
 
       await dbConnection.query(query, values);
       if (req.user[0][0].is_referer_by == 1) {
         try {
-          let DollarRate = await InrToUsdSubscriptionConverter(req.body.credits, periodColumn)
-          console.log(DollarRate, 'rate in dollar ')
           let response = await PurchaseApi(req.user[0][0].emailid, DollarRate, resp.order_id || null, req.user[0][0]?.rowid ?? null)
           console.log(response, 'resppppppp')
         } catch (error) {
@@ -1174,13 +1175,15 @@ let APIControllers = {
             let last_payment = new Date().toISOString()
             await dbConnection.query(`UPDATE registration SET credits = '${newBalance}',last_payment_time='${last_payment}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
             let content
+            let DollarRate = await InrToUsdSubscriptionConverter(creditToConvert, planDetails[2])
+
 
             let amount = resp.amount / 100
             let fee = Math.round(resp.fee / 100)
             let tax = resp.tax / 100
             const query = `
-          INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id,timestamp)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
+          INSERT INTO razorpay_subscription (id, amount,fee,tax, order_id, method, amount_refunded, refund_status, description, card_id, bank, wallet, vpa, email, contact, token_id, notes_address, rrn, upi_transaction_id, created_at, upi_vpa, entity, plan_id, customer_id, status,subscription_id,timestamp,amount_usd,credits)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)
         `;
 
             const values = [
@@ -1210,7 +1213,9 @@ let APIControllers = {
               userDetails[0][0].rowid,
               subscriptinDetails.status || null,
               subscriptinDetails.id || null,
-              new Date().toISOString()
+              new Date().toISOString(),
+              planDetails[2] == 'monthly' ? planDetails[0] : planDetails[0] / 12,
+              DollarRate
 
             ]
 
@@ -1225,7 +1230,6 @@ let APIControllers = {
                 } else {
                   creditToConvert = planDetails[0] / 12;
                 }
-                let DollarRate = await InrToUsdSubscriptionConverter(creditToConvert, planDetails[2])
                 console.log(DollarRate, 'rate in dollar ')
                 let response = await PurchaseApi(userDetails[0][0].emailid, DollarRate, resp.order_id || null, userDetails[0][0]?.rowid ?? null)
                 console.log(response, 'resppppppp')
@@ -1353,7 +1357,7 @@ let APIControllers = {
           if (plan) {
             let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12;
             let amount = await BillingInrToUsdSubscriptionConverter(credit, plan[2]);
-            
+
             planDetails = {
               ...razorPaySub[0][0],
               source: 'razorpay',
@@ -1365,8 +1369,8 @@ let APIControllers = {
             planDetails = {
               ...razorPaySub[0][0],
               source: 'razorpay',
-              credits: 0,  
-              gross_amount: 0  
+              credits: 0,
+              gross_amount: 0
             };
           }
         }
@@ -1395,7 +1399,7 @@ let APIControllers = {
             if (plan) {
               let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12;
               let amount = await BillingInrToUsdSubscriptionConverter(credit, plan[2]);
-              
+
               planDetails = {
                 ...razorPaySub[0][0],
                 source: 'razorpay',
@@ -1407,8 +1411,8 @@ let APIControllers = {
               planDetails = {
                 ...razorPaySub[0][0],
                 source: 'razorpay',
-                credits: 0,  
-                gross_amount: 0  
+                credits: 0,
+                gross_amount: 0
               };
             }
           } else {
@@ -1454,7 +1458,7 @@ let APIControllers = {
     // const token = req.headers.authorization;
     // if (token) {
     try {
-      console.log(req.user[0][0],'body of ztuser')
+      console.log(req.user[0][0], 'body of ztuser')
       let email_id = req.user[0][0].emailid
       let customer_id = req.user[0][0].rowid
       let digestRaw = email_id + customer_id
