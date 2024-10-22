@@ -1229,7 +1229,6 @@ let APIControllers = {
             console.log('outside thriveeeeee')
             if (userDetails[0][0].is_referer_by == 1) {
               try {
-
                 let DollarRate = await InrToUsdSubscriptionConverter(creditToConvert, planDetails[2])
                 console.log(DollarRate, 'rate in dollar ')
                 let response = await PurchaseApi(userDetails[0][0].emailid, DollarRate, resp.order_id || null, userDetails[0][0]?.rowid ?? null)
@@ -1346,34 +1345,12 @@ let APIControllers = {
             ORDER BY glid DESC
           `);
         if (paypalSub[0].length === 0 && razorPaySub[0].length > 0) {
-          let plan = RazorpayPrice.find(([credit, id, period]) => id == razorPaySub[0][0].plan_id)
-          // let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12
-          // let amount=await BillingInrToUsdSubscriptionConverter(credit, plan[2])
-          // planDetails = {
-          //   ...razorPaySub[0][0],
-          //   source: 'razorpay',
-          //   credits: credit,
-          //   gross_amount:amount
-          // };
-          if (plan) {
-            let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12;
-            let amount = await BillingInrToUsdSubscriptionConverter(credit, plan[2]);
-
-            planDetails = {
-              ...razorPaySub[0][0],
-              source: 'razorpay',
-              credits: credit,
-              gross_amount: amount
-            };
-          } else {
-            console.error("No matching plan found for Razorpay subscription");
-            planDetails = {
-              ...razorPaySub[0][0],
-              source: 'razorpay',
-              credits: 0,
-              gross_amount: 0
-            };
-          }
+          planDetails = {
+            ...razorPaySub[0][0],
+            source: 'razorpay',
+            credits: razorPaySub[0][0].credits || null,
+            gross_amount: razorPaySub[0][0].amount_usd || null
+          };
         }
         else if (razorPaySub[0].length === 0 && paypalSub[0].length > 0) {
           planDetails = {
@@ -1382,40 +1359,13 @@ let APIControllers = {
           };
         }
         else if (razorPaySub[0].length > 0 && paypalSub[0].length > 0) {
-          // console.log(new Date(razorPaySub[0][0].timestamp).getTime(), 'rzp timeeeeeeeeeeee', new Date(paypalSub[0][0].time_stamp).getTime())
           if (new Date(razorPaySub[0][0].timestamp).getTime() > new Date(paypalSub[0][0].time_stamp).getTime()) {
-            let plan = RazorpayPrice.find(([credit, id, period]) => id == razorPaySub[0][0].plan_id)
-            // let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12
-            // let amount=await BillingInrToUsdSubscriptionConverter(credit, plan[2])
-
-            // planDetails = {
-            //   ...razorPaySub[0][0],
-            //   source: 'razorpay',
-            //   credits: credit,
-            //   gross_amount:amount
-
-            // };
-
-            //added this code cos plan cant find if the payment in done in test and checking in live.and vise versa
-            if (plan) {
-              let credit = plan[2] == 'monthly' ? plan[0] : plan[0] / 12;
-              let amount = await BillingInrToUsdSubscriptionConverter(credit, plan[2]);
-
-              planDetails = {
-                ...razorPaySub[0][0],
-                source: 'razorpay',
-                credits: credit,
-                gross_amount: amount
-              };
-            } else {
-              console.error("No matching plan found for Razorpay subscription");
-              planDetails = {
-                ...razorPaySub[0][0],
-                source: 'razorpay',
-                credits: 0,
-                gross_amount: 0
-              };
-            }
+            planDetails = {
+              ...razorPaySub[0][0],
+              source: 'razorpay',
+              credits: razorPaySub[0][0].credits || null,
+              gross_amount: razorPaySub[0][0].amount_usd || null
+            };
           } else {
             planDetails = {
               ...paypalSub[0][0],
