@@ -76,7 +76,7 @@ const Authentication = {
           let finalFree = new Date(user[0][0].free_final);
           let finalFreeDate = new Date(finalFree);
           let currentDate = new Date();
-          let expired
+          let expired=null
           if (user[0][0].is_premium == 0 && user[0][0].confirmed == 1) {
             if (user[0][0].credits <= 0) {
               if (finalFree < currentDate) {
