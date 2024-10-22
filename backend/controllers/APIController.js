@@ -1233,7 +1233,7 @@ let APIControllers = {
                 let response = await PurchaseApi(userDetails[0][0].emailid, DollarRate, resp.order_id || null, userDetails[0][0]?.rowid ?? null)
                 console.log(response, 'resppppppp')
               } catch (error) {
-                ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+                ErrorHandler("razorpay webhook Controller Thrive purchase push section", error, req);
               }
             }
             if (planDetails[2] == 'monthly') {

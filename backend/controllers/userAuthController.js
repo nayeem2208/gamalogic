@@ -20,8 +20,8 @@ const Authentication = {
   sample: async (req, res) => {
     ///its for checking purpose
     try {
-      let source='Sign in'
-      leadGeneration('BCOS', 'Healthcare', 'info@bcoshealthcare.com',source,req)
+      let source = 'Sign in'
+      leadGeneration('BCOS', 'Healthcare', 'info@bcoshealthcare.com', source, req)
       // let dbConnection = req.dbConnection
       // let token = '123'
       // // let token = 'AQVkAFg4Qcyjcv5mhrmakhf86FMFsFbtdfDY2ZoLhMH1n5QU1ByJV0baVPGDKCq2Qw3bMo3AclLXpSH8SzzY1Pp_dnpq9MalTojwYi96rseFR-U5MVBFoVaWmOcKv8VtbqXqIigNsTRnjLqz5zazqKHEnNVCu9YGkyLYjkd7u66ZDt8orDSwmb8J_OJqU5lNWIXSYHu-5a3zkxNjapnEWCwM7jujWn8ZXUNZ5FOwyi77fSG4NYalhHUbOGaFA2uppleCoan5pcHQaHaU3sczGSc5ocBqS5IUHESD2aIog3gTxSUQbgQqRRjUBWr-N-dNllrQYkin_i2YozvH_Em2RVsudDeRDQ';
@@ -37,11 +37,11 @@ const Authentication = {
       ErrorHandler("Sample Controller", error, req);
     }
   },
-  samplePost:async (req, res) => {
+  samplePost: async (req, res) => {
     ///its for checking purpose
     try {
-      console.log(req.body,'req.body')
-       ErrorHandler("webhook checker", req.body, req);
+      console.log(req.body, 'req.body')
+      ErrorHandler("webhook checker", req.body, req);
       res.send('hiiii its working')
     } catch (error) {
       // ErrorHandler("Sample Controller", error, req);
@@ -77,17 +77,19 @@ const Authentication = {
           let finalFreeDate = new Date(finalFree);
           let currentDate = new Date();
           let expired
-          if(user[0][0].is_premium==0&&user[0][0].confirmed==1){
-            if(finalFree<currentDate){
-              expired={
-                status:true,
-                reason:'date'
+          if (user[0][0].is_premium == 0 && user[0][0].confirmed == 1) {
+            if (user[0][0].credits <= 0) {
+              if (finalFree < currentDate) {
+                expired = {
+                  status: true,
+                  reason: 'date'
+                }
               }
-            }
-            else if(user[0][0].credits_free<=0){
-              expired={
-                status:true,
-                reason:'credit'
+              else if (user[0][0].credits_free <= 0) {
+                expired = {
+                  status: true,
+                  reason: 'credit'
+                }
               }
             }
           }
@@ -102,9 +104,9 @@ const Authentication = {
             req.headers['x-forwarded-for'] ||
             req.socket.remoteAddress || '';
 
-            const HMACDigest=hmacDigestFunction(user[0][0].emailid,user[0][0].rowid)
+          const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
 
-      
+
 
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
@@ -120,7 +122,7 @@ const Authentication = {
             country_name: 'USA',
             expired,
             HMACDigest,
-            id:user[0][0].rowid
+            id: user[0][0].rowid
           });
 
         } else {
@@ -172,7 +174,7 @@ const Authentication = {
           };
           try {
             const response = await axios.post(url, data, { headers });
-            console.log(response,'response of registration')
+            console.log(response, 'response of registration')
           } catch (error) {
             ErrorHandler("verifyEmail Controller thrive signup section", error, req);
           }
@@ -191,14 +193,14 @@ const Authentication = {
           .slice(0, 19)
           .replace("T", " ");
         let apiKey = await generateUniqueApiKey(req);
-        let referenceCode=req.body.thriveRefId!=null?req.body.thriveRefId:null
-        let isReferedBy=req.body.thriveRefId!=null?1:0
-        let source=req.body.thriveRefId!=null?'Affiliate Referrer':'Sign in'
+        let referenceCode = req.body.thriveRefId != null ? req.body.thriveRefId : null
+        let isReferedBy = req.body.thriveRefId != null ? 1 : 0
+        let source = req.body.thriveRefId != null ? 'Affiliate Referrer' : 'Sign in'
         await dbConnection.query(
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by,referer_by)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}')`
         );
         try {
-          leadGeneration(firstname, lastname, email,source,req)
+          leadGeneration(firstname, lastname, email, source, req)
         } catch (error) {
           ErrorHandler("registerUser Controller CRM lead Generation ", error, req);
         }
@@ -245,17 +247,17 @@ const Authentication = {
         let finalFreeDate = new Date(finalFree);
         let currentDate = new Date();
         let expired
-        if(user[0][0].is_premium==0&&user[0][0].confirmed==1){
-          if(finalFree<currentDate){
-            expired={
-              status:true,
-              reason:'date'
+        if (user[0][0].is_premium == 0 && user[0][0].confirmed == 1) {
+          if (finalFree < currentDate) {
+            expired = {
+              status: true,
+              reason: 'date'
             }
           }
-          else if(user[0][0].credits_free<=0){
-            expired={
-              status:true,
-              reason:'credit'
+          else if (user[0][0].credits_free <= 0) {
+            expired = {
+              status: true,
+              reason: 'credit'
             }
           }
         }
@@ -271,7 +273,7 @@ const Authentication = {
           req.headers['x-forwarded-for'] ||
           req.socket.remoteAddress || '';
 
-          const HMACDigest=hmacDigestFunction(user[0][0].emailid,user[0][0].rowid)
+        const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
 
 
         // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
@@ -288,7 +290,7 @@ const Authentication = {
           country_name: 'USA',
           expired,
           HMACDigest,
-          id:user[0][0].rowid
+          id: user[0][0].rowid
         });
       } else {
         res.status(400).json({
@@ -324,7 +326,7 @@ const Authentication = {
       if (userExists[0].length > 0) {
         res.status(400).json({ error: "User already exists" });
       } else {
-        console.log(req.body.widgetCode ,req.body.thriveRefId,'widget and refidddddd')
+        console.log(req.body.widgetCode, req.body.thriveRefId, 'widget and refidddddd')
         if (req.body.widgetCode && req.body.thriveRefId) {
           const url = `https://thrive.zoho.com/thrive/webhooks/${req.body.widgetCode}/mapreferral`;
 
@@ -341,7 +343,7 @@ const Authentication = {
             last_name: lastname,
           };
           try {
-            
+
             const response = await axios.post(url, data, { headers });
           } catch (error) {
             ErrorHandler("Google Auth Controller Thrive signin section", error, req);
@@ -365,14 +367,14 @@ const Authentication = {
           .replace("T", " ");
 
         let apiKey = await generateUniqueApiKey(req);
-        let referenceCode=req.body.thriveRefId!=null?req.body.thriveRefId:null
-        let isReferedBy=req.body.thriveRefId!=null?1:0
-        let source=req.body.thriveRefId!=null?'Affiliate Referrer':'Sign in'
+        let referenceCode = req.body.thriveRefId != null ? req.body.thriveRefId : null
+        let isReferedBy = req.body.thriveRefId != null ? 1 : 0
+        let source = req.body.thriveRefId != null ? 'Affiliate Referrer' : 'Sign in'
         await dbConnection.query(
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by,referer_by)VALUES(null,'${name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}')`
         );
         try {
-          leadGeneration(firstname, lastname, email,source)
+          leadGeneration(firstname, lastname, email, source)
         } catch (error) {
           ErrorHandler("Google Auth Controller CRM lead Generation ", error, req);
         }
@@ -401,7 +403,7 @@ const Authentication = {
             basicTemplate(user[0][0].username, content)
           );
           let password = false
-          const HMACDigest=hmacDigestFunction(user[0][0].emailid,user[0][0].rowid)
+          const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
 
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
@@ -416,7 +418,7 @@ const Authentication = {
             password,
             country_name: 'USA',
             HMACDigest,
-            id:user[0][0].rowid
+            id: user[0][0].rowid
           });
         } else {
           res
@@ -438,7 +440,7 @@ const Authentication = {
   linkedinSignUp: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      const { code ,widgetCode,thriveRefId} = req.body;
+      const { code, widgetCode, thriveRefId } = req.body;
       if (!code) throw new Error('No code provided')
       const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_SIGNUP_REDIRECT_URI)}`;
       try {
@@ -454,7 +456,7 @@ const Authentication = {
             }
           }
         };
-    
+
         const accessTokenData = await getAccessToken(accessTokenUrl);
 
         try {
@@ -481,12 +483,12 @@ const Authentication = {
           } else {
             if (widgetCode && thriveRefId) {
               const url = `https://thrive.zoho.com/thrive/webhooks/${widgetCode}/mapreferral`;
-    
+
               const headers = {
                 'thrive-secret-hash': process.env.THRIVE_BRAND_SECRET,
                 'Content-Type': 'application/json',
               };
-    
+
               const data = {
                 email: email,
                 widget_code: widgetCode,
@@ -495,7 +497,7 @@ const Authentication = {
                 last_name: lastname,
               };
               try {
-                
+
                 const response = await axios.post(url, data, { headers });
               } catch (error) {
                 ErrorHandler("Linkedin signup Controller Thrive signin section", error, req);
@@ -519,14 +521,14 @@ const Authentication = {
               .replace("T", " ");
 
             let apiKey = await generateUniqueApiKey(req);
-            let referenceCode=thriveRefId!=null?thriveRefId:null
-            let isReferedBy=thriveRefId!=null?1:0
-            let source=thriveRefId!=null?'Affiliate Referrer':'Sign in'
+            let referenceCode = thriveRefId != null ? thriveRefId : null
+            let isReferedBy = thriveRefId != null ? 1 : 0
+            let source = thriveRefId != null ? 'Affiliate Referrer' : 'Sign in'
             await dbConnection.query(
               `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,is_linkedin,is_premium,firstname,lastname,is_referer_by,referer_by)VALUES(null,'${given_name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}')`
             );
             try {
-              leadGeneration(firstname, lastname, email,source)
+              leadGeneration(firstname, lastname, email, source)
             } catch (error) {
               ErrorHandler("Linkedin registerUser Controller CRM lead Generation ", error, req);
             }
@@ -556,7 +558,7 @@ const Authentication = {
               );
               let password = false
 
-              const HMACDigest=hmacDigestFunction(user[0][0].emailid,user[0][0].rowid)
+              const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
 
               res.json({
                 name: user[0][0].username,
@@ -568,7 +570,7 @@ const Authentication = {
                 confirm: 1,
                 password,
                 HMACDigest,
-                id:user[0][0].rowid
+                id: user[0][0].rowid
               });
             } else {
               res
@@ -653,17 +655,17 @@ const Authentication = {
             let finalFreeDate = new Date(finalFree);
             let currentDate = new Date();
             let expired
-            if(user[0][0].is_premium==0&&user[0][0].confirmed==1){
-              if(finalFree<currentDate){
-                expired={
-                  status:true,
-                  reason:'date'
+            if (user[0][0].is_premium == 0 && user[0][0].confirmed == 1) {
+              if (finalFree < currentDate) {
+                expired = {
+                  status: true,
+                  reason: 'date'
                 }
               }
-              else if(user[0][0].credits_free<=0){
-                expired={
-                  status:true,
-                  reason:'credit'
+              else if (user[0][0].credits_free <= 0) {
+                expired = {
+                  status: true,
+                  reason: 'credit'
                 }
               }
             }
@@ -679,7 +681,7 @@ const Authentication = {
               req.socket.remoteAddress || '';
             // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
             // const { country_name } = response.data;
-            const HMACDigest=hmacDigestFunction(user[0][0].emailid,user[0][0].rowid)
+            const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
 
             res.status(200).json({
               name: user[0][0].username,
@@ -693,7 +695,7 @@ const Authentication = {
               country_name: 'India',
               expired,
               HMACDigest,
-              id:user[0][0].rowid
+              id: user[0][0].rowid
             });
           } else {
             res.status(400).json({
@@ -757,7 +759,7 @@ const Authentication = {
             last_name: lastname,
           };
           try {
-            
+
             const response = await axios.post(url, data, { headers });
           } catch (error) {
             ErrorHandler("Google Auth Controller Thrive signin section", error, req);
@@ -781,14 +783,14 @@ const Authentication = {
           .replace("T", " ");
 
         let apiKey = await generateUniqueApiKey(req);
-        let referenceCode=req.body.thriveRefId!=null?req.body.thriveRefId:null
-        let isReferedBy=req.body.thriveRefId!=null?1:0
-        let source=req.body.thriveRefId!=null?'Affiliate Referrer':'Sign in'
+        let referenceCode = req.body.thriveRefId != null ? req.body.thriveRefId : null
+        let isReferedBy = req.body.thriveRefId != null ? 1 : 0
+        let source = req.body.thriveRefId != null ? 'Affiliate Referrer' : 'Sign in'
         await dbConnection.query(
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,is_microsoft,is_premium,firstname,lastname,is_referer_by,referer_by)VALUES(null,'${given_name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}')`
         );
         try {
-          leadGeneration(firstname, lastname, email,source)
+          leadGeneration(firstname, lastname, email, source)
         } catch (error) {
           ErrorHandler("Microsoft Signup Controller CRM lead Generation ", error, req);
         }
@@ -817,7 +819,7 @@ const Authentication = {
             basicTemplate(user[0][0].username, content)
           );
           let password = false
-          const HMACDigest=hmacDigestFunction(user[0][0].emailid,user[0][0].rowid)
+          const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
 
           res.json({
             name: user[0][0].username,
@@ -829,7 +831,7 @@ const Authentication = {
             confirm: 1,
             password,
             HMACDigest,
-            id:user[0][0].rowid
+            id: user[0][0].rowid
           });
         } else {
           res
@@ -866,17 +868,17 @@ const Authentication = {
         let finalFreeDate = new Date(finalFree);
         let currentDate = new Date();
         let expired
-        if(user[0][0].is_premium==0&&user[0][0].confirmed==1){
-          if(finalFree<currentDate){
-            expired={
-              status:true,
-              reason:'date'
+        if (user[0][0].is_premium == 0 && user[0][0].confirmed == 1) {
+          if (finalFree < currentDate) {
+            expired = {
+              status: true,
+              reason: 'date'
             }
           }
-          else if(user[0][0].credits_free<=0){
-            expired={
-              status:true,
-              reason:'credit'
+          else if (user[0][0].credits_free <= 0) {
+            expired = {
+              status: true,
+              reason: 'credit'
             }
           }
         }
@@ -893,7 +895,7 @@ const Authentication = {
           req.socket.remoteAddress || '';
         // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
         // const { country_name } = response.data;
-        const HMACDigest=hmacDigestFunction(user[0][0].emailid,user[0][0].rowid)
+        const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
 
         res.status(200).json({
           name: user[0][0].username,
@@ -907,7 +909,7 @@ const Authentication = {
           country_name: 'India',
           expired,
           HMACDigest,
-          id:user[0][0].rowid
+          id: user[0][0].rowid
 
 
         });
