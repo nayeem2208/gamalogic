@@ -1220,8 +1220,8 @@ let APIControllers = {
               subscriptinDetails.status || null,
               subscriptinDetails.id || null,
               new Date().toISOString(),
+              DollarRateForDB,
               planDetails[2] == 'monthly' ? planDetails[0] : planDetails[0] / 12,
-              DollarRateForDB
 
             ]
 
