@@ -17,18 +17,21 @@ function Body() {
         parsedToken = storedToken;
       }
       setUserDetails(parsedToken);
-      // if (!window.ztUserData) {
-      //   window.ztUserData = {};
-      //   window.ztUserData["za_email_id"] = parsedToken.email;
-      //   window.ztUserData["user_unique_id"] = parsedToken.id;
-      //   window.ztUserData["thrive_digest"] = parsedToken.HMACDigest;
-      //   window.ztUserData["signUpPage"] = `${
-      //     import.meta.env.VITE_FRONTEND_URL
-      //   }/signup`;
-      //   window.ztUserData["signInPage"] = `${
-      //     import.meta.env.VITE_FRONTEND_URL
-      //   }/signin`;
-      // }
+      console.log(window.ztUserData,parsedToken.HMACDigest,'zt user data')
+      if (window.ztUserData["za_email_id"] === undefined || window.ztUserData["za_email_id"] === null) {
+        window.ztUserData["za_email_id"] = parsedToken.email;
+        window.ztUserData["user_unique_id"] = parsedToken.id;
+        window.ztUserData["thrive_digest"] = parsedToken.HMACDigest;
+        window.ztUserData["signUpPage"] = `${import.meta.env.VITE_FRONTEND_URL}/signup`;
+        window.ztUserData["signInPage"] = `${import.meta.env.VITE_FRONTEND_URL}/signin`;
+        
+        const thriveScript = document.createElement('script');
+        thriveScript.id = 'thrive_script';
+        thriveScript.src = 'https://thrive.zohopublic.com/thrive/publicpages/thrivewidget';
+        document.body.appendChild(thriveScript);
+        console.log(window.ztUserData,'inside the ztuserdata')
+      }
+      
     } else {
       setUserDetails(null);
       navigate("/signin");

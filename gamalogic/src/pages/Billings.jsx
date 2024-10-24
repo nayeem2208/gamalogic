@@ -15,22 +15,16 @@ const override = {
   borderColor: "red",
 };
 
-
-
 function Billings() {
   let { setUserDetails, userDetails } = useUserState();
   let [freeTrialExpired, setFreeTrialExpired] = useState(false);
   let [billingDetails, setBillingDetails] = useState(null);
   let [load, setLoad] = useState(30);
   let [loading, setLoading] = useState(false);
-  // let [loading, setLoading] = useState(true);
   let [color, setColor] = useState("#1da6b8");
 
-
-
-
   // console.log(billingDetails, "billing detailssss");
-
+  console.log(billingDetails, "billing details");
   useEffect(() => {
     async function getPlan() {
       try {
@@ -44,23 +38,24 @@ function Billings() {
           setFreeTrialExpired(true);
         }
         if (res.data?.planDetails?.source === "razorpay") {
-          let dateOfPay = res.data?.planDetails?.time_stamp?.split("T")[0]||res.data?.planDetails?.timestamp?.split("T")[0]
+          let dateOfPay =
+            res.data?.planDetails?.time_stamp?.split("T")[0] ||
+            res.data?.planDetails?.timestamp?.split("T")[0];
           let nextBillingDate;
-  
+
           if (res.data?.planDetails?.is_monthly === "1") {
             nextBillingDate = new CalendarDate(dateOfPay).addMonths(1);
           } else {
             nextBillingDate = new CalendarDate(dateOfPay).addMonths(12);
           }
-  
+
           const formattedNextBillingDate = new Date(
             nextBillingDate.unixTimestampInSeconds * 1000
           ).toISOString();
-  
-          res.data.planDetails.next_billing_time = formattedNextBillingDate; 
+
+          res.data.planDetails.next_billing_time = formattedNextBillingDate;
         }
         setBillingDetails(res.data);
-
       } catch (error) {
         console.error("Error fetching plan:", error);
       }
@@ -76,14 +71,79 @@ function Billings() {
     }
   }, []);
 
+  const swalWithBootstrapButtons = Swal.mixin({
+    customClass: {
+      confirmButton: "bg-red-500 p-2 text-white rounded mx-2 w-32",
+      cancelButton: "bg-green-500 p-2 text-white rounded mx-2 w-32",
+    },
+    buttonsStyling: false,
+  });
+  async function handleSubscriptionCancel() {
+    swalWithBootstrapButtons
+      .fire({
+        title: "Are you sure?",
+        text: "Do you want to cancel the subscription",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, cancel it",
+        cancelButtonText: "No, cancel",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            let res = await axiosInstance.get("/cancelSubscription");
+            console.log(res, "res");
+            // Optionally, show a success message after cancellation
+
+            swalWithBootstrapButtons.fire({
+              title: "Verification Link Sent!",
+              text: "A verification link has been sent to your email. Please click the link to confirm your cancellation.",
+              icon: "info",
+              confirmButtonText: "Okay",
+            });
+          } catch (error) {
+            console.log(error);
+            swalWithBootstrapButtons.fire({
+              title: "Error",
+              text: "There was an error cancelling your subscription.",
+              icon: "error",
+            });
+          }
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          swalWithBootstrapButtons.fire({
+            title: "Cancelled",
+            text: "Your subscription is safe :)",
+            icon: "error",
+            timer: 3000,
+            // willClose: () => {
+            //   clearInterval(timerInterval);
+            // }
+          });
+        }
+      });
+  }
+
   return (
     <div className="Billing-container px-6 md:px-20 py-8 accountSettings text-center sm:text-start">
       <SubHeader SubHeader={"Billing"} />
       {userDetails.confirm == 1 ? (
         <div className="mt-6 sm:mt-14 text-bgblue subHeading">
-          
           {billingDetails ? (
-            billingDetails.isPremium == 1 ? (
+            billingDetails.isPremium == 1 &&
+            (billingDetails.isPayAsYouGo == null ||
+              billingDetails.isPayAsYouGo == 0) &&
+            (billingDetails.isMonthly == null ||
+              billingDetails.isMonthly == 0) &&
+            (billingDetails.isAnnual == null ||
+              billingDetails.isAnnual == 0) ? (
+              <div className="p-6 bg-white rounded-lg shadow-md">
+                <h2 className="font-semibold mb-2 flex items-center">
+                  You are a Premium user
+                  <RiVipCrownFill className="text-yellow-400 mx-2 w-6 h-6" />
+                </h2>
+              </div>
+            ) : billingDetails.isPremium == 1 ? (
               <div className="p-6 bg-white rounded-lg shadow-md">
                 <h2 className="font-semibold mb-2 flex items-center">
                   You are a Premium user
@@ -260,6 +320,23 @@ function Billings() {
                               </span>
                             </div>
                           )}
+                          {billingDetails.isActive == 1 && (
+                            <div className="flex justify-center py-6">
+                              <button
+                                onClick={handleSubscriptionCancel}
+                                className="cursor-pointer relative group overflow-hidden border-2 px-0 w-60 py-2 border-red-500 text-sm rounded mt-4 md:mt-0"
+                              >
+                                <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
+                                  Cancel Subscription
+                                </span>
+                                <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:-translate-x-full h-full"></span>
+                                <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-x-full h-full"></span>
+
+                                <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
+                                <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
+                              </button>
+                            </div>
+                          )}
                         </div>
 
                         {billingDetails.isActive == 0 && (
@@ -278,6 +355,20 @@ function Billings() {
                                 </span>
                               </button>
                             </Link>
+                          </div>
+                        )}
+                        {billingDetails.isActive == 1 && (
+                          <div className="flex justify-center py-6">
+                            <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-60 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
+                              <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
+                                Cancel Subscription
+                              </span>
+                              <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:-translate-x-full h-full"></span>
+                              <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-x-full h-full"></span>
+
+                              <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
+                              <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
+                            </button>
                           </div>
                         )}
                       </div>
@@ -327,7 +418,7 @@ function Billings() {
                   <div>
                     <div className="md:flex justify-between  items-center">
                       <p className="text-red-500 font-semibold">
-                      You have used all your free credits!
+                        You have used all your free credits!
                       </p>
                       <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
                         <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
@@ -389,15 +480,15 @@ function Billings() {
             )
           ) : (
             <div className=" h-96 flex items-center">
-            <GridLoader
-            color={color}
-            loading={loading}
-            cssOverride={override}
-            size={20}
-            aria-label="Loading Spinner"
-            data-testid="loader"
-          />
-          </div>
+              <GridLoader
+                color={color}
+                loading={loading}
+                cssOverride={override}
+                size={20}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
+            </div>
           )}
         </div>
       ) : (

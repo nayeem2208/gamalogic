@@ -4,6 +4,7 @@ import APIControllers from '../controllers/APIController.js';
 import authcheck from '../middlewares/auth.js';
 import dbMiddleware from '../middlewares/dbMiddleware.js';
 import APIDecode from '../middlewares/apiDecode.js';
+import newControllers from '../controllers/newController.js';
 
 const router=express.Router()
 
@@ -54,6 +55,8 @@ router.post('/RazorPayWebhook',dbMiddleware,APIControllers.razorPayWebhook)
 
 router.get('/getPlanDetails',dbMiddleware,authcheck,APIControllers.getPlanDetails)
 
+router.get('/cancelSubscription',dbMiddleware,authcheck,newControllers.cancelSubscription)
+router.get('/ConfirmSubscriptionCancellation',dbMiddleware,newControllers.verifyCancelSubscription)
 
 router.get('/affiliateUserId',dbMiddleware,authcheck,APIControllers.affilateUserId)
 router.post('/loyalityProgram',APIControllers.loyalityWebhook)

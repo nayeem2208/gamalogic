@@ -29,7 +29,7 @@ app.use(cookieParser());
 
 
 app.use(cors({
-  origin: 'https://app.gamalogic.com'
+  origin: process.env.FRONTEND_URL
 }));
 
 const noCache = (req, res, next) => {

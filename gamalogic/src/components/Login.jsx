@@ -40,6 +40,7 @@ function Login() {
     } else {
       document.title = "Real time Catch all email validation | Gamalogic";
     }
+    
   }, []);
 
   useEffect(() => {
