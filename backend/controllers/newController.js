@@ -10,14 +10,14 @@ const newControllers = {
     cancelSubscription: async (req, res) => {
         try {
             console.log(req.user[0][0], 'user')
-            let token= subscriptionCancelConfirmationToken(req.user[0][0].emailid)
-            console.log(token,'token')
+            let token = subscriptionCancelConfirmationToken(req.user[0][0].emailid)
+            console.log(token, 'token')
             let link = `${urls.frontendUrl}/api/ConfirmSubscriptionCancellation?email=${token}`
             sendEmail(
-              req.user[0][0].username,
-              req.user[0][0].emailid,
-              "Subscription Cancellation Verification ",
-              verifyCancelSubscriptionTemplate(req.user[0][0].username, token, link)
+                req.user[0][0].username,
+                req.user[0][0].emailid,
+                "Subscription Cancellation Verification ",
+                verifyCancelSubscriptionTemplate(req.user[0][0].username, token, link)
             );
             res.status(200).json({ status: 'success' })
         } catch (error) {
@@ -25,15 +25,27 @@ const newControllers = {
             // ErrorHandler("cancel subscription Controller", error, req)
         }
     },
-    verifyCancelSubscription:async(req,res)=>{
+    verifyCancelSubscription: async (req, res) => {
         try {
-            console.log('hiii')
-            const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
-            const userEmail = decoded.email;
-            console.log(userEmail,'decoded')
+          const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
+          const userEmail = decoded.email;
+      
+          console.log(userEmail, 'Token successfully decoded');
+            
+          res.redirect(`${urls.frontendUrl}/cancelSubscriptionConfirmation`);
         } catch (error) {
-            console.log(error)
+          if (error.name === 'TokenExpiredError') {
+            console.error('Token has expired');
+            res.redirect(`${urls.frontendUrl}/cancelSubscriptionError?error=expired`);
+          } else if (error.name === 'JsonWebTokenError') {
+            console.error('Invalid token');
+            res.redirect(`${urls.frontendUrl}/cancelSubscriptionError?error=invalid`);
+          } else {
+            console.error('An error occurred:', error);
+            res.redirect(`${urls.frontendUrl}/cancelSubscriptionError?error=generic`);
+          }
         }
-    }
+      },
+      
 }
 export default newControllers

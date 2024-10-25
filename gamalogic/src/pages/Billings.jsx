@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { SlInfo } from "react-icons/sl";
 import { CalendarDate } from "calendar-date";
 import GridLoader from "react-spinners/GridLoader";
+import Swal from "sweetalert2";
 
 const override = {
   display: "block",
@@ -355,20 +356,6 @@ function Billings() {
                                 </span>
                               </button>
                             </Link>
-                          </div>
-                        )}
-                        {billingDetails.isActive == 1 && (
-                          <div className="flex justify-center py-6">
-                            <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-60 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
-                              <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
-                                Cancel Subscription
-                              </span>
-                              <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:-translate-x-full h-full"></span>
-                              <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-x-full h-full"></span>
-
-                              <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
-                              <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
-                            </button>
                           </div>
                         )}
                       </div>

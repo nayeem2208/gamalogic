@@ -7,6 +7,8 @@ import EmailVerifiedPage from '../components/EmailVerifiedPage';
 import ServerError from '../pages/ServerError';
 import { useUserState } from '../context/userContext';
 import VerifyAgainErrorPage from '../components/VerifyAgainErrorPage';
+import SubscriptionCancellationConfirmed from '../components/SubscriptionCancellationConfirmed';
+import SubscriptionCancellationError from '../components/SubscriptionCancellationError';
 
 const QuickValidation = lazy(() => import('../pages/QuickValidation'));
 const Body = lazy(() => import('../components/Body'));
@@ -55,6 +57,8 @@ function Router() {
         <Route path="reset" element={<Suspense fallback={<TopLoader loading={loading} />}><ResetPassword setLoading={setLoading}/></Suspense>} />
         <Route path="VerifyYourEmail" element={<Suspense fallback={<TopLoader loading={loading} />}><PostSignupPage setLoading={setLoading}/></Suspense>} />
       </Route>
+      <Route path="/cancelSubscriptionConfirmation" element={<SubscriptionCancellationConfirmed />} />
+      <Route path="/cancelSubscriptionError" element={<SubscriptionCancellationError />} />
       <Route path="*" element={<NotFound />} />
       <Route path='/blocked' element={<BlockePage/>}/>
       <Route path='/EmailConfirmed' element={<EmailVerifiedPage/>}/>
