@@ -6,6 +6,8 @@ import ErrorHandler from "../utils/errorHandler.js"
 import sendEmail from "../utils/zeptoMail.js";
 import jwt from "jsonwebtoken";
 import basicTemplate from "../EmailTemplates/BasicTemplate.js";
+import Razorpay from "razorpay";
+
 
 
 const newControllers = {
@@ -97,7 +99,7 @@ const newControllers = {
 
               let payPalToken = await axios.post(url, data, { headers })
 
-              const payPaldetails = await axios.post(`${urls.paypalUrl}/v1/billing/subscriptions/${planDetails.subscription_id}/cancel`,{reason:'No specific reason'}, {
+              const payPaldetails = await axios.post(`${urls.paypalUrl}/v1/billing/subscriptions/${planDetails.subscription_id}/cancel`, { reason: 'No specific reason' }, {
                   headers: {
                       'Authorization': `Bearer ${payPalToken.data.access_token}`
                   }
@@ -105,23 +107,29 @@ const newControllers = {
 
               let stopTime = new Date().toISOString()
               await dbConnection.query(
-                `UPDATE registration SET is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
-                [stopTime, user[0][0].rowid]
+                  `UPDATE registration SET is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
+                  [stopTime, user[0][0].rowid]
               );
-              // // console.log(resource,'resource in cancelation part')
-              // let PlanData = paypalPrice.find(([credit, id, period]) => id == resource.plan_id)
-              let isMonthlyInEmail = planDetails.is_monthly == 1 ? 'Monthly' : 'Annual'
+          }
+          else if (planDetails.source == 'razorpay') {
+              var instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET })
+              let resp = await instance.subscriptions.cancel(planDetails.subscription_id)
+              console.log(resp,'resp')
+          }
+
+
+          let isMonthlyInEmail = planDetails.is_monthly == 1 ? 'Monthly' : 'Annual'
               let content
               if (planDetails.is_monthly == 1) {
-                content = `
+                  content = `
                 <p>We're sorry to see you go! Your monthly subscription has been successfully cancelled.</p>
                 
                 <p>If you have any questions or need assistance with your account, please don't hesitate to reach out.</p>
         
                 <p>Thank you for choosing us, and we hope to serve you again in the future!</p>
                 `
-              } else if(planDetails.is_annual == 1) {
-                content = `
+              } else if (planDetails.is_annual == 1) {
+                  content = `
                 <p>We're sorry to see you go! Your annual subscription has been successfully cancelled.</p>
                 
                 <p>If you have any questions or need assistance with your account, please don't hesitate to reach out.</p>
@@ -131,16 +139,11 @@ const newControllers = {
               }
               let sub = `Gamalogic ${isMonthlyInEmail} Subscription Cancellation`
               sendEmail(
-                user[0][0].username,
-                user[0][0].emailid,
-                sub,
-                basicTemplate(user[0][0].username, content)
+                  user[0][0].username,
+                  user[0][0].emailid,
+                  sub,
+                  basicTemplate(user[0][0].username, content)
               );
-    
-          }
-          else if (planDetails.source == 'razorpay') {
-              console.log('hiii')
-          }
 
 
           res.redirect(`${urls.frontendUrl}/cancelSubscriptionConfirmation`);
