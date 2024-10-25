@@ -1,9 +1,11 @@
+import axios from "axios";
 import urls from "../ConstFiles/urls.js";
 import verifyCancelSubscriptionTemplate from "../EmailTemplates/verfiyCancelSubscriptionTemplate.js";
 import subscriptionCancelConfirmationToken from "../utils/cancelSubscriptionToken.js";
 import ErrorHandler from "../utils/errorHandler.js"
 import sendEmail from "../utils/zeptoMail.js";
 import jwt from "jsonwebtoken";
+import basicTemplate from "../EmailTemplates/BasicTemplate.js";
 
 
 const newControllers = {
