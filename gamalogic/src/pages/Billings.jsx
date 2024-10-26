@@ -4,11 +4,12 @@ import { useUserState } from "../context/userContext";
 import axiosInstance, { APP } from "../axios/axiosInstance";
 import { RiVipCrownFill } from "react-icons/ri";
 import LoadingBar from "react-top-loading-bar";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { SlInfo } from "react-icons/sl";
 import { CalendarDate } from "calendar-date";
 import GridLoader from "react-spinners/GridLoader";
 import Swal from "sweetalert2";
+import CancelSubscriptionAlert from "../components/cancelModal/CancelSubscriptionAlert";
 
 const override = {
   display: "block",
@@ -23,9 +24,30 @@ function Billings() {
   let [load, setLoad] = useState(30);
   let [loading, setLoading] = useState(false);
   let [color, setColor] = useState("#1da6b8");
+  let [showAlert, setShowAlert] = useState(false);
+  let [success,setSuccess]=useState(null)
+  let [error,setError]=useState(null)
 
   // console.log(billingDetails, "billing detailssss");
   console.log(billingDetails, "billing details");
+  const location = useLocation();
+
+  useEffect(()=>{
+    const searchParams = new URLSearchParams(location.search);
+    const error = new URLSearchParams(location.search).get("error");
+    const success=new URLSearchParams(location.search).get("success");
+    if(error){
+      setSuccess(false)
+      setError(error)
+      searchParams.delete("error");
+    }
+    else if(success){
+      setSuccess(true)
+      searchParams.delete("success");
+    }
+    const newUrl = `${location.pathname}?${searchParams.toString()}`;
+    window.history.replaceState(null, "", newUrl);
+  },[location])
   useEffect(() => {
     async function getPlan() {
       try {
@@ -79,51 +101,43 @@ function Billings() {
     },
     buttonsStyling: false,
   });
-  async function handleSubscriptionCancel() {
-    swalWithBootstrapButtons
-      .fire({
-        title: "Are you sure?",
-        text: "Do you want to cancel the subscription",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, cancel it",
-        cancelButtonText: "No, cancel",
-        reverseButtons: true,
-      })
-      .then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            let res = await axiosInstance.get("/cancelSubscription");
-            console.log(res, "res");
-            // Optionally, show a success message after cancellation
 
-            swalWithBootstrapButtons.fire({
-              title: "Verification Link Sent!",
-              text: "A verification link has been sent to your email. Please click the link to confirm your cancellation.",
-              icon: "info",
-              confirmButtonText: "Okay",
-            });
-          } catch (error) {
-            console.log(error);
-            swalWithBootstrapButtons.fire({
-              title: "Error",
-              text: "There was an error cancelling your subscription.",
-              icon: "error",
-            });
-          }
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithBootstrapButtons.fire({
-            title: "Cancelled",
-            text: "Your subscription is safe :)",
-            icon: "error",
-            timer: 3000,
-            // willClose: () => {
-            //   clearInterval(timerInterval);
-            // }
-          });
-        }
-      });
+  async function handleSubscriptionCancel() {
+    setShowAlert(true);
   }
+
+  const handleAccept = async () => {
+    console.log("Cancelling subscription...");
+    try {
+      try {
+        let res = await axiosInstance.get("/cancelSubscription");
+        console.log(res, "res");
+
+        swalWithBootstrapButtons.fire({
+          title: "Verification Link Sent!",
+          text: "A verification link has been sent to your email. Please click the link to confirm your cancellation.",
+          icon: "info",
+          confirmButtonText: "Okay",
+        });
+      } catch (error) {
+        console.log(error);
+        swalWithBootstrapButtons.fire({
+          title: "Error",
+          text: "There was an error cancelling your subscription.",
+          icon: "error",
+        });
+      }
+      setShowAlert(false);
+    } catch (error) {
+      console.error("Error cancelling subscription:", error);
+      setShowAlert(false);
+    }
+  };
+
+  const handleDismiss = () => {
+    console.log("Cancellation dismissed");
+    setShowAlert(false);
+  };
 
   return (
     <div className="Billing-container px-6 md:px-20 py-8 accountSettings text-center sm:text-start">
@@ -336,6 +350,14 @@ function Billings() {
                                 <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
                                 <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
                               </button>
+                              {showAlert && (
+                                <div>
+                                  <CancelSubscriptionAlert
+                                    onAccept={handleAccept}
+                                    onDismiss={handleDismiss}
+                                  />
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>

@@ -28,6 +28,15 @@ function QuickValidation() {
       document.title = "Quick Validation | Dashboard";
     }
     localStorage.removeItem("refCode");
+
+    const handleEsc = (e) => {
+      if (e.key === "Escape" && tutorialVideo) {
+        handleCloseVideoModal();
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+
+    return () => window.removeEventListener("keydown", handleEsc)
   }, []);
 
   const submitHandler = async (e) => {
@@ -65,6 +74,7 @@ function QuickValidation() {
   };
   const handleCloseVideoModal = () => {
     setTutorialVideo(false);
+    window.reloadThriveWidget()
   };
   const selectVideoId = () => {
     let ids = ["9CnyAJZiQ38", "_ualvh37g9Y",'imageModal',null];

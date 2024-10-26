@@ -99,6 +99,7 @@ const newControllers = {
 
               let payPalToken = await axios.post(url, data, { headers })
 
+
               const payPaldetails = await axios.post(`${urls.paypalUrl}/v1/billing/subscriptions/${planDetails.subscription_id}/cancel`, { reason: 'No specific reason' }, {
                   headers: {
                       'Authorization': `Bearer ${payPalToken.data.access_token}`
@@ -146,20 +147,20 @@ const newControllers = {
               );
 
 
-          res.redirect(`${urls.frontendUrl}/cancelSubscriptionConfirmation`);
-      } catch (error) {
-          console.log(error)
-          if (error.name === 'TokenExpiredError') {
-              console.error('Token has expired');
-              res.redirect(`${urls.frontendUrl}/cancelSubscriptionError?error=expired`);
-          } else if (error.name === 'JsonWebTokenError') {
-              console.error('Invalid token');
-              res.redirect(`${urls.frontendUrl}/cancelSubscriptionError?error=invalid`);
-          } else {
-              console.error('An error occurred:', error);
-              res.redirect(`${urls.frontendUrl}/cancelSubscriptionError?error=generic`);
-          }
-      }
+          res.redirect(`${urls.frontendUrl}/dashboard/billing?success=true`);
+        } catch (error) {
+            console.log(error)
+            if (error.name === 'TokenExpiredError') {
+                console.error('Token has expired');
+                res.redirect(`${urls.frontendUrl}/dashboard/billing?error=expired`);
+            } else if (error.name === 'JsonWebTokenError') {
+                console.error('Invalid token');
+                res.redirect(`${urls.frontendUrl}/dashboard/billing?error=invalid`);
+            } else {
+                console.error('An error occurred:', error);
+                res.redirect(`${urls.frontendUrl}/dashboard/billing?error=generic`);
+            }
+        }
   },
       
 }

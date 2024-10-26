@@ -19,6 +19,7 @@ function SubHeader(props) {
     setUserDetails(null);
     navigate("/signin");
     setLinkedinLoading(false);
+    window.reloadThriveWidget()
   }
   const HandleSendVerifyLink = async (e) => {
     try {

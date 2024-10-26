@@ -16,8 +16,8 @@ function SubscriptionCancellationConfirmed() {
             <div className="red"></div>
             <div className="blue"></div>
           </div>
-          <h2 className="font-semibold text-4xl">Subscription Canceled</h2>
-          <p className="my-12 description">Your subscription has been successfully canceled.</p>
+          <h2 className="font-semibold text-4xl">Subscription Cancellation Request Confirmed</h2>
+          <p className="my-12 description">Your request to cancel the subscription has been successfully confirmed.</p>
           <div className="flex justify-center">
             <GoVerified
               style={{ fontSize: "15vw" }}
@@ -26,7 +26,7 @@ function SubscriptionCancellationConfirmed() {
           </div>
         </div>
         <div className="verify-foot-p my-6">
-          <p className="description font-thin">
+          <p className="description font-thin text-center">
             We're sorry to see you go, but feel free to subscribe again anytime!
           </p>
           <div className="my-6 flex justify-center">

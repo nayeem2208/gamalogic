@@ -44,6 +44,7 @@ function Header() {
       localStorage.removeItem("Gamalogic_token");
       setUserDetails(null);
       navigate("/signin");
+      window.reloadThriveWidget()
 }
   return (
     <div className="  items-center text-white lg:hidden ">

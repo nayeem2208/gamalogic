@@ -50,6 +50,7 @@ function SideBar() {
     } finally {
       setLinkedinLoading(false);
       navigate("/signin");
+      window.reloadThriveWidget()
     }
   }
 
