@@ -105,6 +105,11 @@ const Authentication = {
             req.socket.remoteAddress || '';
 
           const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
+          const userAgent = req.headers["user-agent"];
+          let dateOfLogin = new Date().toISOString().split('T')[0];
+          let timeOfLogin = new Date().toISOString().split('T')[1].split('.')[0];
+          await dbConnection.query(`INSERT INTO  last_login (user_id, date,time,ip,referer)VALUES(?, ?, ?, ?, ?)`, [user[0][0].rowid, dateOfLogin, timeOfLogin, ip, userAgent])
+
 
 
 
@@ -276,6 +281,10 @@ const Authentication = {
           req.socket.remoteAddress || '';
 
         const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
+        const userAgent = req.headers["user-agent"];
+        let dateOfLogin = new Date().toISOString().split('T')[0];
+        let timeOfLogin = new Date().toISOString().split('T')[1].split('.')[0];
+        await dbConnection.query(`INSERT INTO  last_login (user_id, date,time,ip,referer)VALUES(?, ?, ?, ?, ?)`, [user[0][0].rowid, dateOfLogin, timeOfLogin, ip, userAgent])
 
 
         // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
@@ -685,6 +694,11 @@ const Authentication = {
             // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
             // const { country_name } = response.data;
             const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
+            const userAgent = req.headers["user-agent"];
+            let dateOfLogin = new Date().toISOString().split('T')[0];
+            let timeOfLogin = new Date().toISOString().split('T')[1].split('.')[0];
+            await dbConnection.query(`INSERT INTO  last_login (user_id, date,time,ip,referer)VALUES(?, ?, ?, ?, ?)`, [user[0][0].rowid, dateOfLogin, timeOfLogin, ip, userAgent])
+  
 
             res.status(200).json({
               name: user[0][0].username,
@@ -901,6 +915,11 @@ const Authentication = {
         // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
         // const { country_name } = response.data;
         const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
+        const userAgent = req.headers["user-agent"];
+        let dateOfLogin = new Date().toISOString().split('T')[0];
+        let timeOfLogin = new Date().toISOString().split('T')[1].split('.')[0];
+        await dbConnection.query(`INSERT INTO  last_login (user_id, date,time,ip,referer)VALUES(?, ?, ?, ?, ?)`, [user[0][0].rowid, dateOfLogin, timeOfLogin, ip, userAgent])
+
 
         res.status(200).json({
           name: user[0][0].username,

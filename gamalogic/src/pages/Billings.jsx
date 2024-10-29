@@ -10,6 +10,10 @@ import { CalendarDate } from "calendar-date";
 import GridLoader from "react-spinners/GridLoader";
 import Swal from "sweetalert2";
 import CancelSubscriptionAlert from "../components/cancelModal/CancelSubscriptionAlert";
+import SubscriptionCancellationConfirmed from "../components/SubscriptionCancellationConfirmed";
+import SubscriptionCancellationError from "../components/SubscriptionCancellationError";
+import CancelEmailSuccess from "../components/cancelModal/CancelLinkSuccess";
+import CancelEmailFail from "../components/cancelModal/CancelLinkFail";
 
 const override = {
   display: "block",
@@ -25,29 +29,29 @@ function Billings() {
   let [loading, setLoading] = useState(false);
   let [color, setColor] = useState("#1da6b8");
   let [showAlert, setShowAlert] = useState(false);
-  let [success,setSuccess]=useState(null)
-  let [error,setError]=useState(null)
+  let [success, setSuccess] = useState(null);
+  let [error, setError] = useState(null);
+  let [emailSent, setEmailSent] = useState(null);
 
   // console.log(billingDetails, "billing detailssss");
   console.log(billingDetails, "billing details");
   const location = useLocation();
 
-  useEffect(()=>{
+  useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const error = new URLSearchParams(location.search).get("error");
-    const success=new URLSearchParams(location.search).get("success");
-    if(error){
-      setSuccess(false)
-      setError(error)
+    const success = new URLSearchParams(location.search).get("success");
+    if (error) {
+      setSuccess(false);
+      setError(error);
       searchParams.delete("error");
-    }
-    else if(success){
-      setSuccess(true)
+    } else if (success) {
+      setSuccess(true);
       searchParams.delete("success");
     }
     const newUrl = `${location.pathname}?${searchParams.toString()}`;
     window.history.replaceState(null, "", newUrl);
-  },[location])
+  }, [location]);
   useEffect(() => {
     async function getPlan() {
       try {
@@ -111,21 +115,9 @@ function Billings() {
     try {
       try {
         let res = await axiosInstance.get("/cancelSubscription");
-        console.log(res, "res");
-
-        swalWithBootstrapButtons.fire({
-          title: "Verification Link Sent!",
-          text: "A verification link has been sent to your email. Please click the link to confirm your cancellation.",
-          icon: "info",
-          confirmButtonText: "Okay",
-        });
+        setEmailSent(true);
       } catch (error) {
-        console.log(error);
-        swalWithBootstrapButtons.fire({
-          title: "Error",
-          text: "There was an error cancelling your subscription.",
-          icon: "error",
-        });
+        setEmailSent(false);
       }
       setShowAlert(false);
     } catch (error) {
@@ -139,55 +131,289 @@ function Billings() {
     setShowAlert(false);
   };
 
+  const handleOkay=()=>{
+    setEmailSent(null)
+  }
+
+
+
   return (
     <div className="Billing-container px-6 md:px-20 py-8 accountSettings text-center sm:text-start">
       <SubHeader SubHeader={"Billing"} />
-      {userDetails.confirm == 1 ? (
-        <div className="mt-6 sm:mt-14 text-bgblue subHeading">
-          {billingDetails ? (
-            billingDetails.isPremium == 1 &&
-            (billingDetails.isPayAsYouGo == null ||
-              billingDetails.isPayAsYouGo == 0) &&
-            (billingDetails.isMonthly == null ||
-              billingDetails.isMonthly == 0) &&
-            (billingDetails.isAnnual == null ||
-              billingDetails.isAnnual == 0) ? (
-              <div className="p-6 bg-white rounded-lg shadow-md">
-                <h2 className="font-semibold mb-2 flex items-center">
-                  You are a Premium user
-                  <RiVipCrownFill className="text-yellow-400 mx-2 w-6 h-6" />
-                </h2>
-              </div>
-            ) : billingDetails.isPremium == 1 ? (
-              <div className="p-6 bg-white rounded-lg shadow-md">
-                <h2 className="font-semibold mb-2 flex items-center">
-                  You are a Premium user
-                  <RiVipCrownFill className="text-yellow-400 mx-2 w-6 h-6" />
-                </h2>
-                {loading && (
-                  <LoadingBar
-                    color="#f74c41"
-                    progress={load}
-                    onLoaderFinished={() => {}}
-                  />
-                )}
-                {billingDetails.isPayAsYouGo == 1 &&
-                billingDetails.isActive != 1 ? (
-                  <div>
-                    <div className="md:flex justify-between  items-center">
-                      <p>You are in a Pay-as-you-go plan</p>
-                      {billingDetails.credits > 0 ? (
-                        <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
-                          <span className="font-bold text-white text-sm relative z-10 group-hover:text-green-500 duration-500">
-                            Active
-                          </span>
-                          <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:-translate-x-full h-full"></span>
-                          <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-x-full h-full"></span>
+      {success ? (
+        <SubscriptionCancellationConfirmed />
+      ) : success == false ? (
+        <SubscriptionCancellationError error={error} />
+      ) : (
+        ""
+      )}
+      {emailSent ? (
+        <CancelEmailSuccess onOkay={handleOkay}/>
+      ) : emailSent == false ? (
+        <CancelEmailFail onOkay={handleOkay}/>
+      ) : (
+        ""
+      )}
+      {(success == null )&&
+        (userDetails.confirm == 1 && success == null ? (
+          <div className="mt-6 sm:mt-14 text-bgblue subHeading">
+            {billingDetails ? (
+              billingDetails.isPremium == 1 &&
+              (billingDetails.isPayAsYouGo == null ||
+                billingDetails.isPayAsYouGo == 0) &&
+              (billingDetails.isMonthly == null ||
+                billingDetails.isMonthly == 0) &&
+              (billingDetails.isAnnual == null ||
+                billingDetails.isAnnual == 0) ? (
+                <div className="p-6 bg-white rounded-lg shadow-md">
+                  <h2 className="font-semibold mb-2 flex items-center">
+                    You are a Premium user
+                    <RiVipCrownFill className="text-yellow-400 mx-2 w-6 h-6" />
+                  </h2>
+                </div>
+              ) : billingDetails.isPremium == 1 ? (
+                <div className="p-6 bg-white rounded-lg shadow-md">
+                  <h2 className="font-semibold mb-2 flex items-center">
+                    You are a Premium user
+                    <RiVipCrownFill className="text-yellow-400 mx-2 w-6 h-6" />
+                  </h2>
+                  {loading && (
+                    <LoadingBar
+                      color="#f74c41"
+                      progress={load}
+                      onLoaderFinished={() => {}}
+                    />
+                  )}
+                  {billingDetails.isPayAsYouGo == 1 &&
+                  billingDetails.isActive != 1 ? (
+                    <div>
+                      <div className="md:flex justify-between  items-center">
+                        <p>You are in a Pay-as-you-go plan</p>
+                        {billingDetails.credits > 0 ? (
+                          <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
+                            <span className="font-bold text-white text-sm relative z-10 group-hover:text-green-500 duration-500">
+                              Active
+                            </span>
+                            <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:-translate-x-full h-full"></span>
+                            <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-x-full h-full"></span>
 
-                          <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
-                          <span className="absolute delay-300 top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-y-full h-full"></span>
-                        </button>
+                            <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
+                            <span className="absolute delay-300 top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-y-full h-full"></span>
+                          </button>
+                        ) : (
+                          <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
+                            <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
+                              Expired
+                            </span>
+                            <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:-translate-x-full h-full"></span>
+                            <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-x-full h-full"></span>
+
+                            <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
+                            <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
+                          </button>
+                        )}
+                      </div>
+                      {billingDetails.credits <= 0 && (
+                        <Link to="/dashboard/buy-credits">
+                          <button class="overflow-hidden md:mt-12 w-64 p-2 h-12 bg-bgblue text-white border-none rounded-md text-sm font-medium cursor-pointer relative z-10 group">
+                            PURCHASE CREDITS
+                            <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-300 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
+                            <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-800 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"></span>
+                            <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-900 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-1000 duration-500 origin-left"></span>
+                            <span class="group-hover:opacity-100 group-hover:duration-1000 duration-100 opacity-0 absolute  left-6 z-10">
+                              BECOME PREMIUM USER
+                            </span>
+                          </button>
+                        </Link>
+                      )}
+                    </div>
+                  ) : (
+                    <div>
+                      {billingDetails.planDetails?.is_monthly == 1 ? (
+                        <div className="md:flex justify-between  items-center">
+                          <p>You are on a Monthly Subscription</p>
+                          {billingDetails.isActive == 1 ? (
+                            <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
+                              <span className="font-bold text-white text-sm relative z-10 group-hover:text-green-500 duration-500">
+                                Active
+                              </span>
+                              <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:-translate-x-full h-full"></span>
+                              <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-x-full h-full"></span>
+
+                              <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
+                              <span className="absolute delay-300 top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-y-full h-full"></span>
+                            </button>
+                          ) : (
+                            <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
+                              <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
+                                Expired
+                              </span>
+                              <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:-translate-x-full h-full"></span>
+                              <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-x-full h-full"></span>
+
+                              <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
+                              <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
+                            </button>
+                          )}
+                        </div>
+                      ) : billingDetails.planDetails?.is_annual == 1 ? (
+                        // annuall subscription.........................
+                        <div className="md:flex justify-between  items-center">
+                          <p>You are on an Annual Subscription</p>
+                          {billingDetails.isActive == 1 ? (
+                            <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
+                              <span className="font-bold text-white text-sm relative z-10 group-hover:text-green-500 duration-500">
+                                Active
+                              </span>
+                              <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:-translate-x-full h-full"></span>
+                              <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-x-full h-full"></span>
+
+                              <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
+                              <span className="absolute delay-300 top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-y-full h-full"></span>
+                            </button>
+                          ) : (
+                            <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
+                              <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
+                                Expired
+                              </span>
+                              <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:-translate-x-full h-full"></span>
+                              <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-x-full h-full"></span>
+
+                              <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
+                              <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
+                            </button>
+                          )}
+                        </div>
                       ) : (
+                        ""
+                      )}
+                      <div className="flex flex-col justify-center  md:p-4 w-full md:mt-12">
+                        <h2 className="my-4 text-xl font-semibold text-center">
+                          Subscription Details
+                        </h2>
+                        <div className={`rounded-lg shadow-lg w-full  md:p-6 `}>
+                          <h2 className={` font-semibold mb-4 `}>
+                            {billingDetails.planDetails?.source === "paypal"
+                              ? "PayPal Subscription"
+                              : "Razorpay Subscription"}
+                          </h2>
+
+                          <div className="space-y-3 text-xs md:text-base">
+                            <div className="flex justify-between">
+                              <span className="font-medium">Amount:</span>
+                              <span>
+                                {billingDetails.planDetails?.gross_amount
+                                  ? `$${billingDetails.planDetails?.gross_amount}`
+                                  : `₹${billingDetails.planDetails?.amount}`}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="font-medium">Credits:</span>
+                              <span>{billingDetails.planDetails?.credits}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="font-medium">Period:</span>
+                              <span>
+                                {billingDetails.planDetails?.is_monthly == 1
+                                  ? `Monthly`
+                                  : `Annual`}
+                              </span>
+                            </div>
+                            {billingDetails.planDetails?.next_billing_time &&
+                              billingDetails.isActive == 1 && (
+                                <div className="flex justify-between">
+                                  <span className="font-medium">
+                                    Next Billing Time:
+                                  </span>
+                                  <span>
+                                    {billingDetails.planDetails
+                                      ?.next_billing_time
+                                      ? new Date(
+                                          billingDetails.planDetails?.next_billing_time
+                                        ).toLocaleDateString("en-GB")
+                                      : "N/A"}
+                                  </span>
+                                </div>
+                              )}
+                            {billingDetails.isActive == 0 && (
+                              <div className="flex justify-between">
+                                <span className="font-medium">
+                                  Subscription Stopped Time:
+                                </span>
+                                <span>
+                                  {billingDetails.isActive == 0
+                                    ? new Date(
+                                        billingDetails.subStopTime
+                                      ).toLocaleDateString("en-GB")
+                                    : "Active"}
+                                </span>
+                              </div>
+                            )}
+                            {billingDetails.isActive == 1 && (
+                              <div className="flex justify-center py-6">
+                                <button
+                                  onClick={handleSubscriptionCancel}
+                                  className="cursor-pointer relative group overflow-hidden border-2 px-0 w-60 py-2 border-red-500 text-sm rounded mt-4 md:mt-0"
+                                >
+                                  <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
+                                    Cancel Subscription
+                                  </span>
+                                  <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:-translate-x-full h-full"></span>
+                                  <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-x-full h-full"></span>
+
+                                  <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
+                                  <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
+                                </button>
+                                {showAlert && (
+                                  <div>
+                                    <CancelSubscriptionAlert
+                                      onAccept={handleAccept}
+                                      onDismiss={handleDismiss}
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          {billingDetails.isActive == 0 && (
+                            <div>
+                              <div className="mt-4 p-2 bg-red-100 text-red-600 text-xs md:text-base rounded-lg text-center">
+                                This subscription has been stopped.
+                              </div>
+                              <Link to="/dashboard/buy-credits">
+                                <button class="overflow-hidden my-6 md:mt-12 w-64 p-2 h-12 bg-bgblue text-white border-none rounded-md text-sm font-medium cursor-pointer relative z-10 group">
+                                  PURCHASE CREDITS
+                                  <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-300 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
+                                  <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-800 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"></span>
+                                  <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-900 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-1000 duration-500 origin-left"></span>
+                                  <span class="group-hover:opacity-100 group-hover:duration-1000 duration-100 opacity-0 absolute  left-6 z-10">
+                                    ACTIVE YOUR ACCOUNT
+                                  </span>
+                                </button>
+                              </Link>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                //...........freeee trial....................
+                <div className="text-gray-700 p-6 bg-white rounded-lg shadow-md">
+                  <p className="text-xl my-3 font-semibold">
+                    You are in a free trial.
+                  </p>
+                  {freeTrialExpired ? (
+                    <div>
+                      <div className="md:flex justify-between  items-center">
+                        <p className="text-red-500 font-semibold">
+                          Your free trial credits have expired on{" "}
+                          {new Date(
+                            billingDetails.freeTrialExpiry
+                          ).toLocaleDateString("en-GB")}
+                        </p>
                         <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
                           <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
                             Expired
@@ -198,9 +424,7 @@ function Billings() {
                           <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
                           <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
                         </button>
-                      )}
-                    </div>
-                    {billingDetails.credits <= 0 && (
+                      </div>
                       <Link to="/dashboard/buy-credits">
                         <button class="overflow-hidden md:mt-12 w-64 p-2 h-12 bg-bgblue text-white border-none rounded-md text-sm font-medium cursor-pointer relative z-10 group">
                           PURCHASE CREDITS
@@ -212,299 +436,89 @@ function Billings() {
                           </span>
                         </button>
                       </Link>
-                    )}
-                  </div>
-                ) : (
-                  <div>
-                    {billingDetails.planDetails?.is_monthly == 1 ? (
-                      <div className="md:flex justify-between  items-center">
-                        <p>You are on a Monthly Subscription</p>
-                        {billingDetails.isActive == 1 ? (
-                          <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
-                            <span className="font-bold text-white text-sm relative z-10 group-hover:text-green-500 duration-500">
-                              Active
-                            </span>
-                            <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:-translate-x-full h-full"></span>
-                            <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-x-full h-full"></span>
-
-                            <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
-                            <span className="absolute delay-300 top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-y-full h-full"></span>
-                          </button>
-                        ) : (
-                          <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
-                            <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
-                              Expired
-                            </span>
-                            <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:-translate-x-full h-full"></span>
-                            <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-x-full h-full"></span>
-
-                            <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
-                            <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
-                          </button>
-                        )}
-                      </div>
-                    ) : billingDetails.planDetails?.is_annual == 1 ? (
-                      // annuall subscription.........................
-                      <div className="md:flex justify-between  items-center">
-                        <p>You are on an Annual Subscription</p>
-                        {billingDetails.isActive == 1 ? (
-                          <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
-                            <span className="font-bold text-white text-sm relative z-10 group-hover:text-green-500 duration-500">
-                              Active
-                            </span>
-                            <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:-translate-x-full h-full"></span>
-                            <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-x-full h-full"></span>
-
-                            <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
-                            <span className="absolute delay-300 top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-y-full h-full"></span>
-                          </button>
-                        ) : (
-                          <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
-                            <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
-                              Expired
-                            </span>
-                            <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:-translate-x-full h-full"></span>
-                            <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-x-full h-full"></span>
-
-                            <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
-                            <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
-                          </button>
-                        )}
-                      </div>
-                    ) : (
-                      ""
-                    )}
-                    <div className="flex flex-col justify-center  md:p-4 w-full md:mt-12">
-                      <h2 className="my-4 text-xl font-semibold text-center">
-                        Subscription Details
-                      </h2>
-                      <div className={`rounded-lg shadow-lg w-full  md:p-6 `}>
-                        <h2 className={` font-semibold mb-4 `}>
-                          {billingDetails.planDetails?.source === "paypal"
-                            ? "PayPal Subscription"
-                            : "Razorpay Subscription"}
-                        </h2>
-
-                        <div className="space-y-3 text-xs md:text-base">
-                          <div className="flex justify-between">
-                            <span className="font-medium">Amount:</span>
-                            <span>
-                              {billingDetails.planDetails?.gross_amount
-                                ? `$${billingDetails.planDetails?.gross_amount}`
-                                : `₹${billingDetails.planDetails?.amount}`}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="font-medium">Credits:</span>
-                            <span>{billingDetails.planDetails?.credits}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="font-medium">Period:</span>
-                            <span>
-                              {billingDetails.planDetails?.is_monthly == 1
-                                ? `Monthly`
-                                : `Annual`}
-                            </span>
-                          </div>
-                          {billingDetails.planDetails?.next_billing_time &&
-                            billingDetails.isActive == 1 && (
-                              <div className="flex justify-between">
-                                <span className="font-medium">
-                                  Next Billing Time:
-                                </span>
-                                <span>
-                                  {billingDetails.planDetails?.next_billing_time
-                                    ? new Date(
-                                        billingDetails.planDetails?.next_billing_time
-                                      ).toLocaleDateString("en-GB")
-                                    : "N/A"}
-                                </span>
-                              </div>
-                            )}
-                          {billingDetails.isActive == 0 && (
-                            <div className="flex justify-between">
-                              <span className="font-medium">
-                                Subscription Stopped Time:
-                              </span>
-                              <span>
-                                {billingDetails.isActive == 0
-                                  ? new Date(
-                                      billingDetails.subStopTime
-                                    ).toLocaleDateString("en-GB")
-                                  : "Active"}
-                              </span>
-                            </div>
-                          )}
-                          {billingDetails.isActive == 1 && (
-                            <div className="flex justify-center py-6">
-                              <button
-                                onClick={handleSubscriptionCancel}
-                                className="cursor-pointer relative group overflow-hidden border-2 px-0 w-60 py-2 border-red-500 text-sm rounded mt-4 md:mt-0"
-                              >
-                                <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
-                                  Cancel Subscription
-                                </span>
-                                <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:-translate-x-full h-full"></span>
-                                <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-x-full h-full"></span>
-
-                                <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
-                                <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
-                              </button>
-                              {showAlert && (
-                                <div>
-                                  <CancelSubscriptionAlert
-                                    onAccept={handleAccept}
-                                    onDismiss={handleDismiss}
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-
-                        {billingDetails.isActive == 0 && (
-                          <div>
-                            <div className="mt-4 p-2 bg-red-100 text-red-600 text-xs md:text-base rounded-lg text-center">
-                              This subscription has been stopped.
-                            </div>
-                            <Link to="/dashboard/buy-credits">
-                              <button class="overflow-hidden my-6 md:mt-12 w-64 p-2 h-12 bg-bgblue text-white border-none rounded-md text-sm font-medium cursor-pointer relative z-10 group">
-                                PURCHASE CREDITS
-                                <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-300 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
-                                <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-800 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"></span>
-                                <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-900 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-1000 duration-500 origin-left"></span>
-                                <span class="group-hover:opacity-100 group-hover:duration-1000 duration-100 opacity-0 absolute  left-6 z-10">
-                                  ACTIVE YOUR ACCOUNT
-                                </span>
-                              </button>
-                            </Link>
-                          </div>
-                        )}
-                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  ) : billingDetails.freeCredits <= 0 ? (
+                    <div>
+                      <div className="md:flex justify-between  items-center">
+                        <p className="text-red-500 font-semibold">
+                          You have used all your free credits!
+                        </p>
+                        <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
+                          <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
+                            Expired
+                          </span>
+                          <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:-translate-x-full h-full"></span>
+                          <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-x-full h-full"></span>
+
+                          <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
+                          <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
+                        </button>
+                      </div>
+                      <Link to="/dashboard/buy-credits">
+                        <button class="overflow-hidden md:mt-12 w-64 p-2 h-12 bg-bgblue text-white border-none rounded-md text-sm font-medium cursor-pointer relative z-10 group">
+                          PURCHASE CREDITS
+                          <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-300 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
+                          <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-800 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"></span>
+                          <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-900 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-1000 duration-500 origin-left"></span>
+                          <span class="group-hover:opacity-100 group-hover:duration-1000 duration-100 opacity-0 absolute  left-6 z-10">
+                            BECOME PREMIUM USER
+                          </span>
+                        </button>
+                      </Link>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="md:flex justify-between  items-center">
+                        <p>
+                          Your free trial credits will expire on{" "}
+                          {new Date(
+                            billingDetails.freeTrialExpiry
+                          ).toLocaleDateString("en-GB")}
+                        </p>
+                        <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
+                          <span className="font-bold text-white text-sm relative z-10 group-hover:text-green-500 duration-500">
+                            Active
+                          </span>
+                          <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:-translate-x-full h-full"></span>
+                          <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-x-full h-full"></span>
+
+                          <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
+                          <span className="absolute delay-300 top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-y-full h-full"></span>
+                        </button>
+                      </div>
+                      <Link to="/dashboard/buy-credits">
+                        <button class="overflow-hidden md:mt-12 w-64 p-2 h-12 bg-bgblue text-white border-none rounded-md text-sm font-medium cursor-pointer relative z-10 group">
+                          PURCHASE CREDITS
+                          <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-300 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
+                          <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-800 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"></span>
+                          <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-900 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-1000 duration-500 origin-left"></span>
+                          <span class="group-hover:opacity-100 group-hover:duration-1000 duration-100 opacity-0 absolute  left-6 z-10">
+                            BECOME PREMIUM USER
+                          </span>
+                        </button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )
             ) : (
-              //...........freeee trial....................
-              <div className="text-gray-700 p-6 bg-white rounded-lg shadow-md">
-                <p className="text-xl my-3 font-semibold">
-                  You are in a free trial.
-                </p>
-                {freeTrialExpired ? (
-                  <div>
-                    <div className="md:flex justify-between  items-center">
-                      <p className="text-red-500 font-semibold">
-                        Your free trial credits have expired on{" "}
-                        {new Date(
-                          billingDetails.freeTrialExpiry
-                        ).toLocaleDateString("en-GB")}
-                      </p>
-                      <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
-                        <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
-                          Expired
-                        </span>
-                        <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:-translate-x-full h-full"></span>
-                        <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-x-full h-full"></span>
-
-                        <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
-                        <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
-                      </button>
-                    </div>
-                    <Link to="/dashboard/buy-credits">
-                      <button class="overflow-hidden md:mt-12 w-64 p-2 h-12 bg-bgblue text-white border-none rounded-md text-sm font-medium cursor-pointer relative z-10 group">
-                        PURCHASE CREDITS
-                        <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-300 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
-                        <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-800 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"></span>
-                        <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-900 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-1000 duration-500 origin-left"></span>
-                        <span class="group-hover:opacity-100 group-hover:duration-1000 duration-100 opacity-0 absolute  left-6 z-10">
-                          BECOME PREMIUM USER
-                        </span>
-                      </button>
-                    </Link>
-                  </div>
-                ) : billingDetails.freeCredits <= 0 ? (
-                  <div>
-                    <div className="md:flex justify-between  items-center">
-                      <p className="text-red-500 font-semibold">
-                        You have used all your free credits!
-                      </p>
-                      <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-red-500 text-sm rounded mt-4 md:mt-0">
-                        <span className="font-bold text-white text-sm relative z-10 group-hover:text-red-500 duration-500">
-                          Expired
-                        </span>
-                        <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:-translate-x-full h-full"></span>
-                        <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-x-full h-full"></span>
-
-                        <span className="absolute top-0 left-0 w-full bg-red-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
-                        <span className="absolute delay-300 top-0 left-0 w-full bg-red-500 duration-500 group-hover:translate-y-full h-full"></span>
-                      </button>
-                    </div>
-                    <Link to="/dashboard/buy-credits">
-                      <button class="overflow-hidden md:mt-12 w-64 p-2 h-12 bg-bgblue text-white border-none rounded-md text-sm font-medium cursor-pointer relative z-10 group">
-                        PURCHASE CREDITS
-                        <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-300 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
-                        <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-800 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"></span>
-                        <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-900 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-1000 duration-500 origin-left"></span>
-                        <span class="group-hover:opacity-100 group-hover:duration-1000 duration-100 opacity-0 absolute  left-6 z-10">
-                          BECOME PREMIUM USER
-                        </span>
-                      </button>
-                    </Link>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="md:flex justify-between  items-center">
-                      <p>
-                        Your free trial credits will expire on{" "}
-                        {new Date(
-                          billingDetails.freeTrialExpiry
-                        ).toLocaleDateString("en-GB")}
-                      </p>
-                      <button className="cursor-pointer relative group overflow-hidden border-2 px-0 w-32 py-2 border-green-500 text-sm rounded mt-4 md:mt-0">
-                        <span className="font-bold text-white text-sm relative z-10 group-hover:text-green-500 duration-500">
-                          Active
-                        </span>
-                        <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:-translate-x-full h-full"></span>
-                        <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-x-full h-full"></span>
-
-                        <span className="absolute top-0 left-0 w-full bg-green-500 duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
-                        <span className="absolute delay-300 top-0 left-0 w-full bg-green-500 duration-500 group-hover:translate-y-full h-full"></span>
-                      </button>
-                    </div>
-                    <Link to="/dashboard/buy-credits">
-                      <button class="overflow-hidden md:mt-12 w-64 p-2 h-12 bg-bgblue text-white border-none rounded-md text-sm font-medium cursor-pointer relative z-10 group">
-                        PURCHASE CREDITS
-                        <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-300 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
-                        <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-800 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"></span>
-                        <span class="absolute w-64 h-32 -top-8  -left-2 bg-blue-900 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-1000 duration-500 origin-left"></span>
-                        <span class="group-hover:opacity-100 group-hover:duration-1000 duration-100 opacity-0 absolute  left-6 z-10">
-                          BECOME PREMIUM USER
-                        </span>
-                      </button>
-                    </Link>
-                  </div>
-                )}
+              <div className=" h-96 flex items-center">
+                <GridLoader
+                  color={color}
+                  loading={loading}
+                  cssOverride={override}
+                  size={20}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
               </div>
-            )
-          ) : (
-            <div className=" h-96 flex items-center">
-              <GridLoader
-                color={color}
-                loading={loading}
-                cssOverride={override}
-                size={20}
-                aria-label="Loading Spinner"
-                data-testid="loader"
-              />
-            </div>
-          )}
-        </div>
-      ) : (
-        <p className="my-10 text-red-600 font-semibold text-lg">
-          You should verify your email to view billing.
-        </p>
-      )}
+            )}
+          </div>
+        ) : (
+          <p className="my-10 text-red-600 font-semibold text-lg">
+            You should verify your email to view billing.
+          </p>
+        ))}
     </div>
   );
 }
