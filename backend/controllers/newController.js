@@ -162,6 +162,63 @@ const newControllers = {
             }
         }
   },
+  addMoreDetails: async (req, res) => {
+    try {
+        const dbConnection = req.dbConnection;
+        const updatedFields = {};
+
+        if (req.body.firstname) updatedFields.firstname = req.body.firstname;
+        if (req.body.lastname) updatedFields.lastname = req.body.lastname;
+        if (req.body.phone_country_code) updatedFields.phone_country_code = req.body.phone_country_code
+        if (req.body.phone_number) updatedFields.phone_number = req.body.phone_number;
+        if (req.body.title) updatedFields.title = req.body.title;
+        if (req.body.company_name) updatedFields.company_name = req.body.company_name;
+        if (req.body.address_line_1) updatedFields.address_line_1 = req.body.address_line_1;
+        if (req.body.address_line_2) updatedFields.address_line_2 = req.body.address_line_2;
+        if (req.body.city) updatedFields.city = req.body.city;
+        if (req.body.pincode) updatedFields.pincode = req.body.pincode;
+        if (req.body.country) updatedFields.country = req.body.country;
+        if (req.body.state) updatedFields.state = req.body.state;
+        if (req.body.tax_id) updatedFields.tax_id = req.body.tax_id;
+        if (req.body.accountType === 'Company') {
+            updatedFields.is_company = Buffer.from([1]); 
+            updatedFields.is_personal = Buffer.from([0]); 
+        } else if (req.body.accountType === 'Personal') {
+            updatedFields.is_personal = Buffer.from([1]); 
+            updatedFields.is_company = Buffer.from([0]); 
+        }
+        const updateStatements = [];
+        const values = [];
+        let query = `UPDATE registration SET `;
+
+        for (const [key, value] of Object.entries(updatedFields)) {
+            updateStatements.push(`${key} = ?`);
+            values.push(value);
+        }
+
+        if (updateStatements.length === 0) {
+            return res.status(400).json({ message: 'No fields to update.' });
+        }
+
+        query += updateStatements.join(', ') + ` WHERE rowid = ?`;
+        values.push(req.user[0][0].rowid);
+        await dbConnection.query(query, values);
+
+        return res.status(200).json({ message: 'User details updated successfully.' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'An error occurred while updating user details.' });
+    }
+},
+getMoreDetails: async (req, res) => {
+    try {
+        let user = req.user[0][0]
+        res.status(200).json(user)
+    } catch (error) {
+        console.log(error)
+        res.status(500)
+    }
+}
       
 }
 export default newControllers

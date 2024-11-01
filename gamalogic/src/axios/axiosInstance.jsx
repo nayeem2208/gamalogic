@@ -1,11 +1,11 @@
 import axios from "axios";
 
-// export const APP='beta'
-export const APP='app'
+export const APP='beta'
+// export const APP='app'
 
 // const baseURL ="http://localhost:3000/api/"
-const baseURL='https://app.gamalogic.com/api/'
-// const baseURL='https://beta.gamalogic.com/api/'
+// const baseURL='https://app.gamalogic.com/api/'
+const baseURL='https://beta.gamalogic.com/api/'
 const axiosInstance = axios.create({
   baseURL,
 });

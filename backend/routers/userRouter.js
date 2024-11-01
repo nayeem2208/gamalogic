@@ -57,6 +57,9 @@ router.get('/getPlanDetails',dbMiddleware,authcheck,APIControllers.getPlanDetail
 
 router.get('/cancelSubscription',dbMiddleware,authcheck,newControllers.cancelSubscription)
 router.get('/ConfirmSubscriptionCancellation',dbMiddleware,newControllers.verifyCancelSubscription)
+router.post('/updateMoreDetails',dbMiddleware,authcheck,newControllers.addMoreDetails)
+router.get('/getMoreDetails',dbMiddleware,authcheck,newControllers.getMoreDetails)
+
 
 router.get('/affiliateUserId',dbMiddleware,authcheck,APIControllers.affilateUserId)
 router.post('/loyalityProgram',APIControllers.loyalityWebhook)

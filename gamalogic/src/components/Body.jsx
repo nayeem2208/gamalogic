@@ -2,6 +2,8 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useUserState } from "../context/userContext";
 import axiosInstance from "../axios/axiosInstance";
+import { toast } from "react-toastify";
+
 
 function Body() {
   let navigate = useNavigate();
@@ -17,8 +19,8 @@ function Body() {
         parsedToken = storedToken;
       }
       setUserDetails(parsedToken);
-      console.log(window.ztUserData,parsedToken.HMACDigest,'zt user data')
-      if (window.ztUserData["za_email_id"] === undefined || window.ztUserData["za_email_id"] === null) {
+      // console.log(window.ztUserData,parsedToken.HMACDigest,'zt user data')
+      if (window.ztUserData && (window.ztUserData["za_email_id"] === undefined || window.ztUserData["za_email_id"] === null)) {
         window.ztUserData["za_email_id"] = parsedToken.email;
         window.ztUserData["user_unique_id"] = parsedToken.id;
         window.ztUserData["thrive_digest"] = parsedToken.HMACDigest;
