@@ -4,6 +4,7 @@ import countryCodes from "country-codes-list";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import { useUserState } from "../context/userContext";
+import LoadingBar from "react-top-loading-bar";
 
 function MoreDetails() {
   const [accountType, setAccountType] = useState("Company");
@@ -13,6 +14,9 @@ function MoreDetails() {
   const [stateList, setStateList] = useState([]);
   const [phoneCode, setPhoneCode] = useState("");
   const [edit, setEdit] = useState(false);
+  const [editWait,setEditWait]=useState(false)
+  let [loading, setLoading] = useState(false);
+  let [load, setLoad] = useState(30);
   const [moreDetails, setMoreDetails] = useState({
     title: "",
     firstname: "",
@@ -37,7 +41,10 @@ function MoreDetails() {
   useEffect(() => {
     const fetchMoreDetails = async () => {
       try {
+        setLoading(true);
+        setLoad(30);
         let res = await axiosInstance.get("/getMoreDetails");
+        setLoad(100);
         console.log(res, "ressooo");
         const fetchedData = res.data;
 
@@ -110,19 +117,18 @@ function MoreDetails() {
   const validateFields = () => {
     const trimmedfirstname = moreDetails.firstname.trim();
     const trimmedlastname = moreDetails.lastname.trim();
-    const trimmdcompanyName=moreDetails.company_name.trim()
-    const trimmedAddress=moreDetails.address_line_1.trim()
-    const trimmedTax=moreDetails.tax_id.trim()
-    console.log(trimmedfirstname,trimmedlastname,trimmdcompanyName,trimmedAddress,trimmedTax,'trimmed values')
+    const trimmdcompanyName = moreDetails.company_name.trim();
+    const trimmedAddress = moreDetails.address_line_1.trim();
+
     if (!moreDetails.title) {
       toast.error("Please select a title.");
       return false;
     }
-    if (!moreDetails.firstname||!trimmedfirstname) {
+    if (!moreDetails.firstname || !trimmedfirstname) {
       toast.error("First name is required.");
       return false;
     }
-    if (!moreDetails.lastname||!trimmedlastname) {
+    if (!moreDetails.lastname || !trimmedlastname) {
       toast.error("Last name is required.");
       return false;
     }
@@ -130,11 +136,14 @@ function MoreDetails() {
       toast.error("Phone number should be 10 digits.");
       return false;
     }
-    if ((accountType === "Company" && !moreDetails.company_name)||(accountType === "Company" &&!trimmdcompanyName)) {
+    if (
+      (accountType === "Company" && !moreDetails.company_name) ||
+      (accountType === "Company" && !trimmdcompanyName)
+    ) {
       toast.error("Company name is required for Company account type.");
       return false;
     }
-    if (!moreDetails.address_line_1||!trimmedAddress) {
+    if (!moreDetails.address_line_1 || !trimmedAddress) {
       toast.error("Address line 1 is required.");
       return false;
     }
@@ -156,12 +165,7 @@ function MoreDetails() {
       toast.error("State is required.");
       return false;
     }
-    if (!moreDetails.tax_id||!trimmedTax) {
-      toast.error(
-        countryid === "in" ? "GSTIN is required." : "Tax ID is required."
-      );
-      return false;
-    }
+   
     return true;
   };
 
@@ -183,22 +187,26 @@ function MoreDetails() {
           dataToSend.state = stateid;
         }
       }
-
+      setLoading(true);
+      setLoad(30);
+      setEditWait(true)
       let res = await axiosInstance.post("/updateMoreDetails", dataToSend);
       toast.success("Profile Data updated");
       setEdit(false);
+      setLoad(100);
+      setEditWait(false)
       const storedToken = localStorage.getItem("Gamalogic_token");
-        if (storedToken) {
-          let token;
-          try {
-            token = JSON.parse(storedToken);
-          } catch (error) {
-            token = storedToken;
-          }
-          token.name=dataToSend.firstname+dataToSend.lastname
-          localStorage.setItem("Gamalogic_token", JSON.stringify(token));
-          setUserDetails(token);
+      if (storedToken) {
+        let token;
+        try {
+          token = JSON.parse(storedToken);
+        } catch (error) {
+          token = storedToken;
         }
+        token.name = dataToSend.firstname + dataToSend.lastname;
+        localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+        setUserDetails(token);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -210,6 +218,13 @@ function MoreDetails() {
         className=" text-xs sm:text-sm text-bgblue subHeading"
         style={{ fontFamily: "Raleway, sans-serif" }}
       >
+        {loading && (
+          <LoadingBar
+            color="#f74c41"
+            progress={load}
+            onLoaderFinished={() => {}}
+          />
+        )}
         {/* <h3 className="text-lg">More Details</h3> */}
         <div>
           <div className="md:flex w-full md:w-3/6">
@@ -446,6 +461,7 @@ function MoreDetails() {
               className="bg-bgblue text-white py-2  px-4 rounded-md mt-6 text-sm font-medium"
               type="submit"
               onClick={handleUpdateData}
+              disabled={editWait}
             >
               SAVE
             </button>

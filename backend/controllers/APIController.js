@@ -39,8 +39,11 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       // ErrorHandler("getApi Controller", error, req);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
+      if (error.name === 'TokenExpiredError') {
+        res.status(401).json({ error: "TokenExpired", message: "Your session has expired. Please log in again." });
+      } else {
+        res.status(401).json({ error: "Unauthorized" });
+      }    }
     finally {
       if (req.dbConnection) {
         await req.dbConnection.release();

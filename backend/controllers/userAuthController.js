@@ -289,7 +289,6 @@ const Authentication = {
 
         // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
         // const { country_name } = response.data;
-        console.log(expired, 'expireddddddddd')
         res.status(200).json({
           name: user[0][0].username,
           email: user[0][0].emailid,
