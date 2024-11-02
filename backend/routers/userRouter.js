@@ -24,7 +24,7 @@ router.post('/forgotPassword',dbMiddleware,Authentication.forgotPassword)
 router.post('/resetPassword',dbMiddleware,Authentication.resetPassword)
 router.get('/SendVerifyEmail',dbMiddleware,Authentication.sendVerifyEmail)
 
-router.get('/getCreditBalance',dbMiddleware,authcheck,APIControllers.getCreditBalance)
+router.get('/getCreditBalance',dbMiddleware,APIControllers.getCreditBalance)
 router.post('/singleEmailValidator',APIDecode,APIControllers.emailValidation)
 router.post('/singleEmailFinder',APIDecode,APIControllers.FindSingleEmail)
 

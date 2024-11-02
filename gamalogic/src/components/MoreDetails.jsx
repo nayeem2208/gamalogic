@@ -5,13 +5,14 @@ import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import { useUserState } from "../context/userContext";
 
-function MoreDetails({ ChangeUserName }) {
+function MoreDetails() {
   const [accountType, setAccountType] = useState("Company");
   const [countryid, setCountryid] = useState("");
   const [stateid, setStateid] = useState("");
   const [countriesList, setCountriesList] = useState([]);
   const [stateList, setStateList] = useState([]);
   const [phoneCode, setPhoneCode] = useState("");
+  const [edit, setEdit] = useState(false);
   const [moreDetails, setMoreDetails] = useState({
     title: "",
     firstname: "",
@@ -29,12 +30,10 @@ function MoreDetails({ ChangeUserName }) {
 
   let { setUserDetails, userDetails } = useUserState();
 
-
   const countryCodesObject = countryCodes.customList(
     "countryCode",
     "{countryNameEn} +{countryCallingCode}"
   );
-  console.log(moreDetails,'moreDetails')
   useEffect(() => {
     const fetchMoreDetails = async () => {
       try {
@@ -68,7 +67,7 @@ function MoreDetails({ ChangeUserName }) {
       }
     };
     fetchMoreDetails();
-  },[]);
+  }, []);
 
   useEffect(() => {
     let countries = getCountries();
@@ -108,8 +107,67 @@ function MoreDetails({ ChangeUserName }) {
     handleInputChange(e);
   };
 
+  const validateFields = () => {
+    const trimmedfirstname = moreDetails.firstname.trim();
+    const trimmedlastname = moreDetails.lastname.trim();
+    const trimmdcompanyName=moreDetails.company_name.trim()
+    const trimmedAddress=moreDetails.address_line_1.trim()
+    const trimmedTax=moreDetails.tax_id.trim()
+    console.log(trimmedfirstname,trimmedlastname,trimmdcompanyName,trimmedAddress,trimmedTax,'trimmed values')
+    if (!moreDetails.title) {
+      toast.error("Please select a title.");
+      return false;
+    }
+    if (!moreDetails.firstname||!trimmedfirstname) {
+      toast.error("First name is required.");
+      return false;
+    }
+    if (!moreDetails.lastname||!trimmedlastname) {
+      toast.error("Last name is required.");
+      return false;
+    }
+    if (!/^\d{10}$/.test(moreDetails.phone_number)) {
+      toast.error("Phone number should be 10 digits.");
+      return false;
+    }
+    if ((accountType === "Company" && !moreDetails.company_name)||(accountType === "Company" &&!trimmdcompanyName)) {
+      toast.error("Company name is required for Company account type.");
+      return false;
+    }
+    if (!moreDetails.address_line_1||!trimmedAddress) {
+      toast.error("Address line 1 is required.");
+      return false;
+    }
+    if (!moreDetails.city) {
+      toast.error("City is required.");
+      return false;
+    }
+    if (!moreDetails.pincode) {
+      toast.error(
+        countryid === "in" ? "Pincode is required." : "Zip Code is required."
+      );
+      return false;
+    }
+    if (!countryid) {
+      toast.error("Country is required.");
+      return false;
+    }
+    if (stateList.length > 0 && !stateid) {
+      toast.error("State is required.");
+      return false;
+    }
+    if (!moreDetails.tax_id||!trimmedTax) {
+      toast.error(
+        countryid === "in" ? "GSTIN is required." : "Tax ID is required."
+      );
+      return false;
+    }
+    return true;
+  };
+
   const handleUpdateData = async (e) => {
     e.preventDefault();
+    if (!validateFields()) return;
     try {
       const dataToSend = Object.fromEntries(
         Object.entries(moreDetails).filter(([_, value]) => value !== "")
@@ -128,22 +186,31 @@ function MoreDetails({ ChangeUserName }) {
 
       let res = await axiosInstance.post("/updateMoreDetails", dataToSend);
       toast.success("Profile Data updated");
-        if (dataToSend.firstname||dataToSend.lastname) {
-          ChangeUserName(dataToSend.firstname||null,dataToSend.lastname||null)
-        } 
-      console.log(res, "res");
+      setEdit(false);
+      const storedToken = localStorage.getItem("Gamalogic_token");
+        if (storedToken) {
+          let token;
+          try {
+            token = JSON.parse(storedToken);
+          } catch (error) {
+            token = storedToken;
+          }
+          token.name=dataToSend.firstname+dataToSend.lastname
+          localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+          setUserDetails(token);
+        }
     } catch (error) {
       console.log(error);
     }
   };
 
   return (
-    <div className="mb-24 md:mb-20">
+    <div className="mb-24 md:mb-20 ">
       <div
-        className="mt-6 sm:mt-10 text-xs sm:text-sm text-bgblue subHeading"
+        className=" text-xs sm:text-sm text-bgblue subHeading"
         style={{ fontFamily: "Raleway, sans-serif" }}
       >
-        <h3 className="text-lg">More Details</h3>
+        {/* <h3 className="text-lg">More Details</h3> */}
         <div>
           <div className="md:flex w-full md:w-3/6">
             <div>
@@ -153,6 +220,7 @@ function MoreDetails({ ChangeUserName }) {
                 name="title"
                 value={moreDetails.title}
                 onChange={handleInputChange}
+                readOnly={!edit}
               >
                 <option value="">Select</option>
                 <option value="Mr">Mr</option>
@@ -168,6 +236,7 @@ function MoreDetails({ ChangeUserName }) {
                 name="firstname"
                 value={moreDetails.firstname}
                 onChange={handleInputChange}
+                readOnly={!edit}
                 placeholder="First Name"
                 className="w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3"
               />
@@ -179,6 +248,7 @@ function MoreDetails({ ChangeUserName }) {
                 name="lastname"
                 value={moreDetails.lastname}
                 onChange={handleInputChange}
+                readOnly={!edit}
                 placeholder="Last Name"
                 className="w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3"
               />
@@ -192,6 +262,7 @@ function MoreDetails({ ChangeUserName }) {
                 className="border w-full   h-9 border-gray-300 bg-white  rounded py-2 px-4"
                 value={phoneCode}
                 onChange={handleCodeChange}
+                readOnly={!edit}
               >
                 <option>Select</option>
                 {Object.entries(countryCodesObject).map(
@@ -210,6 +281,7 @@ function MoreDetails({ ChangeUserName }) {
                 name="phone_number"
                 value={moreDetails.phone_number}
                 onChange={handleInputChange}
+                readOnly={!edit}
                 placeholder="Phone"
                 className="w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3"
               />
@@ -233,6 +305,7 @@ function MoreDetails({ ChangeUserName }) {
                     className="form-radio h-5 w-5 text-red-500 transition duration-150 ease-in-out"
                     checked={accountType === "Company"}
                     onChange={hanleAccountType}
+                    readOnly={!edit}
                   />
                   <span className="ml-3 text-gray-700">Company</span>
                 </label>
@@ -246,6 +319,7 @@ function MoreDetails({ ChangeUserName }) {
                     className="form-radio h-5 w-5 text-red-500 transition duration-150 ease-in-out"
                     checked={accountType === "Personal"}
                     onChange={hanleAccountType}
+                    readOnly={!edit}
                   />
                   <span className="ml-3 text-gray-700">Personal</span>
                 </label>
@@ -260,6 +334,7 @@ function MoreDetails({ ChangeUserName }) {
                 name="company_name"
                 value={moreDetails.company_name}
                 onChange={handleInputChange}
+                readOnly={!edit}
                 placeholder="Company Name"
                 className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3"
               />
@@ -271,6 +346,7 @@ function MoreDetails({ ChangeUserName }) {
             name="address_line_1"
             value={moreDetails.address_line_1}
             onChange={handleInputChange}
+            readOnly={!edit}
             placeholder="Address line 1"
             className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3"
           />
@@ -280,6 +356,7 @@ function MoreDetails({ ChangeUserName }) {
             name="address_line_2"
             value={moreDetails.address_line_2}
             onChange={handleInputChange}
+            readOnly={!edit}
             placeholder="Address line 2"
             className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3"
           />
@@ -292,6 +369,7 @@ function MoreDetails({ ChangeUserName }) {
                   name="city"
                   value={moreDetails.city}
                   onChange={handleInputChange}
+                  readOnly={!edit}
                   placeholder="City"
                   className="w-full border border-gray-300 rounded py-2 px-4 mr-3"
                 />
@@ -305,6 +383,7 @@ function MoreDetails({ ChangeUserName }) {
                   name="pincode"
                   value={moreDetails.pincode}
                   onChange={handleInputChange}
+                  readOnly={!edit}
                   placeholder={countryid == "in" ? "Pincode" : "Zip Code"}
                   className="w-full border border-gray-300 rounded py-2 px-4 mr-3"
                 />
@@ -315,6 +394,7 @@ function MoreDetails({ ChangeUserName }) {
                 <p className="text-sm mb-1">Country</p>
                 <select
                   onChange={handleCountryChange}
+                  readOnly={!edit}
                   className="w-full border bg-white border-gray-300  h-9 rounded py-2 px-4"
                   value={countryid}
                 >
@@ -329,6 +409,7 @@ function MoreDetails({ ChangeUserName }) {
               <div className="w-2/4 mb-4">
                 <p className="text-sm mb-1">State</p>
                 <select
+                  readOnly={!edit}
                   onChange={handleStateChange}
                   className="w-full border bg-white border-gray-300  h-9 rounded py-2 px-4"
                   value={stateid}
@@ -349,6 +430,7 @@ function MoreDetails({ ChangeUserName }) {
                 {countryid == "in" ? "GSTIN" : "TAX ID"}
               </p>
               <input
+                readOnly={!edit}
                 type="text"
                 name="tax_id"
                 value={moreDetails.tax_id}
@@ -359,13 +441,23 @@ function MoreDetails({ ChangeUserName }) {
             </div>
           </div>
           <br />
-          <button
-            className="bg-bgblue text-white py-2  px-4 rounded-md mt-6 text-sm font-medium"
-            type="submit"
-            onClick={handleUpdateData}
-          >
-            UPDATE
-          </button>
+          {edit ? (
+            <button
+              className="bg-bgblue text-white py-2  px-4 rounded-md mt-6 text-sm font-medium"
+              type="submit"
+              onClick={handleUpdateData}
+            >
+              SAVE
+            </button>
+          ) : (
+            <button
+              className="bg-bgblue text-white py-2  px-4 rounded-md mt-6 text-sm font-medium"
+              type="submit"
+              onClick={() => setEdit(true)}
+            >
+              EDIT
+            </button>
+          )}
         </div>
       </div>
     </div>

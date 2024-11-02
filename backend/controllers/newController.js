@@ -167,25 +167,36 @@ const newControllers = {
         const dbConnection = req.dbConnection;
         const updatedFields = {};
 
-        if (req.body.firstname) updatedFields.firstname = req.body.firstname;
-        if (req.body.lastname) updatedFields.lastname = req.body.lastname;
-        if (req.body.phone_country_code) updatedFields.phone_country_code = req.body.phone_country_code
-        if (req.body.phone_number) updatedFields.phone_number = req.body.phone_number;
-        if (req.body.title) updatedFields.title = req.body.title;
-        if (req.body.company_name) updatedFields.company_name = req.body.company_name;
-        if (req.body.address_line_1) updatedFields.address_line_1 = req.body.address_line_1;
-        if (req.body.address_line_2) updatedFields.address_line_2 = req.body.address_line_2;
-        if (req.body.city) updatedFields.city = req.body.city;
-        if (req.body.pincode) updatedFields.pincode = req.body.pincode;
-        if (req.body.country) updatedFields.country = req.body.country;
-        if (req.body.state) updatedFields.state = req.body.state;
-        if (req.body.tax_id) updatedFields.tax_id = req.body.tax_id;
+        if (req.body.firstname && req.body.lastname) {
+            updatedFields.username = `${req.body.firstname}${req.body.lastname}`;
+        } else if (req.body.firstname) {
+            const [, ...lastNameParts] = req.user[0][0].username.split(/(?=[A-Z])/);
+            updatedFields.username = `${req.body.firstname}${lastNameParts.join('')}`;
+        } else if (req.body.lastname) {
+            const [firstNamePart] = req.user[0][0].username.split(/(?=[A-Z])/);
+            updatedFields.username = `${firstNamePart}${req.body.lastname}`;
+        }
+
+        const dbUser = req.user[0][0];
+        if (req.body.firstname && req.body.firstname !== dbUser.firstname) updatedFields.firstname = req.body.firstname;
+        if (req.body.lastname && req.body.lastname !== dbUser.lastname) updatedFields.lastname = req.body.lastname;
+        if (req.body.phone_country_code && req.body.phone_country_code !== dbUser.phone_country_code) updatedFields.phone_country_code = req.body.phone_country_code
+        if (req.body.phone_number && req.body.phone_number !== dbUser.phone_number) updatedFields.phone_number = req.body.phone_number;
+        if (req.body.title && req.body.title !== dbUser.title) updatedFields.title = req.body.title;
+        if (req.body.company_name && req.body.company_name !== dbUser.company_name) updatedFields.company_name = req.body.company_name;
+        if (req.body.address_line_1 && req.body.address_line_1 !== dbUser.address_line_1) updatedFields.address_line_1 = req.body.address_line_1;
+        if (req.body.address_line_2 && req.body.address_line_2 !== dbUser.address_line_2) updatedFields.address_line_2 = req.body.address_line_2;
+        if (req.body.city && req.body.city !== dbUser.city) updatedFields.city = req.body.city;
+        if (req.body.pincode && req.body.pincode !== dbUser.pincode) updatedFields.pincode = req.body.pincode;
+        if (req.body.country && req.body.country !== dbUser.country) updatedFields.country = req.body.country;
+        if (req.body.state && req.body.state !== dbUser.state) updatedFields.state = req.body.state;
+        if (req.body.tax_id && req.body.tax_id !== dbUser.tax_id) updatedFields.tax_id = req.body.tax_id;
         if (req.body.accountType === 'Company') {
-            updatedFields.is_company = Buffer.from([1]); 
-            updatedFields.is_personal = Buffer.from([0]); 
+            updatedFields.is_company = Buffer.from([1]);
+            updatedFields.is_personal = Buffer.from([0]);
         } else if (req.body.accountType === 'Personal') {
-            updatedFields.is_personal = Buffer.from([1]); 
-            updatedFields.is_company = Buffer.from([0]); 
+            updatedFields.is_personal = Buffer.from([1]);
+            updatedFields.is_company = Buffer.from([0]);
         }
         const updateStatements = [];
         const values = [];

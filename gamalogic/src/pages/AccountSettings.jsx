@@ -125,26 +125,7 @@ function AccountSettings() {
     }
   };
 
-  const ChangeUserName = (firstname, lastname) => {
-    console.log(firstname, lastname, "firstname and lastname");
-    const storedToken = localStorage.getItem("Gamalogic_token");
-    if (storedToken) {
-      let token;
-      try {
-        token = JSON.parse(storedToken);
-      } catch (error) {
-        token = storedToken;
-      }
-      if (firstname) {
-        token.firstname = firstname;
-      }
-      if (lastname) {
-        token.lastname = lastname;
-      }
-      localStorage.setItem("Gamalogic_token", JSON.stringify(token));
-      setUserDetails(token);
-    }
-  };
+
   if (serverError) {
     return <ServerError />;
   }
@@ -153,19 +134,31 @@ function AccountSettings() {
       <SubHeader SubHeader={"Account Settings"} />
       {userDetails.confirm == 1 ? (
         <>
+        <div className="subHeading ">
+          <h3 className="mt-8">Your Profile</h3>
+          {loading && (
+            <LoadingBar
+              color="#f74c41"
+              progress={load}
+              onLoaderFinished={() => {}}
+            />
+          )}
+          
+          <p className="mt-6 mb-1 text-sm">Your Email</p>
+          <input
+            type="email"
+            placeholder="enter the email here"
+            className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3 selection:border-gray-400"
+            value={userDetails.email}
+            readOnly
+          />{" "}
+          <MoreDetails />
+          </div>
           <form
-            className="mt-6 sm:mt-14 text-xs sm:text-sm text-bgblue subHeading"
+            className="mt-6 sm:mt-14 text-xs sm:text-sm text-bgblue subHeading "
             onSubmit={changaePassword}
             style={{ fontFamily: "Raleway,sans-serif" }}
           >
-            <h3>Your Profile</h3>
-            {loading && (
-              <LoadingBar
-                color="#f74c41"
-                progress={load}
-                onLoaderFinished={() => {}}
-              />
-            )}
             {!userDetails.firstname && !userDetails.lastname && (
               <div>
                 <p className="mt-6 mb-1 text-sm">Your Name</p>
@@ -178,34 +171,7 @@ function AccountSettings() {
                 />{" "}
               </div>
             )}
-            {(userDetails.firstname || userDetails.lastname) && (
-              <div>
-                <p className="mt-6 mb-1 text-sm">First Name</p>
-                <input
-                  type="text"
-                  placeholder="first name"
-                  className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3"
-                  value={userDetails.firstname}
-                  readOnly
-                />
-                <p className="mt-6 mb-1 text-sm">Last Name</p>
-                <input
-                  type="text"
-                  placeholder="last name "
-                  className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3"
-                  value={userDetails.lastname}
-                  readOnly
-                />
-              </div>
-            )}
-            <p className="mt-6 mb-1 text-sm">Your Email</p>
-            <input
-              type="email"
-              placeholder="enter the email here"
-              className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3 selection:border-gray-400"
-              value={userDetails.email}
-              readOnly
-            />{" "}
+
             <h3 className="mt-6 mb-1">Change Your Password</h3>
             <p className="my-7 description">
               Changing your Gamalogic password to a secure password that only
@@ -287,7 +253,6 @@ function AccountSettings() {
               CHANGE PASSWORD
             </button>
           </form>
-          <MoreDetails ChangeUserName={ChangeUserName} />
         </>
       ) : (
         <p className="my-10 text-red-600 font-semibold text-lg">

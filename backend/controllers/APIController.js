@@ -20,14 +20,20 @@ import InrToUsdSubscriptionConverter from "../utils/INRtoUSDSubscription.js";
 let APIControllers = {
   getCreditBalance: async (req, res) => {
     try {
+      const dbConnection = req.dbConnection;
+      const token = req.headers.authorization;
+      const tokenWithoutBearer = token.replace("Bearer ", "");
+      let parsedTokenWithoutBearer = JSON.parse(tokenWithoutBearer)
+      const decoded = jwt.verify(parsedTokenWithoutBearer.token, process.env.JWT_SECRET);
+      let user = await dbConnection.query(`SELECT free_final,credits_free,credits from registration WHERE rowid='${decoded.userId}'`)
       let creditBal;
-      let finalFree = new Date(req.user[0][0].free_final);
+      let finalFree = new Date(user[0][0].free_final);
       let finalFreeDate = new Date(finalFree);
       let currentDate = new Date();
-      if (req.user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
-        creditBal = req.user[0][0].credits_free + req.user[0][0].credits
+      if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
+        creditBal = user[0][0].credits_free + user[0][0].credits
       } else {
-        creditBal = req.user[0][0].credits;
+        creditBal = user[0][0].credits;
       }
       res.status(200).json(creditBal)
     } catch (error) {
