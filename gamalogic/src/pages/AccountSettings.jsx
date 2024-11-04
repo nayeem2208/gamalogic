@@ -152,7 +152,7 @@ function AccountSettings() {
             value={userDetails.email}
             readOnly
           />{" "}
-          <MoreDetails />
+          {/* <MoreDetails /> */}
           </div>
           <form
             className="mt-6 sm:mt-14 text-xs sm:text-sm text-bgblue subHeading "
