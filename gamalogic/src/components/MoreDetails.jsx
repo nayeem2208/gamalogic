@@ -14,7 +14,7 @@ function MoreDetails() {
   const [stateList, setStateList] = useState([]);
   const [phoneCode, setPhoneCode] = useState("");
   const [edit, setEdit] = useState(false);
-  const [editWait,setEditWait]=useState(false)
+  const [editWait, setEditWait] = useState(false);
   let [loading, setLoading] = useState(false);
   let [load, setLoad] = useState(30);
   const [moreDetails, setMoreDetails] = useState({
@@ -165,7 +165,7 @@ function MoreDetails() {
       toast.error("State is required.");
       return false;
     }
-   
+
     return true;
   };
 
@@ -189,12 +189,12 @@ function MoreDetails() {
       }
       setLoading(true);
       setLoad(30);
-      setEditWait(true)
+      setEditWait(true);
       let res = await axiosInstance.post("/updateMoreDetails", dataToSend);
       toast.success("Profile Data updated");
       setEdit(false);
       setLoad(100);
-      setEditWait(false)
+      setEditWait(false);
       const storedToken = localStorage.getItem("Gamalogic_token");
       if (storedToken) {
         let token;
@@ -226,16 +226,19 @@ function MoreDetails() {
           />
         )}
         {/* <h3 className="text-lg">More Details</h3> */}
-        <div>
-          <div className="md:flex w-full md:w-3/6">
+        <div className=" mt-8  mb-4 rounded-md  w-full md:w-3/6 ">
+          <div className="md:flex w-full md:w-full ">
+            {/* <MdModeEdit  className="w-6 h-6 text-end"/> */}
             <div>
               <p className="mt-6 mb-1 text-sm">Title</p>
               <select
-                className="border bg-white  h-9 border-gray-300 rounded py-2 px-4 mr-3"
+                className={`border   h-9 border-gray-300 rounded py-2 px-4 mr-3 ${
+                  edit ? "input-box" : "input-box-readonly"
+                }`}
                 name="title"
                 value={moreDetails.title}
                 onChange={handleInputChange}
-                readOnly={!edit}
+                disabled={!edit}
               >
                 <option value="">Select</option>
                 <option value="Mr">Mr</option>
@@ -253,7 +256,10 @@ function MoreDetails() {
                 onChange={handleInputChange}
                 readOnly={!edit}
                 placeholder="First Name"
-                className="w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3"
+                // className="w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3"
+                className={`w-10/12 md:w-full border rounded py-2 px-4 mr-3 ${
+                  edit ? "input-box" : "input-box-readonly"
+                }`}
               />
             </div>
             <div className="md:w-2/4">
@@ -265,19 +271,23 @@ function MoreDetails() {
                 onChange={handleInputChange}
                 readOnly={!edit}
                 placeholder="Last Name"
-                className="w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3"
+                className={`w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
+                  edit ? "input-box" : "input-box-readonly"
+                }`}
               />
             </div>
           </div>
-          <div className="flex w-full  justify-center md:justify-normal md:w-3/6">
+          <div className="flex w-full  justify-center md:justify-normal md:w-full">
             <div className="md:mr-3 w-3/5">
               <p className="mt-6 mb-1 text-sm">Code</p>
               <select
                 name="phone_country_code"
-                className="border w-full   h-9 border-gray-300 bg-white  rounded py-2 px-4"
+                className={`border w-full   h-9 border-gray-300   rounded py-2 px-4 ${
+                  edit ? "input-box" : "input-box-readonly"
+                }`}
                 value={phoneCode}
                 onChange={handleCodeChange}
-                readOnly={!edit}
+                disabled={!edit}
               >
                 <option>Select</option>
                 {Object.entries(countryCodesObject).map(
@@ -298,7 +308,9 @@ function MoreDetails() {
                 onChange={handleInputChange}
                 readOnly={!edit}
                 placeholder="Phone"
-                className="w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3"
+                className={`w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
+                  edit ? "input-box" : "input-box-readonly"
+                }`}
               />
             </div>
           </div>
@@ -308,34 +320,51 @@ function MoreDetails() {
             placeholder="Phone"
             className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3"
           /> */}
-          <div className="w-full sm:w-4/6 md:w-3/6 mt-6 py-4 mr-3">
+          <div className="w-full sm:w-4/6 md:w-full mt-6 py-4 mr-3">
             <p className="text-sm mb-2">Select Account Type</p>
             <div className="flex mt-6 justify-center md:justify-normal">
               <div className="w-2/5 xl:w-1/5 mr-3">
                 <label className="flex items-center mb-2">
-                  <input
+                  {/* <input
                     type="radio"
                     name="accountType"
                     value="Company"
-                    className="form-radio h-5 w-5 text-red-500 transition duration-150 ease-in-out"
+                    className={`form-radio h-5 w-5 text-red-500 transition duration-150 ease-in-out ${
+                      edit ? "input-box" : "input-box-readonly"
+                    }`}
                     checked={accountType === "Company"}
                     onChange={hanleAccountType}
-                    readOnly={!edit}
-                  />
+                    disabled={!edit}
+                  /> */}
+              
+                    <input
+                      type="radio"
+                      name="accountType"
+                      value="Company"
+                      className={`form-radio h-5 w-5 text-red-500 transition duration-150 ease-in-out ${
+                        edit ? "input-box" : "input-box-readonly"
+                      }`}
+                      checked={accountType === "Company"}
+                      onChange={hanleAccountType}
+                      disabled={!edit}
+                    />
+                  
+
                   <span className="ml-3 text-gray-700">Company</span>
                 </label>
               </div>
               <div className="w-1/5">
                 <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="accountType"
-                    value="Personal"
-                    className="form-radio h-5 w-5 text-red-500 transition duration-150 ease-in-out"
-                    checked={accountType === "Personal"}
-                    onChange={hanleAccountType}
-                    readOnly={!edit}
-                  />
+                    <input
+                      type="radio"
+                      name="accountType"
+                      value="Personal"
+                      className="form-radio h-5 w-5 text-red-500 transition duration-150 ease-in-out"
+                      checked={accountType === "Personal"}
+                      onChange={hanleAccountType}
+                      disabled={!edit}
+                    />
+                
                   <span className="ml-3 text-gray-700">Personal</span>
                 </label>
               </div>
@@ -351,7 +380,9 @@ function MoreDetails() {
                 onChange={handleInputChange}
                 readOnly={!edit}
                 placeholder="Company Name"
-                className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3"
+                className={`w-5/6 sm:w-4/6 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
+                  edit ? "input-box" : "input-box-readonly"
+                }`}
               />
             </>
           )}
@@ -363,7 +394,9 @@ function MoreDetails() {
             onChange={handleInputChange}
             readOnly={!edit}
             placeholder="Address line 1"
-            className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3"
+            className={`w-5/6 sm:w-4/6 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
+              edit ? "input-box" : "input-box-readonly"
+            }`}
           />
           <p className="mt-6 mb-1 text-sm">Address Line 2</p>
           <input
@@ -373,9 +406,11 @@ function MoreDetails() {
             onChange={handleInputChange}
             readOnly={!edit}
             placeholder="Address line 2"
-            className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3"
+            className={`w-5/6 sm:w-4/6 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
+              edit ? "input-box" : "input-box-readonly"
+            }`}
           />
-          <div className="flex flex-wrap w-full sm:w-4/6 md:w-3/6 mt-6">
+          <div className="flex flex-wrap w-full sm:w-4/6 md:w-full mt-6">
             <div className="flex w-full">
               <div className="w-2/4 mr-3">
                 <p className="mb-1 text-sm">City</p>
@@ -386,13 +421,16 @@ function MoreDetails() {
                   onChange={handleInputChange}
                   readOnly={!edit}
                   placeholder="City"
-                  className="w-full border border-gray-300 rounded py-2 px-4 mr-3"
+                  className={`w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
+                    edit ? "input-box" : "input-box-readonly"
+                  }`}
                 />
               </div>
               <div className="w-2/4">
                 <p className="mb-1 text-sm">
                   {countryid == "in" ? "Pincode" : "Zip Code"}
                 </p>
+
                 <input
                   type="text"
                   name="pincode"
@@ -400,7 +438,9 @@ function MoreDetails() {
                   onChange={handleInputChange}
                   readOnly={!edit}
                   placeholder={countryid == "in" ? "Pincode" : "Zip Code"}
-                  className="w-full border border-gray-300 rounded py-2 px-4 mr-3"
+                  className={`w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
+                    edit ? "input-box" : "input-box-readonly"
+                  }`}
                 />
               </div>
             </div>
@@ -409,8 +449,10 @@ function MoreDetails() {
                 <p className="text-sm mb-1">Country</p>
                 <select
                   onChange={handleCountryChange}
-                  readOnly={!edit}
-                  className="w-full border bg-white border-gray-300  h-9 rounded py-2 px-4"
+                  disabled={!edit}
+                  className={`w-full border  border-gray-300  h-9 rounded py-2 px-4 ${
+                    edit ? "input-box" : "input-box-readonly"
+                  }`}
                   value={countryid}
                 >
                   <option value="">Select Country</option>
@@ -424,9 +466,11 @@ function MoreDetails() {
               <div className="w-2/4 mb-4">
                 <p className="text-sm mb-1">State</p>
                 <select
-                  readOnly={!edit}
+                  disabled={!edit}
                   onChange={handleStateChange}
-                  className="w-full border bg-white border-gray-300  h-9 rounded py-2 px-4"
+                  className={`w-full border  border-gray-300  h-9 rounded py-2 px-4 ${
+                    edit ? "input-box" : "input-box-readonly"
+                  }`}
                   value={stateid}
                 >
                   <option value="">Select State</option>
@@ -440,7 +484,7 @@ function MoreDetails() {
             </div>
           </div>
           <div className="">
-            <div className="w-full sm:w-4/6 md:w-3/6">
+            <div className="w-full sm:w-4/6 md:w-full">
               <p className="mt-4 mb-1 text-sm">
                 {countryid == "in" ? "GSTIN" : "TAX ID"}
               </p>
@@ -451,7 +495,9 @@ function MoreDetails() {
                 value={moreDetails.tax_id}
                 onChange={handleInputChange}
                 placeholder={countryid == "in" ? "GSTIN" : "TAX ID"}
-                className="w-full md:w-full  border border-gray-300 rounded py-2 px-4 mr-3"
+                className={`w-full md:w-full  border border-gray-300 rounded py-2 px-4 mr-3 ${
+                  edit ? "input-box" : "input-box-readonly"
+                }`}
               />
             </div>
           </div>

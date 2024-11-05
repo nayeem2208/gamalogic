@@ -6,6 +6,7 @@ import LoadingBar from "react-top-loading-bar";
 import ServerError from "./ServerError";
 import { useUserState } from "../context/userContext";
 import VideoModal from "../components/VideoModal";
+import AccountDetailsModal from "../components/AccountDetailsModa";
 
 function QuickValidation() {
   let [email, setEmail] = useState("");
@@ -19,6 +20,8 @@ function QuickValidation() {
     creditBal,
     tutorialVideo,
     setTutorialVideo,
+    accountDetailsModal,
+    setAccountDetailsModal,
   } = useUserState();
 
   useEffect(() => {
@@ -36,7 +39,7 @@ function QuickValidation() {
     };
     window.addEventListener("keydown", handleEsc);
 
-    return () => window.removeEventListener("keydown", handleEsc)
+    return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
   const submitHandler = async (e) => {
@@ -74,26 +77,31 @@ function QuickValidation() {
   };
   const handleCloseVideoModal = () => {
     setTutorialVideo(false);
-    window.reloadThriveWidget()
+    window.reloadThriveWidget();
+    setAccountDetailsModal(true);
   };
+
+  useEffect(() => {
+    if (userDetails.accountDetailsModal&&!tutorialVideo) setAccountDetailsModal(true);
+  }, []);
   const selectVideoId = () => {
-    let ids = ["9CnyAJZiQ38", "_ualvh37g9Y",'imageModal',null];
+    let ids = ["9CnyAJZiQ38", "_ualvh37g9Y", "imageModal", null];
     let urls = [
       "https://blog.gamalogic.com/email-validation-google-sheets-add-on/",
       "https://blog.gamalogic.com/find-email-address-using-name-and-company-on-google-sheets-add-on/",
-      'imageModal',
-      null
+      "imageModal",
+      null,
     ];
     let texts = [
       "Learn how to integrate the Gamalogic email validation add-on with Google Sheets",
       "Learn more to integrate Gamalogic to find email address list on Google sheets",
-      'imageModal',
-      null
+      "imageModal",
+      null,
     ];
     const index = Math.floor(Math.random() * ids.length);
     return { id: ids[index], url: urls[index], texts: texts[index] };
   };
-  const { id, url,texts } = selectVideoId();
+  const { id, url, texts } = selectVideoId();
 
   if (serverError) {
     return <ServerError />;
@@ -101,13 +109,19 @@ function QuickValidation() {
   return (
     <div className=" px-6 md:px-20 py-8">
       {tutorialVideo && (
-       <VideoModal
-       videoId={id}
-       url={url}
-       texts={texts}
-       isOpen={tutorialVideo}
-       onClose={handleCloseVideoModal}
-     />
+        <VideoModal
+          videoId={id}
+          url={url}
+          texts={texts}
+          isOpen={tutorialVideo}
+          onClose={handleCloseVideoModal}
+        />
+      )}
+
+      {accountDetailsModal && (
+        <AccountDetailsModal
+          isOpen={accountDetailsModal}
+        />
       )}
       <SubHeader SubHeader={"Quick Validation"} />
       <div className="mt-14 text-bgblue subHeading text-center sm:text-left">

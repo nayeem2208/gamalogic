@@ -148,11 +148,11 @@ function AccountSettings() {
           <input
             type="email"
             placeholder="enter the email here"
-            className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3 selection:border-gray-400"
+            className="input-box-readonly w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3 selection:border-gray-400"
             value={userDetails.email}
             readOnly
           />{" "}
-          {/* <MoreDetails /> */}
+          <MoreDetails />
           </div>
           <form
             className="mt-6 sm:mt-14 text-xs sm:text-sm text-bgblue subHeading "

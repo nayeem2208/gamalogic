@@ -305,6 +305,23 @@ input[type="range"].custom-range:focus::-ms-fill-upper {
   width: 100%;
 }
 
+.input-box {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border-radius: 5px;
+  background-color: white;
+}
+
+.input-box-readonly {
+  background-color: #f9f9f9;
+  border: 5px dashed #c6c5c5;
+  color: #666;
+}
+.input-box-readonly:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 
 
   

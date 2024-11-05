@@ -43,7 +43,8 @@ let APIControllers = {
         res.status(401).json({ error: "TokenExpired", message: "Your session has expired. Please log in again." });
       } else {
         res.status(401).json({ error: "Unauthorized" });
-      }    }
+      }
+    }
     finally {
       if (req.dbConnection) {
         await req.dbConnection.release();

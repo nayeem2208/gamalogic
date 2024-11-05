@@ -109,8 +109,18 @@ const Authentication = {
           let dateOfLogin = new Date().toISOString().split('T')[0];
           let timeOfLogin = new Date().toISOString().split('T')[1].split('.')[0];
           await dbConnection.query(`INSERT INTO  last_login (user_id, date,time,ip,referer)VALUES(?, ?, ?, ?, ?)`, [user[0][0].rowid, dateOfLogin, timeOfLogin, ip, userAgent])
-
-
+          let accountDetailsModal = false
+          if ((!user[0][0].title || !user[0][0].firstname || !user[0][0].phone_country_code ||
+            !user[0][0].phone_number ||
+            (!user[0][0].is_company == 1 && !user[0][0].is_personal == 1) ||
+            (user[0][0].is_company == 1 && !user[0][0].company_name) ||
+            !user[0][0].address_line_1 ||
+            !user[0][0].city ||
+            !user[0][0].pincode ||
+            !user[0][0].country ||
+            !user[0][0].state) && user[0][0].is_premium == 1) {
+            accountDetailsModal = true
+          }
 
 
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
@@ -127,7 +137,8 @@ const Authentication = {
             country_name: 'USA',
             expired,
             HMACDigest,
-            id: user[0][0].rowid
+            id: user[0][0].rowid,
+            accountDetailsModal
           });
 
         } else {
@@ -285,7 +296,18 @@ const Authentication = {
         let dateOfLogin = new Date().toISOString().split('T')[0];
         let timeOfLogin = new Date().toISOString().split('T')[1].split('.')[0];
         await dbConnection.query(`INSERT INTO  last_login (user_id, date,time,ip,referer)VALUES(?, ?, ?, ?, ?)`, [user[0][0].rowid, dateOfLogin, timeOfLogin, ip, userAgent])
-
+        let accountDetailsModal = false
+        if ((!user[0][0].title || !user[0][0].firstname || !user[0][0].phone_country_code ||
+          !user[0][0].phone_number ||
+          (!user[0][0].is_company == 1 && !user[0][0].is_personal == 1) ||
+          (user[0][0].is_company == 1 && !user[0][0].company_name) ||
+          !user[0][0].address_line_1 ||
+          !user[0][0].city ||
+          !user[0][0].pincode ||
+          !user[0][0].country ||
+          !user[0][0].state) && user[0][0].is_premium == 1) {
+          accountDetailsModal = true
+        }
 
         // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
         // const { country_name } = response.data;
@@ -301,7 +323,8 @@ const Authentication = {
           country_name: 'USA',
           expired,
           HMACDigest,
-          id: user[0][0].rowid
+          id: user[0][0].rowid,
+          accountDetailsModal
         });
       } else {
         res.status(400).json({
@@ -697,7 +720,18 @@ const Authentication = {
             let dateOfLogin = new Date().toISOString().split('T')[0];
             let timeOfLogin = new Date().toISOString().split('T')[1].split('.')[0];
             await dbConnection.query(`INSERT INTO  last_login (user_id, date,time,ip,referer)VALUES(?, ?, ?, ?, ?)`, [user[0][0].rowid, dateOfLogin, timeOfLogin, ip, userAgent])
-  
+            let accountDetailsModal = false
+            if ((!user[0][0].title || !user[0][0].firstname || !user[0][0].phone_country_code ||
+              !user[0][0].phone_number ||
+              (!user[0][0].is_company == 1 && !user[0][0].is_personal == 1) ||
+              (user[0][0].is_company == 1 && !user[0][0].company_name) ||
+              !user[0][0].address_line_1 ||
+              !user[0][0].city ||
+              !user[0][0].pincode ||
+              !user[0][0].country ||
+              !user[0][0].state) && user[0][0].is_premium == 1) {
+              accountDetailsModal = true
+            }
 
             res.status(200).json({
               name: user[0][0].username,
@@ -711,7 +745,8 @@ const Authentication = {
               country_name: 'India',
               expired,
               HMACDigest,
-              id: user[0][0].rowid
+              id: user[0][0].rowid,
+              accountDetailsModal
             });
           } else {
             res.status(400).json({
@@ -918,7 +953,18 @@ const Authentication = {
         let dateOfLogin = new Date().toISOString().split('T')[0];
         let timeOfLogin = new Date().toISOString().split('T')[1].split('.')[0];
         await dbConnection.query(`INSERT INTO  last_login (user_id, date,time,ip,referer)VALUES(?, ?, ?, ?, ?)`, [user[0][0].rowid, dateOfLogin, timeOfLogin, ip, userAgent])
-
+        let accountDetailsModal = false
+        if ((!user[0][0].title || !user[0][0].firstname || !user[0][0].phone_country_code ||
+          !user[0][0].phone_number ||
+          (!user[0][0].is_company == 1 && !user[0][0].is_personal == 1) ||
+          (user[0][0].is_company == 1 && !user[0][0].company_name) ||
+          !user[0][0].address_line_1 ||
+          !user[0][0].city ||
+          !user[0][0].pincode ||
+          !user[0][0].country ||
+          !user[0][0].state) && user[0][0].is_premium == 1) {
+          accountDetailsModal = true
+        }
 
         res.status(200).json({
           name: user[0][0].username,
@@ -932,7 +978,8 @@ const Authentication = {
           country_name: 'India',
           expired,
           HMACDigest,
-          id: user[0][0].rowid
+          id: user[0][0].rowid,
+          accountDetailsModal
 
 
         });
