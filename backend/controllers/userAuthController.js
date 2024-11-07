@@ -138,7 +138,8 @@ const Authentication = {
             expired,
             HMACDigest,
             id: user[0][0].rowid,
-            accountDetailsModal
+            accountDetailsModal,
+            isTeam:user[0][0].is_team_admin
           });
 
         } else {
@@ -324,7 +325,8 @@ const Authentication = {
           expired,
           HMACDigest,
           id: user[0][0].rowid,
-          accountDetailsModal
+          accountDetailsModal,
+          isTeam:user[0][0].is_team_admin
         });
       } else {
         res.status(400).json({
@@ -746,7 +748,8 @@ const Authentication = {
               expired,
               HMACDigest,
               id: user[0][0].rowid,
-              accountDetailsModal
+              accountDetailsModal,
+              isTeam:user[0][0].is_team_admin
             });
           } else {
             res.status(400).json({
@@ -979,7 +982,8 @@ const Authentication = {
           expired,
           HMACDigest,
           id: user[0][0].rowid,
-          accountDetailsModal
+          accountDetailsModal,
+          isTeam:user[0][0].is_team_admin
 
 
         });
