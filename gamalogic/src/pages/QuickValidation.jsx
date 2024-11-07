@@ -77,13 +77,14 @@ function QuickValidation() {
   };
   const handleCloseVideoModal = () => {
     setTutorialVideo(false);
+    if (userDetails.accountDetailsModal) setAccountDetailsModal(true);
     window.reloadThriveWidget();
-    setAccountDetailsModal(true);
   };
 
   useEffect(() => {
     if (userDetails.accountDetailsModal&&!tutorialVideo) setAccountDetailsModal(true);
   }, []);
+
   const selectVideoId = () => {
     let ids = ["9CnyAJZiQ38", "_ualvh37g9Y", "imageModal", null];
     let urls = [

@@ -7,6 +7,7 @@ import sendEmail from "../utils/zeptoMail.js";
 import jwt from "jsonwebtoken";
 import basicTemplate from "../EmailTemplates/BasicTemplate.js";
 import Razorpay from "razorpay";
+import createTeamVerificationLink from "../EmailTemplates/createTeamEmail.js";
 
 
 
@@ -244,6 +245,51 @@ const newControllers = {
             console.log(error)
             ErrorHandler("getMoreDetails Controller", error, req);
             res.status(500)
+        }
+        finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
+    },
+    createTeam: async (req, res) => {
+        try {
+            //using same subscriptionCancelConfirmationToken here cos it can use here too
+            let token = subscriptionCancelConfirmationToken(req.user[0][0].emailid)
+            console.log(token, 'token')
+            let link = `${urls.frontendUrl}/api/teamCreationVerify?email=${token}`
+
+            let sub = `Invitation to Create Your Gamalogic Team Account`;
+
+            sendEmail(
+                req.user[0][0].username,
+                req.user[0][0].emailid,
+                sub,
+                createTeamVerificationLink(req.user[0][0].username, token, link)
+            );
+            console.log('ivda vare okay')
+            res.status(200).json({ message: "Email sent successfully" });
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ message: "Failed to create team" });
+        }
+        finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
+    },
+    verifyTeamCreationLink: async (req, res) => {
+        try {
+            const dbConnection = req.dbConnection;
+            const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
+            const userEmail = decoded.email;
+            console.log(userEmail, 'user email for team creation')
+            await dbConnection.query(`UPDATE registration set is_team_admin=1 where emailid='${userEmail}'`)
+            // dashboard/team
+            res.redirect(`${urls.frontendUrl}/dashboard/team?team=true`);
+        } catch (error) {
+            console.log(error)
         }
         finally {
             if (req.dbConnection) {

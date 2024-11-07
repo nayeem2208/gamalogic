@@ -8,6 +8,8 @@ import { useUserState } from "../context/userContext";
 import ServerError from "./ServerError";
 import LoadingBar from "react-top-loading-bar";
 import MoreDetails from "../components/MoreDetails";
+import { MdOutlineGroups } from "react-icons/md";
+
 
 function AccountSettings() {
   let [passwordVisible, setPasswordVisible] = useState({
@@ -125,12 +127,28 @@ function AccountSettings() {
     }
   };
 
+  const handleCreateTeam = async (e) => {
+    e.preventDefault()
+    try {
+      await axiosInstance.get("/createTeamAccount");
+      const response = await axiosInstance.get("/createTeamAccount");
+        
+      if (response.status === 200) {
+          toast.success('Email has been sent to your account');
+      } else {
+          toast.error('Failed to send email. Please try again.');
+      }
+  } catch (error) {
+      console.log(error);
+    }
+  };
+
 
   if (serverError) {
     return <ServerError />;
   }
   return (
-    <div className=" px-6 md:px-20 py-8 accountSettings text-center sm:text-start">
+    <div className=" px-6 md:px-20 py-8 accountSettings text-center sm:text-start overflow-hidden">
       <SubHeader SubHeader={"Account Settings"} />
       {userDetails.confirm == 1 ? (
         <>
@@ -253,6 +271,67 @@ function AccountSettings() {
               CHANGE PASSWORD
             </button>
           </form>
+          {userDetails.isTeam != 1 && (
+            <div className="subHeading mt-14 shadow-lg px-6 py-12  bg-gray-100">
+              <h3 className="flex">
+                Create Team Account{" "}
+                <MdOutlineGroups className=" mt-2 mx-2 text-lg w-6 h-6" />
+              </h3>
+              <div>
+                <p className="my-7 description">
+                  Become the admin of your team to unlock advanced features for
+                  managing sub-accounts and sharing resources.
+                </p>
+                <div className="advantages my-5">
+                  <h4 className="font-semibold text-lg mb-2">
+                    Why Create a Team Account?
+                  </h4>
+                  <ul className="list-disc list-inside">
+                    <li>
+                      <span className="font-semibold mr-1">
+                        Centralized Management:
+                      </span>{" "}
+                      Easily oversee and manage all user accounts from a single
+                      dashboard.
+                    </li>
+                    <li>
+                      <span className="font-semibold mr-1">
+                        Credit Sharing:
+                      </span>{" "}
+                      Seamlessly share credits across all secondary accounts.
+                    </li>
+                    <li>
+                      <span className="font-semibold mr-1">
+                        Enhanced Collaboration:
+                      </span>{" "}
+                      Allow team members to access necessary resources and
+                      collaborate effectively.
+                    </li>
+                    <li>
+                      <span className="font-semibold mr-1">
+                        Controlled Access:
+                      </span>{" "}
+                      Limit access to uploaded files for child accounts, giving
+                      them access only to their own uploads.
+                    </li>
+                    <li>
+                      <span className="font-semibold mr-1">
+                        Scalable Solution:
+                      </span>{" "}
+                      As your team grows, add more members and manage them with
+                      ease.
+                    </li>
+                  </ul>
+                </div>
+                <button
+                  onClick={handleCreateTeam}
+                  className="bg-bgblue hover:bg-slate-700 transition-all text-white py-2 px-4 rounded-md mt-6 text-sm font-medium"
+                >
+                  CREATE & BECOME ADMIN
+                </button>
+              </div>{" "}
+            </div>
+          )}
         </>
       ) : (
         <p className="my-10 text-red-600 font-semibold text-lg">

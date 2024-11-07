@@ -256,8 +256,8 @@ function MoreDetails() {
                 onChange={handleInputChange}
                 readOnly={!edit}
                 placeholder="First Name"
-                // className="w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3"
-                className={`w-10/12 md:w-full border rounded py-2 px-4 mr-3 ${
+                // className="w-full border border-gray-300 rounded py-2 px-4 mr-3"
+                className={`w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
                   edit ? "input-box" : "input-box-readonly"
                 }`}
               />
@@ -271,14 +271,14 @@ function MoreDetails() {
                 onChange={handleInputChange}
                 readOnly={!edit}
                 placeholder="Last Name"
-                className={`w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
+                className={`w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
                   edit ? "input-box" : "input-box-readonly"
                 }`}
               />
             </div>
           </div>
-          <div className="flex w-full  justify-center md:justify-normal md:w-full">
-            <div className="md:mr-3 w-3/5">
+          <div className="md:flex w-full  justify-center md:justify-normal md:w-full">
+            <div className="md:mr-3 w-full md:w-3/5">
               <p className="mt-6 mb-1 text-sm">Code</p>
               <select
                 name="phone_country_code"
@@ -308,7 +308,7 @@ function MoreDetails() {
                 onChange={handleInputChange}
                 readOnly={!edit}
                 placeholder="Phone"
-                className={`w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
+                className={`w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
                   edit ? "input-box" : "input-box-readonly"
                 }`}
               />
@@ -318,7 +318,7 @@ function MoreDetails() {
           <input
             type="text"
             placeholder="Phone"
-            className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3"
+            className="w-3/6 border border-gray-300 rounded py-2 px-4 mr-3"
           /> */}
           <div className="w-full sm:w-4/6 md:w-full mt-6 py-4 mr-3">
             <p className="text-sm mb-2">Select Account Type</p>
@@ -380,7 +380,7 @@ function MoreDetails() {
                 onChange={handleInputChange}
                 readOnly={!edit}
                 placeholder="Company Name"
-                className={`w-5/6 sm:w-4/6 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
+                className={`w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
                   edit ? "input-box" : "input-box-readonly"
                 }`}
               />
@@ -394,7 +394,7 @@ function MoreDetails() {
             onChange={handleInputChange}
             readOnly={!edit}
             placeholder="Address line 1"
-            className={`w-5/6 sm:w-4/6 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
+            className={`w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
               edit ? "input-box" : "input-box-readonly"
             }`}
           />
@@ -406,7 +406,7 @@ function MoreDetails() {
             onChange={handleInputChange}
             readOnly={!edit}
             placeholder="Address line 2"
-            className={`w-5/6 sm:w-4/6 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
+            className={`w-full border border-gray-300 rounded py-2 px-4 mr-3 ${
               edit ? "input-box" : "input-box-readonly"
             }`}
           />

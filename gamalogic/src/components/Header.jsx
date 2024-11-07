@@ -10,7 +10,7 @@ import {
   IoSettingsOutline,
 } from "react-icons/io5";
 import { LuFileUp, LuHistory, LuKey } from "react-icons/lu";
-import { MdArrowDropDown, MdOutlineFindInPage } from "react-icons/md";
+import { MdArrowDropDown, MdOutlineFindInPage, MdOutlineGroups } from "react-icons/md";
 import { PiCurrencyDollarSimpleBold } from "react-icons/pi";
 import { RiProfileLine } from "react-icons/ri";
 import { SlSupport } from "react-icons/sl";
@@ -22,7 +22,7 @@ function Header() {
   let [dropDown, setDropDown] = useState(false);
   let [uploadfileDropDown, setUploadFileDropDown] = useState(false);
   let [tutorialDropDown, setTutorialDropDown] = useState(false);
-  let { setUserDetails,setLinkedinLoading } = useUserState();
+  let { userDetails,setUserDetails,setLinkedinLoading } = useUserState();
   let navigate = useNavigate();
 
 
@@ -173,6 +173,14 @@ function Header() {
                 Become an Affiliate
               </li>
             </Link>
+            {userDetails.isTeam == 1 && (
+              <Link to="/dashboard/team" onClick={dropDownToggle}>
+                <li className="py-2 flex underlineLi">
+                  <MdOutlineGroups className="text-teal-800 mt-2 mx-2 text-lg" />
+                  Team
+                </li>
+              </Link>
+            )}
             <Link to='/dashboard/support' onClick={dropDownToggle}>
             <li className="py-2 flex underlineLi">
               <SlSupport className="text-teal-800 mt-2 mx-2 text-lg" /> Support

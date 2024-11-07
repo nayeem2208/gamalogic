@@ -59,6 +59,8 @@ router.get('/cancelSubscription',dbMiddleware,authcheck,newControllers.cancelSub
 router.get('/ConfirmSubscriptionCancellation',dbMiddleware,newControllers.verifyCancelSubscription)
 router.post('/updateMoreDetails',dbMiddleware,authcheck,newControllers.addMoreDetails)
 router.get('/getMoreDetails',dbMiddleware,authcheck,newControllers.getMoreDetails)
+router.get('/createTeamAccount',dbMiddleware,authcheck,newControllers.createTeam)
+router.get('/teamCreationVerify',dbMiddleware,newControllers.verifyTeamCreationLink)
 
 
 router.get('/affiliateUserId',dbMiddleware,authcheck,APIControllers.affilateUserId)

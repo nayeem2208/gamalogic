@@ -16,17 +16,19 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUserState } from "../context/userContext";
 import { GrMoney } from "react-icons/gr";
 
-
 function SideBar() {
   let [uploadfileDropDown, setUploadFileDropDown] = useState(false);
   let [tutorialDropDown, setTutorialDropDown] = useState(false);
-  let {setUserDetails,userDetails,setLinkedinLoading}=useUserState()
+  let { setUserDetails, userDetails, setLinkedinLoading } = useUserState();
   let navigate = useNavigate();
 
-  const location=useLocation()
+  const location = useLocation();
   // console.log(location,'locationnnnn')
   useEffect(() => {
-    if (location.pathname === "/dashboard/file-upload" || location.pathname === "/dashboard/file-upload-finder") {
+    if (
+      location.pathname === "/dashboard/file-upload" ||
+      location.pathname === "/dashboard/file-upload-finder"
+    ) {
       setUploadFileDropDown(true);
     }
   }, [location.pathname]);
@@ -39,129 +41,171 @@ function SideBar() {
     setTutorialDropDown(!tutorialDropDown);
   };
 
-
   async function logoutHandler() {
     setLinkedinLoading(true);
     try {
       localStorage.removeItem("Gamalogic_token");
       setUserDetails(null);
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
       setLinkedinLoading(false);
       navigate("/signin");
-      window.reloadThriveWidget()
+      window.reloadThriveWidget();
     }
   }
 
-
   return (
     <>
-    {userDetails&&<div
-      style={{ backgroundColor: "#0A0E2B",fontFamily: "Raleway, sans-serif" }}
-      className="w-96 text-white hidden  lg:flex flex-col h-screen  p-4 pt-8 overflow-y-auto pb-12 "
-    >
-      <Link to="/">
-        <p className="font-semibold text-xl text-center mt-2" style={{fontFamily: "Montserrat, sans-serif"}}>GAMALOGIC</p>
-      </Link>
-      <ul className="mt-14 text-lg font-semibold text-left">
-        <Link to="/dashboard/quick-validation">
-          <li className="my-4 flex ">
-            <GrDocumentVerified className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
-            Quick Validation
-          </li>
-        </Link>
-        <Link to="/dashboard/email-finder">
-            <li className="my-4 flex">
-            <IoSearchOutline className="text-teal-800 mt-2 mx-2 text-lg" />
-            Email Finder
-          </li>
-        </Link>
-        <Link to="/dashboard/apikey">
-          <li className="my-4 flex">
-            <LuKey className="text-teal-800 mt-2 mx-2 text-lg" />
-            API Key
-          </li>
-        </Link>
-
-       <li className="my-4 flex cursor-pointer" onClick={uploadfileDropDownToggle}>
-          <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" /> Upload Your
-          File
-          <MdArrowDropDown className="mt-2 text-xl" />
-        </li>
-        {uploadfileDropDown && (
-          <ul className="ml-6">
-             <Link to='/dashboard/file-upload'><li className="my-4 flex">
-              <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" /> Email
-              Verification
-            </li></Link>
-            <Link to='/dashboard/file-upload-finder'><li className="my-4 flex">
-              <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" /> Email
-              Finder
-            </li></Link>
-          </ul>
-        )}
-
-        <li className="my-4 flex cursor-pointer" onClick={tutorialDropDownToggle}>
-          <CgFileDocument className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
-          Tutorial
-          <MdArrowDropDown className="mt-2 text-xl" />
-        </li>
-        {tutorialDropDown && (
-          <ul className="ml-6">
-           {/* <Link to='/api-docs'> */}
-           <a href="https://docs.gamalogic.com/" target="_blank" >
-            <li className="my-4 flex">
-              <IoMailOutline className="text-teal-800 mt-2 mx-2 text-lg" /> API
-              Docs
-            </li></a>
-            {/* </Link>  */}
-            {/* <Link to='/googleSheet-integration'> */}
-            <a href="https://blog.gamalogic.com/email-validation-google-sheets-add-on/" target="_blank">
+      {userDetails && (
+        <div
+          style={{
+            backgroundColor: "#0A0E2B",
+            fontFamily: "Raleway, sans-serif",
+          }}
+          className="w-96 text-white hidden  lg:flex flex-col h-screen  p-4 pt-8 overflow-y-auto pb-12 "
+        >
+          <Link to="/">
+            <p
+              className="font-semibold text-xl text-center mt-2"
+              style={{ fontFamily: "Montserrat, sans-serif" }}
+            >
+              GAMALOGIC
+            </p>
+          </Link>
+          <ul className="mt-14 text-lg font-semibold text-left">
+            <Link to="/dashboard/quick-validation">
+              <li className="my-4 flex ">
+                <GrDocumentVerified className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                Quick Validation
+              </li>
+            </Link>
+            <Link to="/dashboard/email-finder">
               <li className="my-4 flex">
-              <RiProfileLine className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
-              Integrate Google sheets
-            </li></a>
-            {/* </Link> */}
-           {/* <Link to='/find-any-email'> */}
-           <a href="https://blog.gamalogic.com/find-email-address-using-name-and-company-on-google-sheets-add-on/" target="_blank">
-             <li className="my-4 flex">
-              <MdOutlineFindInPage className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
-              Find Any Email
-            </li></a>
-            {/* </Link> */}
-            
-          </ul>
-        )}
-        <Link to='/dashboard/account-settings'><li className="my-4 flex">
-          <IoSettingsOutline className="text-teal-800 mt-2 mx-2 text-lg" />
-          Account Settings
-        </li></Link>
-       <Link to='/dashboard/buy-credits'> <li className="my-4 flex">
-          <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
-          Buy Credits
-        </li></Link>
-        <Link to="/dashboard/billing">
+                <IoSearchOutline className="text-teal-800 mt-2 mx-2 text-lg" />
+                Email Finder
+              </li>
+            </Link>
+            <Link to="/dashboard/apikey">
+              <li className="my-4 flex">
+                <LuKey className="text-teal-800 mt-2 mx-2 text-lg" />
+                API Key
+              </li>
+            </Link>
+
+            <li
+              className="my-4 flex cursor-pointer"
+              onClick={uploadfileDropDownToggle}
+            >
+              <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" /> Upload
+              Your File
+              <MdArrowDropDown className="mt-2 text-xl" />
+            </li>
+            {uploadfileDropDown && (
+              <ul className="ml-6">
+                <Link to="/dashboard/file-upload">
+                  <li className="my-4 flex">
+                    <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    Email Verification
+                  </li>
+                </Link>
+                <Link to="/dashboard/file-upload-finder">
+                  <li className="my-4 flex">
+                    <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    Email Finder
+                  </li>
+                </Link>
+              </ul>
+            )}
+
+            <li
+              className="my-4 flex cursor-pointer"
+              onClick={tutorialDropDownToggle}
+            >
+              <CgFileDocument className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+              Tutorial
+              <MdArrowDropDown className="mt-2 text-xl" />
+            </li>
+            {tutorialDropDown && (
+              <ul className="ml-6">
+                {/* <Link to='/api-docs'> */}
+                <a href="https://docs.gamalogic.com/" target="_blank">
+                  <li className="my-4 flex">
+                    <IoMailOutline className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    API Docs
+                  </li>
+                </a>
+                {/* </Link>  */}
+                {/* <Link to='/googleSheet-integration'> */}
+                <a
+                  href="https://blog.gamalogic.com/email-validation-google-sheets-add-on/"
+                  target="_blank"
+                >
+                  <li className="my-4 flex">
+                    <RiProfileLine className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    Integrate Google sheets
+                  </li>
+                </a>
+                {/* </Link> */}
+                {/* <Link to='/find-any-email'> */}
+                <a
+                  href="https://blog.gamalogic.com/find-email-address-using-name-and-company-on-google-sheets-add-on/"
+                  target="_blank"
+                >
+                  <li className="my-4 flex">
+                    <MdOutlineFindInPage className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    Find Any Email
+                  </li>
+                </a>
+                {/* </Link> */}
+              </ul>
+            )}
+            <Link to="/dashboard/account-settings">
+              <li className="my-4 flex">
+                <IoSettingsOutline className="text-teal-800 mt-2 mx-2 text-lg" />
+                Account Settings
+              </li>
+            </Link>
+            {userDetails.isTeam == 1 && (
+              <Link to="dashboard/team">
+                <li className="my-4 flex">
+                  <MdOutlineGroups className="text-teal-800 mt-2 mx-2 text-lg" />
+                  Team
+                </li>
+              </Link>
+            )}
+            <Link to="/dashboard/buy-credits">
+              {" "}
+              <li className="my-4 flex">
+                <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
+                Buy Credits
+              </li>
+            </Link>
+            <Link to="/dashboard/billing">
               <li className="my-4 flex">
                 <LuHistory className="text-teal-800 mt-2 mx-2 text-lg" />
                 Billing
               </li>
             </Link>
-        <Link to="/dashboard/affiliate">
+            <Link to="/dashboard/affiliate">
               <li className="my-4 flex">
                 <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />
                 Become an Affiliate
               </li>
             </Link>
-        <Link to='/dashboard/support'><li className="my-4 flex">
-          <SlSupport className="text-teal-800 mt-2 mx-2 text-lg" /> Support
-        </li></Link>
-        <li className="my-4 flex cursor-pointer" onClick={logoutHandler}>
-          <IoLogOutOutline className="text-teal-800 mt-2 mx-2 " />
-          Logout
-        </li>
-      </ul>
-    </div>}
+            <Link to="/dashboard/support">
+              <li className="my-4 flex">
+                <SlSupport className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                Support
+              </li>
+            </Link>
+            <li className="my-4 flex cursor-pointer" onClick={logoutHandler}>
+              <IoLogOutOutline className="text-teal-800 mt-2 mx-2 " />
+              Logout
+            </li>
+          </ul>
+        </div>
+      )}
     </>
   );
 }

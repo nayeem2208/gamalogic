@@ -121,53 +121,64 @@ function AccountDetailsModal({ isOpen }) {
     const trimmedAddress = moreDetails.address_line_1.trim();
 
     if (!moreDetails.title) {
-      toast.error("Please select a title.");
+      toast.error("Please add the details");
       return false;
     }
     if (!moreDetails.firstname || !trimmedfirstname) {
-      toast.error("First name is required.");
+      // toast.error("First name is required.");
+      toast.error("Please add the details");
+
       return false;
     }
     if (!moreDetails.lastname || !trimmedlastname) {
-      toast.error("Last name is required.");
+      // toast.error("Last name is required.");
+      toast.error("Please add the details");
       return false;
     }
     if (!/^\d{10}$/.test(moreDetails.phone_number)) {
-      toast.error("Phone number should be 10 digits.");
+      // toast.error("Phone number should be 10 digits.");
+      toast.error("Please add the details");
       return false;
     }
     if (
       (accountType === "Company" && !moreDetails.company_name) ||
       (accountType === "Company" && !trimmdcompanyName)
     ) {
-      toast.error("Company name is required for Company account type.");
+      // toast.error("Company name is required for Company account type.");
+      toast.error("Please add the details");
       return false;
     }
     if (!moreDetails.address_line_1 || !trimmedAddress) {
-      toast.error("Address line 1 is required.");
+      // toast.error("Address line 1 is required.");
+      toast.error("Please add the details");
       return false;
     }
     if (!moreDetails.city) {
-      toast.error("City is required.");
+      // toast.error("City is required.");
+      toast.error("Please add the details");
       return false;
     }
     if (!moreDetails.pincode) {
-      toast.error(
-        countryid === "in" ? "Pincode is required." : "Zip Code is required."
-      );
+      // toast.error(
+      //   countryid === "in" ? "Pincode is required." : "Zip Code is required."
+      // );
+      toast.error("Please add the details");
       return false;
     }
     if (!countryid) {
-      toast.error("Country is required.");
+      // toast.error("Country is required.");
+      toast.error("Please add the details");
       return false;
     }
     if (stateList.length > 0 && !stateid) {
-      toast.error("State is required.");
+      // toast.error("State is required.");
+      toast.error("Please add the details");
       return false;
     }
 
     return true;
   };
+
 
   const handleUpdateData = async (e) => {
     e.preventDefault();
@@ -242,14 +253,14 @@ function AccountDetailsModal({ isOpen }) {
           style={{ fontFamily: "Raleway, sans-serif" }}
         >
           <div className=" mt-8  mb-4 rounded-md  w-full md:w-full ">
-            <h3>Complete Your Profile</h3>
-            <p className="text-xs my-3">
+            <h3 className="text-center md:text-left">Complete Your Profile</h3>
+            <p className="text-xs my-3 text-center md:text-left">
               Please fill in your account details to ensure a smooth experience.
               This information will help us personalize your account and comply
               with relevant regulations. Fields marked with an asterisk (
               <FaStarOfLife className="text-red-500 inline w-[6px] h-[6px] mb-1"/>) are mandatory.
             </p>
-            <div className="md:flex w-full md:w-full ">
+            <div className="flex flex-wrap justify-center md:flex md:flex-nowrap  w-full md:w-full ">
               <div>
                 <p className="mt-6 mb-1 text-sm flex">
                   Title<span className="text-red-500 text-3xl ml-1 h-2">*</span>
@@ -267,7 +278,7 @@ function AccountDetailsModal({ isOpen }) {
                   <option value="Miss">Miss</option>
                 </select>
               </div>
-              <div className="md:w-2/4 md:mr-3">
+              <div className="w-full md:w-2/4 md:mr-3">
                 <p className="mt-6 mb-1 text-sm flex">
                   First Name{" "}
                   <span className="text-red-500 text-3xl ml-1 h-2">*</span>
@@ -279,10 +290,10 @@ function AccountDetailsModal({ isOpen }) {
                   onChange={handleInputChange}
                   placeholder="First Name"
                   // className="w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3"
-                  className={`w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 `}
+                  className={`w-full border border-gray-300 rounded py-2 px-4 mr-3 `}
                 />
               </div>
-              <div className="md:w-2/4">
+              <div className="w-full md:w-2/4 ">
                 <p className="mt-6 mb-1 text-sm flex">
                   Last Name{" "}
                   <span className="text-red-500 text-3xl ml-1 h-2">*</span>
@@ -293,12 +304,12 @@ function AccountDetailsModal({ isOpen }) {
                   value={moreDetails.lastname}
                   onChange={handleInputChange}
                   placeholder="Last Name"
-                  className={`w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 `}
+                  className={`w-full border border-gray-300 rounded py-2 px-4 mr-3 `}
                 />
               </div>
             </div>
-            <div className="flex w-full  justify-center md:justify-normal md:w-full">
-              <div className="md:mr-3 w-3/5">
+            <div className="md:flex w-full  justify-center md:justify-normal md:w-full">
+              <div className="md:mr-3 w-full md:w-3/5">
                 <p className="mt-6 mb-1 text-sm flex">
                   Code<span className="text-red-500 text-3xl ml-1 h-2">*</span>
                 </p>
@@ -328,7 +339,7 @@ function AccountDetailsModal({ isOpen }) {
                   value={moreDetails.phone_number}
                   onChange={handleInputChange}
                   placeholder="Phone"
-                  className={`w-10/12 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 `}
+                  className={`w-full border border-gray-300 rounded py-2 px-4 mr-3 `}
                 />
               </div>
             </div>
@@ -338,9 +349,9 @@ function AccountDetailsModal({ isOpen }) {
             placeholder="Phone"
             className="w-5/6 sm:w-4/6 md:w-3/6 border border-gray-300 rounded py-2 px-4 mr-3"
           /> */}
-            <div className="w-full sm:w-4/6 md:w-full mt-6 py-4 mr-3">
+            <div className="w-full sm:w-4/6 md:w-full mt-6 py-4 mr-3 ">
               <p className="text-sm mb-2">Select Account Type</p>
-              <div className="flex mt-6 justify-center md:justify-normal">
+              <div className="flex mt-6 ">
                 <div className="w-2/5 xl:w-1/5 mr-3">
                   <label className="flex items-center mb-2">
                     {/* <input
@@ -392,7 +403,7 @@ function AccountDetailsModal({ isOpen }) {
                   value={moreDetails.company_name}
                   onChange={handleInputChange}
                   placeholder="Company Name"
-                  className={`w-5/6 sm:w-4/6 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 `}
+                  className={`w-full border border-gray-300 rounded py-2 px-4 mr-3 `}
                 />
               </>
             )}
@@ -406,7 +417,7 @@ function AccountDetailsModal({ isOpen }) {
               value={moreDetails.address_line_1}
               onChange={handleInputChange}
               placeholder="Address line 1"
-              className={`w-5/6 sm:w-4/6 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 `}
+              className={`w-full border border-gray-300 rounded py-2 px-4 mr-3 `}
             />
             <p className="mt-6 mb-1 text-sm">Address Line 2</p>
             <input
@@ -415,7 +426,7 @@ function AccountDetailsModal({ isOpen }) {
               value={moreDetails.address_line_2}
               onChange={handleInputChange}
               placeholder="Address line 2"
-              className={`w-5/6 sm:w-4/6 md:w-full border border-gray-300 rounded py-2 px-4 mr-3 `}
+              className={`w-full border border-gray-300 rounded py-2 px-4 mr-3 `}
             />
             <div className="flex flex-wrap w-full sm:w-4/6 md:w-full mt-6">
               <div className="flex w-full">
@@ -509,7 +520,7 @@ function AccountDetailsModal({ isOpen }) {
               type="submit"
               onClick={handleUpdateData}
             >
-              ADD Details
+               SAVE BILLING INFORMATION
             </button>
           </div>
         </div>
