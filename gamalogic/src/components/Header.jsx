@@ -200,7 +200,7 @@ function Header() {
                     Account Settings
                   </li>
                 </Link>
-                {userDetails.isTeam == 1 && (
+                {userDetails.isTeam == 1 && userDetails.isTeamMember != 1&&(
                   <Link
                     to="dashboard/team"
                     onClick={dropDownToggle}
@@ -220,18 +220,18 @@ function Header() {
                 Account Settings
               </li>
             </Link> */}
-            <Link to="/dashboard/buy-credits" onClick={dropDownToggle}>
+            {userDetails.isTeamMember != 1&&(<Link to="/dashboard/buy-credits" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
                 <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
                 Buy Credits
               </li>
-            </Link>
-            <Link to="/dashboard/billing" onClick={dropDownToggle}>
+            </Link>)}
+            {userDetails.isTeamMember != 1&&(<Link to="/dashboard/billing" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
                 <LuHistory className="text-teal-800 mt-2 mx-2 text-lg" />
                 Billing
               </li>
-            </Link>
+            </Link>)}
             <Link to="/dashboard/affiliate" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
                 <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />

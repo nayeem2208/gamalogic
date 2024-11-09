@@ -257,7 +257,10 @@ const newControllers = {
     },
     createTeam: async (req, res) => {
         try {
-            console.log('hiiii ivda ethi ')
+            if(req.user[0][0].is_premium==0){
+                res.status(500).json({ message: "You should be a premium member to create team" });
+                return
+            }
             //using same subscriptionCancelConfirmationToken here cos it can use here too
             let token = subscriptionCancelConfirmationToken(req.user[0][0].emailid)
             console.log(token, 'token')

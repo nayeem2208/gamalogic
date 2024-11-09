@@ -9,7 +9,11 @@ import { LuKey, LuFileUp, LuHistory } from "react-icons/lu";
 import { CgFileDocument } from "react-icons/cg";
 import { PiCurrencyDollarSimpleBold } from "react-icons/pi";
 import { SlSupport } from "react-icons/sl";
-import { MdArrowDropDown, MdArrowDropUp, MdOutlineFindInPage } from "react-icons/md";
+import {
+  MdArrowDropDown,
+  MdArrowDropUp,
+  MdOutlineFindInPage,
+} from "react-icons/md";
 import { RiProfileLine } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -34,8 +38,7 @@ function SideBar() {
       location.pathname === "/dashboard/file-upload-finder"
     ) {
       setUploadFileDropDown(true);
-    }
-    else if (
+    } else if (
       location.pathname === "/dashboard/account-settings" ||
       location.pathname === "/dashboard/team"
     ) {
@@ -113,7 +116,11 @@ function SideBar() {
             >
               <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" /> Upload
               Your File
-              {!uploadfileDropDown?(<MdArrowDropDown className="mt-2 text-xl" />):(<MdArrowDropUp className="mt-2 text-xl"/>)}
+              {!uploadfileDropDown ? (
+                <MdArrowDropDown className="mt-2 text-xl" />
+              ) : (
+                <MdArrowDropUp className="mt-2 text-xl" />
+              )}
             </li>
             {uploadfileDropDown && (
               <ul className="ml-6">
@@ -138,7 +145,11 @@ function SideBar() {
             >
               <CgFileDocument className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
               Tutorial
-              {!tutorialDropDown?(<MdArrowDropDown className="mt-2 text-xl" />):(<MdArrowDropUp className="mt-2 text-xl"/>)}
+              {!tutorialDropDown ? (
+                <MdArrowDropDown className="mt-2 text-xl" />
+              ) : (
+                <MdArrowDropUp className="mt-2 text-xl" />
+              )}
               {/* <MdArrowDropDown className="mt-2 text-xl" /> */}
             </li>
             {tutorialDropDown && (
@@ -181,18 +192,22 @@ function SideBar() {
             >
               <IoSettingsOutline className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
               Settings
-              {!settingDropDown?(<MdArrowDropDown className="mt-2 text-xl" />):(<MdArrowDropUp className="mt-2 text-xl"/>)}
+              {!settingDropDown ? (
+                <MdArrowDropDown className="mt-2 text-xl" />
+              ) : (
+                <MdArrowDropUp className="mt-2 text-xl" />
+              )}
             </li>
             {settingDropDown && (
               <ul className="ml-6">
                 {/* <Link to='/api-docs'> */}
                 <Link to="/dashboard/account-settings">
                   <li className="my-4 flex">
-                    <MdManageAccounts  className="text-teal-800 mt-2 mx-2 text-lg" />
+                    <MdManageAccounts className="text-teal-800 mt-2 mx-2 text-lg" />
                     Account Settings
                   </li>
                 </Link>
-                {userDetails.isTeam == 1 && (
+                {userDetails.isTeam == 1 && userDetails.isTeamMember != 1 && (
                   <Link to="dashboard/team">
                     <li className="my-4 flex">
                       <MdOutlineGroups className="text-teal-800 mt-2 mx-2 text-lg" />
@@ -208,19 +223,19 @@ function SideBar() {
                 Account Settings
               </li>
             </Link> */}
-            <Link to="/dashboard/buy-credits">
+            {userDetails.isTeamMember != 1&&(<Link to="/dashboard/buy-credits">
               {" "}
               <li className="my-4 flex">
                 <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
                 Buy Credits
               </li>
-            </Link>
-            <Link to="/dashboard/billing">
+            </Link>)}
+            {userDetails.isTeamMember != 1&&(<Link to="/dashboard/billing">
               <li className="my-4 flex">
                 <LuHistory className="text-teal-800 mt-2 mx-2 text-lg" />
                 Billing
               </li>
-            </Link>
+            </Link>)}
             <Link to="/dashboard/affiliate">
               <li className="my-4 flex">
                 <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />
