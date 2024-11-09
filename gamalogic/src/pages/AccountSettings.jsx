@@ -271,7 +271,7 @@ function AccountSettings() {
               CHANGE PASSWORD
             </button>
           </form>
-          {userDetails.isTeam != 1 && (
+          
             <div className="subHeading mt-14 shadow-lg px-6 py-12  bg-gray-100">
               <h3 className="flex">
                 Create Team Account{" "}
@@ -323,15 +323,22 @@ function AccountSettings() {
                     </li>
                   </ul>
                 </div>
+                {userDetails.isTeam ==1?( <button
+                  // onClick={handleCreateTeam}
+                  className="bg-bgblue hover:bg-slate-700 transition-all text-white py-2 px-4 rounded-md mt-6 text-sm font-medium"
+                >
+                  DELETE TEAM
+                </button>): (
                 <button
                   onClick={handleCreateTeam}
                   className="bg-bgblue hover:bg-slate-700 transition-all text-white py-2 px-4 rounded-md mt-6 text-sm font-medium"
                 >
                   CREATE & BECOME ADMIN
                 </button>
+                )}
               </div>{" "}
             </div>
-          )}
+         
         </>
       ) : (
         <p className="my-10 text-red-600 font-semibold text-lg">

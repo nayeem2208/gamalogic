@@ -122,7 +122,6 @@ const Authentication = {
             accountDetailsModal = true
           }
 
-
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
           res.json({
@@ -139,7 +138,8 @@ const Authentication = {
             HMACDigest,
             id: user[0][0].rowid,
             accountDetailsModal,
-            isTeam:user[0][0].is_team_admin
+            isTeam: user[0][0].is_team_admin
+
           });
 
         } else {
@@ -149,6 +149,7 @@ const Authentication = {
         res.status(401).json({ error: "Invalid User" });
       }
     } catch (error) {
+      console.log(error)
       ErrorHandler("Login Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
@@ -161,6 +162,8 @@ const Authentication = {
   registerUser: async (req, res) => {
     try {
       const { firstname, lastname, email, password } = req.body.data;
+      let invitedUserId = null
+      console.log(req.body.teamId, 'team id is here')
       const userAgent = req.headers["user-agent"];
       let ip = req.headers['cf-connecting-ip'] ||
         req.headers['x-real-ip'] ||
@@ -171,9 +174,27 @@ const Authentication = {
       let userExists = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
+      if (req.body.teamId) {
+        const decoded = jwt.verify(req.body.teamId, process.env.JWT_SECRET);
+        const { userEmail, teamEmail } = decoded;
+        if (email != userEmail) {
+          res.status(401).json({ error: "Email address is not invited" });
+          return;
+        }
+        invitedUserId = teamEmail
+        try {
+          await dbConnection.query(
+            `DELETE FROM team_member_invite WHERE emailaddress = '${userEmail}'`
+          );
+          console.log('Invite successfully deleted');
+        } catch (error) {
+          console.error('Error deleting invite:', error);
+        }
+      }
       if (userExists[0].length > 0) {
         res.status(401).json({ error: "User already exists" });
       } else {
+
         if (req.body.widgetCode && req.body.thriveRefId) {
           const url = `https://thrive.zoho.com/thrive/webhooks/${req.body.widgetCode}/mapreferral`;
 
@@ -213,8 +234,9 @@ const Authentication = {
         let referenceCode = req.body.thriveRefId != null ? req.body.thriveRefId : null
         let isReferedBy = req.body.thriveRefId != null ? 1 : 0
         let source = req.body.thriveRefId != null ? 'Affiliate Referrer' : 'Sign in'
+
         await dbConnection.query(
-          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by,referer_by)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}')`
+          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by,referer_by,is_team_member,team_id)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}',1,'${invitedUserId}')`
         );
         try {
           leadGeneration(firstname, lastname, email, source, req)
@@ -310,8 +332,10 @@ const Authentication = {
           accountDetailsModal = true
         }
 
+
         // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
         // const { country_name } = response.data;
+        console.log(expired, 'expireddddddddd')
         res.status(200).json({
           name: user[0][0].username,
           email: user[0][0].emailid,
@@ -326,7 +350,7 @@ const Authentication = {
           HMACDigest,
           id: user[0][0].rowid,
           accountDetailsModal,
-          isTeam:user[0][0].is_team_admin
+          isTeam: user[0][0].is_team_admin
         });
       } else {
         res.status(400).json({
@@ -749,7 +773,7 @@ const Authentication = {
               HMACDigest,
               id: user[0][0].rowid,
               accountDetailsModal,
-              isTeam:user[0][0].is_team_admin
+              isTeam: user[0][0].is_team_admin
             });
           } else {
             res.status(400).json({
@@ -983,7 +1007,7 @@ const Authentication = {
           HMACDigest,
           id: user[0][0].rowid,
           accountDetailsModal,
-          isTeam:user[0][0].is_team_admin
+          isTeam: user[0][0].is_team_admin
 
 
         });
@@ -1033,10 +1057,19 @@ const Authentication = {
       if (alreadyVerifiedUser[0].length > 0) {
         return res.redirect(`${urls.frontendUrl}/EmailAlreadyverified`)
       }
+      const isTeamMember = await dbConnection.query(
+        `SELECT team_id FROM registration WHERE emailid='${userEmail}'`
+      );
       let apiKey = await generateUniqueApiKey(req);
       let confirmedDate = new Date();
-      const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,api_key=?,referer=?, credits_free=500  WHERE emailid = ?`;
-      await dbConnection.query(query, [confirmedDate, apiKey, referer, userEmail]);
+      if (isTeamMember[0][0] && isTeamMember[0][0].team_id) {
+        const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,api_key=?,referer=? WHERE emailid = ?`;
+        await dbConnection.query(query, [confirmedDate, apiKey, referer, userEmail]);
+      }
+      else {
+        const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,api_key=?,referer=?, credits_free=500  WHERE emailid = ?`;
+        await dbConnection.query(query, [confirmedDate, apiKey, referer, userEmail]);
+      }
       let verifiedUser = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
       );

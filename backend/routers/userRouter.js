@@ -61,6 +61,8 @@ router.post('/updateMoreDetails',dbMiddleware,authcheck,newControllers.addMoreDe
 router.get('/getMoreDetails',dbMiddleware,authcheck,newControllers.getMoreDetails)
 router.get('/createTeamAccount',dbMiddleware,authcheck,newControllers.createTeam)
 router.get('/teamCreationVerify',dbMiddleware,newControllers.verifyTeamCreationLink)
+router.post('/sendSecondaryUserInvite',dbMiddleware,authcheck,newControllers.sendInviteLinkForSecondaryUser)
+router.get('/getTeamDetails',dbMiddleware,authcheck,newControllers.getTeamDetails)
 
 
 router.get('/affiliateUserId',dbMiddleware,authcheck,APIControllers.affilateUserId)

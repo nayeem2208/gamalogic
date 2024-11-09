@@ -8,6 +8,8 @@ import jwt from "jsonwebtoken";
 import basicTemplate from "../EmailTemplates/BasicTemplate.js";
 import Razorpay from "razorpay";
 import createTeamVerificationLink from "../EmailTemplates/createTeamEmail.js";
+import childTeamCreationInvite from "../EmailTemplates/childAccountInviteEmail.js";
+import inviteTeamMemberToken from "../utils/inviteTeamMemberToken.js";
 
 
 
@@ -28,7 +30,8 @@ const newControllers = {
         } catch (error) {
             console.log(error)
             ErrorHandler("cancel subscription Controller", error, req)
-        } finally {
+        }
+        finally {
             if (req.dbConnection) {
                 await req.dbConnection.release();
             }
@@ -43,16 +46,16 @@ const newControllers = {
             let planDetails = {}
             if (user[0][0].is_premium == 1 && (user[0][0].is_monthly == 1 || user[0][0].is_annual == 1)) {
                 let paypalSub = await dbConnection.query(`
-              SELECT * FROM paypal_subscription 
-              WHERE userid='${user[0][0].rowid}' 
-              ORDER BY id DESC
-            `);
+                SELECT * FROM paypal_subscription 
+                WHERE userid='${user[0][0].rowid}' 
+                ORDER BY id DESC
+              `);
 
                 let razorPaySub = await dbConnection.query(`
-              SELECT * FROM razorpay_subscription 
-              WHERE customer_id='${user[0][0].rowid}' 
-              ORDER BY glid DESC
-            `);
+                SELECT * FROM razorpay_subscription 
+                WHERE customer_id='${user[0][0].rowid}' 
+                ORDER BY glid DESC
+              `);
                 if (paypalSub[0].length === 0 && razorPaySub[0].length > 0) {
                     planDetails = {
                         ...razorPaySub[0][0],
@@ -104,7 +107,6 @@ const newControllers = {
 
                 let payPalToken = await axios.post(url, data, { headers })
 
-
                 const payPaldetails = await axios.post(`${urls.paypalUrl}/v1/billing/subscriptions/${planDetails.subscription_id}/cancel`, { reason: 'No specific reason' }, {
                     headers: {
                         'Authorization': `Bearer ${payPalToken.data.access_token}`
@@ -128,20 +130,20 @@ const newControllers = {
             let content
             if (planDetails.is_monthly == 1) {
                 content = `
-                <p>We're sorry to see you go! Your monthly subscription has been successfully cancelled.</p>
-                
-                <p>If you have any questions or need assistance with your account, please don't hesitate to reach out.</p>
-        
-                <p>Thank you for choosing us, and we hope to serve you again in the future!</p>
-                `
+                  <p>We're sorry to see you go! Your monthly subscription has been successfully cancelled.</p>
+                  
+                  <p>If you have any questions or need assistance with your account, please don't hesitate to reach out.</p>
+          
+                  <p>Thank you for choosing us, and we hope to serve you again in the future!</p>
+                  `
             } else if (planDetails.is_annual == 1) {
                 content = `
-                <p>We're sorry to see you go! Your annual subscription has been successfully cancelled.</p>
-                
-                <p>If you have any questions or need assistance with your account, please don't hesitate to reach out.</p>
-        
-                <p>Thank you for choosing us, and we hope to serve you again in the future!</p>
-                `
+                  <p>We're sorry to see you go! Your annual subscription has been successfully cancelled.</p>
+                  
+                  <p>If you have any questions or need assistance with your account, please don't hesitate to reach out.</p>
+          
+                  <p>Thank you for choosing us, and we hope to serve you again in the future!</p>
+                  `
             }
             let sub = `Gamalogic ${isMonthlyInEmail} Subscription Cancellation`
             sendEmail(
@@ -167,7 +169,8 @@ const newControllers = {
             }
             ErrorHandler("verifyCancelSubscription Controller", error, req);
 
-        } finally {
+        }
+        finally {
             if (req.dbConnection) {
                 await req.dbConnection.release();
             }
@@ -230,6 +233,7 @@ const newControllers = {
         } catch (error) {
             console.error(error);
             ErrorHandler("addMoreDetails Controller", error, req);
+
             return res.status(500).json({ message: 'An error occurred while updating user details.' });
         } finally {
             if (req.dbConnection) {
@@ -245,8 +249,7 @@ const newControllers = {
             console.log(error)
             ErrorHandler("getMoreDetails Controller", error, req);
             res.status(500)
-        }
-        finally {
+        } finally {
             if (req.dbConnection) {
                 await req.dbConnection.release();
             }
@@ -254,6 +257,7 @@ const newControllers = {
     },
     createTeam: async (req, res) => {
         try {
+            console.log('hiiii ivda ethi ')
             //using same subscriptionCancelConfirmationToken here cos it can use here too
             let token = subscriptionCancelConfirmationToken(req.user[0][0].emailid)
             console.log(token, 'token')
@@ -292,6 +296,50 @@ const newControllers = {
             console.log(error)
         }
         finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
+    },
+    sendInviteLinkForSecondaryUser:async(req,res)=>{
+        try {
+            let dbConnection=req.dbConnection
+            const linkSent = await dbConnection.query(
+                `INSERT INTO team_member_invite (team_id, emailaddress) VALUES (?, ?)`,
+                [req.user[0][0].rowid, req.body.email]
+            );
+            let token = inviteTeamMemberToken(req.body.email,req.user[0][0].emailid)
+            let link = `${urls.frontendUrl}/signup?Team_admin=${token}`
+
+            let sub = `Invitation to Join Gamalogic Team Account`;
+            let nameOfUser=req.body.email.split('@')
+            sendEmail(
+                nameOfUser[0],
+                req.body.email,
+                sub,
+                childTeamCreationInvite(req.user[0][0].username, token, link)
+            );
+            res.status(200).json({message:'its working'})
+        } catch (error) {
+            console.log(error)
+        }finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
+    },
+    getTeamDetails:async(req,res)=>{
+        try {
+            let dbConnection=req.dbConnection
+           let teamMembers= await dbConnection.query(`SELECT emailid FROM registration where team_id='${req.user[0][0].emailid}'`)
+           console.log(teamMembers,'team membersss')
+           let invited=await dbConnection.query(`SELECT emailaddress from team_member_invite where team_id='${req.user[0][0].rowid}'`)
+           console.log(invited,'invited')
+           res.status(200).json({teamMembers:teamMembers[0],invited:invited[0]})
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({error:error})
+        }finally {
             if (req.dbConnection) {
                 await req.dbConnection.release();
             }

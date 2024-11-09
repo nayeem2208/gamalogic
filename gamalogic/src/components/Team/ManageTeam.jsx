@@ -1,54 +1,57 @@
+import axios from "axios";
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import axiosInstance from "../../axios/axiosInstance";
 
 const ManageTeam = () => {
   const [email, setEmail] = useState("");
   const [accounts, setAccounts] = useState([]);
+  const [invites, setInvites] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Fetch accounts with dummy data
-    const fetchDummyAccounts = () => {
-      const dummyData = [
-        { id: 1, email: "user1@example.com", status: "admin" },
-        { id: 2, email: "user2@example.com", status: "member" },
-        { id: 3, email: "user3@example.com", status: "viewer" },
-      ];
-      setAccounts(dummyData);
+    // Fetch accounts with data from the server
+    const fetchTeamDetails = async () => {
+      try {
+        const res = await axiosInstance.get('/getTeamDetails');
+        const members = res.data.teamMembers;
+        setAccounts(members);
+        const invited = res.data.invited;
+        setInvites(invited);
+      } catch (error) {
+        setError("Failed to fetch team details");
+      }
     };
-    fetchDummyAccounts();
+    fetchTeamDetails();
   }, []);
 
-  const handleAddAccount = () => {
+  const handleAddAccount = async (e) => {
+    e.preventDefault();
     if (!email) return;
     try {
       setLoading(true);
-      const newAccount = { id: accounts.length + 1, email, status: "member" };
-      setAccounts([...accounts, newAccount]);
+      const newAccount = { emailaddress: email }; // Consistent field naming
+      setInvites([...invites, newAccount]); // Add to invites
+      await axiosInstance.post('/sendSecondaryUserInvite', { email });
       setEmail("");
+      toast.success('Invitation link has been successfully sent');
       setLoading(false);
     } catch (error) {
       setError("Failed to add account");
       setLoading(false);
     }
   };
-  const handleDeleteAccount = (accountId) => {
+
+  const handleDeleteAccount = (emailToDelete) => {
     try {
       setLoading(true);
-      setAccounts(accounts.filter((account) => account.id !== accountId));
+      setAccounts(accounts.filter((account) => account.emailid !== emailToDelete)); // Delete based on emailaddress
       setLoading(false);
     } catch (error) {
       setError("Failed to delete account");
       setLoading(false);
     }
-  };
-
-  const handleStatusChange = (accountId, newStatus) => {
-    setAccounts(
-      accounts.map((account) =>
-        account.id === accountId ? { ...account, status: newStatus } : account
-      )
-    );
   };
 
   return (
@@ -61,41 +64,50 @@ const ManageTeam = () => {
           placeholder="Enter email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="py-1 px-2 border border-gray-300 rounded-md mr-2"
+          className="py-1 px-2 border border-gray-300 rounded-md mr-2 "
         />
         <button
           onClick={handleAddAccount}
           className="bg-bgblue hover:bg-slate-700 transition-all text-white py-2 px-4 rounded-md mt-6 text-sm font-medium"
         >
-          ADD NEW ACCOUNT
+          INVITE USER
         </button>
       </div>
       {loading && <p>Loading...</p>}
+      
+      {/* Members Section */}
       <ul className="space-y-4 mt-12">
-        {accounts.map((account) => (
+        <h3>Members</h3>
+        {accounts.map((account, index) => (
           <li
-            key={account.id}
-            className="flex justify-between items-center p-4 bg-gray-100 rounded shadow"
+            key={index}
+            className="flex flex-col md:flex-row justify-between items-center p-4  bg-gray-100 rounded shadow"
           >
-            <span>{account.email}</span>
-            <div>
-              <select
-                value={account.status}
-                onChange={(e) => handleStatusChange(account.id, e.target.value)}
-                className="input-box p-2 border border-gray-300 rounded text-sm "
-              >
-                <option value="admin">Admin</option>
-                <option value="member">Member</option>
-                <option value="viewer">Viewer</option>
-              </select>
+            <span>{account.emailid}</span> 
+            <div className="flex flex-col md:flex-row justify-between items-center w-full mr-2  md:w-2/6 xl:w-1/6">
+              <div className="text-gray-600 text-sm my-2 md:my-0">
+                <p>Member</p>
+              </div>
               <button
-                onClick={() => handleDeleteAccount(account.id)}
+                onClick={() => handleDeleteAccount(account.emailid)} 
                 className="p-2 mx-4 bg-red-500 text-sm text-white rounded hover:bg-red-700"
               >
-                {" "}
-                Delete{" "}
+                Delete
               </button>
             </div>
+          </li>
+        ))}
+      </ul>
+      
+      <ul className="space-y-4 mt-12">
+        <h3>Invited</h3>
+        {invites.map((account, index) => (
+          <li
+            key={index}
+            className="flex flex-col md:flex-row justify-between items-center p-4 bg-gray-100 rounded shadow"
+          >
+            <span>{account.emailaddress}</span> 
+            <p>Invited</p>
           </li>
         ))}
       </ul>

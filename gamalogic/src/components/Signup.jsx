@@ -27,6 +27,7 @@ function Signup() {
   let [serverError, setServerError] = useState(false);
   const [thriveRefId, setThriveRefId] = useState(null);
   const [widgetCode, setWidgetCode] = useState(null);
+  const [teamId,setTeamId]=useState(null)
 
   let navigate = useNavigate();
   let {
@@ -62,6 +63,7 @@ function Signup() {
               code,
               thriveRefId: refData?.refId || null,
               widgetCode: refData?.widget || null,
+              teamAdminId:teamId||null,
             });
             toast.success("Welcome to Gamalogic! You've successfully registered with us.");
             let token = res.data;
@@ -91,6 +93,7 @@ function Signup() {
     let urlParams = new URLSearchParams(window.location.search);
     let refId = urlParams.get("thrive_ref_id");
     let widget = urlParams.get("widget_code");
+    const teamAdminToken = urlParams.get("Team_admin");
     if (refId && widget) {
       setThriveRefId(refId);
       setWidgetCode(widget);
@@ -99,6 +102,7 @@ function Signup() {
       const refData = { refId, widget };
       localStorage.setItem("refCode", JSON.stringify(refData));
     }
+    setTeamId(teamAdminToken)
   }, []);
   console.log(thriveRefId, "ref id is here ", widgetCode, "widget codeeeee");
 
@@ -142,6 +146,7 @@ function Signup() {
                     data,
                     thriveRefId,
                     widgetCode,
+                    teamId
                   });
                   setLinkedinLoading(false);
                   console.log(userData, "userdata");
@@ -192,6 +197,7 @@ function Signup() {
         credentialResponse,
         thriveRefId,
         widgetCode,
+        teamId
       });
       setLinkedinLoading(false);
 

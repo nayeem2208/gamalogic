@@ -9,16 +9,20 @@ import { LuKey, LuFileUp, LuHistory } from "react-icons/lu";
 import { CgFileDocument } from "react-icons/cg";
 import { PiCurrencyDollarSimpleBold } from "react-icons/pi";
 import { SlSupport } from "react-icons/sl";
-import { MdArrowDropDown, MdOutlineFindInPage } from "react-icons/md";
+import { MdArrowDropDown, MdArrowDropUp, MdOutlineFindInPage } from "react-icons/md";
 import { RiProfileLine } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUserState } from "../context/userContext";
 import { GrMoney } from "react-icons/gr";
+import { MdOutlineGroups } from "react-icons/md";
+import { MdManageAccounts } from "react-icons/md";
 
 function SideBar() {
   let [uploadfileDropDown, setUploadFileDropDown] = useState(false);
   let [tutorialDropDown, setTutorialDropDown] = useState(false);
+  let [settingDropDown, setSettingDropDown] = useState(false);
+
   let { setUserDetails, userDetails, setLinkedinLoading } = useUserState();
   let navigate = useNavigate();
 
@@ -31,6 +35,12 @@ function SideBar() {
     ) {
       setUploadFileDropDown(true);
     }
+    else if (
+      location.pathname === "/dashboard/account-settings" ||
+      location.pathname === "/dashboard/team"
+    ) {
+      setSettingDropDown(true);
+    }
   }, [location.pathname]);
 
   const uploadfileDropDownToggle = () => {
@@ -39,6 +49,10 @@ function SideBar() {
 
   const tutorialDropDownToggle = () => {
     setTutorialDropDown(!tutorialDropDown);
+  };
+
+  const settingDropDownToggle = () => {
+    setSettingDropDown(!settingDropDown);
   };
 
   async function logoutHandler() {
@@ -99,7 +113,7 @@ function SideBar() {
             >
               <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" /> Upload
               Your File
-              <MdArrowDropDown className="mt-2 text-xl" />
+              {!uploadfileDropDown?(<MdArrowDropDown className="mt-2 text-xl" />):(<MdArrowDropUp className="mt-2 text-xl"/>)}
             </li>
             {uploadfileDropDown && (
               <ul className="ml-6">
@@ -124,7 +138,8 @@ function SideBar() {
             >
               <CgFileDocument className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
               Tutorial
-              <MdArrowDropDown className="mt-2 text-xl" />
+              {!tutorialDropDown?(<MdArrowDropDown className="mt-2 text-xl" />):(<MdArrowDropUp className="mt-2 text-xl"/>)}
+              {/* <MdArrowDropDown className="mt-2 text-xl" /> */}
             </li>
             {tutorialDropDown && (
               <ul className="ml-6">
@@ -160,20 +175,39 @@ function SideBar() {
                 {/* </Link> */}
               </ul>
             )}
-            <Link to="/dashboard/account-settings">
+            <li
+              className="my-4 flex cursor-pointer"
+              onClick={settingDropDownToggle}
+            >
+              <IoSettingsOutline className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+              Settings
+              {!settingDropDown?(<MdArrowDropDown className="mt-2 text-xl" />):(<MdArrowDropUp className="mt-2 text-xl"/>)}
+            </li>
+            {settingDropDown && (
+              <ul className="ml-6">
+                {/* <Link to='/api-docs'> */}
+                <Link to="/dashboard/account-settings">
+                  <li className="my-4 flex">
+                    <MdManageAccounts  className="text-teal-800 mt-2 mx-2 text-lg" />
+                    Account Settings
+                  </li>
+                </Link>
+                {userDetails.isTeam == 1 && (
+                  <Link to="dashboard/team">
+                    <li className="my-4 flex">
+                      <MdOutlineGroups className="text-teal-800 mt-2 mx-2 text-lg" />
+                      Team
+                    </li>
+                  </Link>
+                )}
+              </ul>
+            )}
+            {/* <Link to="/dashboard/account-settings">
               <li className="my-4 flex">
                 <IoSettingsOutline className="text-teal-800 mt-2 mx-2 text-lg" />
                 Account Settings
               </li>
-            </Link>
-            {userDetails.isTeam == 1 && (
-              <Link to="dashboard/team">
-                <li className="my-4 flex">
-                  <MdOutlineGroups className="text-teal-800 mt-2 mx-2 text-lg" />
-                  Team
-                </li>
-              </Link>
-            )}
+            </Link> */}
             <Link to="/dashboard/buy-credits">
               {" "}
               <li className="my-4 flex">
@@ -193,6 +227,14 @@ function SideBar() {
                 Become an Affiliate
               </li>
             </Link>
+            {/* {userDetails.isTeam == 1 && (
+              <Link to="dashboard/team">
+                <li className="my-4 flex">
+                  <MdOutlineGroups className="text-teal-800 mt-2 mx-2 text-lg" />
+                  Team
+                </li>
+              </Link>
+            )} */}
             <Link to="/dashboard/support">
               <li className="my-4 flex">
                 <SlSupport className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
