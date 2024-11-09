@@ -138,7 +138,8 @@ const Authentication = {
             HMACDigest,
             id: user[0][0].rowid,
             accountDetailsModal,
-            isTeam: user[0][0].is_team_admin
+            isTeam: user[0][0].is_team_admin,
+            isTeamMember:user[0][0].is_team_member
 
           });
 
@@ -350,7 +351,8 @@ const Authentication = {
           HMACDigest,
           id: user[0][0].rowid,
           accountDetailsModal,
-          isTeam: user[0][0].is_team_admin
+          isTeam: user[0][0].is_team_admin,
+          isTeamMember:user[0][0].is_team_member
         });
       } else {
         res.status(400).json({
@@ -478,7 +480,8 @@ const Authentication = {
             password,
             country_name: 'USA',
             HMACDigest,
-            id: user[0][0].rowid
+            id: user[0][0].rowid,
+            isTeamMember:user[0][0].is_team_member
           });
         } else {
           res
@@ -773,7 +776,8 @@ const Authentication = {
               HMACDigest,
               id: user[0][0].rowid,
               accountDetailsModal,
-              isTeam: user[0][0].is_team_admin
+              isTeam: user[0][0].is_team_admin,
+              isTeamMember:user[0][0].is_team_member
             });
           } else {
             res.status(400).json({
@@ -909,7 +913,8 @@ const Authentication = {
             confirm: 1,
             password,
             HMACDigest,
-            id: user[0][0].rowid
+            id: user[0][0].rowid,
+            isTeamMember:user[0][0].is_team_member
           });
         } else {
           res
@@ -1007,7 +1012,8 @@ const Authentication = {
           HMACDigest,
           id: user[0][0].rowid,
           accountDetailsModal,
-          isTeam: user[0][0].is_team_admin
+          isTeam: user[0][0].is_team_admin,
+          isTeamMember:user[0][0].is_team_member
 
 
         });

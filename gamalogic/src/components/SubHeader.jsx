@@ -2,7 +2,7 @@ import { IoLogOutOutline } from "react-icons/io5";
 import { useUserState } from "../context/userContext";
 import { Link, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import {  useState } from "react";
+import { useState } from "react";
 import { SlInfo } from "react-icons/sl";
 import axiosInstance from "../axios/axiosInstance";
 import ServerError from "../pages/ServerError";
@@ -19,7 +19,7 @@ function SubHeader(props) {
     setUserDetails(null);
     navigate("/signin");
     setLinkedinLoading(false);
-    window.reloadThriveWidget()
+    window.reloadThriveWidget();
   }
   const HandleSendVerifyLink = async (e) => {
     try {
@@ -80,8 +80,9 @@ function SubHeader(props) {
           </p>
         </div>
       )}
-       {userDetails.expired?.status == true &&
-        userDetails.expired?.reason == "date" && (
+      {userDetails.expired?.status == true &&
+        userDetails.expired?.reason == "date" &&
+        userDetails.isTeamMember != 1 && (
           <div className="my-8 flex bg-red-100 border border-red-400 rounded-lg p-2 text-sm 2xl:text-base">
             <SlInfo className="text-red-500 mx-1 mt-1" />
             <p>
@@ -97,7 +98,8 @@ function SubHeader(props) {
         )}
 
       {userDetails.expired?.status == true &&
-        userDetails.expired?.reason == "credit" && (
+        userDetails.expired?.reason == "credit" &&
+        userDetails.isTeamMember != 1 && (
           <div className="my-8 flex bg-red-100 border border-red-400 rounded-lg p-2 text-sm 2xl:text-base">
             <SlInfo className="text-red-500 mx-1 mt-1" />
             <p>
