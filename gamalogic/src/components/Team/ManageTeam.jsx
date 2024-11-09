@@ -31,8 +31,11 @@ const ManageTeam = () => {
     if (!email) return;
     try {
       setLoading(true);
-      const newAccount = { emailaddress: email }; // Consistent field naming
-      setInvites([...invites, newAccount]); // Add to invites
+      const emailExists = invites.some((invite) => invite.emailaddress === email);
+      if (!emailExists) {
+        const newAccount = { emailaddress: email }; 
+        setInvites([...invites, newAccount]);
+      }
       await axiosInstance.post('/sendSecondaryUserInvite', { email });
       setEmail("");
       toast.success('Invitation link has been successfully sent');

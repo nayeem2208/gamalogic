@@ -307,10 +307,20 @@ const newControllers = {
     sendInviteLinkForSecondaryUser:async(req,res)=>{
         try {
             let dbConnection=req.dbConnection
-            const linkSent = await dbConnection.query(
-                `INSERT INTO team_member_invite (team_id, emailaddress) VALUES (?, ?)`,
+            const [existingInvite] = await dbConnection.query(
+                `SELECT * FROM team_member_invite WHERE team_id = ? AND emailaddress = ?`,
                 [req.user[0][0].rowid, req.body.email]
             );
+            
+            if (existingInvite.length === 0) {
+                const linkSent = await dbConnection.query(
+                    `INSERT INTO team_member_invite (team_id, emailaddress) VALUES (?, ?)`,
+                    [req.user[0][0].rowid, req.body.email]
+                );
+                console.log('Invitation link sent successfully');
+            } else {
+                console.log('Email address already invited');
+            }
             let token = inviteTeamMemberToken(req.body.email,req.user[0][0].emailid)
             let link = `${urls.frontendUrl}/signup?Team_admin=${token}`
 
