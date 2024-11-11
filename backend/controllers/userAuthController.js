@@ -235,9 +235,10 @@ const Authentication = {
         let referenceCode = req.body.thriveRefId != null ? req.body.thriveRefId : null
         let isReferedBy = req.body.thriveRefId != null ? 1 : 0
         let source = req.body.thriveRefId != null ? 'Affiliate Referrer' : 'Sign in'
-
+        let isTeamMember=invitedUserId?1:0
+        let teamId=invitedUserId?invitedUserId:null
         await dbConnection.query(
-          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by,referer_by,is_team_member,team_id)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}',1,'${invitedUserId}')`
+          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by,referer_by,is_team_member,team_id)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}','${isTeamMember}','${teamId}')`
         );
         try {
           leadGeneration(firstname, lastname, email, source, req)
@@ -260,6 +261,7 @@ const Authentication = {
         res.status(200).json("Please check your email for verification link");
       }
     } catch (error) {
+      console.log(error)
       ErrorHandler("registerUser Controller", error, req);
       res
         .status(500)
@@ -382,6 +384,8 @@ const Authentication = {
         lastname = firstname
         firstname = ''
       }
+      let invitedUserId = null
+
       const userExists = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
@@ -389,6 +393,23 @@ const Authentication = {
         res.status(400).json({ error: "User already exists" });
       } else {
         console.log(req.body.widgetCode, req.body.thriveRefId, 'widget and refidddddd')
+        if (req.body.teamId) {
+          const decoded = jwt.verify(req.body.teamId, process.env.JWT_SECRET);
+          const { userEmail, teamEmail } = decoded;
+          if (email != userEmail) {
+            res.status(401).json({ error: "Email address is not invited" });
+            return;
+          }
+          invitedUserId = teamEmail
+          try {
+            await dbConnection.query(
+              `DELETE FROM team_member_invite WHERE emailaddress = '${userEmail}'`
+            );
+            console.log('Invite successfully deleted');
+          } catch (error) {
+            console.error('Error deleting invite:', error);
+          }
+        }
         if (req.body.widgetCode && req.body.thriveRefId) {
           const url = `https://thrive.zoho.com/thrive/webhooks/${req.body.widgetCode}/mapreferral`;
 
@@ -432,8 +453,10 @@ const Authentication = {
         let referenceCode = req.body.thriveRefId != null ? req.body.thriveRefId : null
         let isReferedBy = req.body.thriveRefId != null ? 1 : 0
         let source = req.body.thriveRefId != null ? 'Affiliate Referrer' : 'Sign in'
+        let isTeamMember=invitedUserId?1:0
+        let creditFree=invitedUserId?0:500
         await dbConnection.query(
-          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by,referer_by)VALUES(null,'${name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}')`
+          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by,referer_by,is_team_member,team_id)VALUES(null,'${name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,'${creditFree}','${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}','${isTeamMember}','${invitedUserId}')`
         );
         try {
           leadGeneration(firstname, lastname, email, source)

@@ -29,13 +29,14 @@ const ManageTeam = () => {
   const handleAddAccount = async (e) => {
     e.preventDefault();
     if (!email) return;
+
     try {
       setLoading(true);
       const emailExists = invites.some((invite) => invite.emailaddress === email);
-      if (!emailExists) {
-        const newAccount = { emailaddress: email }; 
-        setInvites([...invites, newAccount]);
-      }
+    if (!emailExists) {
+      const newAccount = { emailaddress: email }; 
+      setInvites([...invites, newAccount]);
+    }
       await axiosInstance.post('/sendSecondaryUserInvite', { email });
       setEmail("");
       toast.success('Invitation link has been successfully sent');
@@ -100,20 +101,17 @@ const ManageTeam = () => {
             </div>
           </li>
         ))}
-      </ul>
-      
-      <ul className="space-y-4 mt-12">
-        <h3>Invited</h3>
         {invites.map((account, index) => (
           <li
             key={index}
             className="flex flex-col md:flex-row justify-between items-center p-4 bg-gray-100 rounded shadow"
           >
             <span>{account.emailaddress}</span> 
-            <p>Invited</p>
+            <div className=" w-20"><p>Invited</p></div>
           </li>
         ))}
       </ul>
+      
     </div>
   );
 };
