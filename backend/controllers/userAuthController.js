@@ -832,7 +832,7 @@ const Authentication = {
   microsoftSignUP: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      let email = req.body.mail
+      let email = req.body.mail??req.body.userPrincipalName
       let invitedUserId = null
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
@@ -982,7 +982,7 @@ const Authentication = {
     try {
       const dbConnection = req.dbConnection;
 
-      let email = req.body.mail
+      let email =req.body.mail??req.body.userPrincipalName
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
       }
