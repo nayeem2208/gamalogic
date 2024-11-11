@@ -832,6 +832,7 @@ const Authentication = {
   microsoftSignUP: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
+      console.log(req.body,'req body in micro signup')
       let email = req.body.mail??req.body.userPrincipalName
       let invitedUserId = null
       if (!email) {
@@ -981,7 +982,7 @@ const Authentication = {
   microsoftLogin: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-
+      console.log(req.body,'req body in micro signin')
       let email =req.body.mail??req.body.userPrincipalName
       if (!email) {
         return res.status(400).json({ message: "Email is required" });

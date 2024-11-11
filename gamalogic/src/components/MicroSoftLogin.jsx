@@ -15,7 +15,7 @@ const MicroSoftSignInButton = (props) => {
   const request = {
     scopes: ["user.read"],
   };
-  console.log(props.page, "page");
+  console.log(props.page,props.teamId, "page");
   const handleLogin = async () => {
     setLinkedinLoading(true);
     const token = await getToken();
@@ -105,7 +105,7 @@ const MicroSoftSignInButton = (props) => {
     <img
       src="/microsoft.png"
       alt="Microsoft Logo"
-      className="w-5 h-5 mr-1"
+      className="w-4 h-4 mr-2"
     />
     Sign in with Microsoft
   </button>
