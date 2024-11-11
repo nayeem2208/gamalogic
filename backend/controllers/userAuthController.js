@@ -527,6 +527,7 @@ const Authentication = {
     try {
       const dbConnection = req.dbConnection;
       const { code, widgetCode, thriveRefId } = req.body;
+      
       if (!code) throw new Error('No code provided')
       const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_SIGNUP_REDIRECT_URI)}`;
       try {
@@ -832,6 +833,7 @@ const Authentication = {
     try {
       const dbConnection = req.dbConnection;
       let email = req.body.mail
+      let invitedUserId = null
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
       }
@@ -848,6 +850,23 @@ const Authentication = {
       if (userExists[0].length > 0) {
         res.status(400).json({ error: "User already exists" });
       } else {
+        if (req.body.teamId) {
+          const decoded = jwt.verify(req.body.teamId, process.env.JWT_SECRET);
+          const { userEmail, teamEmail } = decoded;
+          if (email != userEmail) {
+            res.status(401).json({ error: "Email address is not invited" });
+            return;
+          }
+          invitedUserId = teamEmail
+          try {
+            await dbConnection.query(
+              `DELETE FROM team_member_invite WHERE emailaddress = '${userEmail}'`
+            );
+            console.log('Invite successfully deleted');
+          } catch (error) {
+            console.error('Error deleting invite:', error);
+          }
+        }
         if (req.body.widgetCode && req.body.thriveRefId) {
           const url = `https://thrive.zoho.com/thrive/webhooks/${req.body.widgetCode}/mapreferral`;
 
@@ -891,8 +910,11 @@ const Authentication = {
         let referenceCode = req.body.thriveRefId != null ? req.body.thriveRefId : null
         let isReferedBy = req.body.thriveRefId != null ? 1 : 0
         let source = req.body.thriveRefId != null ? 'Affiliate Referrer' : 'Sign in'
+        let isTeamMember=invitedUserId?1:0
+        let creditFree=invitedUserId?0:500
+
         await dbConnection.query(
-          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,is_microsoft,is_premium,firstname,lastname,is_referer_by,referer_by)VALUES(null,'${given_name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,500,'${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}')`
+          `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,is_microsoft,is_premium,firstname,lastname,is_referer_by,referer_by,is_team_member,team_id)VALUES(null,'${given_name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,'${creditFree}','${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}','${isTeamMember}','${invitedUserId}')`
         );
         try {
           leadGeneration(firstname, lastname, email, source)

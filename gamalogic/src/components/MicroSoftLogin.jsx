@@ -53,10 +53,12 @@ const MicroSoftSignInButton = (props) => {
         }
       } else if (props.page == "signup") {
         try {
+          console.lof(props.teamId,'props.teamiddddddddddddddddddd')
           let res = await axiosInstance.post("/microsoftSignUP", {
             ...userDetails,
             thriveRefId: props.thriveRefId,
-            widgetCode: props.widgetCode
+            widgetCode: props.widgetCode,
+            teamId:props.teamId
           });
           toast.success("Welcome back! You've successfully logged in");
           let token = res.data;

@@ -2,6 +2,8 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import axiosInstance from "../../axios/axiosInstance";
+import { MdAddTask, MdDeleteForever } from "react-icons/md";
+import { RiDeleteBin5Line } from "react-icons/ri";
 
 const ManageTeam = () => {
   const [email, setEmail] = useState("");
@@ -89,14 +91,15 @@ const ManageTeam = () => {
           >
             <span>{account.emailid}</span> 
             <div className="flex flex-col md:flex-row justify-between items-center w-full mr-2  md:w-2/6 xl:w-1/6">
-              <div className="text-gray-600 text-sm my-2 md:my-0">
+              <div className="text-gray-400 font-medium text-sm my-2 md:my-0">
                 <p>Member</p>
               </div>
               <button
                 onClick={() => handleDeleteAccount(account.emailid)} 
-                className="p-2 mx-4 bg-red-500 text-sm text-white rounded hover:bg-red-700"
+                className="p-2 mx-4 flex  items-center bg-red-500 text-sm text-white rounded hover:bg-red-700"
               >
-                Delete
+                
+                <MdDeleteForever className=" w-4 h-4 "/>
               </button>
             </div>
           </li>
@@ -107,11 +110,12 @@ const ManageTeam = () => {
             className="flex flex-col md:flex-row justify-between items-center p-4 bg-gray-100 rounded shadow"
           >
             <span>{account.emailaddress}</span> 
-            <div className=" w-20"><p>Invited</p></div>
+            <div className=" w-20 flex  items-center text-green-500 font-medium"><p>Invited</p><MdAddTask className="text-green-500 w-6 h-6 ml-2"/></div>
           </li>
         ))}
       </ul>
       
+    
     </div>
   );
 };

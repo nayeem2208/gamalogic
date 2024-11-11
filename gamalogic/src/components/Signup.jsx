@@ -386,6 +386,7 @@ function Signup() {
                 page="signup"
                 thriveRefId={thriveRefId}
                 widgetCode={widgetCode}
+                teamId={teamId}
               />
             </div>
             <Link to="/signin">
