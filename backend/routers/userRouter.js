@@ -63,7 +63,7 @@ router.get('/createTeamAccount',dbMiddleware,authcheck,newControllers.createTeam
 router.get('/teamCreationVerify',dbMiddleware,newControllers.verifyTeamCreationLink)
 router.post('/sendSecondaryUserInvite',dbMiddleware,authcheck,newControllers.sendInviteLinkForSecondaryUser)
 router.get('/getTeamDetails',dbMiddleware,authcheck,newControllers.getTeamDetails)
-
+router.post('/deleteFromTeam',dbMiddleware,authcheck,newControllers.removeFromTeam)
 
 router.get('/affiliateUserId',dbMiddleware,authcheck,APIControllers.affilateUserId)
 router.post('/loyalityProgram',APIControllers.loyalityWebhook)
