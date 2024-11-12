@@ -323,7 +323,7 @@ const newControllers = {
             }
             let token = inviteTeamMemberToken(req.body.email,req.user[0][0].emailid)
             let link = `${urls.frontendUrl}/signup?Team_admin=${token}`
-
+            console.log(link,'linkkkkkkkk')
             let sub = `Invitation to Join Gamalogic Team Account`;
             let nameOfUser=req.body.email.split('@')
             sendEmail(
