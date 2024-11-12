@@ -4,7 +4,6 @@ import { useUserState } from "../context/userContext";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 
-
 function Body() {
   let navigate = useNavigate();
   let { setUserDetails, userDetails, setCreditBal, creditBal } = useUserState();
@@ -20,20 +19,39 @@ function Body() {
       }
       setUserDetails(parsedToken);
       // console.log(window.ztUserData,parsedToken.HMACDigest,'zt user data')
-      if (window.ztUserData && (window.ztUserData["za_email_id"] === undefined || window.ztUserData["za_email_id"] === null)) {
+      if (
+        window.ztUserData &&
+        (window.ztUserData["za_email_id"] === undefined ||
+          window.ztUserData["za_email_id"] === null)
+      ) {
         window.ztUserData["za_email_id"] = parsedToken.email;
         window.ztUserData["user_unique_id"] = parsedToken.id;
         window.ztUserData["thrive_digest"] = parsedToken.HMACDigest;
-        window.ztUserData["signUpPage"] = `${import.meta.env.VITE_FRONTEND_URL}/signup`;
-        window.ztUserData["signInPage"] = `${import.meta.env.VITE_FRONTEND_URL}/signin`;
-        
-        const thriveScript = document.createElement('script');
-        thriveScript.id = 'thrive_script';
-        thriveScript.src = 'https://thrive.zohopublic.com/thrive/publicpages/thrivewidget';
+        window.ztUserData["signUpPage"] = `${
+          import.meta.env.VITE_FRONTEND_URL
+        }/signup`;
+        window.ztUserData["signInPage"] = `${
+          import.meta.env.VITE_FRONTEND_URL
+        }/signin`;
+
+        const thriveScript = document.createElement("script");
+        thriveScript.id = "thrive_script";
+        thriveScript.src =
+          "https://thrive.zohopublic.com/thrive/publicpages/thrivewidget";
         document.body.appendChild(thriveScript);
-        console.log(window.ztUserData,'inside the ztuserdata')
+        console.log(window.ztUserData, "inside the ztuserdata");
       }
-      
+      if (window.location.pathname.endsWith("affiliate")) {
+        if (window.hideThriveWidget == true) {
+          window.hideThriveWidget = false;
+          window.reloadThriveWidget();
+        }
+      } else {
+        if (window.hideThriveWidget == false) {
+          window.hideThriveWidget = true;
+          window.reloadThriveWidget();
+        }
+      }
     } else {
       setUserDetails(null);
       navigate("/signin");

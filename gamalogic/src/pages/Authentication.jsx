@@ -18,6 +18,8 @@ function Authentication() {
           setUserDetails(parsedToken);
           navigate('/')
         }
+        // window.hideThriveWidget = false;
+        //   window.reloadThriveWidget();
     }, []);
   
     const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;

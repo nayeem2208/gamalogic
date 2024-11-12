@@ -257,8 +257,8 @@ const newControllers = {
     },
     createTeam: async (req, res) => {
         try {
-            if(req.user[0][0].is_premium==0){
-                res.status(500).json({ message: "You should be a premium member to create team" });
+            if (req.user[0][0].is_premium == 0) {
+                res.status(500).json({ message: "You should be a premium user to create team" });
                 return
             }
             //using same subscriptionCancelConfirmationToken here cos it can use here too
@@ -304,14 +304,14 @@ const newControllers = {
             }
         }
     },
-    sendInviteLinkForSecondaryUser:async(req,res)=>{
+    sendInviteLinkForSecondaryUser: async (req, res) => {
         try {
-            let dbConnection=req.dbConnection
+            let dbConnection = req.dbConnection
             const [existingInvite] = await dbConnection.query(
                 `SELECT * FROM team_member_invite WHERE team_id = ? AND emailaddress = ?`,
                 [req.user[0][0].rowid, req.body.email]
             );
-            
+
             if (existingInvite.length === 0) {
                 const linkSent = await dbConnection.query(
                     `INSERT INTO team_member_invite (team_id, emailaddress) VALUES (?, ?)`,
@@ -321,38 +321,58 @@ const newControllers = {
             } else {
                 console.log('Email address already invited');
             }
-            let token = inviteTeamMemberToken(req.body.email,req.user[0][0].emailid)
+            let token = inviteTeamMemberToken(req.body.email, req.user[0][0].emailid)
             let link = `${urls.frontendUrl}/signup?Team_admin=${token}`
-            console.log(link,'linkkkkkkkk')
+            console.log(link, 'linkk')
             let sub = `Invitation to Join Gamalogic Team Account`;
-            let nameOfUser=req.body.email.split('@')
+            let nameOfUser = req.body.email.split('@')
             sendEmail(
                 nameOfUser[0],
                 req.body.email,
                 sub,
                 childTeamCreationInvite(req.user[0][0].username, token, link)
             );
-            res.status(200).json({message:'its working'})
+            res.status(200).json({ message: 'its working' })
         } catch (error) {
             console.log(error)
-        }finally {
+        } finally {
             if (req.dbConnection) {
                 await req.dbConnection.release();
             }
         }
     },
-    getTeamDetails:async(req,res)=>{
+    getTeamDetails: async (req, res) => {
         try {
-            let dbConnection=req.dbConnection
-           let teamMembers= await dbConnection.query(`SELECT emailid FROM registration where team_id='${req.user[0][0].emailid}'`)
-           console.log(teamMembers,'team membersss')
-           let invited=await dbConnection.query(`SELECT emailaddress from team_member_invite where team_id='${req.user[0][0].rowid}'`)
-           console.log(invited,'invited')
-           res.status(200).json({teamMembers:teamMembers[0],invited:invited[0]})
+            let dbConnection = req.dbConnection
+            let teamMembers = await dbConnection.query(`SELECT emailid FROM registration where team_id='${req.user[0][0].emailid}'`)
+            console.log(teamMembers, 'team membersss')
+            let invited = await dbConnection.query(`SELECT emailaddress from team_member_invite where team_id='${req.user[0][0].rowid}'`)
+            console.log(invited, 'invited')
+            res.status(200).json({ teamMembers: teamMembers[0], invited: invited[0] })
         } catch (error) {
             console.log(error)
-            res.status(500).json({error:error})
-        }finally {
+            res.status(500).json({ error: error })
+        } finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
+    },
+    removeFromTeam: async (req, res) => {
+        try {
+            let dbConnection=req.dbConnection
+            if(!req.body.email){
+                res.status(400).json({error:'please give the email'})
+                return 
+            }
+            await dbConnection.query(
+                `UPDATE registration SET is_team_member = 0, team_id = NULL WHERE emailid = ?`,
+                [req.body.email]
+            );
+            res.status(200).json({message:'succesfully deleted'})
+        } catch (error) {
+            console.log(error)
+        } finally {
             if (req.dbConnection) {
                 await req.dbConnection.release();
             }
