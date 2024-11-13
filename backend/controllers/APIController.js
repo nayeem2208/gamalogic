@@ -19,21 +19,36 @@ import InrToUsdSubscriptionConverter from "../utils/INRtoUSDSubscription.js";
 
 let APIControllers = {
   getCreditBalance: async (req, res) => {
+    let dbConnection
     try {
-      const dbConnection = req.dbConnection;
+      dbConnection = req.dbConnection;
       const token = req.headers.authorization;
       const tokenWithoutBearer = token.replace("Bearer ", "");
       let parsedTokenWithoutBearer = JSON.parse(tokenWithoutBearer)
       const decoded = jwt.verify(parsedTokenWithoutBearer.token, process.env.JWT_SECRET);
-      let user = await dbConnection.query(`SELECT free_final,credits_free,credits from registration WHERE rowid='${decoded.userId}'`)
+      let user = await dbConnection.query(`SELECT free_final,credits_free,credits,is_team_member,team_id from registration WHERE rowid='${decoded.userId}'`)
       let creditBal;
-      let finalFree = new Date(user[0][0].free_final);
-      let finalFreeDate = new Date(finalFree);
-      let currentDate = new Date();
-      if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
-        creditBal = user[0][0].credits_free + user[0][0].credits
-      } else {
-        creditBal = user[0][0].credits;
+      if (user[0][0].is_team_member == 1) {
+        let TeamAdmin = await dbConnection.query(`SELECT free_final,credits_free,credits from registration WHERE rowid='${user[0][0].team_id}'`)
+        console.log(TeamAdmin[0][0],'team admin details')
+        let finalFree = new Date(TeamAdmin[0][0].free_final);
+        let finalFreeDate = new Date(finalFree);
+        let currentDate = new Date();
+        if (TeamAdmin[0][0].credits_free > 0 && finalFreeDate > currentDate) {
+          creditBal = TeamAdmin[0][0].credits_free + TeamAdmin[0][0].credits
+        } else {
+          creditBal = TeamAdmin[0][0].credits;
+        }
+      }
+      else {
+        let finalFree = new Date(user[0][0].free_final);
+        let finalFreeDate = new Date(finalFree);
+        let currentDate = new Date();
+        if (user[0][0].credits_free > 0 && finalFreeDate > currentDate) {
+          creditBal = user[0][0].credits_free + user[0][0].credits
+        } else {
+          creditBal = user[0][0].credits;
+        }
       }
       res.status(200).json(creditBal)
     } catch (error) {
@@ -46,8 +61,8 @@ let APIControllers = {
       }
     }
     finally {
-      if (req.dbConnection) {
-        await req.dbConnection.release();
+      if (dbConnection) {
+        await dbConnection.release();
       }
     }
   },
