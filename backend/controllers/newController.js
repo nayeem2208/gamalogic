@@ -338,11 +338,35 @@ const newControllers = {
             }
         }
     },
+    ResendInvite: async (req, res) => {
+        try {
+            console.log(req.body,'req.body')
+            let token = inviteTeamMemberToken(req.body.email, req.user[0][0].rowid)
+            let link = `${urls.frontendUrl}/signup?Team_admin=${token}`
+            console.log(link, 'linkk')
+            let sub = `Invitation to Join Gamalogic Team Account`;
+            let nameOfUser = req.body.email.split('@')
+            sendEmail(
+                nameOfUser[0],
+                req.body.email,
+                sub,
+                childTeamCreationInvite(req.user[0][0].username, token, link)
+            );
+            res.status(200).json({ message: "Invitation link has been successfully sent" })
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: error })
+        } finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
+    },
     getTeamDetails: async (req, res) => {
         try {
             let dbConnection = req.dbConnection
             let teamMembers = await dbConnection.query(`SELECT emailid FROM registration where team_id='${req.user[0][0].rowid}'`)
-            let invited = await dbConnection.query(`SELECT emailaddress from team_member_invite where team_id='${req.user[0][0].rowid}' AND (is_deleted IS NULL OR is_deleted = 0)`)
+            let invited = await dbConnection.query(`SELECT emailaddress from team_member_invite where team_id='${req.user[0][0].rowid}' AND (is_deleted IS NULL OR is_deleted = 0) AND (is_member IS NULL OR is_member=0)`)
             res.status(200).json({ teamMembers: teamMembers[0], invited: invited[0] })
         } catch (error) {
             console.log(error)

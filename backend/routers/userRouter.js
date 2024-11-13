@@ -62,6 +62,7 @@ router.get('/getMoreDetails',dbMiddleware,authcheck,newControllers.getMoreDetail
 router.get('/createTeamAccount',dbMiddleware,authcheck,newControllers.createTeam)
 router.get('/teamCreationVerify',dbMiddleware,newControllers.verifyTeamCreationLink)
 router.post('/sendSecondaryUserInvite',dbMiddleware,authcheck,newControllers.sendInviteLinkForSecondaryUser)
+router.post('/ResendInvite',dbMiddleware,authcheck,newControllers.ResendInvite)
 router.get('/getTeamDetails',dbMiddleware,authcheck,newControllers.getTeamDetails)
 router.post('/deleteFromTeam',dbMiddleware,authcheck,newControllers.removeFromTeam)
 router.post('/deleteTeamMemberInvite',dbMiddleware,authcheck,newControllers.removeTeamMemberInvite)

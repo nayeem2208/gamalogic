@@ -1,6 +1,6 @@
 import urls from "../ConstFiles/urls.js"
 
-const childTeamCreationInvite = (name, token, link) => {
+const createTeamVerificationLink = (name, token, link) => {
     // const encodedReferer = encodeURIComponent(referer);
     const htmlFile = `
     <!DOCTYPE html>
@@ -112,18 +112,19 @@ const childTeamCreationInvite = (name, token, link) => {
                 <img src="${urls.frontendUrl}/gmLogo.png" alt="GAMALOGIC">
             </div>
             <div class="content">
-                <p class="nameofUser">Hi,</p>
-                <p>You’ve been invited by your team admin to join their Gamalogic team account! As a secondary member, you'll be able to access shared resources, benefit from team credits, and contribute to the team’s activities.</p>                <p>To proceed with the cancellation, please use the following link to confirm your request:</p>
-                <p>To accept the invitation and activate your team member account, please use the link below:</p>
+                <p class="nameofUser">Hi ${name},</p>
+                <p>We’re excited to offer you the ability to create a team account! As a team admin, you’ll be able to manage members account, share credits, and oversee activity with ease.</p>
+                <p>To proceed, please use the following link to confirm your request:</p>
+                <p>To get started, please click the link below to activate your team account and become an admin:</p>
                 <div class="verify">
-                    <a href="${urls.frontendUrl}/signup?Team_admin=${token}"><button
-                            class="verifyButton">Join Team</button></a>
+                    <a href="${urls.frontendUrl}/api/teamCreationVerify?email=${token}"><button
+                            class="verifyButton">Confirm</button></a>
                     <p>Or</p>
                     <p>
-                        <a href="${urls.frontendUrl}/signup?Team_admin=${token}">${link}</a>
+                        <a href="http://localhost:3000/api/teamCreationVerify?email=${token}">${link}</a>
                     </p>
                 </div>
-                <p>This link is valid for the next 10 minutes. If you did not request this action, please ignore this email.</p>
+                <p>This link is valid for the next 4 days. If you did not request this action, please ignore this email.</p>
                 <br>
                 <p>Best regards,<br>
                     Team Gamalogic</p>
@@ -157,4 +158,4 @@ const childTeamCreationInvite = (name, token, link) => {
 }
 
 
-export default childTeamCreationInvite
+export default createTeamVerificationLink

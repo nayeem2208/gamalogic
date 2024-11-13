@@ -51,7 +51,7 @@ const ManageTeam = () => {
       }
       setLoading(true);
       setLoad(30);
-      let res=await axiosInstance.post("/sendSecondaryUserInvite", { email });
+      let res = await axiosInstance.post("/sendSecondaryUserInvite", { email });
       setLoad(100);
       setEmail("");
       toast.success(res.data.message);
@@ -141,6 +141,24 @@ const ManageTeam = () => {
     setShowInvitationAlert(false);
   };
 
+  const handleResendInvite=async(emailToReInvite) => {
+      console.log(emailToReInvite,'eeeeee')
+      if (!emailToReInvite) return;
+  
+      try {
+        setLoading(true);
+        setLoad(30);
+        let res = await axiosInstance.post("/ResendInvite", { email:emailToReInvite });
+        setLoad(100);
+        setEmail("");
+        toast.success(res.data.message);
+        setLoading(false);
+      } catch (error) {
+        setError("Failed to add account");
+        setLoading(false);
+      }
+    };
+
   return (
     <div className="p-6 subHeading bg-white rounded-lg shadow-md mt-12">
       <h3 className="text-2xl font-bold mb-4">Manage Team</h3>
@@ -185,49 +203,54 @@ const ManageTeam = () => {
       )}
       {/* Members Section */}
       <ul className="space-y-4 mt-12">
-        {(accounts.length>0||invites.length>0)&&<h3>Members</h3>}
-        {accounts.map((account, index) => (
-          <li
-            key={index}
-            className="flex flex-col md:flex-row justify-between items-center p-4  bg-gray-100 rounded shadow"
+  {(accounts.length > 0 || invites.length > 0) && <h3>Members</h3>}
+  {accounts.map((account, index) => (
+    <li
+      key={index}
+      className="flex flex-col md:flex-row justify-between items-center p-4 bg-gray-100 rounded shadow"
+    >
+      <span>{account.emailid}</span>
+      <div className="flex flex-col md:flex-row justify-between items-center w-full md:w-2/4 xl:w-2/5 2xl:w-1/4">
+        <div className="text-gray-400 font-medium text-sm my-2 md:my-0 flex items-center">
+          <p>Member</p>
+        </div>
+        <div className="flex">
+          <button className="p-2 text-xs bg-blue-800 text-white rounded font-semibold hidden">RESEND</button>
+          <button
+            onClick={() => handleRemoveUser(account.emailid)}
+            className="p-2 mx-4 flex items-center bg-red-500 text-sm text-white rounded hover:bg-red-700"
           >
-            <span>{account.emailid}</span>
-            <div className="flex flex-col md:flex-row justify-between items-center w-full mr-2  md:w-2/6 xl:w-1/6">
-              <div className="text-gray-400 font-medium text-sm my-2 md:my-0">
-                <p>Member</p>
-              </div>
-              <button
-                onClick={() => handleRemoveUser(account.emailid)}
-                className="p-2 mx-4 flex  items-center bg-red-500 text-sm text-white rounded hover:bg-red-700"
-              >
-                <MdDeleteForever className=" w-4 h-4 " />
-              </button>
-            </div>
-          </li>
-        ))}
-        {invites.map((account, index) => (
-          <li
-            key={index}
-            className="flex flex-col md:flex-row justify-between items-center p-4 bg-gray-100 rounded shadow"
+            <MdDeleteForever className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </li>
+  ))}
+  {invites.map((account, index) => (
+    <li
+      key={index}
+      className="flex flex-col md:flex-row justify-between items-center p-4 bg-gray-100 rounded shadow"
+    >
+      <span>{account.emailaddress}</span>
+      <div className="flex flex-col md:flex-row justify-between items-center w-full md:w-2/4 xl:w-2/5 2xl:w-1/4">
+        <div className="text-green-500 font-medium text-sm my-2 md:my-0 flex items-center">
+          <p>Invited</p>
+          <MdAddTask className="text-green-500 w-6 h-6 ml-2" />
+        </div>
+        <div className="flex justify-center md:justify-normal">
+          <button className="p-2 text-xs bg-blue-900 text-white rounded font-semibold" onClick={()=>handleResendInvite(account.emailaddress)}>RESEND</button>
+          <button
+            onClick={() => handleRemoveinvitation(account.emailaddress)}
+            className="p-2 mx-4 flex items-center bg-red-500 text-sm text-white rounded hover:bg-red-700"
           >
-            <span>{account.emailaddress}</span>
+            <MdDeleteForever className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </li>
+  ))}
+</ul>
 
-            <div className="flex flex-col md:flex-row justify-between items-center text-gray-400 font-medium text-sm my-2 md:my-0 w-full mr-2  md:w-2/6 xl:w-1/6">
-              <div className=" w-20 flex  items-center text-green-500 font-medium">
-                <p>Invited</p>
-                <MdAddTask className="text-green-500 w-6 h-6 ml-2" />
-              </div>
-
-              <button
-                onClick={() => handleRemoveinvitation(account.emailaddress)}
-                className="p-2 mx-4 flex  items-center bg-red-500 text-sm text-white rounded hover:bg-red-700"
-              >
-                <MdDeleteForever className=" w-4 h-4 " />
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 };
