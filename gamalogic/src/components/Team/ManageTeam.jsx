@@ -51,10 +51,10 @@ const ManageTeam = () => {
       }
       setLoading(true);
       setLoad(30);
-      await axiosInstance.post("/sendSecondaryUserInvite", { email });
+      let res=await axiosInstance.post("/sendSecondaryUserInvite", { email });
       setLoad(100);
       setEmail("");
-      toast.success("Invitation link has been successfully sent");
+      toast.success(res.data.message);
       setLoading(false);
     } catch (error) {
       setError("Failed to add account");

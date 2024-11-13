@@ -124,8 +124,8 @@ const Authentication = {
 
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
-          let TeamAdminEmail=null
-          if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'){
+          let TeamAdminEmail
+          if(user[0][0].team_id){
             let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
             TeamAdminEmail=TeamAdmin[0][0].emailid
           }
@@ -201,7 +201,7 @@ const Authentication = {
         invitedUserId = teamIds
         try {
           await dbConnection.query(
-            `UPDATE team_member_invite set is_deleted=1 WHERE emailaddress = '${userEmail}'`
+            `UPDATE team_member_invite set is_member=1 WHERE emailaddress = '${userEmail}'`
           );
           console.log('Invite successfully deleted');
         } catch (error) {
@@ -295,7 +295,6 @@ const Authentication = {
       const token = req.body.credentialResponse.credential;
       const decode = jwt.decode(token);
       const { email } = decode;
-      console.log(email,'email after decode')
       let user = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
@@ -356,10 +355,9 @@ const Authentication = {
         // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
         // const { country_name } = response.data;
 
-        let TeamAdminEmail=null
-        if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'){
+        let TeamAdminEmail
+        if(user[0][0].team_id){
           let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
-          console.log(TeamAdmin,'team admin')
           TeamAdminEmail=TeamAdmin[0][0].emailid
         }
         res.status(200).json({
@@ -387,7 +385,6 @@ const Authentication = {
         });
       }
     } catch (error) {
-      console.log(error)
       ErrorHandler("googleLogin Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
@@ -438,7 +435,7 @@ const Authentication = {
           invitedUserId = teamIds
           try {
             await dbConnection.query(
-              `UPDATE team_member_invite SET is_deleted=1 WHERE emailaddress = '${userEmail}'`
+              `UPDATE team_member_invite SET is_member=1 WHERE emailaddress = '${userEmail}'`
             );
             console.log('Invite successfully deleted');
           } catch (error) {
@@ -527,7 +524,7 @@ const Authentication = {
 
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
-          let TeamAdminEmail=null
+          let TeamAdminEmail
           if(user[0][0].team_id){
             let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
             TeamAdminEmail=TeamAdmin[0][0].emailid
@@ -827,7 +824,7 @@ const Authentication = {
               accountDetailsModal = true
             }
 
-            let TeamAdminEmail=null
+            let TeamAdminEmail
             if(user[0][0].team_id){
               let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
               TeamAdminEmail=TeamAdmin[0][0].emailid
@@ -918,7 +915,7 @@ const Authentication = {
           invitedUserId = teamIds
           try {
             await dbConnection.query(
-              `UPDATE team_member_invite SET is_deleted=1 WHERE emailaddress = '${userEmail}'`
+              `UPDATE team_member_invite SET is_member=1 WHERE emailaddress = '${userEmail}'`
             );
             console.log('Invite successfully deleted');
           } catch (error) {
@@ -1006,8 +1003,8 @@ const Authentication = {
           let password = false
           const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
 
-          let TeamAdminEmail=null
-          if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'){
+          let TeamAdminEmail
+          if(user[0][0].team_id){
             let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
             TeamAdminEmail=TeamAdmin[0][0].emailid
           }
@@ -1105,8 +1102,8 @@ const Authentication = {
           !user[0][0].state) && user[0][0].is_premium == 1) {
           accountDetailsModal = true
         }
-        let TeamAdminEmail=null
-        if(user[0][0].team_id != null && user[0][0].team_id != 'null'){
+        let TeamAdminEmail
+        if(user[0][0].team_id){
           let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
           TeamAdminEmail=TeamAdmin[0][0].emailid
         }

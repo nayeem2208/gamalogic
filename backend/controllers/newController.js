@@ -302,10 +302,12 @@ const newControllers = {
         try {
             let dbConnection = req.dbConnection
             const [existingInvite] = await dbConnection.query(
-                `SELECT * FROM team_member_invite WHERE team_id = ? AND emailaddress = ? AND is_deleted!=1`,
+                `SELECT * FROM team_member_invite WHERE team_id = ? AND emailaddress = ? AND is_deleted!=1 `,
                 [req.user[0][0].rowid, req.body.email]
             );
-
+            if(existingInvite[0].is_member!=null&&existingInvite[0].is_member!=0){
+                return res.status(200).json({message: "Invited email is already a user" })
+            }
             if (existingInvite.length === 0) {
                 const linkSent = await dbConnection.query(
                     `INSERT INTO team_member_invite (team_id, emailaddress,is_deleted) VALUES (?, ?,0)`,
@@ -313,7 +315,7 @@ const newControllers = {
                 );
                 console.log('Invitation link sent successfully');
             } else {
-                console.log('Email address already invited');
+                console.log('Email address already invited or is already a member');
             }
             let token = inviteTeamMemberToken(req.body.email, req.user[0][0].rowid)
             let link = `${urls.frontendUrl}/signup?Team_admin=${token}`
@@ -326,9 +328,10 @@ const newControllers = {
                 sub,
                 childTeamCreationInvite(req.user[0][0].username, token, link)
             );
-            res.status(200).json({ message: 'its working' })
+            res.status(200).json({ message: "Invitation link has been successfully sent" })
         } catch (error) {
             console.log(error)
+            res.status(500).json({ error: error })
         } finally {
             if (req.dbConnection) {
                 await req.dbConnection.release();
