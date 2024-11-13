@@ -16,9 +16,7 @@ import inviteTeamMemberToken from "../utils/inviteTeamMemberToken.js";
 const newControllers = {
     cancelSubscription: async (req, res) => {
         try {
-            console.log(req.user[0][0], 'user')
             let token = subscriptionCancelConfirmationToken(req.user[0][0].emailid)
-            console.log(token, 'token')
             let link = `${urls.frontendUrl}/api/ConfirmSubscriptionCancellation?email=${token}`
             sendEmail(
                 req.user[0][0].username,
@@ -122,7 +120,6 @@ const newControllers = {
             else if (planDetails.source == 'razorpay') {
                 var instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET })
                 let resp = await instance.subscriptions.cancel(planDetails.subscription_id)
-                console.log(resp, 'resp')
             }
 
 
@@ -263,7 +260,6 @@ const newControllers = {
             }
             //using same subscriptionCancelConfirmationToken here cos it can use here too
             let token = subscriptionCancelConfirmationToken(req.user[0][0].emailid)
-            console.log(token, 'token')
             let link = `${urls.frontendUrl}/api/teamCreationVerify?email=${token}`
 
             let sub = `Invitation to Create Your Gamalogic Team Account`;
@@ -274,7 +270,6 @@ const newControllers = {
                 sub,
                 createTeamVerificationLink(req.user[0][0].username, token, link)
             );
-            console.log('ivda vare okay')
             res.status(200).json({ message: "Email sent successfully" });
         } catch (error) {
             console.log(error)
@@ -291,7 +286,6 @@ const newControllers = {
             const dbConnection = req.dbConnection;
             const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
             const userEmail = decoded.email;
-            console.log(userEmail, 'user email for team creation')
             await dbConnection.query(`UPDATE registration set is_team_admin=1 where emailid='${userEmail}'`)
             // dashboard/team
             res.redirect(`${urls.frontendUrl}/dashboard/team?team=true`);
@@ -345,9 +339,7 @@ const newControllers = {
         try {
             let dbConnection = req.dbConnection
             let teamMembers = await dbConnection.query(`SELECT emailid FROM registration where team_id='${req.user[0][0].rowid}'`)
-            console.log(teamMembers, 'team membersss')
             let invited = await dbConnection.query(`SELECT emailaddress from team_member_invite where team_id='${req.user[0][0].rowid}' AND (is_deleted IS NULL OR is_deleted = 0)`)
-            console.log(invited, 'invited')
             res.status(200).json({ teamMembers: teamMembers[0], invited: invited[0] })
         } catch (error) {
             console.log(error)
