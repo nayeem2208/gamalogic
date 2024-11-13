@@ -254,10 +254,37 @@ const newControllers = {
     },
     createTeam: async (req, res) => {
         try {
-            if (req.user[0][0].is_premium == 0) {
-                res.status(500).json({ message: "You should be a premium user to create team" });
-                return
+            const requiredFields = [
+                "title",
+                "phone_country_code",
+                "phone_number",
+                "is_company",
+                "is_personal",
+                "company_name",
+                "address_line_1",
+                "city",
+                "pincode",
+                "country",
+                "state",
+                "firstname",
+                "lastname"
+            ];
+
+            const validateFields = (data) => {
+                const missingFields = requiredFields.filter((field) => !data[field]);
+                return missingFields;
+            };
+            if (req.user[0][0].is_premium === 0) {
+                res.status(500).json({ message: "You should be a premium user to create a team" });
+                return;
             }
+
+            const missingFields = validateFields(req.user[0][0]);
+            if (missingFields.length > 0) {
+                res.status(400).json({ message: `Please fill all the required fields to create a team` });
+                return;
+            }
+
             //using same subscriptionCancelConfirmationToken here cos it can use here too
             let token = subscriptionCancelConfirmationToken(req.user[0][0].emailid)
             let link = `${urls.frontendUrl}/api/teamCreationVerify?email=${token}`
@@ -271,6 +298,7 @@ const newControllers = {
                 createTeamVerificationLink(req.user[0][0].username, token, link)
             );
             res.status(200).json({ message: "Email sent successfully" });
+
         } catch (error) {
             console.log(error)
             res.status(500).json({ message: "Failed to create team" });
@@ -305,8 +333,8 @@ const newControllers = {
                 `SELECT * FROM team_member_invite WHERE team_id = ? AND emailaddress = ? AND is_deleted!=1 `,
                 [req.user[0][0].rowid, req.body.email]
             );
-            if(existingInvite.length > 0 && existingInvite[0].is_member != null && existingInvite[0].is_member != 0){
-                return res.status(200).json({message: "Invited email is already a user" })
+            if (existingInvite.length > 0 && existingInvite[0].is_member != null && existingInvite[0].is_member != 0) {
+                return res.status(200).json({ message: "Invited email is already a user" })
             }
             if (existingInvite.length === 0) {
                 const linkSent = await dbConnection.query(
@@ -340,7 +368,7 @@ const newControllers = {
     },
     ResendInvite: async (req, res) => {
         try {
-            console.log(req.body,'req.body')
+            console.log(req.body, 'req.body')
             let token = inviteTeamMemberToken(req.body.email, req.user[0][0].rowid)
             let link = `${urls.frontendUrl}/signup?Team_admin=${token}`
             console.log(link, 'linkk')
@@ -403,12 +431,12 @@ const newControllers = {
         try {
             const { email } = req.body;
             console.log(email, 'req.body email');
-    
+
             dbConnection = req.dbConnection;
-    
+
             const query = `UPDATE team_member_invite SET is_deleted = 1 WHERE emailaddress = ?`;
             await dbConnection.query(query, [email]);
-    
+
             res.status(200).json({ message: 'Successfully deleted' });
         } catch (error) {
             console.error('Error in removeTeamMemberInvite:', error);
@@ -419,7 +447,7 @@ const newControllers = {
             }
         }
     }
-    
+
 
 }
 export default newControllers
