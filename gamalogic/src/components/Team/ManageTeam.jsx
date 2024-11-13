@@ -185,7 +185,7 @@ const ManageTeam = () => {
       )}
       {/* Members Section */}
       <ul className="space-y-4 mt-12">
-        <h3>Members</h3>
+        {(accounts.length>0||invites.length>0)&&<h3>Members</h3>}
         {accounts.map((account, index) => (
           <li
             key={index}

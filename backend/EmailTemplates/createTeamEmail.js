@@ -113,8 +113,8 @@ const createTeamVerificationLink = (name, token, link) => {
             </div>
             <div class="content">
                 <p class="nameofUser">Hi ${name},</p>
-                <p>We’re excited to offer you the ability to create a team account! As a team admin, you’ll be able to manage sub-accounts, share credits, and oversee activity with ease.</p>
-                <p>To proceed with the cancellation, please use the following link to confirm your request:</p>
+                <p>We’re excited to offer you the ability to create a team account! As a team admin, you’ll be able to manage members account, share credits, and oversee activity with ease.</p>
+                <p>To proceed, please use the following link to confirm your request:</p>
                 <p>To get started, please click the link below to activate your team account and become an admin:</p>
                 <div class="verify">
                     <a href="${urls.frontendUrl}/api/teamCreationVerify?email=${token}"><button

@@ -139,8 +139,7 @@ function AccountSettings() {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message)
-
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -279,7 +278,7 @@ function AccountSettings() {
               <div>
                 <p className="my-7 description">
                   Become the admin of your team to unlock advanced features for
-                  managing sub-accounts and sharing resources.
+                  managing team members and sharing resources.
                 </p>
                 <div className="advantages my-5">
                   <h4 className="font-semibold text-lg mb-2">
@@ -297,7 +296,7 @@ function AccountSettings() {
                       <span className="font-semibold mr-1">
                         Credit Sharing:
                       </span>{" "}
-                      Seamlessly share credits across all secondary accounts.
+                      Seamlessly share credits across all member accounts.
                     </li>
                     <li>
                       <span className="font-semibold mr-1">
@@ -310,8 +309,7 @@ function AccountSettings() {
                       <span className="font-semibold mr-1">
                         Controlled Access:
                       </span>{" "}
-                      Limit access to uploaded files for child accounts, giving
-                      them access only to their own uploads.
+                      Limit access to uploaded files for member accounts, giving them access only to their own uploads.
                     </li>
                     <li>
                       <span className="font-semibold mr-1">
