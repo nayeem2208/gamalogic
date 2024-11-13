@@ -124,8 +124,8 @@ const Authentication = {
 
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
-          let TeamAdminEmail
-          if(user[0][0].team_id){
+          let TeamAdminEmail=null
+          if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'){
             let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
             TeamAdminEmail=TeamAdmin[0][0].emailid
           }
@@ -357,8 +357,7 @@ const Authentication = {
         // const { country_name } = response.data;
 
         let TeamAdminEmail=null
-        console.log(user[0][0].team_id,'team id')
-        if(user[0][0].team_id){
+        if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'){
           let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
           console.log(TeamAdmin,'team admin')
           TeamAdminEmail=TeamAdmin[0][0].emailid
@@ -528,7 +527,7 @@ const Authentication = {
 
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
-          let TeamAdminEmail
+          let TeamAdminEmail=null
           if(user[0][0].team_id){
             let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
             TeamAdminEmail=TeamAdmin[0][0].emailid
@@ -828,7 +827,7 @@ const Authentication = {
               accountDetailsModal = true
             }
 
-            let TeamAdminEmail
+            let TeamAdminEmail=null
             if(user[0][0].team_id){
               let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
               TeamAdminEmail=TeamAdmin[0][0].emailid
@@ -1007,8 +1006,8 @@ const Authentication = {
           let password = false
           const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
 
-          let TeamAdminEmail
-          if(user[0][0].team_id){
+          let TeamAdminEmail=null
+          if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'){
             let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
             TeamAdminEmail=TeamAdmin[0][0].emailid
           }
@@ -1106,8 +1105,8 @@ const Authentication = {
           !user[0][0].state) && user[0][0].is_premium == 1) {
           accountDetailsModal = true
         }
-        let TeamAdminEmail
-        if(user[0][0].team_id){
+        let TeamAdminEmail=null
+        if(user[0][0].team_id != null && user[0][0].team_id != 'null'){
           let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
           TeamAdminEmail=TeamAdmin[0][0].emailid
         }
