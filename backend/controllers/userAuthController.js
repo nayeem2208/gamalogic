@@ -385,6 +385,7 @@ const Authentication = {
         });
       }
     } catch (error) {
+      console.log(error)
       ErrorHandler("googleLogin Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
