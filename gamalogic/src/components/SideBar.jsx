@@ -211,7 +211,7 @@ function SideBar() {
                   <Link to="dashboard/team">
                     <li className="my-4 flex">
                       <MdOutlineGroups className="text-teal-800 mt-2 mx-2 text-lg" />
-                      Team
+                      Team Settings
                     </li>
                   </Link>
                 )}

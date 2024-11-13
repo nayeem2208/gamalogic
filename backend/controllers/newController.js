@@ -308,20 +308,20 @@ const newControllers = {
         try {
             let dbConnection = req.dbConnection
             const [existingInvite] = await dbConnection.query(
-                `SELECT * FROM team_member_invite WHERE team_id = ? AND emailaddress = ?`,
+                `SELECT * FROM team_member_invite WHERE team_id = ? AND emailaddress = ? AND is_deleted!=1`,
                 [req.user[0][0].rowid, req.body.email]
             );
 
             if (existingInvite.length === 0) {
                 const linkSent = await dbConnection.query(
-                    `INSERT INTO team_member_invite (team_id, emailaddress) VALUES (?, ?)`,
+                    `INSERT INTO team_member_invite (team_id, emailaddress,is_deleted) VALUES (?, ?,0)`,
                     [req.user[0][0].rowid, req.body.email]
                 );
                 console.log('Invitation link sent successfully');
             } else {
                 console.log('Email address already invited');
             }
-            let token = inviteTeamMemberToken(req.body.email, req.user[0][0].emailid)
+            let token = inviteTeamMemberToken(req.body.email, req.user[0][0].rowid)
             let link = `${urls.frontendUrl}/signup?Team_admin=${token}`
             console.log(link, 'linkk')
             let sub = `Invitation to Join Gamalogic Team Account`;
@@ -344,9 +344,9 @@ const newControllers = {
     getTeamDetails: async (req, res) => {
         try {
             let dbConnection = req.dbConnection
-            let teamMembers = await dbConnection.query(`SELECT emailid FROM registration where team_id='${req.user[0][0].emailid}'`)
+            let teamMembers = await dbConnection.query(`SELECT emailid FROM registration where team_id='${req.user[0][0].rowid}'`)
             console.log(teamMembers, 'team membersss')
-            let invited = await dbConnection.query(`SELECT emailaddress from team_member_invite where team_id='${req.user[0][0].rowid}'`)
+            let invited = await dbConnection.query(`SELECT emailaddress from team_member_invite where team_id='${req.user[0][0].rowid}' AND (is_deleted IS NULL OR is_deleted = 0)`)
             console.log(invited, 'invited')
             res.status(200).json({ teamMembers: teamMembers[0], invited: invited[0] })
         } catch (error) {
@@ -360,24 +360,47 @@ const newControllers = {
     },
     removeFromTeam: async (req, res) => {
         try {
-            let dbConnection=req.dbConnection
-            if(!req.body.email){
-                res.status(400).json({error:'please give the email'})
-                return 
+            let dbConnection = req.dbConnection
+            if (!req.body.email) {
+                res.status(400).json({ error: 'please give the email' })
+                return
             }
             await dbConnection.query(
                 `UPDATE registration SET is_team_member = 0, team_id = NULL WHERE emailid = ?`,
                 [req.body.email]
             );
-            res.status(200).json({message:'succesfully deleted'})
+            res.status(200).json({ message: 'succesfully deleted' })
         } catch (error) {
             console.log(error)
+            res.status(500).json({ error: error })
         } finally {
             if (req.dbConnection) {
                 await req.dbConnection.release();
             }
         }
+    },
+    removeTeamMemberInvite: async (req, res) => {
+        let dbConnection;
+        try {
+            const { email } = req.body;
+            console.log(email, 'req.body email');
+    
+            dbConnection = req.dbConnection;
+    
+            const query = `UPDATE team_member_invite SET is_deleted = 1 WHERE emailaddress = ?`;
+            await dbConnection.query(query, [email]);
+    
+            res.status(200).json({ message: 'Successfully deleted' });
+        } catch (error) {
+            console.error('Error in removeTeamMemberInvite:', error);
+            res.status(500).json({ error: 'Failed to delete invitation' });
+        } finally {
+            if (dbConnection) {
+                await dbConnection.release();
+            }
+        }
     }
+    
 
 }
 export default newControllers

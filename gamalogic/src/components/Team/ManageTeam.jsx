@@ -5,15 +5,17 @@ import axiosInstance from "../../axios/axiosInstance";
 import { MdAddTask, MdDeleteForever } from "react-icons/md";
 import RemoveTeamMemberAlert from "./RemoveTeamMemberAlert";
 import LoadingBar from "react-top-loading-bar";
+import RemoveInviteMember from "./RemoveInviteMemberAlert";
 
 const ManageTeam = () => {
   const [email, setEmail] = useState("");
   const [accounts, setAccounts] = useState([]);
   const [invites, setInvites] = useState([]);
   const [loading, setLoading] = useState(false);
-  let [load, setLoad] = useState(30);
+  const [load, setLoad] = useState(30);
   const [error, setError] = useState("");
-  let [showAlert, setShowAlert] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [showInvitatoinAlert, setShowInvitationAlert] = useState(false);
   const [emailToDelete, setEmailToDelete] = useState(null);
 
   useEffect(() => {
@@ -78,16 +80,36 @@ const ManageTeam = () => {
     }
   };
 
+  const handleRemoveInvite = async (emailToDelete) => {
+    try {
+      console.log(emailToDelete, "invite to delete");
+      setLoading(true);
+      setLoad(30);
+      setInvites(
+        invites.filter((account) => account.emailaddress !== emailToDelete)
+      );
+      await axiosInstance.post("/deleteTeamMemberInvite", {
+        email: emailToDelete,
+      });
+      setLoad(100);
+      toast.success("Removed Invite succesfully");
+      setLoading(false);
+    } catch (error) {
+      setError("Failed to delete Invite");
+      setLoading(false);
+    }
+  };
+
   async function handleRemoveUser(email) {
     setEmailToDelete(email);
     setShowAlert(true);
   }
   const handleAccept = async () => {
     try {
+      setShowAlert(false);
       if (emailToDelete) {
         await handleDeleteAccount(emailToDelete);
       }
-      setShowAlert(false);
     } catch (error) {
       console.error("Error removing user:", error);
       setShowAlert(false);
@@ -96,6 +118,27 @@ const ManageTeam = () => {
 
   const handleDismiss = () => {
     setShowAlert(false);
+  };
+
+  async function handleRemoveinvitation(email) {
+    setEmailToDelete(email);
+    setShowInvitationAlert(true);
+  }
+  const handleInviationCancelAccept = async () => {
+    try {
+      setShowInvitationAlert(false);
+      if (emailToDelete) {
+        await handleRemoveInvite(emailToDelete);
+      }
+      console.log("its workinggggg");
+    } catch (error) {
+      console.error("Error removing user:", error);
+      setShowInvitationAlert(false);
+    }
+  };
+
+  const handleInviationCancelDismiss = () => {
+    setShowInvitationAlert(false);
   };
 
   return (
@@ -132,6 +175,14 @@ const ManageTeam = () => {
           />
         </div>
       )}
+      {showInvitatoinAlert && (
+        <div>
+          <RemoveInviteMember
+            onAccept={handleInviationCancelAccept}
+            onDismiss={handleInviationCancelDismiss}
+          />
+        </div>
+      )}
       {/* Members Section */}
       <ul className="space-y-4 mt-12">
         <h3>Members</h3>
@@ -146,7 +197,6 @@ const ManageTeam = () => {
                 <p>Member</p>
               </div>
               <button
-                // onClick={() => handleDeleteAccount(account.emailid)}
                 onClick={() => handleRemoveUser(account.emailid)}
                 className="p-2 mx-4 flex  items-center bg-red-500 text-sm text-white rounded hover:bg-red-700"
               >
@@ -161,9 +211,19 @@ const ManageTeam = () => {
             className="flex flex-col md:flex-row justify-between items-center p-4 bg-gray-100 rounded shadow"
           >
             <span>{account.emailaddress}</span>
-            <div className=" w-20 flex  items-center text-green-500 font-medium">
-              <p>Invited</p>
-              <MdAddTask className="text-green-500 w-6 h-6 ml-2" />
+
+            <div className="flex flex-col md:flex-row justify-between items-center text-gray-400 font-medium text-sm my-2 md:my-0 w-full mr-2  md:w-2/6 xl:w-1/6">
+              <div className=" w-20 flex  items-center text-green-500 font-medium">
+                <p>Invited</p>
+                <MdAddTask className="text-green-500 w-6 h-6 ml-2" />
+              </div>
+
+              <button
+                onClick={() => handleRemoveinvitation(account.emailaddress)}
+                className="p-2 mx-4 flex  items-center bg-red-500 text-sm text-white rounded hover:bg-red-700"
+              >
+                <MdDeleteForever className=" w-4 h-4 " />
+              </button>
             </div>
           </li>
         ))}

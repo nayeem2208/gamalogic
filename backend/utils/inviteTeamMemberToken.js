@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 
-function inviteTeamMemberToken(userEmail, teamEmail) {
+function inviteTeamMemberToken(userEmail, teamIds) {
   const token = jwt.sign(
-    { userEmail, teamEmail }, 
+    { userEmail, teamIds }, 
     process.env.JWT_SECRET, 
     { expiresIn: '4d' }
   );

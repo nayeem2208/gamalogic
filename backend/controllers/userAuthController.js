@@ -139,7 +139,7 @@ const Authentication = {
             id: user[0][0].rowid,
             accountDetailsModal,
             isTeam: user[0][0].is_team_admin,
-            isTeamMember:user[0][0].is_team_member
+            isTeamMember: user[0][0].is_team_member
 
           });
 
@@ -177,15 +177,25 @@ const Authentication = {
       );
       if (req.body.teamId) {
         const decoded = jwt.verify(req.body.teamId, process.env.JWT_SECRET);
-        const { userEmail, teamEmail } = decoded;
+        const { userEmail, teamIds } = decoded;
+        const [validLink] = await dbConnection.query(
+          `SELECT * FROM team_member_invite WHERE emailaddress = ? AND (is_deleted IS NULL OR is_deleted = 0)`,
+          [userEmail]
+        );
         if (email != userEmail) {
-          res.status(401).json({ error: "Email address is not invited" });
+          res.status(401).json({ error: "Email address does not match the invitation" });
           return;
         }
-        invitedUserId = teamEmail
+
+        if (!validLink || validLink.length == 0) {
+          res.status(401).json({ error: "Email address is not invited or the invitation has been removed" });
+          return;
+        }
+
+        invitedUserId = teamIds
         try {
           await dbConnection.query(
-            `DELETE FROM team_member_invite WHERE emailaddress = '${userEmail}'`
+            `UPDATE team_member_invite set is_deleted=1 WHERE emailaddress = '${userEmail}'`
           );
           console.log('Invite successfully deleted');
         } catch (error) {
@@ -235,8 +245,8 @@ const Authentication = {
         let referenceCode = req.body.thriveRefId != null ? req.body.thriveRefId : null
         let isReferedBy = req.body.thriveRefId != null ? 1 : 0
         let source = req.body.thriveRefId != null ? 'Affiliate Referrer' : 'Sign in'
-        let isTeamMember=invitedUserId?1:0
-        let teamId=invitedUserId?invitedUserId:null
+        let isTeamMember = invitedUserId ? 1 : 0
+        let teamId = invitedUserId ? invitedUserId : null
         await dbConnection.query(
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by,referer_by,is_team_member,team_id)VALUES(null,'${fullname}','${email}','${hashedPassword}','${formattedDate}',0,'${freeFinalDate}',0,0,'${ip}','${userAgent}',0,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}','${isTeamMember}','${teamId}')`
         );
@@ -354,7 +364,7 @@ const Authentication = {
           id: user[0][0].rowid,
           accountDetailsModal,
           isTeam: user[0][0].is_team_admin,
-          isTeamMember:user[0][0].is_team_member
+          isTeamMember: user[0][0].is_team_member
         });
       } else {
         res.status(400).json({
@@ -395,15 +405,25 @@ const Authentication = {
         console.log(req.body.widgetCode, req.body.thriveRefId, 'widget and refidddddd')
         if (req.body.teamId) {
           const decoded = jwt.verify(req.body.teamId, process.env.JWT_SECRET);
-          const { userEmail, teamEmail } = decoded;
+          const { userEmail, teamIds } = decoded;
+          const [validLink] = await dbConnection.query(
+            `SELECT * FROM team_member_invite WHERE emailaddress = ? AND (is_deleted IS NULL OR is_deleted = 0)`,
+            [userEmail]
+          );
           if (email != userEmail) {
-            res.status(401).json({ error: "Email address is not invited" });
+            res.status(401).json({ error: "Email address does not match the invitation" });
             return;
           }
-          invitedUserId = teamEmail
+
+          if (!validLink || validLink.length == 0) {
+            res.status(401).json({ error: "Email address is not invited or the invitation has been removed" });
+            return;
+          }
+
+          invitedUserId = teamIds
           try {
             await dbConnection.query(
-              `DELETE FROM team_member_invite WHERE emailaddress = '${userEmail}'`
+              `UPDATE team_member_invite SET is_deleted=1 WHERE emailaddress = '${userEmail}'`
             );
             console.log('Invite successfully deleted');
           } catch (error) {
@@ -453,8 +473,8 @@ const Authentication = {
         let referenceCode = req.body.thriveRefId != null ? req.body.thriveRefId : null
         let isReferedBy = req.body.thriveRefId != null ? 1 : 0
         let source = req.body.thriveRefId != null ? 'Affiliate Referrer' : 'Sign in'
-        let isTeamMember=invitedUserId?1:0
-        let creditFree=invitedUserId?0:500
+        let isTeamMember = invitedUserId ? 1 : 0
+        let creditFree = invitedUserId ? 0 : 500
         await dbConnection.query(
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by,referer_by,is_team_member,team_id)VALUES(null,'${name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,'${creditFree}','${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}','${isTeamMember}','${invitedUserId}')`
         );
@@ -504,7 +524,7 @@ const Authentication = {
             country_name: 'USA',
             HMACDigest,
             id: user[0][0].rowid,
-            isTeamMember:user[0][0].is_team_member
+            isTeamMember: user[0][0].is_team_member
           });
         } else {
           res
@@ -527,7 +547,7 @@ const Authentication = {
     try {
       const dbConnection = req.dbConnection;
       const { code, widgetCode, thriveRefId } = req.body;
-      
+
       if (!code) throw new Error('No code provided')
       const accessTokenUrl = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${encodeURIComponent(code)}&client_id=${process.env.LINKEDIN_CLIENTID}&client_secret=${process.env.LINKEDIN_CLIENT_SECRET}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_SIGNUP_REDIRECT_URI)}`;
       try {
@@ -801,7 +821,7 @@ const Authentication = {
               id: user[0][0].rowid,
               accountDetailsModal,
               isTeam: user[0][0].is_team_admin,
-              isTeamMember:user[0][0].is_team_member
+              isTeamMember: user[0][0].is_team_member
             });
           } else {
             res.status(400).json({
@@ -832,8 +852,8 @@ const Authentication = {
   microsoftSignUP: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      console.log(req.body,'req body in micro signup')
-      let email = req.body.mail??req.body.userPrincipalName
+      console.log(req.body, 'req body in micro signup')
+      let email = req.body.mail ?? req.body.userPrincipalName
       let invitedUserId = null
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
@@ -853,15 +873,25 @@ const Authentication = {
       } else {
         if (req.body.teamId) {
           const decoded = jwt.verify(req.body.teamId, process.env.JWT_SECRET);
-          const { userEmail, teamEmail } = decoded;
+          const { userEmail, teamIds } = decoded;
+          const [validLink] = await dbConnection.query(
+            `SELECT * FROM team_member_invite WHERE emailaddress = ? AND (is_deleted IS NULL OR is_deleted = 0)`,
+            [userEmail]
+          );
           if (email != userEmail) {
-            res.status(401).json({ error: "Email address is not invited" });
+            res.status(401).json({ error: "Email address does not match the invitation" });
             return;
           }
-          invitedUserId = teamEmail
+
+          if (!validLink || validLink.length == 0) {
+            res.status(401).json({ error: "Email address is not invited or the invitation has been removed" });
+            return;
+          }
+
+          invitedUserId = teamIds
           try {
             await dbConnection.query(
-              `DELETE FROM team_member_invite WHERE emailaddress = '${userEmail}'`
+              `UPDATE team_member_invite SET is_deleted=1 WHERE emailaddress = '${userEmail}'`
             );
             console.log('Invite successfully deleted');
           } catch (error) {
@@ -911,8 +941,8 @@ const Authentication = {
         let referenceCode = req.body.thriveRefId != null ? req.body.thriveRefId : null
         let isReferedBy = req.body.thriveRefId != null ? 1 : 0
         let source = req.body.thriveRefId != null ? 'Affiliate Referrer' : 'Sign in'
-        let isTeamMember=invitedUserId?1:0
-        let creditFree=invitedUserId?0:500
+        let isTeamMember = invitedUserId ? 1 : 0
+        let creditFree = invitedUserId ? 0 : 500
 
         await dbConnection.query(
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,is_microsoft,is_premium,firstname,lastname,is_referer_by,referer_by,is_team_member,team_id)VALUES(null,'${given_name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,'${creditFree}','${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}','${isTeamMember}','${invitedUserId}')`
@@ -960,7 +990,7 @@ const Authentication = {
             password,
             HMACDigest,
             id: user[0][0].rowid,
-            isTeamMember:user[0][0].is_team_member
+            isTeamMember: user[0][0].is_team_member
           });
         } else {
           res
@@ -982,8 +1012,7 @@ const Authentication = {
   microsoftLogin: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      console.log(req.body,'req body in micro signin')
-      let email =req.body.mail??req.body.userPrincipalName
+      let email = req.body.mail ?? req.body.userPrincipalName
       if (!email) {
         return res.status(400).json({ message: "Email is required" });
       }
@@ -1059,7 +1088,7 @@ const Authentication = {
           id: user[0][0].rowid,
           accountDetailsModal,
           isTeam: user[0][0].is_team_admin,
-          isTeamMember:user[0][0].is_team_member
+          isTeamMember: user[0][0].is_team_member
 
 
         });
