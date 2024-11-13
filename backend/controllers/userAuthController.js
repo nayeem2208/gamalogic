@@ -295,6 +295,7 @@ const Authentication = {
       const token = req.body.credentialResponse.credential;
       const decode = jwt.decode(token);
       const { email } = decode;
+      console.log(email,'email after decode')
       let user = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
