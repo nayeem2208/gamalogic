@@ -125,7 +125,7 @@ const Authentication = {
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
           let TeamAdminEmail
-          if(user[0][0].team_id){
+          if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'&&user[0][0].team_id){
             let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
             TeamAdminEmail=TeamAdmin[0][0].emailid
           }
@@ -356,7 +356,7 @@ const Authentication = {
         // const { country_name } = response.data;
 
         let TeamAdminEmail
-        if(user[0][0].team_id){
+        if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'&&user[0][0].team_id){
           let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
           TeamAdminEmail=TeamAdmin[0][0].emailid
         }
@@ -385,6 +385,7 @@ const Authentication = {
         });
       }
     } catch (error) {
+      console.log(error)
       ErrorHandler("googleLogin Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
@@ -525,7 +526,7 @@ const Authentication = {
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
           let TeamAdminEmail
-          if(user[0][0].team_id){
+          if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'&&user[0][0].team_id){
             let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
             TeamAdminEmail=TeamAdmin[0][0].emailid
           }
@@ -825,7 +826,7 @@ const Authentication = {
             }
 
             let TeamAdminEmail
-            if(user[0][0].team_id){
+            if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'&&user[0][0].team_id){
               let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
               TeamAdminEmail=TeamAdmin[0][0].emailid
             }
@@ -1004,7 +1005,7 @@ const Authentication = {
           const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
 
           let TeamAdminEmail
-          if(user[0][0].team_id){
+          if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'&&user[0][0].team_id){
             let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
             TeamAdminEmail=TeamAdmin[0][0].emailid
           }
@@ -1103,7 +1104,7 @@ const Authentication = {
           accountDetailsModal = true
         }
         let TeamAdminEmail
-        if(user[0][0].team_id){
+        if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'&&user[0][0].team_id){
           let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
           TeamAdminEmail=TeamAdmin[0][0].emailid
         }

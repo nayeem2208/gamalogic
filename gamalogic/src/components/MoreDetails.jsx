@@ -336,35 +336,34 @@ function MoreDetails() {
                     onChange={hanleAccountType}
                     disabled={!edit}
                   /> */}
-              
-                    <input
-                      type="radio"
-                      name="accountType"
-                      value="Company"
-                      className={`form-radio h-5 w-5 text-red-500 transition duration-150 ease-in-out ${
-                        edit ? "input-box" : "input-box-readonly"
-                      }`}
-                      checked={accountType === "Company"}
-                      onChange={hanleAccountType}
-                      disabled={!edit}
-                    />
-                  
+
+                  <input
+                    type="radio"
+                    name="accountType"
+                    value="Company"
+                    className={`form-radio h-5 w-5 text-red-500 transition duration-150 ease-in-out ${
+                      edit ? "input-box" : "input-box-readonly"
+                    }`}
+                    checked={accountType === "Company"}
+                    onChange={hanleAccountType}
+                    disabled={!edit}
+                  />
 
                   <span className="ml-3 text-gray-700">Company</span>
                 </label>
               </div>
               <div className="w-1/5">
                 <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="accountType"
-                      value="Personal"
-                      className="form-radio h-5 w-5 text-red-500 transition duration-150 ease-in-out"
-                      checked={accountType === "Personal"}
-                      onChange={hanleAccountType}
-                      disabled={!edit}
-                    />
-                
+                  <input
+                    type="radio"
+                    name="accountType"
+                    value="Personal"
+                    className="form-radio h-5 w-5 text-red-500 transition duration-150 ease-in-out"
+                    checked={accountType === "Personal"}
+                    onChange={hanleAccountType}
+                    disabled={!edit}
+                  />
+
                   <span className="ml-3 text-gray-700">Personal</span>
                 </label>
               </div>
@@ -502,24 +501,25 @@ function MoreDetails() {
             </div>
           </div>
           <br />
-          {edit ? (
-            <button
-              className="bg-bgblue text-white py-2  px-4 rounded-md mt-6 text-sm font-medium"
-              type="submit"
-              onClick={handleUpdateData}
-              disabled={editWait}
-            >
-              SAVE
-            </button>
-          ) : (
-            <button
-              className="bg-bgblue text-white py-2  px-4 rounded-md mt-6 text-sm font-medium"
-              type="submit"
-              onClick={() => setEdit(true)}
-            >
-              EDIT
-            </button>
-          )}
+          {userDetails.isTeamMember != 1 &&
+            (edit ? (
+              <button
+                className="bg-bgblue text-white py-2  px-4 rounded-md mt-6 text-sm font-medium"
+                type="submit"
+                onClick={handleUpdateData}
+                disabled={editWait}
+              >
+                SAVE
+              </button>
+            ) : (
+              <button
+                className="bg-bgblue text-white py-2  px-4 rounded-md mt-6 text-sm font-medium"
+                type="submit"
+                onClick={() => setEdit(true)}
+              >
+                EDIT
+              </button>
+            ))}
         </div>
       </div>
     </div>
