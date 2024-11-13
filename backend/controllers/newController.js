@@ -305,7 +305,7 @@ const newControllers = {
                 `SELECT * FROM team_member_invite WHERE team_id = ? AND emailaddress = ? AND is_deleted!=1 `,
                 [req.user[0][0].rowid, req.body.email]
             );
-            if(existingInvite[0].is_member!=null&&existingInvite[0].is_member!=0){
+            if(existingInvite.length > 0 && existingInvite[0].is_member != null && existingInvite[0].is_member != 0){
                 return res.status(200).json({message: "Invited email is already a user" })
             }
             if (existingInvite.length === 0) {
