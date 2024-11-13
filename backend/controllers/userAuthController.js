@@ -124,6 +124,11 @@ const Authentication = {
 
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
+          let TeamAdminEmail
+          if(user[0][0].team_id){
+            let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
+            TeamAdminEmail=TeamAdmin[0][0].emailid
+          }
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
@@ -139,7 +144,8 @@ const Authentication = {
             id: user[0][0].rowid,
             accountDetailsModal,
             isTeam: user[0][0].is_team_admin,
-            isTeamMember: user[0][0].is_team_member
+            isTeamMember: user[0][0].is_team_member,
+            isTeamid:TeamAdminEmail
 
           });
 
@@ -348,7 +354,12 @@ const Authentication = {
 
         // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
         // const { country_name } = response.data;
-        console.log(expired, 'expireddddddddd')
+
+        let TeamAdminEmail
+        if(user[0][0].team_id){
+          let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
+          TeamAdminEmail=TeamAdmin[0][0].emailid
+        }
         res.status(200).json({
           name: user[0][0].username,
           email: user[0][0].emailid,
@@ -364,7 +375,8 @@ const Authentication = {
           id: user[0][0].rowid,
           accountDetailsModal,
           isTeam: user[0][0].is_team_admin,
-          isTeamMember: user[0][0].is_team_member
+          isTeamMember: user[0][0].is_team_member,
+          isTeamid:TeamAdminEmail
         });
       } else {
         res.status(400).json({
@@ -512,6 +524,11 @@ const Authentication = {
 
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
+          let TeamAdminEmail
+          if(user[0][0].team_id){
+            let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
+            TeamAdminEmail=TeamAdmin[0][0].emailid
+          }
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
@@ -524,7 +541,8 @@ const Authentication = {
             country_name: 'USA',
             HMACDigest,
             id: user[0][0].rowid,
-            isTeamMember: user[0][0].is_team_member
+            isTeamMember: user[0][0].is_team_member,
+            isTeamid:TeamAdminEmail
           });
         } else {
           res
@@ -806,6 +824,11 @@ const Authentication = {
               accountDetailsModal = true
             }
 
+            let TeamAdminEmail
+            if(user[0][0].team_id){
+              let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
+              TeamAdminEmail=TeamAdmin[0][0].emailid
+            }
             res.status(200).json({
               name: user[0][0].username,
               email: user[0][0].emailid,
@@ -821,7 +844,8 @@ const Authentication = {
               id: user[0][0].rowid,
               accountDetailsModal,
               isTeam: user[0][0].is_team_admin,
-              isTeamMember: user[0][0].is_team_member
+              isTeamMember: user[0][0].is_team_member,
+              isTeamid:TeamAdminEmail
             });
           } else {
             res.status(400).json({
@@ -979,6 +1003,11 @@ const Authentication = {
           let password = false
           const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
 
+          let TeamAdminEmail
+          if(user[0][0].team_id){
+            let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
+            TeamAdminEmail=TeamAdmin[0][0].emailid
+          }
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
@@ -990,7 +1019,8 @@ const Authentication = {
             password,
             HMACDigest,
             id: user[0][0].rowid,
-            isTeamMember: user[0][0].is_team_member
+            isTeamMember: user[0][0].is_team_member,
+            isTeamid:TeamAdminEmail
           });
         } else {
           res
@@ -1072,7 +1102,11 @@ const Authentication = {
           !user[0][0].state) && user[0][0].is_premium == 1) {
           accountDetailsModal = true
         }
-
+        let TeamAdminEmail
+        if(user[0][0].team_id){
+          let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
+          TeamAdminEmail=TeamAdmin[0][0].emailid
+        }
         res.status(200).json({
           name: user[0][0].username,
           email: user[0][0].emailid,
@@ -1088,8 +1122,8 @@ const Authentication = {
           id: user[0][0].rowid,
           accountDetailsModal,
           isTeam: user[0][0].is_team_admin,
-          isTeamMember: user[0][0].is_team_member
-
+          isTeamMember: user[0][0].is_team_member,
+          isTeamid:TeamAdminEmail,
 
         });
       } else {

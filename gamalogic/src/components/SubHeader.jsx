@@ -113,6 +113,14 @@ function SubHeader(props) {
             </p>
           </div>
         )}
+        {userDetails.isTeamid && (
+        <div className="my-8 flex bg-gray-100 border border-gray-400 rounded-lg p-2 text-sm 2xl:text-base">
+          <p className="text-sm text-gray-500">
+            You are part of the team managed by the admin:{" "}
+            {userDetails.isTeamid}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
