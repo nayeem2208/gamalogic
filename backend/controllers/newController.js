@@ -416,11 +416,28 @@ const newControllers = {
                 res.status(400).json({ error: 'please give the email' })
                 return
             }
+            let [MemberDetails] = await dbConnection.query(`SELECT username,emailid from registration where emailid='${req.body.email}'`)
+            console.log(MemberDetails[0], 'member details')
             try {
                 let response = await axios.post(`http://service.gamalogic.com/delete-account?api_key=${req.user[0][0].api_key}&team_member_id=${req.body.email}&is_team_admin_delete_member=1`);
 
                 if (response.status === 200) {
                     console.log("Email sent successfully for account deletion.");
+                    let userContent = ` <p>We wanted to inform you that you have been removed from the team. If this was unexpected, please reach out to your team admin for clarification.</p>`
+
+                    sendEmail(
+                        MemberDetails[0].emailid,
+                        userEmail,
+                        "Notification of Team Removal",
+                        basicTemplate(MemberDetails[0].username, userContent)
+                    );
+                    let adminContent=` <p>You have successfully removed a team member from your team. If this action was unintentional, please contact support for assistance.</p>`
+                    sendEmail(
+                        req.user[0][0].emailid,
+                        userEmail,
+                        "Team Member Removal Confirmation",
+                        basicTemplate(req.user[0][0].username, adminContent)
+                    );
                 } else {
                     console.error("Failed to send delete request. Response:", response.data);
                 }
