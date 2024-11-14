@@ -8,8 +8,8 @@ import jwt from "jsonwebtoken";
 import basicTemplate from "../EmailTemplates/BasicTemplate.js";
 import Razorpay from "razorpay";
 import createTeamVerificationLink from "../EmailTemplates/createTeamEmail.js";
-import childTeamCreationInvite from "../EmailTemplates/childAccountInviteEmail.js";
 import inviteTeamMemberToken from "../utils/inviteTeamMemberToken.js";
+import childTeamMemberInvite from "../EmailTemplates/childAccountInviteEmail.js";
 
 
 
@@ -358,7 +358,7 @@ const newControllers = {
                 nameOfUser[0],
                 req.body.email,
                 sub,
-                childTeamCreationInvite(req.user[0][0].username, token, link)
+                childTeamMemberInvite(req.user[0][0].username, token, link)
             );
             res.status(200).json({ message: "Invitation link has been successfully sent" })
         } catch (error) {
@@ -382,7 +382,7 @@ const newControllers = {
                 nameOfUser[0],
                 req.body.email,
                 sub,
-                childTeamCreationInvite(req.user[0][0].username, token, link)
+                childTeamMemberInvite(req.user[0][0].username, token, link)
             );
             res.status(200).json({ message: "Invitation link has been successfully sent" })
         } catch (error) {

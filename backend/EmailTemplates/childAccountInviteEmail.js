@@ -1,6 +1,6 @@
 import urls from "../ConstFiles/urls.js"
 
-const createTeamVerificationLink = (name, token, link) => {
+const childTeamMemberInvite = (name, token, link) => {
     // const encodedReferer = encodeURIComponent(referer);
     const htmlFile = `
     <!DOCTYPE html>
@@ -117,11 +117,11 @@ const createTeamVerificationLink = (name, token, link) => {
                 <p>To proceed, please use the following link to confirm your request:</p>
                 <p>To accept the invitation and activate your team member account, please use the link below:</p>
                 <div class="verify">
-                    <a href="${urls.frontendUrl}/api/teamCreationVerify?email=${token}"><button
+                    <a href="${urls.frontendUrl}/signup?Team_admin=${token}"><button
                             class="verifyButton">Confirm</button></a>
                     <p>Or</p>
                     <p>
-                        <a href="${urls.frontendUrl}/api/teamCreationVerify?email=${token}">${link}</a>
+                        <a href="${urls.frontendUrl}/signup?Team_admin=${token}">${link}</a>
                     </p>
                 </div>
                 <p>This link is valid for the next 4 days. If you did not request this action, please ignore this email.</p>
@@ -158,4 +158,4 @@ const createTeamVerificationLink = (name, token, link) => {
 }
 
 
-export default createTeamVerificationLink
+export default childTeamMemberInvite
