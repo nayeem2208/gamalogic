@@ -426,15 +426,15 @@ const newControllers = {
                     let userContent = ` <p>We wanted to inform you that you have been removed from the team. If this was unexpected, please reach out to your team admin for clarification.</p>`
 
                     sendEmail(
+                        MemberDetails[0].username,
                         MemberDetails[0].emailid,
-                        userEmail,
                         "Notification of Team Removal",
                         basicTemplate(MemberDetails[0].username, userContent)
                     );
                     let adminContent=` <p>You have successfully removed a team member from your team. If this action was unintentional, please contact support for assistance.</p>`
                     sendEmail(
+                        req.user[0][0].username,
                         req.user[0][0].emailid,
-                        userEmail,
                         "Team Member Removal Confirmation",
                         basicTemplate(req.user[0][0].username, adminContent)
                     );
