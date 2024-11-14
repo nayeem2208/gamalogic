@@ -419,7 +419,9 @@ const newControllers = {
             let [MemberDetails] = await dbConnection.query(`SELECT username,emailid from registration where emailid='${req.body.email}'`)
             console.log(MemberDetails[0], 'member details')
             try {
-                let response = await axios.post(`http://service.gamalogic.com/delete-account?api_key=${req.user[0][0].api_key}&team_member_id=${req.body.email}&is_team_admin_delete_member=1`);
+                let currDate=new Date().toISOString().slice(0, 19).replace("T", " ");
+
+                let response = await axios.post(`http://service.gamalogic.com/delete-account?api_key=${req.user[0][0].api_key}&team_member_id=${req.body.email}&is_team_admin_delete_member=1&deleted_date_time=${currDate}`);
 
                 if (response.status === 200) {
                     console.log("Email sent successfully for account deletion.");
