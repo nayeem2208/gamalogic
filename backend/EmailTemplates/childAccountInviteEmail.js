@@ -112,16 +112,16 @@ const createTeamVerificationLink = (name, token, link) => {
                 <img src="${urls.frontendUrl}/gmLogo.png" alt="GAMALOGIC">
             </div>
             <div class="content">
-                <p class="nameofUser">Hi ${name},</p>
-                <p>We’re excited to offer you the ability to create a team account! As a team admin, you’ll be able to manage members account, share credits, and oversee activity with ease.</p>
+                <p class="nameofUser">Hi,</p>
+                <p>You’ve been invited by your team admin to join their Gamalogic team account! As a team member, you'll be able to access shared resources, benefit from team credits, and contribute to the team’s activities.</p>
                 <p>To proceed, please use the following link to confirm your request:</p>
-                <p>To get started, please click the link below to activate your team account and become an admin:</p>
+                <p>To accept the invitation and activate your team member account, please use the link below:</p>
                 <div class="verify">
                     <a href="${urls.frontendUrl}/api/teamCreationVerify?email=${token}"><button
                             class="verifyButton">Confirm</button></a>
                     <p>Or</p>
                     <p>
-                        <a href="http://localhost:3000/api/teamCreationVerify?email=${token}">${link}</a>
+                        <a href="${urls.frontendUrl}/api/teamCreationVerify?email=${token}">${link}</a>
                     </p>
                 </div>
                 <p>This link is valid for the next 4 days. If you did not request this action, please ignore this email.</p>

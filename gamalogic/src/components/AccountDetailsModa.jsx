@@ -63,6 +63,7 @@ function AccountDetailsModal({ isOpen }) {
           pincode: fetchedData.pincode || "",
           tax_id: fetchedData.tax_id || "",
         });
+        setAccountType(fetchedData.is_personal == 1 ? "Personal" : "Company")
         setPhoneCode(fetchedData.phone_country_code);
         let country = getCountry(fetchedData.country || "");
         setCountryid(country.code || "");
