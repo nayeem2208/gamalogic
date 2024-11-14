@@ -416,10 +416,17 @@ const newControllers = {
                 res.status(400).json({ error: 'please give the email' })
                 return
             }
-            await dbConnection.query(
-                `UPDATE registration SET is_team_member = 0, team_id = NULL WHERE emailid = ?`,
-                [req.body.email]
-            );
+            try {
+                let response = await axios.post(`http://service.gamalogic.com/delete-account?api_key=${req.user[0][0].api_key}&team_member_id=${req.body.email}&is_team_admin_delete_member=1`);
+
+                if (response.status === 200) {
+                    console.log("Email sent successfully for account deletion.");
+                } else {
+                    console.error("Failed to send delete request. Response:", response.data);
+                }
+            } catch (error) {
+                console.error("Error occurred during account deletion:", error);
+            }
             res.status(200).json({ message: 'succesfully deleted' })
         } catch (error) {
             console.log(error)
