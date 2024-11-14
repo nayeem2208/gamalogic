@@ -258,8 +258,6 @@ const newControllers = {
                 "title",
                 "phone_country_code",
                 "phone_number",
-                "is_company",
-                "is_personal",
                 "company_name",
                 "address_line_1",
                 "city",
@@ -272,6 +270,9 @@ const newControllers = {
 
             const validateFields = (data) => {
                 const missingFields = requiredFields.filter((field) => !data[field]);
+                if (!data.is_company && !data.is_personal) {
+                    missingFields.push("is_company or is_personal");
+                  }
                 return missingFields;
             };
             if (req.user[0][0].is_premium === 0) {
@@ -280,6 +281,7 @@ const newControllers = {
             }
 
             const missingFields = validateFields(req.user[0][0]);
+            console.log(missingFields,'missing fields')
             if (missingFields.length > 0) {
                 res.status(400).json({ message: `Please fill all the required fields to create a team` });
                 return;

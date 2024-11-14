@@ -9,6 +9,7 @@ import ServerError from "./ServerError";
 import LoadingBar from "react-top-loading-bar";
 import MoreDetails from "../components/MoreDetails";
 import { MdOutlineGroups } from "react-icons/md";
+import AccountDetailsModal from "../components/AccountDetailsModa";
 
 function AccountSettings() {
   let [passwordVisible, setPasswordVisible] = useState({
@@ -24,7 +25,12 @@ function AccountSettings() {
   let [serverError, setServerError] = useState(false);
   let [loading, setLoading] = useState(false);
   let [load, setLoad] = useState(30);
-  let { setUserDetails, userDetails } = useUserState();
+  let {
+    setUserDetails,
+    userDetails,
+    accountDetailsModal,
+    setAccountDetailsModal,
+  } = useUserState();
 
   useEffect(() => {
     if (userDetails.password == false) {
@@ -62,6 +68,10 @@ function AccountSettings() {
       }));
     }
   }, []);
+
+  useEffect(() => {
+    if (userDetails.accountDetailsModal) setAccountDetailsModal(true);
+  }, [userDetails]);
 
   const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?!\s).{6,}$/;
   let changaePassword = async (e) => {
@@ -138,17 +148,38 @@ function AccountSettings() {
         toast.error("Failed to send email. Please try again.");
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.response?.data?.message);
+      const errorMessage = error.response?.data?.message;
+
+      if (
+        errorMessage === "Please fill all the required fields to create a team"
+      ) {
+        const storedToken = localStorage.getItem("Gamalogic_token");
+        if (storedToken) {
+          let token;
+          try {
+            token = JSON.parse(storedToken);
+          } catch (error) {
+            token = storedToken;
+          }
+          token.accountDetailsModal = true;
+          localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+          setUserDetails(token);
+        }
+      } else {
+        toast.error(errorMessage);
+      }
     }
   };
-
+  console.log(accountDetailsModal,'account details modaaaaaal')
   if (serverError) {
     return <ServerError />;
   }
   return (
     <div className=" px-6 md:px-20 py-8 accountSettings text-center sm:text-start overflow-hidden">
       <SubHeader SubHeader={"Account Settings"} />
+      {accountDetailsModal && (
+        <AccountDetailsModal isOpen={accountDetailsModal} />
+      )}
       {userDetails.confirm == 1 ? (
         <>
           <div className="subHeading ">
@@ -309,7 +340,8 @@ function AccountSettings() {
                       <span className="font-semibold mr-1">
                         Controlled Access:
                       </span>{" "}
-                      Limit access to uploaded files for member accounts, giving them access only to their own uploads.
+                      Limit access to uploaded files for member accounts, giving
+                      them access only to their own uploads.
                     </li>
                     <li>
                       <span className="font-semibold mr-1">
