@@ -26,7 +26,7 @@ let APIControllers = {
       if (!token) {
         return res.status(401).json({ error: "Unauthorized", message: "Token is required." });
       }
-  
+
       const tokenWithoutBearer = token.replace("Bearer ", "");
       let parsedTokenWithoutBearer = JSON.parse(tokenWithoutBearer)
       const decoded = jwt.verify(parsedTokenWithoutBearer.token, process.env.JWT_SECRET);
@@ -110,15 +110,21 @@ let APIControllers = {
   },
   emailValidation: async (req, res) => {
     try {
+      let dbConnection=req.dbConnection
       if (!req.body.email || typeof req.body.email !== 'string') {
         return res.status(400).json({ error: "Invalid email provided" });
       }
 
-      if (!req.user || !req.user.api_key) {
+      if (!req.user[0][0] || !req.user[0][0].api_key) {
         return res.status(403).json({ error: "API key not found or user not authenticated" });
       }
-
-      let apiKey = req.user.api_key;
+      let apiKey
+      if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
+        let [admin] = await dbConnection.query(`SELECT api_key FROM registration WHERE rowid = ${req.user[0][0].team_id}`);
+        apiKey = admin[0].api_key;
+      } else {
+        apiKey = req.user[0][0].api_key;
+      }
       const response = await axios.get(
         `https://gamalogic.com/emailvrf/?emailid=${req.body.email}&apikey=${apiKey}&speed_rank=0`
       );
@@ -128,6 +134,7 @@ let APIControllers = {
         res.status(500).json({ error: "Unexpected response from email validation service" });
       }
     } catch (error) {
+      console.log(error)
       ErrorHandler("emailValidation Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
@@ -138,10 +145,17 @@ let APIControllers = {
   },
   FindSingleEmail: async (req, res) => {
     try {
+      let dbConnection=req.dbConnection
       let nameArray = req.body.fullname.split(" ");
       let firstname = nameArray[0];
       let lastname = nameArray[nameArray.length - 1];
-      let apiKey = req.user.api_key;
+      let apiKey
+      if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
+        let [admin] = await dbConnection.query(`SELECT api_key FROM registration WHERE rowid = ${req.user[0][0].team_id}`);
+        apiKey = admin[0].api_key;
+      } else {
+        apiKey = req.user[0][0].api_key;
+      }
       let find = await axios.get(
         `https://gamalogic.com/email-discovery/?firstname=${firstname}&lastname=${lastname}&domain=${req.body.domain}&apikey=${apiKey}&speed_rank=0`
       );
