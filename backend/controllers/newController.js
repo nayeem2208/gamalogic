@@ -319,7 +319,22 @@ const newControllers = {
             const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
             const userEmail = decoded.email;
             await dbConnection.query(`UPDATE registration set is_team_admin=1 where emailid='${userEmail}'`)
-            // dashboard/team
+            const [rows] = await dbConnection.query(`SELECT username FROM registration WHERE emailid = '${userEmail}'`);
+            const username = rows[0]?.username;
+            let content = `<p>Congratulations! Your team has been successfully created. You can now start adding members and manage your team effectively.</p>
+<p>If you have any questions or need assistance, feel free to reach out to our support team.</p>
+<div class="verify">
+        <a href="${urls.frontendUrl}/dashboard/team"><button
+                class="verifyButton">Go To Team Settings</button></a>
+
+        </div>
+`
+            sendEmail(
+                username,
+                userEmail,
+                "Password successfully updated",
+                basicTemplate(username, content)
+            );
             res.redirect(`${urls.frontendUrl}/dashboard/team?team=true`);
         } catch (error) {
             console.log(error)
@@ -419,7 +434,7 @@ const newControllers = {
             let [MemberDetails] = await dbConnection.query(`SELECT username,emailid from registration where emailid='${req.body.email}'`)
             console.log(MemberDetails[0], 'member details')
             try {
-                let currDate=new Date().toISOString().slice(0, 19).replace("T", " ");
+                let currDate = new Date().toISOString().slice(0, 19).replace("T", " ");
 
                 let response = await axios.post(`http://service.gamalogic.com/delete-account?api_key=${req.user[0][0].api_key}&team_member_id=${req.body.email}&is_team_admin_delete_member=1&deleted_date_time=${currDate}`);
 
@@ -433,7 +448,7 @@ const newControllers = {
                         "Notification of Team Removal",
                         basicTemplate(MemberDetails[0].username, userContent)
                     );
-                    let adminContent=` <p>You have successfully removed a team member from your team. If this action was unintentional, please contact support for assistance.</p>`
+                    let adminContent = ` <p>You have successfully removed a team member from your team. If this action was unintentional, please contact support for assistance.</p>`
                     sendEmail(
                         req.user[0][0].username,
                         req.user[0][0].emailid,
@@ -442,7 +457,7 @@ const newControllers = {
                     );
                     const query = `UPDATE team_member_invite SET is_deleted = 1,is_member=0 WHERE emailaddress = ? AND is_member=1`;
                     await dbConnection.query(query, [MemberDetails[0].emailid]);
-        
+
                 } else {
                     console.error("Failed to send delete request. Response:", response.data);
                 }
