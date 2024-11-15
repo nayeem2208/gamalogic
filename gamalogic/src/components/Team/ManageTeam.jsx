@@ -13,7 +13,6 @@ const ManageTeam = () => {
   const [invites, setInvites] = useState([]);
   const [loading, setLoading] = useState(false);
   const [load, setLoad] = useState(30);
-  const [error, setError] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [showInvitatoinAlert, setShowInvitationAlert] = useState(false);
   const [emailToDelete, setEmailToDelete] = useState(null);
@@ -75,7 +74,8 @@ const ManageTeam = () => {
       toast.success("Removed user succesfully");
       setLoading(false);
     } catch (error) {
-      setError("Failed to delete account");
+      // setError("Failed to delete account");
+      toast.error("Failed to delete account")
       setLoading(false);
     }
   };
@@ -162,7 +162,7 @@ const ManageTeam = () => {
   return (
     <div className="p-6 subHeading bg-white rounded-lg shadow-md mt-12">
       <h3 className="text-2xl font-bold mb-4">Manage Team</h3>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+      {/* {error && <p className="text-red-500 mb-4">{error}</p>} */}
       {loading && (
         <LoadingBar
           color="#f74c41"
