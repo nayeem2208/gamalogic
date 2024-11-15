@@ -440,6 +440,9 @@ const newControllers = {
                         "Team Member Removal Confirmation",
                         basicTemplate(req.user[0][0].username, adminContent)
                     );
+                    const query = `UPDATE team_member_invite SET is_deleted = 1,is_member=0 WHERE emailaddress = ? AND is_member=1`;
+                    await dbConnection.query(query, [MemberDetails[0].emailid]);
+        
                 } else {
                     console.error("Failed to send delete request. Response:", response.data);
                 }
