@@ -332,7 +332,7 @@ const newControllers = {
             sendEmail(
                 username,
                 userEmail,
-                "Password successfully updated",
+                "Congratulations! Your Team is Ready to Go",
                 basicTemplate(username, content)
             );
             res.redirect(`${urls.frontendUrl}/dashboard/team?team=true`);
