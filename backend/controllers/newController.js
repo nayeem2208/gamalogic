@@ -446,10 +446,11 @@ const newControllers = {
                 } else {
                     console.error("Failed to send delete request. Response:", response.data);
                 }
+                res.status(200).json({ message: 'succesfully deleted' })
             } catch (error) {
                 console.error("Error occurred during account deletion:", error);
+                res.status(400).json({ message: 'Error occurred during account deletion' })
             }
-            res.status(200).json({ message: 'succesfully deleted' })
         } catch (error) {
             console.log(error)
             res.status(500).json({ error: error })
