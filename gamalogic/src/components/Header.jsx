@@ -96,12 +96,12 @@ function Header() {
                 Email Finder
               </li>
             </Link>
-            <Link to="/dashboard/apikey" onClick={dropDownToggle}>
+            {userDetails.isTeamMember != 1&&(<Link to="/dashboard/apikey" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
                 <LuKey className="text-teal-800 mt-2 mx-2 text-lg" />
                 API Key
               </li>
-            </Link>
+            </Link>)}
             <li
               className="py-2 flex underlineLi"
               onClick={uploadfileDropDownToggle}

@@ -31,7 +31,7 @@ router.post('/singleEmailFinder',dbMiddleware,authcheck,APIControllers.FindSingl
 //file based email validation
 router.get('/getAllUploadedEmailValidationFiles',dbMiddleware,authcheck,APIControllers.getAlreadyCheckedBatchEmailFiles)
 router.post('/batchEmailVerification',dbMiddleware,authcheck,APIControllers.batchEmailValidation)
-router.get('/getBatchStatus',APIDecode,APIControllers.batchEmailStatus)
+router.get('/getBatchStatus',dbMiddleware,APIDecode,APIControllers.batchEmailStatus)
 router.get('/downloadEmailVerificationFile',dbMiddleware,authcheck,APIControllers.downloadEmailVerificationFile)
 
 //file based email finder 
@@ -54,9 +54,9 @@ router.post('/RazorPaySubscriptionPaymentSuccess',dbMiddleware,authcheck,APICont
 router.post('/RazorPayWebhook',dbMiddleware,APIControllers.razorPayWebhook)
 
 router.get('/getPlanDetails',dbMiddleware,authcheck,APIControllers.getPlanDetails)
-
 router.get('/cancelSubscription',dbMiddleware,authcheck,newControllers.cancelSubscription)
 router.get('/ConfirmSubscriptionCancellation',dbMiddleware,newControllers.verifyCancelSubscription)
+
 router.post('/updateMoreDetails',dbMiddleware,authcheck,newControllers.addMoreDetails)
 router.get('/getMoreDetails',dbMiddleware,authcheck,newControllers.getMoreDetails)
 router.get('/createTeamAccount',dbMiddleware,authcheck,newControllers.createTeam)

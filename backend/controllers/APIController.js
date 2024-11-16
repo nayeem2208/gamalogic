@@ -110,7 +110,7 @@ let APIControllers = {
   },
   emailValidation: async (req, res) => {
     try {
-      let dbConnection=req.dbConnection
+      let dbConnection = req.dbConnection
       if (!req.body.email || typeof req.body.email !== 'string') {
         return res.status(400).json({ error: "Invalid email provided" });
       }
@@ -145,7 +145,7 @@ let APIControllers = {
   },
   FindSingleEmail: async (req, res) => {
     try {
-      let dbConnection=req.dbConnection
+      let dbConnection = req.dbConnection
       let nameArray = req.body.fullname.split(" ");
       let firstname = nameArray[0];
       let lastname = nameArray[nameArray.length - 1];
@@ -225,10 +225,21 @@ let APIControllers = {
     try {
       dbConnection = req.dbConnection;
       if (req.user[0][0] && req.user[0][0].rowid != null) {
-        let files = await dbConnection.query(
-          `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}' AND (error_id IS NULL OR error_id = 0) ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page - 1) * 5};`
-        );
-        res.status(200).json(files[0]);
+        if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
+          let files = await dbConnection.query(
+            `SELECT * FROM useractivity_batch_link WHERE team_member_id='${req.user[0][0].rowid}' AND (error_id IS NULL OR error_id = 0) ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page - 1) * 5};`
+          );
+          console.log('first')
+          res.status(200).json(files[0]);
+        }
+        else {
+          let files = await dbConnection.query(
+            `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}' AND (error_id IS NULL OR error_id = 0) ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page - 1) * 5};`
+          );
+          console.log('second')
+
+          res.status(200).json(files[0]);
+        }
       }
     } catch (error) {
       console.error(error);
@@ -249,43 +260,89 @@ let APIControllers = {
   batchEmailValidation: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      let apiKey = req.user[0][0].api_key;
+      // let apiKey = req.user[0][0].api_key;
+      // console.log(apiKey,'apikey')
       const { emails, fileName } = req.body;
-      let finalFreeDate = new Date(req.user[0][0].free_final);
-      let currentDate = new Date();
-      if ((req.user[0][0].credits + req.user[0][0].credits_free >= emails.length && finalFreeDate > currentDate) || (req.user[0][0].credits >= emails.length)) {
-        const data = {
-          gamalogic_emailid_vrfy: emails,
-        };
-        let response = await axios.post(
-          `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}`,
-          data
-        );
-        if (response.data.error !== undefined && response.data.error == false) {
-          let files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
-          let content = `<p>This is to inform you that the batch email verification process for the file ${fileName} has been started.</p>
-        <p>Please note that the verification process may take some time depending on the size of the file and the number of emails to be verified.</p>
-        <p>Thank you for using our service.</p>
-        <div class="verify">
-        <a href="${urls.frontendUrl}/dashboard/file-upload"><button
-                class="verifyButton">Download</button></a>
-
-        </div>`
-          sendEmail(
-            req.user[0][0].username,
-            req.user[0][0].emailid,
-            "Batch Email Verification Started",
-            basicTemplate(req.user[0][0].username, content)
+      let apiKey
+      if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
+        let [admin] = await dbConnection.query(`SELECT api_key,credits,credits_free,free_final FROM registration WHERE rowid = ${req.user[0][0].team_id}`);
+        apiKey = admin[0].api_key;
+        let memberKey = req.user[0][0].api_key
+        let finalFreeDate = new Date(admin[0].free_final);
+        let currentDate = new Date();
+        if ((admin[0].credits + admin[0].credits_free >= emails.length && finalFreeDate > currentDate) || (admin[0].credits >= emails.length)) {
+          const data = {
+            gamalogic_emailid_vrfy: emails,
+          };
+          let response = await axios.post(
+            `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}&team_member_api_key=${memberKey}`,
+            data
           );
-          res.status(200).json({ message: response.data.message, files: files[0][0] });
+          console.log(response, 'resppp')
+          if (response.data.error !== undefined && response.data.error == false) {
+            let files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
+            let content = `<p>This is to inform you that the batch email verification process for the file ${fileName} has been started.</p>
+          <p>Please note that the verification process may take some time depending on the size of the file and the number of emails to be verified.</p>
+          <p>Thank you for using our service.</p>
+          <div class="verify">
+          <a href="${urls.frontendUrl}/dashboard/file-upload"><button
+                  class="verifyButton">Download</button></a>
+  
+          </div>`
+            sendEmail(
+              req.user[0][0].username,
+              req.user[0][0].emailid,
+              "Batch Email Verification Started",
+              basicTemplate(req.user[0][0].username, content)
+            );
+            res.status(200).json({ message: response.data.message, files: files[0][0] });
+          } else {
+            const errorMessage = Object.values(response.data)[0];
+            let errorREsponse = await ErrorHandler("batchEmailValidation Controller", errorMessage, req);
+            res.status(400).json({ error: errorMessage, errorREsponse });
+          }
         } else {
-          const errorMessage = Object.values(response.data)[0];
-          let errorREsponse = await ErrorHandler("batchEmailValidation Controller", errorMessage, req);
-          res.status(400).json({ error: errorMessage, errorREsponse });
+          res.status(400).json({ error: 'You dont have enough to do this' });
         }
       } else {
-        res.status(400).json({ error: 'You dont have enough to do this' });
+        apiKey = req.user[0][0].api_key;
+        let finalFreeDate = new Date(req.user[0][0].free_final);
+        let currentDate = new Date();
+        if ((req.user[0][0].credits + req.user[0][0].credits_free >= emails.length && finalFreeDate > currentDate) || (req.user[0][0].credits >= emails.length)) {
+          const data = {
+            gamalogic_emailid_vrfy: emails,
+          };
+          let response = await axios.post(
+            `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}`,
+            data
+          );
+          if (response.data.error !== undefined && response.data.error == false) {
+            let files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
+            let content = `<p>This is to inform you that the batch email verification process for the file ${fileName} has been started.</p>
+          <p>Please note that the verification process may take some time depending on the size of the file and the number of emails to be verified.</p>
+          <p>Thank you for using our service.</p>
+          <div class="verify">
+          <a href="${urls.frontendUrl}/dashboard/file-upload"><button
+                  class="verifyButton">Download</button></a>
+  
+          </div>`
+            sendEmail(
+              req.user[0][0].username,
+              req.user[0][0].emailid,
+              "Batch Email Verification Started",
+              basicTemplate(req.user[0][0].username, content)
+            );
+            res.status(200).json({ message: response.data.message, files: files[0][0] });
+          } else {
+            const errorMessage = Object.values(response.data)[0];
+            let errorREsponse = await ErrorHandler("batchEmailValidation Controller", errorMessage, req);
+            res.status(400).json({ error: errorMessage, errorREsponse });
+          }
+        } else {
+          res.status(400).json({ error: 'You dont have enough to do this' });
+        }
       }
+
     } catch (error) {
       console.log(error);
       let errorREsponse = await ErrorHandler("batchEmailValidation Controller", error, req);
@@ -299,26 +356,44 @@ let APIControllers = {
   },
   batchEmailStatus: async (req, res) => {
     try {
-      let apiKey = req.user.api_key;
+      let dbConnection = req.dbConnection
+      // let apiKey = req.user.api_key;
+      let apiKey
+      if (req.user.team_id && req.user.team_id !== 'null' && req.user.team_id !== null) {
+        let [admin] = await dbConnection.query(`SELECT api_key FROM registration WHERE rowid = ${req.user.team_id}`);
+        apiKey = admin[0].api_key;
+      } else {
+        apiKey = req.user.api_key;
+      }
       let emailStatus = await axios.get(
         `https://gamalogic.com/batchstatus/?apikey=${apiKey}&batchid=${req.query.id}`
       );
+      console.log(emailStatus, 'email status')
       res.status(200).json({ emailStatus: emailStatus.data })
     } catch (error) {
       console.log(error);
       // ErrorHandler("batchEmailStatus Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     }
-    // finally {
-    //   if (req.dbConnection) {
-    //     await req.dbConnection.release();
-    //   }
-    // }
+    finally {
+      if (req.dbConnection) {
+        await req.dbConnection.release();
+      }
+    }
 
   },
   downloadEmailVerificationFile: async (req, res) => {
     try {
-      let apiKey = req.user[0][0].api_key;
+      // let apiKey = req.user[0][0].api_key;
+      let dbConnection = req.dbConnection
+
+      let apiKey
+      if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
+        let [admin] = await dbConnection.query(`SELECT api_key FROM registration WHERE rowid = ${req.user[0][0].team_id}`);
+        apiKey = admin[0].api_key;
+      } else {
+        apiKey = req.user[0][0].api_key;
+      }
       let download = await axios.get(
         `https://gamalogic.com/batchresult/?apikey=${apiKey}&batchid=${req.query.batchId}`
       );

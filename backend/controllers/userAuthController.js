@@ -71,7 +71,7 @@ const Authentication = {
         const hashedPassword = user[0][0].password;
         let passwordMatch = await verifyPassword(password, hashedPassword);
         if (passwordMatch) {
-          let token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
+          let token = generateToken(res, user[0][0].rowid, user[0][0].api_key,user[0][0].team_id);
           let creditBal;
           let finalFree = new Date(user[0][0].free_final);
           let finalFreeDate = new Date(finalFree);
@@ -299,7 +299,7 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
       if (user[0].length > 0) {
-        const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
+        const token = generateToken(res, user[0][0].rowid, user[0][0].api_key,user[0][0].team_id);
         let creditBal;
         let finalFree = new Date(user[0][0].free_final);
         let finalFreeDate = new Date(finalFree);
@@ -505,7 +505,7 @@ const Authentication = {
           `SELECT * FROM registration WHERE emailid='${email}'`
         );
         if (user[0].length > 0) {
-          const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
+          const token = generateToken(res, user[0][0].rowid, user[0][0].api_key,user[0][0].team_id);
           let content = `<p>Welcome to Gamalogic! We're thrilled to have you on board.</p>
           <p>Your registration is now complete, and you're all set to explore our platform.</p>
           <p>If you have any questions or need assistance getting started, feel free to reach out to us.</p>
@@ -667,7 +667,7 @@ const Authentication = {
               `SELECT * FROM registration WHERE emailid='${email}'`
             );
             if (user[0].length > 0) {
-              const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
+              const token = generateToken(res, user[0][0].rowid, user[0][0].api_key,user[0][0].team_id);
               let content = `<p>Welcome to Gamalogic! We're thrilled to have you on board.</p>
               <p>Your registration is now complete, and you're all set to explore our platform.</p>
               <p>If you have any questions or need assistance getting started, feel free to reach out to us.</p>
@@ -775,7 +775,7 @@ const Authentication = {
             `SELECT * FROM registration WHERE emailid='${email}'`
           );
           if (user[0].length > 0) {
-            const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
+            const token = generateToken(res, user[0][0].rowid, user[0][0].api_key,user[0][0].team_id);
             let creditBal;
             let finalFree = new Date(user[0][0].free_final);
             let finalFreeDate = new Date(finalFree);
@@ -986,7 +986,7 @@ const Authentication = {
           `SELECT * FROM registration WHERE emailid='${email}'`
         );
         if (user[0].length > 0) {
-          const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
+          const token = generateToken(res, user[0][0].rowid, user[0][0].api_key,user[0][0].team_id);
           let content = `<p>Welcome to Gamalogic! We're thrilled to have you on board.</p>
           <p>Your registration is now complete, and you're all set to explore our platform.</p>
           <p>If you have any questions or need assistance getting started, feel free to reach out to us.</p>
@@ -1051,7 +1051,7 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
       if (user[0].length > 0) {
-        const token = generateToken(res, user[0][0].rowid, user[0][0].api_key);
+        const token = generateToken(res, user[0][0].rowid, user[0][0].api_key,user[0][0].team_id);
         let creditBal;
         let finalFree = new Date(user[0][0].free_final);
         let finalFreeDate = new Date(finalFree);

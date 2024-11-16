@@ -103,12 +103,12 @@ function SideBar() {
                 Email Finder
               </li>
             </Link>
-            <Link to="/dashboard/apikey">
+            {userDetails.isTeamMember != 1&&( <Link to="/dashboard/apikey">
               <li className="my-4 flex">
                 <LuKey className="text-teal-800 mt-2 mx-2 text-lg" />
                 API Key
               </li>
-            </Link>
+            </Link>)}
 
             <li
               className="my-4 flex cursor-pointer"
