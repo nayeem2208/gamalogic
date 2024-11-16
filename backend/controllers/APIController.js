@@ -359,12 +359,16 @@ let APIControllers = {
       let dbConnection = req.dbConnection
       // let apiKey = req.user.api_key;
       let apiKey
+      console.log(req.user.team_id ,'team id')
       if (req.user.team_id && req.user.team_id !== 'null' && req.user.team_id !== null) {
         let [admin] = await dbConnection.query(`SELECT api_key FROM registration WHERE rowid = ${req.user.team_id}`);
         apiKey = admin[0].api_key;
+        console.log('first')
       } else {
         apiKey = req.user.api_key;
+        console.log('second')
       }
+      console.log(apiKey,'apiKeyyyyyyyy')
       let emailStatus = await axios.get(
         `https://gamalogic.com/batchstatus/?apikey=${apiKey}&batchid=${req.query.id}`
       );
