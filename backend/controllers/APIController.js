@@ -359,16 +359,12 @@ let APIControllers = {
       let dbConnection = req.dbConnection
       // let apiKey = req.user.api_key;
       let apiKey
-      console.log(req.user.team_id ,'team id')
       if (req.user.team_id && req.user.team_id !== 'null' && req.user.team_id !== null) {
         let [admin] = await dbConnection.query(`SELECT api_key FROM registration WHERE rowid = ${req.user.team_id}`);
         apiKey = admin[0].api_key;
-        console.log('first')
       } else {
         apiKey = req.user.api_key;
-        console.log('second')
       }
-      console.log(apiKey,'apiKeyyyyyyyy')
       let emailStatus = await axios.get(
         `https://gamalogic.com/batchstatus/?apikey=${apiKey}&batchid=${req.query.id}`
       );
@@ -419,8 +415,18 @@ let APIControllers = {
   getAlreadyCheckedBatchEmailFinderFiles: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}' AND (error_id IS NULL OR error_id = 0) ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page - 1) * 5};`)
-      res.status(200).json(files[0])
+      if (req.user[0][0] && req.user[0][0].rowid != null) {
+        if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
+          let files = await dbConnection.query(
+            `SELECT * FROM useractivity_batch_finder_link WHERE team_member_id='${req.user[0][0].rowid}' AND (error_id IS NULL OR error_id = 0) ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page - 1) * 5};`
+          );
+          console.log('first')
+          res.status(200).json(files[0]);
+        } else {
+          let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}' AND (error_id IS NULL OR error_id = 0) ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page - 1) * 5};`)
+          res.status(200).json(files[0])
+        }
+      }
     } catch (error) {
       console.log(error);
       ErrorHandler("getAlreadyCheckedBatchEmailFinderFiles Controller", error, req);
@@ -435,21 +441,25 @@ let APIControllers = {
   batchEmailFinder: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      let apiKey = req.user[0][0].api_key;
-      let finalFreeDate = new Date(req.user[0][0].free_final);
-      let currentDate = new Date();
-      //checking that we have enough credits to do this 
-      if ((req.user[0][0].credits + req.user[0][0].credits_free >= (req.body.data.length * 10) && finalFreeDate > currentDate) || (req.user[0][0].credits >= req.body.data.length * 10)) {
-        const data = {
-          gamalogic_emailid_finder: req.body.data,
-        };
-        let response = await axios.post(
-          `https://gamalogic.com/batch-email-discovery/?apikey=${apiKey}&file_name=${req.body.fileName}`,
-          data
-        );
-        if (response.data.error !== undefined && response.data.error == false) {
-          let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
-          let content = `<p>This is to inform you that the batch email finder process for the file ${req.body.fileName} has been started.</p>
+      let apiKey
+      if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
+        let [admin] = await dbConnection.query(`SELECT api_key,credits,credits_free,free_final FROM registration WHERE rowid = ${req.user[0][0].team_id}`);
+        apiKey = admin[0].api_key;
+        let memberKey = req.user[0][0].api_key
+        let finalFreeDate = new Date(admin[0].free_final);
+        let currentDate = new Date();
+        //checking that we have enough credits to do this 
+        if ((admin[0].credits + admin[0].credits_free >= (req.body.data.length * 10) && finalFreeDate > currentDate) || (admin[0].credits >= req.body.data.length * 10)) {
+          const data = {
+            gamalogic_emailid_finder: req.body.data,
+          };
+          let response = await axios.post(
+            `https://gamalogic.com/batch-email-discovery/?apikey=${apiKey}&file_name=${req.body.fileName}&team_member_api_key=${memberKey}`,
+            data
+          );
+          if (response.data.error !== undefined && response.data.error == false) {
+            let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
+            let content = `<p>This is to inform you that the batch email finder process for the file ${req.body.fileName} has been started.</p>
         <p>Please note that the finding process may take some time depending on the size of the file and the number of emails to be find.</p>
         <p>Thank you for using our service.</p>
         <div class="verify">
@@ -457,22 +467,65 @@ let APIControllers = {
                 class="verifyButton">Download</button></a>
 
         </div>`
-          //sending email when finding process started 
-          sendEmail(
-            req.user[0][0].username,
-            req.user[0][0].emailid,
-            "Batch Email Finder Started",
-            basicTemplate(req.user[0][0].username, content)
-          );
-          res.status(200).json({ message: response.data.message, files: files[0][0] });
+            //sending email when finding process started 
+            sendEmail(
+              req.user[0][0].username,
+              req.user[0][0].emailid,
+              "Batch Email Finder Started",
+              basicTemplate(req.user[0][0].username, content)
+            );
+            res.status(200).json({ message: response.data.message, files: files[0][0] });
+          }
+          else {
+            const errorMessage = Object.values(response.data)[0];
+            let errorREsponse = await ErrorHandler("batchEmailFinder Controller", errorMessage, req);
+            res.status(400).json({ error: errorMessage, errorREsponse });
+          }
+        } else {
+          console.log('outside the enough credits')
+          res.status(400).json({ error: 'You dont have enough to do this' });
         }
-        else {
-          const errorMessage = Object.values(response.data)[0];
-          let errorREsponse = await ErrorHandler("batchEmailFinder Controller", errorMessage, req);
-          res.status(400).json({ error: errorMessage, errorREsponse });
-        }
+
       } else {
-        res.status(400).json({ error: 'You dont have enough to do this' });
+        apiKey = req.user[0][0].api_key;
+        let finalFreeDate = new Date(req.user[0][0].free_final);
+        let currentDate = new Date();
+
+        if ((req.user[0][0].credits + req.user[0][0].credits_free >= (req.body.data.length * 10) && finalFreeDate > currentDate) || (req.user[0][0].credits >= req.body.data.length * 10)) {
+          const data = {
+            gamalogic_emailid_finder: req.body.data,
+          };
+          let response = await axios.post(
+            `https://gamalogic.com/batch-email-discovery/?apikey=${apiKey}&file_name=${req.body.fileName}`,
+            data
+          );
+          if (response.data.error !== undefined && response.data.error == false) {
+            let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
+            let content = `<p>This is to inform you that the batch email finder process for the file ${req.body.fileName} has been started.</p>
+        <p>Please note that the finding process may take some time depending on the size of the file and the number of emails to be find.</p>
+        <p>Thank you for using our service.</p>
+        <div class="verify">
+        <a href="${urls.frontendUrl}/dashboard/file-upload-finder"><button
+                class="verifyButton">Download</button></a>
+
+        </div>`
+            //sending email when finding process started 
+            sendEmail(
+              req.user[0][0].username,
+              req.user[0][0].emailid,
+              "Batch Email Finder Started",
+              basicTemplate(req.user[0][0].username, content)
+            );
+            res.status(200).json({ message: response.data.message, files: files[0][0] });
+          }
+          else {
+            const errorMessage = Object.values(response.data)[0];
+            let errorREsponse = await ErrorHandler("batchEmailFinder Controller", errorMessage, req);
+            res.status(400).json({ error: errorMessage, errorREsponse });
+          }
+        } else {
+          res.status(400).json({ error: 'You dont have enough to do this' });
+        }
       }
     } catch (error) {
       console.log(error)
@@ -487,7 +540,15 @@ let APIControllers = {
   },
   batchEmailFinderStatus: async (req, res) => {
     try {
-      let apiKey = req.user.api_key;
+      let dbConnection = req.dbConnection
+      // let apiKey = req.user.api_key;
+      let apiKey
+      if (req.user.team_id && req.user.team_id !== 'null' && req.user.team_id !== null) {
+        let [admin] = await dbConnection.query(`SELECT api_key FROM registration WHERE rowid = ${req.user.team_id}`);
+        apiKey = admin[0].api_key;
+      } else {
+        apiKey = req.user.api_key;
+      }
       let emailStatus = await axios.get(
         `https://gamalogic.com/batch-email-discovery-status/?apikey=${apiKey}&batchid=${req.query.id}`
       );
@@ -496,12 +557,25 @@ let APIControllers = {
       console.log(error);
       // ErrorHandler("batchEmailStatus Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
+    } finally {
+      if (req.dbConnection) {
+        await req.dbConnection.release();
+      }
     }
 
   },
   downloadEmailFinderResultFile: async (req, res) => {
     try {
-      let apiKey = req.user[0][0].api_key;
+      // let apiKey = req.user[0][0].api_key;
+      let dbConnection = req.dbConnection
+
+      let apiKey
+      if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
+        let [admin] = await dbConnection.query(`SELECT api_key FROM registration WHERE rowid = ${req.user[0][0].team_id}`);
+        apiKey = admin[0].api_key;
+      } else {
+        apiKey = req.user[0][0].api_key;
+      }
       let download = await axios.get(
         `https://gamalogic.com/batch-email-discovery-result/?apikey=${apiKey}&batchid=${req.query.batchId}`
       );

@@ -37,7 +37,7 @@ router.get('/downloadEmailVerificationFile',dbMiddleware,authcheck,APIController
 //file based email finder 
 router.get('/getAllUploadedEmailFinderFiles',dbMiddleware,authcheck,APIControllers.getAlreadyCheckedBatchEmailFinderFiles)
 router.post('/batchEmailFinder',dbMiddleware,authcheck,APIControllers.batchEmailFinder)
-router.get('/getBatchFinderStatus',APIDecode,APIControllers.batchEmailFinderStatus)
+router.get('/getBatchFinderStatus',dbMiddleware,APIDecode,APIControllers.batchEmailFinderStatus)
 router.get('/downloadEmailFinderFile',dbMiddleware,authcheck,APIControllers.downloadEmailFinderResultFile)
 
 router.get('/getApiKey',APIDecode,APIControllers.getApi)
