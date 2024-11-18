@@ -46,9 +46,9 @@ router.get('/resetApiKey',dbMiddleware,authcheck,APIControllers.resetApiKey)
 router.post('/changePassword',dbMiddleware,authcheck,APIControllers.changePassword)
 
 //payment related
-router.post('/updateCredit',dbMiddleware,authcheck,accountDetailsValidation,APIControllers.PayPalUpdateCredit)
+router.post('/updateCredit',dbMiddleware,authcheck,APIControllers.PayPalUpdateCredit)
 router.post('/paymentFailedEmail',dbMiddleware,authcheck,APIControllers.PayPalCreditFailureEmail)
-router.post('/payPalSubscription',dbMiddleware,authcheck,accountDetailsValidation,APIControllers.payPalSubscription)
+router.post('/payPalSubscription',dbMiddleware,authcheck,APIControllers.payPalSubscription)
 router.post('/paypalWebhook',dbMiddleware,APIControllers.payPalWebHook)
 router.post('/Razorpay',dbMiddleware,authcheck,accountDetailsValidation,APIControllers.RazorpayPayment)
 router.post('/RazorPayPaymentSuccess',dbMiddleware,authcheck,APIControllers.razorPayPaymentSuccess)

@@ -41,8 +41,8 @@ const Authentication = {
     ///its for checking purpose
     try {
       console.log(req.body, 'req.body')
-      ErrorHandler("webhook checker", req.body, req);
-      res.send('hiiii its working')
+      // ErrorHandler("webhook checker", req.body, req);
+      res.send({success:true})
     } catch (error) {
       // ErrorHandler("Sample Controller", error, req);
       console.log(error)
@@ -121,6 +121,19 @@ const Authentication = {
             !user[0][0].state) && user[0][0].is_premium == 1) {
             accountDetailsModal = true
           }
+          let accountDetailsModalInBuyCredits = false
+          if ((!user[0][0].title || !user[0][0].firstname || !user[0][0].phone_country_code ||
+            !user[0][0].phone_number ||
+            (!user[0][0].is_company == 1 && !user[0][0].is_personal == 1) ||
+            (user[0][0].is_company == 1 && !user[0][0].company_name) ||
+            !user[0][0].address_line_1 ||
+            !user[0][0].city ||
+            !user[0][0].pincode ||
+            !user[0][0].country ||
+            !user[0][0].state) && user[0][0].is_premium != 1) {
+              accountDetailsModalInBuyCredits = true
+          }
+          
 
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
@@ -143,6 +156,7 @@ const Authentication = {
             HMACDigest,
             id: user[0][0].rowid,
             accountDetailsModal,
+            accountDetailsModalInBuyCredits,
             isTeam: user[0][0].is_team_admin,
             isTeamMember: user[0][0].is_team_member,
             isTeamid:TeamAdminEmail
@@ -350,6 +364,18 @@ const Authentication = {
           !user[0][0].state) && user[0][0].is_premium == 1) {
           accountDetailsModal = true
         }
+        let accountDetailsModalInBuyCredits = false
+        if ((!user[0][0].title || !user[0][0].firstname || !user[0][0].phone_country_code ||
+          !user[0][0].phone_number ||
+          (!user[0][0].is_company == 1 && !user[0][0].is_personal == 1) ||
+          (user[0][0].is_company == 1 && !user[0][0].company_name) ||
+          !user[0][0].address_line_1 ||
+          !user[0][0].city ||
+          !user[0][0].pincode ||
+          !user[0][0].country ||
+          !user[0][0].state) && user[0][0].is_premium != 1) {
+            accountDetailsModalInBuyCredits = true
+        }
 
 
         // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
@@ -374,6 +400,7 @@ const Authentication = {
           HMACDigest,
           id: user[0][0].rowid,
           accountDetailsModal,
+          accountDetailsModalInBuyCredits,
           isTeam: user[0][0].is_team_admin,
           isTeamMember: user[0][0].is_team_member,
           isTeamid:TeamAdminEmail
@@ -543,7 +570,8 @@ const Authentication = {
             HMACDigest,
             id: user[0][0].rowid,
             isTeamMember: user[0][0].is_team_member,
-            isTeamid:TeamAdminEmail
+            isTeamid:TeamAdminEmail,
+            accountDetailsModalInBuyCredits:true
           });
         } else {
           res
@@ -1021,7 +1049,8 @@ const Authentication = {
             HMACDigest,
             id: user[0][0].rowid,
             isTeamMember: user[0][0].is_team_member,
-            isTeamid:TeamAdminEmail
+            isTeamid:TeamAdminEmail,
+            accountDetailsModalInBuyCredits:true
           });
         } else {
           res
@@ -1103,6 +1132,18 @@ const Authentication = {
           !user[0][0].state) && user[0][0].is_premium == 1) {
           accountDetailsModal = true
         }
+        let accountDetailsModalInBuyCredits = false
+        if ((!user[0][0].title || !user[0][0].firstname || !user[0][0].phone_country_code ||
+          !user[0][0].phone_number ||
+          (!user[0][0].is_company == 1 && !user[0][0].is_personal == 1) ||
+          (user[0][0].is_company == 1 && !user[0][0].company_name) ||
+          !user[0][0].address_line_1 ||
+          !user[0][0].city ||
+          !user[0][0].pincode ||
+          !user[0][0].country ||
+          !user[0][0].state) && user[0][0].is_premium != 1) {
+            accountDetailsModalInBuyCredits = true
+        }
         let TeamAdminEmail
         if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'&&user[0][0].team_id){
           let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
@@ -1122,6 +1163,7 @@ const Authentication = {
           HMACDigest,
           id: user[0][0].rowid,
           accountDetailsModal,
+          accountDetailsModalInBuyCredits,
           isTeam: user[0][0].is_team_admin,
           isTeamMember: user[0][0].is_team_member,
           isTeamid:TeamAdminEmail,

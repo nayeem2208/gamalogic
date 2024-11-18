@@ -210,8 +210,9 @@ function AccountDetailsModal({ isOpen }) {
         } catch (error) {
           token = storedToken;
         }
-        token.name = dataToSend.firstname + dataToSend.lastname;
+        token.name = dataToSend.firstname +' '+ dataToSend.lastname;
         token.accountDetailsModal = false;
+        token.accountDetailsModalInBuyCredits=false
         localStorage.setItem("Gamalogic_token", JSON.stringify(token));
         setUserDetails(token);
       }

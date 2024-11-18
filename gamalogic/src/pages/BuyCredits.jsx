@@ -100,7 +100,7 @@ export default function BuyCredits() {
   }, []);
 
   useEffect(() => {
-    if (userDetails.accountDetailsModal) setAccountDetailsModal(true);
+    if (userDetails.accountDetailsModalInBuyCredits) setAccountDetailsModal(true);
   }, [userDetails]);
 
   const createOrder = (data, actions) => {

@@ -21,13 +21,12 @@ const ButtonWrapper = ({ type }) => {
     userDetails,
   } = useUserState();
   const planIdRef = useRef("P-7NW45488DG075491MM25NWLY");
-  const paymentDetailsref=useRef({})
+  const paymentDetailsref = useRef({});
   const [{ options }, dispatch] = usePayPalScriptReducer();
 
-  let MonthlyCreditCostMappings
-  let AnnualCreditCostMappings
+  let MonthlyCreditCostMappings;
+  let AnnualCreditCostMappings;
 
-  
   if (APP == "beta") {
     MonthlyCreditCostMappings = [
       [1000, 6, "P-7NW45488DG075491MM25NWLY"],
@@ -44,24 +43,21 @@ const ButtonWrapper = ({ type }) => {
       [1000000, 800, "P-67S29215LN183245PM4ASNIY"],
     ];
 
-
-
-   AnnualCreditCostMappings = [
-    [1000, 60, "P-7NW45488DG075491MM25NWLY"],
-    [2500, 144, "P-642861822H125174XM4LVR5I"],
-    [5000, 240, "P-7AN44135WF1263455M4LVSOQ"],
-    [10000, 300, "P-0U600409VG797471MM4LVTAA"],
-    [25000, 660, "P-02V62927KD940054TM4LVTVA"],
-    [50000, 780, "P-3BB69288VK398404BM4LVY7I"],
-    [75000, 900, "P-80291684742965055M4LVUDY"],
-    [100000, 1020, "P-3ER93865PV808691NM4LVUPA"],
-    [250000, 2160, "P-03C33616VX263094JM4LVU5Y"],
-    [500000, 4200, "P-2TD975038N187041SM4LVVLI"],
-    [750000, 6300, "P-62F09829HV516111GM4LVVVQ"],
-    [1000000, 8400, "P-7XA05716Y28451420M4LVV7Y"],
-  ];
-  }
-  else{
+    AnnualCreditCostMappings = [
+      [1000, 60, "P-7NW45488DG075491MM25NWLY"],
+      [2500, 144, "P-642861822H125174XM4LVR5I"],
+      [5000, 240, "P-7AN44135WF1263455M4LVSOQ"],
+      [10000, 300, "P-0U600409VG797471MM4LVTAA"],
+      [25000, 660, "P-02V62927KD940054TM4LVTVA"],
+      [50000, 780, "P-3BB69288VK398404BM4LVY7I"],
+      [75000, 900, "P-80291684742965055M4LVUDY"],
+      [100000, 1020, "P-3ER93865PV808691NM4LVUPA"],
+      [250000, 2160, "P-03C33616VX263094JM4LVU5Y"],
+      [500000, 4200, "P-2TD975038N187041SM4LVVLI"],
+      [750000, 6300, "P-62F09829HV516111GM4LVVVQ"],
+      [1000000, 8400, "P-7XA05716Y28451420M4LVV7Y"],
+    ];
+  } else {
     MonthlyCreditCostMappings = [
       [1000, 6, "P-72U39124UW699140VM3UVDJA"],
       [2500, 14, "P-95N96582N5110634CM3UVD5Y"],
@@ -77,26 +73,21 @@ const ButtonWrapper = ({ type }) => {
       [1000000, 800, "P-22G689928N540831NM3U3COQ"],
     ];
 
-
-   AnnualCreditCostMappings = [
-    [1000, 60, "P-09P99448F15622802M3U3DHA"],
-    [2500, 144, "P-4P1083047P145962AM3U3EHQ"],
-    [5000, 240, "P-8FJ05805WK865450TM3U3FKI"],
-    [10000, 300, "P-86249996XY404550JM3U3GOA"],
-    [25000, 660, "P-4PF792591V539335BM3U3HAY"],
-    [50000, 780, "P-5C050367JW309282HM3U3IEI"],
-    [75000, 900, "P-68C34773GY056461KM3U3JVA"],
-    [100000, 1020, "P-73090635J8051762FM3U3KMQ"],
-    [250000, 2160, "P-3RE78809304001220M3U3LII"],
-    [500000, 4200, "P-43448757LG389983FM3U3MCI"],
-    [750000, 6300, "P-6TY213663V394212CM3U3NFA"],
-    [1000000, 8400, "P-8KU33391038351740M3U3OIY"],
-  ];
+    AnnualCreditCostMappings = [
+      [1000, 60, "P-09P99448F15622802M3U3DHA"],
+      [2500, 144, "P-4P1083047P145962AM3U3EHQ"],
+      [5000, 240, "P-8FJ05805WK865450TM3U3FKI"],
+      [10000, 300, "P-86249996XY404550JM3U3GOA"],
+      [25000, 660, "P-4PF792591V539335BM3U3HAY"],
+      [50000, 780, "P-5C050367JW309282HM3U3IEI"],
+      [75000, 900, "P-68C34773GY056461KM3U3JVA"],
+      [100000, 1020, "P-73090635J8051762FM3U3KMQ"],
+      [250000, 2160, "P-3RE78809304001220M3U3LII"],
+      [500000, 4200, "P-43448757LG389983FM3U3MCI"],
+      [750000, 6300, "P-6TY213663V394212CM3U3NFA"],
+      [1000000, 8400, "P-8KU33391038351740M3U3OIY"],
+    ];
   }
-
-
-  
-
 
   useEffect(() => {
     const loadPayPalScript = () => {
@@ -141,16 +132,15 @@ const ButtonWrapper = ({ type }) => {
       matchedPlan = MonthlyCreditCostMappings.find(
         ([credits]) => credits === paymentDetails.credits
       );
-      paymentDetailsref.current=paymentDetails
-
+      paymentDetailsref.current = paymentDetails;
     } else {
       matchedPlan = AnnualCreditCostMappings.find(
         ([credits]) => credits === paymentDetails.credits
       );
       const annualCost = paymentDetails.cost * 12;
-      const annualCredits = paymentDetails.credits 
+      const annualCredits = paymentDetails.credits;
       paymentDetailsref.current = {
-        ...paymentDetails,  // Keep existing properties
+        ...paymentDetails, // Keep existing properties
         cost: annualCost,
         credits: annualCredits,
       };
@@ -164,7 +154,6 @@ const ButtonWrapper = ({ type }) => {
         paymentDetails.credits
       ); // Debugging line
     }
-
   }, [paymentDetails]);
 
   useEffect(() => {
@@ -185,7 +174,7 @@ const ButtonWrapper = ({ type }) => {
         subscriptionId: subscription.id,
         planId: planIdRef.current,
         payerId: data.payerID,
-        paymentDetails:paymentDetailsref.current,
+        paymentDetails: paymentDetailsref.current,
       };
 
       // Send data to your backend
@@ -233,8 +222,8 @@ const ButtonWrapper = ({ type }) => {
       }
     }
   };
-  console.log(paymentDetails,'payment details')
-  return (
+  console.log(paymentDetails, "payment details");
+  return isLoaded ? (
     <PayPalButtons
       createSubscription={(data, actions) => {
         return actions.subscription
@@ -246,10 +235,19 @@ const ButtonWrapper = ({ type }) => {
           });
       }}
       onApprove={handleApprove}
-      style={{
-        // label: "subscribe",
-      }}
+      style={
+        {
+          // label: "subscribe",
+        }
+      }
     />
+  ) : (
+    <div className="text-center">
+      <button className="bg-yellow-400 px-24 py-2 font-bold rounded  italic text-blue-900">
+        Pay<span className="text-sky-600">Pal</span>
+      </button>
+      <p className="font-semibold text-sm">The safer,easier way to pay </p>
+    </div>
   );
 };
 function PayPalSubscription() {
@@ -258,7 +256,7 @@ function PayPalSubscription() {
   return (
     <div className="w-5/6 sm:w-3/6 md:w-2/6 mt-3 z-0 relative">
       <PayPalScriptProvider
-      deferLoading={true}
+        deferLoading={true}
         options={{
           clientId: paypalClientId,
           components: "buttons",
