@@ -44,7 +44,7 @@ function EmailVerification() {
       document.title = "Batch Email Verification | Dashboard";
     }
     fetchAllFiles(pageIndex);
-  }, []);
+  }, []); 
 
   const fetchAllFiles = async (newPageIndex) => {
     try {
@@ -492,12 +492,13 @@ function EmailVerification() {
               className="text-bgblue w-full  mt-14 min-w-96"
               style={{ fontFamily: "Raleway,sans-serif" }}
             >
-              <tbody>
-                <tr className="sm:text-left text-xs sm:text-sm">
-                  <th className="font-normal  md:w-1/5">File Name</th>
-                  <th className="font-normal  md:w-2/5 ">Status</th>
-                  <th className="font-normal  md:w-1/5">Upload Time</th>
-                  <th></th>
+              <tbody className="overflow-x-auto">
+                <tr className="sm:text-left text-xs sm:text-sm font-medium">
+                  <th className={`  ${userDetails.isTeam==1?'w-1/6':'w-1/5'}`}>File Name</th>
+                  <th className={`  ${userDetails.isTeam==1?'w-1/6':'w-2/5'}`}>Status</th>
+                  {userDetails.isTeam==1&&(<th className={`  ${userDetails.isTeam==1?'w-1/6':'w-1/5'}`}>Uploaded By</th>)}
+                  <th className={`  ${userDetails.isTeam==1?'w-1/6':'w-1/5'}`}>Upload Time</th>
+                  <th className={`  ${userDetails.isTeam==1?'w-1/6':'w-1/5'}`}></th>
                 </tr>
                 {resultFile.map((data, index) => (
                   <tr key={index} className="text-xs sm:text-sm">
@@ -508,11 +509,12 @@ function EmailVerification() {
                         completed={data.processed}
                         bgColor="#181e4a"
                         labelSize="13px"
-                        className="md:w-2/5 mr-2"
+                        className={`mr-2  ${userDetails.isTeam==1?'w-3/5':'w-2/5'}`}
                         maxCompleted={100}
                       />
                       {data.processed}%
                     </td>
+                    {userDetails.isTeam==1&&(<td className="md:pt-5">{data.team_member_emailid||'You'}</td>)}
                     <td className="md:pt-5">{data.formattedDate}</td>
                     <td className="flex justify-center items-center ">
                       <div className="sm:hidden">
@@ -523,7 +525,7 @@ function EmailVerification() {
                       </div>
                       <div className="hidden sm:block">
                         <button
-                          className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-8 text-xs"
+                          className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-4 text-xs"
                           onClick={() => DownloadFile(data)}
                         >
                           DOWNLOAD

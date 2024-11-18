@@ -6,7 +6,7 @@ import {APP} from '../../axios/axiosInstance'
 import { useEffect, useRef } from "react";
 
 const RazorPaySubscriptionButton = ({  credits, onSuccess, onFailure }) => {
-  const { userDetails,paymentDetails } = useUserState();
+  const { userDetails,paymentDetails,setUserDetails } = useUserState();
   let paymentDetailsRef = useRef(paymentDetails);
   const taxRate = 0.18; // 18% tax
 
@@ -85,8 +85,28 @@ const RazorPaySubscriptionButton = ({  credits, onSuccess, onFailure }) => {
       paymentObject.open();
     } catch (error) {
       console.error("Server error:", error);
-      alert("Server error. Are you online?");
-      onFailure("serverError");
+      // alert("Server error. Are you online?");
+      // onFailure("serverError");
+      const errorMessage = error.response?.data?.message;
+      if (
+        errorMessage === "Please fill all the required fields to buy credits"
+      ) {
+        const storedToken = localStorage.getItem("Gamalogic_token");
+        if (storedToken) {
+          let token;
+          try {
+            token = JSON.parse(storedToken);
+          } catch (error) {
+            token = storedToken;
+          }
+          token.accountDetailsModal = true;
+          localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+          setUserDetails(token);
+        }
+      } else {
+        alert("Server error. Are you online?");
+        onFailure("serverError");
+      }
     }
   };
 

@@ -214,6 +214,23 @@ const ButtonWrapper = ({ type }) => {
         "Error handling approval or sending data to backend:",
         error
       );
+      const errorMessage = error.response?.data?.message;
+      if (
+        errorMessage === "Please fill all the required fields to buy credits"
+      ) {
+        const storedToken = localStorage.getItem("Gamalogic_token");
+        if (storedToken) {
+          let token;
+          try {
+            token = JSON.parse(storedToken);
+          } catch (error) {
+            token = storedToken;
+          }
+          token.accountDetailsModal = true;
+          localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+          setUserDetails(token);
+        }
+      }
     }
   };
   console.log(paymentDetails,'payment details')

@@ -12,6 +12,7 @@ import BuyCreditsRazorPay from "./BuyCreditsRazorPay";
 import Pricing from "../components/Payment_related/Pricing";
 import PayPalSubscription from "../components/Payment_related/PayPalSubscription";
 import BuyCreditsRazorPaySubsciption from "../components/Payment_related/RazorPaySubscription";
+import AccountDetailsModal from "../components/AccountDetailsModa";
 
 function PayPalButton({ createOrder, onApprove, onError }) {
   const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
@@ -41,6 +42,8 @@ export default function BuyCredits() {
     paymentResult,
     setPaymentResult,
     paymentDetails,
+    accountDetailsModal,
+    setAccountDetailsModal
   } = useUserState();
   const costRef = useRef(paymentDetails.cost);
   const creditsRef = useRef(paymentDetails.credits);
@@ -96,6 +99,10 @@ export default function BuyCredits() {
     }
   }, []);
 
+  useEffect(() => {
+    if (userDetails.accountDetailsModal) setAccountDetailsModal(true);
+  }, [userDetails]);
+
   const createOrder = (data, actions) => {
     console.log(paymentDetails, "payment details");
     return actions.order
@@ -141,6 +148,25 @@ export default function BuyCredits() {
           }
         }
       } catch (error) {
+        const errorMessage = error.response?.data?.message;
+        console.log(errorMessage,'error message')
+        if (
+          errorMessage ===
+          "Please fill all the required fields to buy credits"
+        ) {
+          const storedToken = localStorage.getItem("Gamalogic_token");
+          if (storedToken) {
+            let token;
+            try {
+              token = JSON.parse(storedToken);
+            } catch (error) {
+              token = storedToken;
+            }
+            token.accountDetailsModal = true;
+            localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+            setUserDetails(token);
+          }
+        }
         if (error.response && error.response.status === 500) {
           setServerError(true);
         } else {
@@ -168,11 +194,13 @@ export default function BuyCredits() {
   if (serverError) {
     return <ServerError />;
   }
-
   const paypalClientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
   return (
     <div className=" px-6 md:px-20 py-8 text-center sm:text-start">
       <SubHeader SubHeader={"Buy Credits"} />
+      {accountDetailsModal && (
+        <AccountDetailsModal isOpen={accountDetailsModal} />
+      )}
       {paymentResult.result == null && (
         <div className="mt-6 sm:mt-14 text-bgblue subHeading">
           <h3>Pricing</h3>
@@ -186,7 +214,7 @@ export default function BuyCredits() {
               contact us.
             </Link>
           </p>
-          <Pricing />
+          {!accountDetailsModal && (<Pricing />)}
           {userDetails.confirm == 1 &&
             paymentDetails.type == "Pay As You Go" && (
               <div className="">

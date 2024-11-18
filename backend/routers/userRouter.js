@@ -5,6 +5,7 @@ import authcheck from '../middlewares/auth.js';
 import dbMiddleware from '../middlewares/dbMiddleware.js';
 import APIDecode from '../middlewares/apiDecode.js';
 import newControllers from '../controllers/newController.js';
+import accountDetailsValidation from '../middlewares/accountDetailsValidation.js';
 
 const router=express.Router()
 
@@ -43,13 +44,15 @@ router.get('/downloadEmailFinderFile',dbMiddleware,authcheck,APIControllers.down
 router.get('/getApiKey',APIDecode,APIControllers.getApi)
 router.get('/resetApiKey',dbMiddleware,authcheck,APIControllers.resetApiKey)
 router.post('/changePassword',dbMiddleware,authcheck,APIControllers.changePassword)
-router.post('/updateCredit',dbMiddleware,authcheck,APIControllers.PayPalUpdateCredit)
+
+//payment related
+router.post('/updateCredit',dbMiddleware,authcheck,accountDetailsValidation,APIControllers.PayPalUpdateCredit)
 router.post('/paymentFailedEmail',dbMiddleware,authcheck,APIControllers.PayPalCreditFailureEmail)
-router.post('/payPalSubscription',dbMiddleware,authcheck,APIControllers.payPalSubscription)
+router.post('/payPalSubscription',dbMiddleware,authcheck,accountDetailsValidation,APIControllers.payPalSubscription)
 router.post('/paypalWebhook',dbMiddleware,APIControllers.payPalWebHook)
-router.post('/Razorpay',dbMiddleware,authcheck,APIControllers.RazorpayPayment)
+router.post('/Razorpay',dbMiddleware,authcheck,accountDetailsValidation,APIControllers.RazorpayPayment)
 router.post('/RazorPayPaymentSuccess',dbMiddleware,authcheck,APIControllers.razorPayPaymentSuccess)
-router.post('/razorPaySubscription',dbMiddleware,authcheck,APIControllers.razorPaySubscriptin)
+router.post('/razorPaySubscription',dbMiddleware,authcheck,accountDetailsValidation,APIControllers.razorPaySubscriptin)
 router.post('/RazorPaySubscriptionPaymentSuccess',dbMiddleware,authcheck,APIControllers.razorPaySubscriptionSuccess)
 router.post('/RazorPayWebhook',dbMiddleware,APIControllers.razorPayWebhook)
 

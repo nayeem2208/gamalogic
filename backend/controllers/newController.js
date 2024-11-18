@@ -179,13 +179,13 @@ const newControllers = {
             const updatedFields = {};
 
             if (req.body.firstname && req.body.lastname) {
-                updatedFields.username = `${req.body.firstname}${req.body.lastname}`;
+                updatedFields.username = `${req.body.firstname} ${req.body.lastname}`;
             } else if (req.body.firstname) {
                 const [, ...lastNameParts] = req.user[0][0].username.split(/(?=[A-Z])/);
-                updatedFields.username = `${req.body.firstname}${lastNameParts.join('')}`;
+                updatedFields.username = `${req.body.firstname} ${lastNameParts.join('')}`;
             } else if (req.body.lastname) {
                 const [firstNamePart] = req.user[0][0].username.split(/(?=[A-Z])/);
-                updatedFields.username = `${firstNamePart}${req.body.lastname}`;
+                updatedFields.username = `${firstNamePart} ${req.body.lastname}`;
             }
 
             const dbUser = req.user[0][0];
