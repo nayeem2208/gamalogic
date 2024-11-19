@@ -70,6 +70,7 @@ router.get('/getTeamDetails',dbMiddleware,authcheck,newControllers.getTeamDetail
 router.post('/deleteFromTeam',dbMiddleware,authcheck,newControllers.removeFromTeam)
 router.post('/deleteTeamMemberInvite',dbMiddleware,authcheck,newControllers.removeTeamMemberInvite)
 router.get('/deleteAccount',dbMiddleware,authcheck,newControllers.deleteAccount)
+router.get('/verifyAccountDeletion',dbMiddleware,newControllers.verifyAccountDelete)
 
 router.get('/affiliateUserId',dbMiddleware,authcheck,APIControllers.affilateUserId)
 router.post('/loyalityProgram',APIControllers.loyalityWebhook)

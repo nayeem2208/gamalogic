@@ -10,6 +10,7 @@ import Razorpay from "razorpay";
 import createTeamVerificationLink from "../EmailTemplates/createTeamEmail.js";
 import inviteTeamMemberToken from "../utils/inviteTeamMemberToken.js";
 import childTeamMemberInvite from "../EmailTemplates/childAccountInviteEmail.js";
+import deleteAccountVerify from "../EmailTemplates/deleteAccountVerifyLink.js";
 
 
 
@@ -505,26 +506,58 @@ const newControllers = {
     },
     deleteAccount: async (req, res) => {
         try {
-            let response = await axios.post(`http://service.gamalogic.com/delete-account?api_key=${req.user[0][0].api_key}`)
-            if (response.status === 200) {
-                let userContent = `<p>Your account has been successfully deleted. If you did not intend to perform this action or have any concerns, please contact our support team for assistance.</p>`;
+            let token = subscriptionCancelConfirmationToken(req.user[0][0].emailid)
+            let link = `${urls.frontendUrl}/api/verifyAccountDeletion?email=${token}`
 
-                sendEmail(
-                    req.user[0][0].username,
-                    req.user[0][0].emailid,
-                    "Account Deletion Confirmation",
-                    basicTemplate(req.user[0][0].username, userContent)
-                );
-                res.status(200).json({ message: 'Account successfully deleted' });
-            } else {
-                console.error("Failed to delete account. Response:", response.data);
-                res.status(400).json({ message: 'Failed to delete account' });
-            }
+            let sub = `Confirm Your Account Deletion`;
+
+            sendEmail(
+                req.user[0][0].username,
+                req.user[0][0].emailid,
+                sub,
+                deleteAccountVerify(req.user[0][0].username, token, link)
+            );
+            res.status(200).json({ message: "Email sent successfully" });
         } catch (error) {
             console.log(error)
             ErrorHandler("Delete account Controller", error, req)
             res.status(500).json({ error: 'Failed to delete account' });
         } finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
+    },
+    verifyAccountDelete:async(req,res)=>{
+        try {
+            const dbConnection = req.dbConnection;
+            const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
+            const userEmail = decoded.email;
+            console.log(userEmail,'user Email')
+            let [user]=await dbConnection.query('SELECT username,api_key FROM registration WHERE emailid = ?', [userEmail])
+              let currDate = new Date().toISOString().slice(0, 19).replace("T", " ");
+            let response = await axios.post(`http://service.gamalogic.com/delete-account?api_key=${user[0].api_key}&deleted_date_time=${currDate}`)
+            if (response.status === 200) {
+                let userContent = `<p>Your account has been successfully deleted. If you did not intend to perform this action or have any concerns, please contact our support team for assistance.</p>`;
+
+                sendEmail(
+                    user[0].username,
+                    userEmail,
+                    "Account Deletion Confirmation",
+                    basicTemplate(user[0].username, userContent)
+                );
+                // res.status(200).json({ message: 'Account successfully deleted' });
+                res.redirect(`${urls.frontendUrl}/DeleteAccountSuccess`);
+            } else {
+                console.error("Failed to delete account. Response:", response.data);
+                res.status(400).json({ message: 'Failed to delete account' });
+            }
+
+        } catch (error) {
+            console.log(error)
+            ErrorHandler("verify Account Controller", error, req)
+            res.status(500).json({ error: error })
+        }finally {
             if (req.dbConnection) {
                 await req.dbConnection.release();
             }

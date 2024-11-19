@@ -28,7 +28,7 @@ const PostSignupPage = lazy(() => import('../components/PostSignupPage'));
 const Affiliate=lazy(()=>import('../pages/Affiliate'))
 const Billing=lazy(()=>import('../pages/Billings'))
 const Team=lazy(()=>import('../pages/Team'))
-// const TeamCreationLinkVerifyPage=lazy(()=>import('../components/Team/TeamCreationLinkVerifyPage'))
+const DeleteAccountSuccess=lazy(()=>import('../components/DeleteAccount/DeleteAccountSuccess'))
 
 
 
@@ -53,7 +53,6 @@ function Router() {
         <Route path="dashboard/affiliate" element={<Suspense fallback={<TopLoader loading={loading} />}><Affiliate setLoading={setLoading}/></Suspense>} />
         <Route path="dashboard/billing" element={<Suspense fallback={<TopLoader loading={loading} />}><Billing setLoading={setLoading}/></Suspense>} />
         <Route path='dashboard/team' element={<Suspense fallback={<TopLoader loading={loading}/>}><Team setLoading={setLoading}/></Suspense>}/>
-        {/* <Route path='dashboard/teamCreationVerify' element={<Suspense fallback={<TopLoader loading={loading}/>}><TeamCreationLinkVerifyPage setLoading={setLoading}/></Suspense>}/> */}
 
       </Route>
       <Route path="/" element={<Authentication />}>
@@ -69,6 +68,7 @@ function Router() {
       <Route path='/blocked' element={<BlockePage/>}/>
       <Route path='/EmailConfirmed' element={<EmailVerifiedPage/>}/>
       <Route path='/EmailAlreadyverified' element={<VerifyAgainErrorPage/>}/>
+      <Route path='/DeleteAccountSuccess' element={<Suspense fallback={<TopLoader loading={loading}/>}><DeleteAccountSuccess setLoading={setLoading}/></Suspense>}/>
     </Routes>
   );
 }

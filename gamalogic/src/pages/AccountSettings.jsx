@@ -10,6 +10,7 @@ import LoadingBar from "react-top-loading-bar";
 import MoreDetails from "../components/MoreDetails";
 import { MdOutlineGroups } from "react-icons/md";
 import AccountDetailsModal from "../components/AccountDetailsModa";
+import DeleteAccount from "../components/DeleteAccount/DeleteAccount";
 
 function AccountSettings() {
   let [passwordVisible, setPasswordVisible] = useState({
@@ -170,7 +171,11 @@ function AccountSettings() {
       }
     }
   };
-  console.log(accountDetailsModal,'account details modaaaaaal')
+
+  const handleDeleteAccount = () => {
+    // Logic to delete the user account
+    console.log("Account deleted");
+  };
   if (serverError) {
     return <ServerError />;
   }
@@ -370,6 +375,7 @@ function AccountSettings() {
               </div>{" "}
             </div>
           )}
+          <DeleteAccount handleDeleteAccount={handleDeleteAccount}/>
         </>
       ) : (
         <p className="my-10 text-red-600 font-semibold text-lg">
