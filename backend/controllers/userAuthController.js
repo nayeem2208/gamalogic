@@ -42,7 +42,7 @@ const Authentication = {
     try {
       console.log(req.body, 'req.body')
       // ErrorHandler("webhook checker", req.body, req);
-      res.send({success:true})
+      res.send({ success: true })
     } catch (error) {
       // ErrorHandler("Sample Controller", error, req);
       console.log(error)
@@ -71,7 +71,7 @@ const Authentication = {
         const hashedPassword = user[0][0].password;
         let passwordMatch = await verifyPassword(password, hashedPassword);
         if (passwordMatch) {
-          let token = generateToken(res, user[0][0].rowid, user[0][0].api_key,user[0][0].team_id);
+          let token = generateToken(res, user[0][0].rowid, user[0][0].api_key, user[0][0].team_id);
           let creditBal;
           let finalFree = new Date(user[0][0].free_final);
           let finalFreeDate = new Date(finalFree);
@@ -131,16 +131,16 @@ const Authentication = {
             !user[0][0].pincode ||
             !user[0][0].country ||
             !user[0][0].state) && user[0][0].is_premium != 1) {
-              accountDetailsModalInBuyCredits = true
+            accountDetailsModalInBuyCredits = true
           }
-          
+
 
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
           let TeamAdminEmail
-          if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'&&user[0][0].team_id){
-            let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
-            TeamAdminEmail=TeamAdmin[0][0].emailid
+          if (user[0][0].team_id !== null && user[0][0].team_id !== 'null' && user[0][0].team_id) {
+            let TeamAdmin = await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
+            TeamAdminEmail = TeamAdmin[0][0].emailid
           }
           res.json({
             name: user[0][0].username,
@@ -159,7 +159,7 @@ const Authentication = {
             accountDetailsModalInBuyCredits,
             isTeam: user[0][0].is_team_admin,
             isTeamMember: user[0][0].is_team_member,
-            isTeamid:TeamAdminEmail
+            isTeamid: TeamAdminEmail
 
           });
 
@@ -313,7 +313,7 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
       if (user[0].length > 0) {
-        const token = generateToken(res, user[0][0].rowid, user[0][0].api_key,user[0][0].team_id);
+        const token = generateToken(res, user[0][0].rowid, user[0][0].api_key, user[0][0].team_id);
         let creditBal;
         let finalFree = new Date(user[0][0].free_final);
         let finalFreeDate = new Date(finalFree);
@@ -374,7 +374,7 @@ const Authentication = {
           !user[0][0].pincode ||
           !user[0][0].country ||
           !user[0][0].state) && user[0][0].is_premium != 1) {
-            accountDetailsModalInBuyCredits = true
+          accountDetailsModalInBuyCredits = true
         }
 
 
@@ -382,9 +382,9 @@ const Authentication = {
         // const { country_name } = response.data;
 
         let TeamAdminEmail
-        if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'&&user[0][0].team_id){
-          let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
-          TeamAdminEmail=TeamAdmin[0][0].emailid
+        if (user[0][0].team_id !== null && user[0][0].team_id !== 'null' && user[0][0].team_id) {
+          let TeamAdmin = await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
+          TeamAdminEmail = TeamAdmin[0][0].emailid
         }
         res.status(200).json({
           name: user[0][0].username,
@@ -403,7 +403,7 @@ const Authentication = {
           accountDetailsModalInBuyCredits,
           isTeam: user[0][0].is_team_admin,
           isTeamMember: user[0][0].is_team_member,
-          isTeamid:TeamAdminEmail
+          isTeamid: TeamAdminEmail
         });
       } else {
         res.status(400).json({
@@ -508,13 +508,22 @@ const Authentication = {
           .toISOString()
           .slice(0, 19)
           .replace("T", " ");
-
         let apiKey = await generateUniqueApiKey(req);
         let referenceCode = req.body.thriveRefId != null ? req.body.thriveRefId : null
         let isReferedBy = req.body.thriveRefId != null ? 1 : 0
         let source = req.body.thriveRefId != null ? 'Affiliate Referrer' : 'Sign in'
         let isTeamMember = invitedUserId ? 1 : 0
-        let creditFree = invitedUserId ? 0 : 500
+        let deletedUser = await dbConnection.query('SELECT * from registration_deleted where emailid=?', [email])
+        let creditFree
+        if (deletedUser[0].length > 0) {
+          creditFree = 0
+        }
+        else if (invitedUserId) {
+          creditFree = 0
+        }
+        else {
+          creditFree = 500
+        }
         await dbConnection.query(
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,session_google,is_premium,firstname,lastname,is_referer_by,referer_by,is_team_member,team_id)VALUES(null,'${name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,'${creditFree}','${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}','${isTeamMember}','${invitedUserId}')`
         );
@@ -532,7 +541,7 @@ const Authentication = {
           `SELECT * FROM registration WHERE emailid='${email}'`
         );
         if (user[0].length > 0) {
-          const token = generateToken(res, user[0][0].rowid, user[0][0].api_key,user[0][0].team_id);
+          const token = generateToken(res, user[0][0].rowid, user[0][0].api_key, user[0][0].team_id);
           let content = `<p>Welcome to Gamalogic! We're thrilled to have you on board.</p>
           <p>Your registration is now complete, and you're all set to explore our platform.</p>
           <p>If you have any questions or need assistance getting started, feel free to reach out to us.</p>
@@ -553,9 +562,9 @@ const Authentication = {
           // const response = await axios.get(`https://ipapi.co/${ip}/json/`);
           // const { country_name } = response.data;
           let TeamAdminEmail
-          if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'&&user[0][0].team_id){
-            let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
-            TeamAdminEmail=TeamAdmin[0][0].emailid
+          if (user[0][0].team_id !== null && user[0][0].team_id !== 'null' && user[0][0].team_id) {
+            let TeamAdmin = await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
+            TeamAdminEmail = TeamAdmin[0][0].emailid
           }
           res.json({
             name: user[0][0].username,
@@ -570,8 +579,8 @@ const Authentication = {
             HMACDigest,
             id: user[0][0].rowid,
             isTeamMember: user[0][0].is_team_member,
-            isTeamid:TeamAdminEmail,
-            accountDetailsModalInBuyCredits:true
+            isTeamid: TeamAdminEmail,
+            accountDetailsModalInBuyCredits: true
           });
         } else {
           res
@@ -695,7 +704,7 @@ const Authentication = {
               `SELECT * FROM registration WHERE emailid='${email}'`
             );
             if (user[0].length > 0) {
-              const token = generateToken(res, user[0][0].rowid, user[0][0].api_key,user[0][0].team_id);
+              const token = generateToken(res, user[0][0].rowid, user[0][0].api_key, user[0][0].team_id);
               let content = `<p>Welcome to Gamalogic! We're thrilled to have you on board.</p>
               <p>Your registration is now complete, and you're all set to explore our platform.</p>
               <p>If you have any questions or need assistance getting started, feel free to reach out to us.</p>
@@ -803,7 +812,7 @@ const Authentication = {
             `SELECT * FROM registration WHERE emailid='${email}'`
           );
           if (user[0].length > 0) {
-            const token = generateToken(res, user[0][0].rowid, user[0][0].api_key,user[0][0].team_id);
+            const token = generateToken(res, user[0][0].rowid, user[0][0].api_key, user[0][0].team_id);
             let creditBal;
             let finalFree = new Date(user[0][0].free_final);
             let finalFreeDate = new Date(finalFree);
@@ -854,9 +863,9 @@ const Authentication = {
             }
 
             let TeamAdminEmail
-            if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'&&user[0][0].team_id){
-              let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
-              TeamAdminEmail=TeamAdmin[0][0].emailid
+            if (user[0][0].team_id !== null && user[0][0].team_id !== 'null' && user[0][0].team_id) {
+              let TeamAdmin = await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
+              TeamAdminEmail = TeamAdmin[0][0].emailid
             }
             res.status(200).json({
               name: user[0][0].username,
@@ -874,7 +883,7 @@ const Authentication = {
               accountDetailsModal,
               isTeam: user[0][0].is_team_admin,
               isTeamMember: user[0][0].is_team_member,
-              isTeamid:TeamAdminEmail
+              isTeamid: TeamAdminEmail
             });
           } else {
             res.status(400).json({
@@ -995,7 +1004,17 @@ const Authentication = {
         let isReferedBy = req.body.thriveRefId != null ? 1 : 0
         let source = req.body.thriveRefId != null ? 'Affiliate Referrer' : 'Sign in'
         let isTeamMember = invitedUserId ? 1 : 0
-        let creditFree = invitedUserId ? 0 : 500
+        let deletedUser = await dbConnection.query('SELECT * from registration_deleted where emailid=?', [email])
+        let creditFree
+        if (deletedUser[0].length > 0) {
+          creditFree = 0
+        }
+        else if (invitedUserId) {
+          creditFree = 0
+        }
+        else {
+          creditFree = 500
+        }
 
         await dbConnection.query(
           `INSERT INTO registration(rowid,username,emailid,password,registered_on,confirmed,confirmed_on,api_key,free_final,credits,credits_free,ip_address,user_agent,is_microsoft,is_premium,firstname,lastname,is_referer_by,referer_by,is_team_member,team_id)VALUES(null,'${given_name}','${email}',0,'${formattedDate}',1,'${formattedDate}','${apiKey}','${freeFinalDate}',0,'${creditFree}','${ip}','${userAgent}',1,0,'${firstname}','${lastname}','${isReferedBy}','${referenceCode}','${isTeamMember}','${invitedUserId}')`
@@ -1014,7 +1033,7 @@ const Authentication = {
           `SELECT * FROM registration WHERE emailid='${email}'`
         );
         if (user[0].length > 0) {
-          const token = generateToken(res, user[0][0].rowid, user[0][0].api_key,user[0][0].team_id);
+          const token = generateToken(res, user[0][0].rowid, user[0][0].api_key, user[0][0].team_id);
           let content = `<p>Welcome to Gamalogic! We're thrilled to have you on board.</p>
           <p>Your registration is now complete, and you're all set to explore our platform.</p>
           <p>If you have any questions or need assistance getting started, feel free to reach out to us.</p>
@@ -1033,9 +1052,9 @@ const Authentication = {
           const HMACDigest = hmacDigestFunction(user[0][0].emailid, user[0][0].rowid)
 
           let TeamAdminEmail
-          if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'&&user[0][0].team_id){
-            let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
-            TeamAdminEmail=TeamAdmin[0][0].emailid
+          if (user[0][0].team_id !== null && user[0][0].team_id !== 'null' && user[0][0].team_id) {
+            let TeamAdmin = await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
+            TeamAdminEmail = TeamAdmin[0][0].emailid
           }
           res.json({
             name: user[0][0].username,
@@ -1049,8 +1068,8 @@ const Authentication = {
             HMACDigest,
             id: user[0][0].rowid,
             isTeamMember: user[0][0].is_team_member,
-            isTeamid:TeamAdminEmail,
-            accountDetailsModalInBuyCredits:true
+            isTeamid: TeamAdminEmail,
+            accountDetailsModalInBuyCredits: true
           });
         } else {
           res
@@ -1080,7 +1099,7 @@ const Authentication = {
         `SELECT * FROM registration WHERE emailid='${email}'`
       );
       if (user[0].length > 0) {
-        const token = generateToken(res, user[0][0].rowid, user[0][0].api_key,user[0][0].team_id);
+        const token = generateToken(res, user[0][0].rowid, user[0][0].api_key, user[0][0].team_id);
         let creditBal;
         let finalFree = new Date(user[0][0].free_final);
         let finalFreeDate = new Date(finalFree);
@@ -1142,12 +1161,12 @@ const Authentication = {
           !user[0][0].pincode ||
           !user[0][0].country ||
           !user[0][0].state) && user[0][0].is_premium != 1) {
-            accountDetailsModalInBuyCredits = true
+          accountDetailsModalInBuyCredits = true
         }
         let TeamAdminEmail
-        if(user[0][0].team_id !== null && user[0][0].team_id !== 'null'&&user[0][0].team_id){
-          let TeamAdmin=await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
-          TeamAdminEmail=TeamAdmin[0][0].emailid
+        if (user[0][0].team_id !== null && user[0][0].team_id !== 'null' && user[0][0].team_id) {
+          let TeamAdmin = await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
+          TeamAdminEmail = TeamAdmin[0][0].emailid
         }
         res.status(200).json({
           name: user[0][0].username,
@@ -1166,7 +1185,7 @@ const Authentication = {
           accountDetailsModalInBuyCredits,
           isTeam: user[0][0].is_team_admin,
           isTeamMember: user[0][0].is_team_member,
-          isTeamid:TeamAdminEmail,
+          isTeamid: TeamAdminEmail,
 
         });
       } else {
@@ -1225,8 +1244,16 @@ const Authentication = {
         await dbConnection.query(query, [confirmedDate, apiKey, referer, userEmail]);
       }
       else {
-        const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,api_key=?,referer=?, credits_free=500  WHERE emailid = ?`;
-        await dbConnection.query(query, [confirmedDate, apiKey, referer, userEmail]);
+        let deletedUser = await dbConnection.query('SELECT * from registration_deleted where emailid=?', [userEmail])
+        let creditFree
+        if (deletedUser[0].length > 0) {
+          creditFree = 0
+        }
+        else {
+          creditFree = 500
+        }
+        const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,api_key=?,referer=?, credits_free=?  WHERE emailid = ?`;
+        await dbConnection.query(query, [confirmedDate, apiKey, referer, creditFree,userEmail]);
       }
       let verifiedUser = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
