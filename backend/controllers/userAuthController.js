@@ -1239,7 +1239,7 @@ const Authentication = {
       );
       let apiKey = await generateUniqueApiKey(req);
       let confirmedDate = new Date();
-      if (isTeamMember[0][0] && isTeamMember[0][0].team_id) {
+      if (isTeamMember[0][0] &&(isTeamMember[0][0].team_id !== null && isTeamMember[0][0].team_id !== 'null' && isTeamMember[0][0].team_id)) {
         const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,api_key=?,referer=? WHERE emailid = ?`;
         await dbConnection.query(query, [confirmedDate, apiKey, referer, userEmail]);
       }
