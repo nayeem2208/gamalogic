@@ -305,7 +305,9 @@ const newControllers = {
 
         } catch (error) {
             console.log(error)
+            ErrorHandler("create team Controller", error, req)
             res.status(500).json({ message: "Failed to create team" });
+
         }
         finally {
             if (req.dbConnection) {
@@ -378,6 +380,7 @@ const newControllers = {
             res.status(200).json({ message: "Invitation link has been successfully sent" })
         } catch (error) {
             console.log(error)
+            ErrorHandler("Send invitation for members Controller", error, req)
             res.status(500).json({ error: error })
         } finally {
             if (req.dbConnection) {
@@ -402,6 +405,7 @@ const newControllers = {
             res.status(200).json({ message: "Invitation link has been successfully sent" })
         } catch (error) {
             console.log(error)
+            ErrorHandler("Resend invite  Controller", error, req)
             res.status(500).json({ error: error })
         } finally {
             if (req.dbConnection) {
@@ -417,6 +421,7 @@ const newControllers = {
             res.status(200).json({ teamMembers: teamMembers[0], invited: invited[0] })
         } catch (error) {
             console.log(error)
+            ErrorHandler("get team details Controller", error, req)
             res.status(500).json({ error: error })
         } finally {
             if (req.dbConnection) {
@@ -468,6 +473,7 @@ const newControllers = {
             }
         } catch (error) {
             console.log(error)
+            ErrorHandler("remove from team Controller", error, req)
             res.status(500).json({ error: error })
         } finally {
             if (req.dbConnection) {
@@ -489,10 +495,38 @@ const newControllers = {
             res.status(200).json({ message: 'Successfully deleted' });
         } catch (error) {
             console.error('Error in removeTeamMemberInvite:', error);
+            ErrorHandler("Remove team member invite Controller", error, req)
             res.status(500).json({ error: 'Failed to delete invitation' });
         } finally {
             if (dbConnection) {
                 await dbConnection.release();
+            }
+        }
+    },
+    deleteAccount: async (req, res) => {
+        try {
+            let response = await axios.post(`http://service.gamalogic.com/delete-account?api_key=${req.user[0][0].api_key}`)
+            if (response.status === 200) {
+                let userContent = `<p>Your account has been successfully deleted. If you did not intend to perform this action or have any concerns, please contact our support team for assistance.</p>`;
+
+                sendEmail(
+                    req.user[0][0].username,
+                    req.user[0][0].emailid,
+                    "Account Deletion Confirmation",
+                    basicTemplate(req.user[0][0].username, userContent)
+                );
+                res.status(200).json({ message: 'Account successfully deleted' });
+            } else {
+                console.error("Failed to delete account. Response:", response.data);
+                res.status(400).json({ message: 'Failed to delete account' });
+            }
+        } catch (error) {
+            console.log(error)
+            ErrorHandler("Delete account Controller", error, req)
+            res.status(500).json({ error: 'Failed to delete account' });
+        } finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
             }
         }
     }

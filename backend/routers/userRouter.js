@@ -69,6 +69,7 @@ router.post('/ResendInvite',dbMiddleware,authcheck,newControllers.ResendInvite)
 router.get('/getTeamDetails',dbMiddleware,authcheck,newControllers.getTeamDetails)
 router.post('/deleteFromTeam',dbMiddleware,authcheck,newControllers.removeFromTeam)
 router.post('/deleteTeamMemberInvite',dbMiddleware,authcheck,newControllers.removeTeamMemberInvite)
+router.get('/deleteAccount',dbMiddleware,authcheck,newControllers.deleteAccount)
 
 router.get('/affiliateUserId',dbMiddleware,authcheck,APIControllers.affilateUserId)
 router.post('/loyalityProgram',APIControllers.loyalityWebhook)
