@@ -1245,11 +1245,14 @@ const Authentication = {
       }
       else {
         let deletedUser = await dbConnection.query('SELECT * from registration_deleted where emailid=?', [userEmail])
+        console.log(deletedUser[0][0],deletedUser[0].length)
         let creditFree
         if (deletedUser[0].length > 0) {
+          console.log('first section')
           creditFree = 0
         }
         else {
+          console.log('second section')
           creditFree = 500
         }
         const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,api_key=?,referer=?, credits_free=?  WHERE emailid = ?`;
