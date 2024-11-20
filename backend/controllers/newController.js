@@ -538,7 +538,7 @@ const newControllers = {
             } catch (err) {
                 if (err.name === "TokenExpiredError") {
                     console.error("JWT token has expired:", err.message);
-                    return res.redirect(`${urls.frontendUrl}/LinkExpiredError`);
+                    return res.redirect(`${urls.frontendUrl}/LinkExpired`);
                 }
                 console.error("JWT verification failed:", err.message);
                 return res.status(400).json({ message: "Invalid token." });
