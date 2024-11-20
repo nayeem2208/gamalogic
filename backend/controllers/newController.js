@@ -534,7 +534,7 @@ const newControllers = {
             // const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
             let decoded;
             try {
-                decoded = jwt.verify(email, process.env.JWT_SECRET);
+                decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
             } catch (err) {
                 if (err.name === "TokenExpiredError") {
                     console.error("JWT token has expired:", err.message);
