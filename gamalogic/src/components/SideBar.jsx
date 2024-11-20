@@ -21,6 +21,7 @@ import { useUserState } from "../context/userContext";
 import { GrMoney } from "react-icons/gr";
 import { MdOutlineGroups } from "react-icons/md";
 import { MdManageAccounts } from "react-icons/md";
+import { TbBasketStar } from "react-icons/tb";
 
 function SideBar() {
   let [uploadfileDropDown, setUploadFileDropDown] = useState(false);
@@ -240,6 +241,12 @@ function SideBar() {
               <li className="my-4 flex">
                 <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />
                 Become an Affiliate
+              </li>
+            </Link>
+            <Link to="/dashboard/EarnPoints">
+              <li className="my-4 flex">
+                <TbBasketStar className="text-teal-800 mt-2 mx-2 text-lg" />
+                Earn Points
               </li>
             </Link>
             {/* {userDetails.isTeam == 1 && (

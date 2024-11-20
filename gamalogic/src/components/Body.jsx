@@ -41,11 +41,9 @@ function Body() {
         document.body.appendChild(thriveScript);
         console.log(window.ztUserData, "inside the ztuserdata");
       }
-      if (window.location.pathname.endsWith("affiliate")) {
-        if (window.hideThriveWidget == true) {
+      if (window.location.pathname.endsWith("EarnPoints")) {
           window.hideThriveWidget = false;
           window.reloadThriveWidget();
-        }
       } else {
         if (window.hideThriveWidget == false) {
           window.hideThriveWidget = true;

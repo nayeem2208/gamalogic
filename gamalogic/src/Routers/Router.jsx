@@ -27,6 +27,7 @@ const ForgotPassword = lazy(() => import('../components/ForgotPassword'));
 const ResetPassword = lazy(() => import('../components/ResetPassword'));
 const PostSignupPage = lazy(() => import('../components/PostSignupPage'));
 const Affiliate=lazy(()=>import('../pages/Affiliate'))
+const EarnPoints=lazy(()=>import('../pages/EarnPoints'))
 const Billing=lazy(()=>import('../pages/Billings'))
 const Team=lazy(()=>import('../pages/Team'))
 const DeleteAccountSuccess=lazy(()=>import('../components/DeleteAccount/DeleteAccountSuccess'))
@@ -54,7 +55,7 @@ function Router() {
         <Route path="dashboard/affiliate" element={<Suspense fallback={<TopLoader loading={loading} />}><Affiliate setLoading={setLoading}/></Suspense>} />
         <Route path="dashboard/billing" element={<Suspense fallback={<TopLoader loading={loading} />}><Billing setLoading={setLoading}/></Suspense>} />
         <Route path='dashboard/team' element={<Suspense fallback={<TopLoader loading={loading}/>}><Team setLoading={setLoading}/></Suspense>}/>
-
+        <Route path='dashboard/EarnPoints' element={<Suspense fallback={<TopLoader loading={loading}/>}><EarnPoints setLoading={setLoading}/></Suspense>}/>
       </Route>
       <Route path="/" element={<Authentication />}>
         <Route index path="signin" element={<Suspense fallback={<TopLoader loading={loading} />}><Login setLoading={setLoading}/></Suspense>} />

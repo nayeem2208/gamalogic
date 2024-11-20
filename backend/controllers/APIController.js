@@ -929,44 +929,47 @@ let APIControllers = {
               await dbConnection.query(query, values);
 
               let user = await dbConnection.query(`SELECT username,emailid,credits,is_referer_by FROM registration WHERE rowid = '${planInDataBase[0][0].userid}'`);
-              let newBalance = user[0][0].credits + creditsToAdd;
-              let lastPayment_registration = details.billing_info.last_payment.time ?? new Date().toISOString()
-              await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
-              if (user[0][0].is_referer_by == 1) {
-                try {
-                  let orderId = subId + new Date().toISOString().split('T')[0];
-                  console.log(orderId, 'orderIdddddd')
-                  let resp = await PurchaseApi(user[0][0].emailid, gross_amount || null, orderId, user[0][0]?.rowid ?? null)
-                  console.log(resp, 'resppppppp')
-                } catch (error) {
-                  ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
-                  console.log(error)
+              if (user[0].length > 0) {
+                let newBalance = user[0][0].credits + creditsToAdd;
+                let lastPayment_registration = details.billing_info.last_payment.time ?? new Date().toISOString()
+                await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
+                if (user[0][0].is_referer_by == 1) {
+                  try {
+                    let orderId = subId + new Date().toISOString().split('T')[0];
+                    console.log(orderId, 'orderIdddddd')
+                    let resp = await PurchaseApi(user[0][0].emailid, gross_amount || null, orderId, user[0][0]?.rowid ?? null)
+                    console.log(resp, 'resppppppp')
+                  } catch (error) {
+                    ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
+                    console.log(error)
+                  }
                 }
+
+                let content
+                if (paymentDetails[2] == 'monthly') {
+                  content = `
+                <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed.</p>
+                
+                <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
+                `
+                }
+                else {
+                  content = `
+                <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed.</p>
+                
+                <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
+                `
+                }
+                let isMonthlyInEmail = paymentDetails[2] == 'monthly' ? 'Monthly' : 'Annual'
+                let sub = `Gamalogic ${isMonthlyInEmail} Subscription Payment successful`
+                sendEmail(
+                  user[0][0].username,
+                  user[0][0].emailid,
+                  sub,
+                  basicTemplate(user[0][0].username, content)
+                );
               }
 
-              let content
-              if (paymentDetails[2] == 'monthly') {
-                content = `
-                <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed.</p>
-                
-                <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
-                `
-              }
-              else {
-                content = `
-                <p>Your subscription has been renewed successfully. We have processed your payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed.</p>
-                
-                <p>If you have any questions or concerns regarding this payment or your subscription, please feel free to contact us.</p>
-                `
-              }
-              let isMonthlyInEmail = paymentDetails[2] == 'monthly' ? 'Monthly' : 'Annual'
-              let sub = `Gamalogic ${isMonthlyInEmail} Subscription Payment successful`
-              sendEmail(
-                user[0][0].username,
-                user[0][0].emailid,
-                sub,
-                basicTemplate(user[0][0].username, content)
-              );
             } else {
               // ErrorHandler("update paypal webhook checker step 2", req.body, req);
               console.log('Dates are the same. No update needed.');

@@ -22,6 +22,7 @@ import { RiProfileLine } from "react-icons/ri";
 import { SlSupport } from "react-icons/sl";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserState } from "../context/userContext";
+import { TbBasketStar } from "react-icons/tb";
 
 function Header() {
   let [dropDown, setDropDown] = useState(false);
@@ -236,6 +237,12 @@ function Header() {
               <li className="py-2 flex underlineLi">
                 <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />
                 Become an Affiliate
+              </li>
+            </Link>
+            <Link to="/dashboard/EarnPoints" onClick={dropDownToggle}>
+              <li className="py-2 flex underlineLi">
+                <TbBasketStar className="text-teal-800 mt-2 mx-2 text-lg" />
+                Earn Points
               </li>
             </Link>
             {/* {userDetails.isTeam == 1 && (
