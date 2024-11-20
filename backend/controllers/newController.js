@@ -531,7 +531,18 @@ const newControllers = {
     verifyAccountDelete:async(req,res)=>{
         try {
             const dbConnection = req.dbConnection;
-            const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
+            // const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
+            let decoded;
+            try {
+                decoded = jwt.verify(email, process.env.JWT_SECRET);
+            } catch (err) {
+                if (err.name === "TokenExpiredError") {
+                    console.error("JWT token has expired:", err.message);
+                    return res.redirect(`${urls.frontendUrl}/LinkExpiredError`);
+                }
+                console.error("JWT verification failed:", err.message);
+                return res.status(400).json({ message: "Invalid token." });
+            }
             const userEmail = decoded.email;
             console.log(userEmail,'user Email')
             let [user]=await dbConnection.query('SELECT username,api_key FROM registration WHERE emailid = ?', [userEmail])

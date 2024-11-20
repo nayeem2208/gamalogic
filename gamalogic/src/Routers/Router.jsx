@@ -9,6 +9,7 @@ import { useUserState } from '../context/userContext';
 import VerifyAgainErrorPage from '../components/VerifyAgainErrorPage';
 import SubscriptionCancellationConfirmed from '../components/SubscriptionCancellationConfirmed';
 import SubscriptionCancellationError from '../components/SubscriptionCancellationError';
+import LinkExpired from '../components/LinkExpiredPage';
 
 const QuickValidation = lazy(() => import('../pages/QuickValidation'));
 const Body = lazy(() => import('../components/Body'));
@@ -69,6 +70,8 @@ function Router() {
       <Route path='/EmailConfirmed' element={<EmailVerifiedPage/>}/>
       <Route path='/EmailAlreadyverified' element={<VerifyAgainErrorPage/>}/>
       <Route path='/DeleteAccountSuccess' element={<Suspense fallback={<TopLoader loading={loading}/>}><DeleteAccountSuccess setLoading={setLoading}/></Suspense>}/>
+      <Route path='/LinkExpired' element={<Suspense fallback={<TopLoader loading={loading}/>}><LinkExpired setLoading={setLoading}/></Suspense>}/>
+
     </Routes>
   );
 }
