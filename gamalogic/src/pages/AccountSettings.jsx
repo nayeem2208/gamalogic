@@ -11,6 +11,7 @@ import MoreDetails from "../components/MoreDetails";
 import { MdOutlineGroups } from "react-icons/md";
 import AccountDetailsModal from "../components/AccountDetailsModa";
 import DeleteAccount from "../components/DeleteAccount/DeleteAccount";
+import TimeZone from "../components/TimeZone";
 
 function AccountSettings() {
   let [passwordVisible, setPasswordVisible] = useState({
@@ -207,7 +208,7 @@ function AccountSettings() {
             <MoreDetails />
           </div>
           <form
-            className="mt-6 sm:mt-14 text-xs sm:text-sm text-bgblue subHeading "
+            className="mt-6 sm:mt-14 text-xs sm:text-sm text-bgblue subHeading border-t-2 py-8"
             onSubmit={changaePassword}
             style={{ fontFamily: "Raleway,sans-serif" }}
           >
@@ -305,6 +306,7 @@ function AccountSettings() {
               CHANGE PASSWORD
             </button>
           </form>
+          <TimeZone/>
           {userDetails.isTeamMember != 1 && (
             <div className="subHeading mt-14 shadow-lg px-6 py-12  bg-gray-100">
               <h3 className="flex">

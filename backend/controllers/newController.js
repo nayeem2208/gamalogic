@@ -573,6 +573,26 @@ const newControllers = {
                 await req.dbConnection.release();
             }
         }
+    },
+    updateTimeZone: async (req, res) => {
+        try {
+            const dbConnection = req.dbConnection;
+            const { timezone } = req.body;
+            const emailid = req.user[0][0].emailid;
+
+            const query = `UPDATE registration SET time_zone = ? WHERE emailid = ?`;
+            await dbConnection.query(query, [timezone, emailid]);
+
+            res.status(200).json({ message: 'Time zone successfully updated' });
+        } catch (error) {
+            console.error('Error in updateTimeZone:', error);
+            ErrorHandler("update timeZone Controller", error, req);
+            res.status(500).json({ error: error.message || 'Internal Server Error' });
+        } finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
     }
 
 

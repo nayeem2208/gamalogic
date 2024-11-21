@@ -11,6 +11,8 @@ const router=express.Router()
 
 router.get('/sampleCheck',dbMiddleware,Authentication.sample)
 router.post('/sampleCheck1',Authentication.samplePost)
+
+//authentication based
 router.post('/login',dbMiddleware,Authentication.login)
 router.post('/signup',dbMiddleware,Authentication.registerUser)
 router.get('/verifyEmail',dbMiddleware,Authentication.verifyEmail)
@@ -41,6 +43,7 @@ router.post('/batchEmailFinder',dbMiddleware,authcheck,APIControllers.batchEmail
 router.get('/getBatchFinderStatus',dbMiddleware,APIDecode,APIControllers.batchEmailFinderStatus)
 router.get('/downloadEmailFinderFile',dbMiddleware,authcheck,APIControllers.downloadEmailFinderResultFile)
 
+//api key related
 router.get('/getApiKey',APIDecode,APIControllers.getApi)
 router.get('/resetApiKey',dbMiddleware,authcheck,APIControllers.resetApiKey)
 router.post('/changePassword',dbMiddleware,authcheck,APIControllers.changePassword)
@@ -56,12 +59,17 @@ router.post('/razorPaySubscription',dbMiddleware,authcheck,accountDetailsValidat
 router.post('/RazorPaySubscriptionPaymentSuccess',dbMiddleware,authcheck,APIControllers.razorPaySubscriptionSuccess)
 router.post('/RazorPayWebhook',dbMiddleware,APIControllers.razorPayWebhook)
 
+//cancelling subscriptions
 router.get('/getPlanDetails',dbMiddleware,authcheck,APIControllers.getPlanDetails)
 router.get('/cancelSubscription',dbMiddleware,authcheck,newControllers.cancelSubscription)
 router.get('/ConfirmSubscriptionCancellation',dbMiddleware,newControllers.verifyCancelSubscription)
 
+//userDetails based
 router.post('/updateMoreDetails',dbMiddleware,authcheck,newControllers.addMoreDetails)
 router.get('/getMoreDetails',dbMiddleware,authcheck,newControllers.getMoreDetails)
+router.post('/update-timezone',dbMiddleware,authcheck,newControllers.updateTimeZone)
+
+//Team Based
 router.get('/createTeamAccount',dbMiddleware,authcheck,newControllers.createTeam)
 router.get('/teamCreationVerify',dbMiddleware,newControllers.verifyTeamCreationLink)
 router.post('/sendSecondaryUserInvite',dbMiddleware,authcheck,newControllers.sendInviteLinkForSecondaryUser)
@@ -69,6 +77,7 @@ router.post('/ResendInvite',dbMiddleware,authcheck,newControllers.ResendInvite)
 router.get('/getTeamDetails',dbMiddleware,authcheck,newControllers.getTeamDetails)
 router.post('/deleteFromTeam',dbMiddleware,authcheck,newControllers.removeFromTeam)
 router.post('/deleteTeamMemberInvite',dbMiddleware,authcheck,newControllers.removeTeamMemberInvite)
+
 router.get('/deleteAccount',dbMiddleware,authcheck,newControllers.deleteAccount)
 router.get('/verifyAccountDeletion',dbMiddleware,newControllers.verifyAccountDelete)
 
