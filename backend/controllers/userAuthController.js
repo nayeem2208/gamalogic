@@ -159,7 +159,8 @@ const Authentication = {
             accountDetailsModalInBuyCredits,
             isTeam: user[0][0].is_team_admin,
             isTeamMember: user[0][0].is_team_member,
-            isTeamid: TeamAdminEmail
+            isTeamid: TeamAdminEmail,
+            timeZone:user[0][0].time_zone
 
           });
 
@@ -403,7 +404,8 @@ const Authentication = {
           accountDetailsModalInBuyCredits,
           isTeam: user[0][0].is_team_admin,
           isTeamMember: user[0][0].is_team_member,
-          isTeamid: TeamAdminEmail
+          isTeamid: TeamAdminEmail,
+          timeZone:user[0][0].time_zone
         });
       } else {
         res.status(400).json({
@@ -580,7 +582,8 @@ const Authentication = {
             id: user[0][0].rowid,
             isTeamMember: user[0][0].is_team_member,
             isTeamid: TeamAdminEmail,
-            accountDetailsModalInBuyCredits: true
+            accountDetailsModalInBuyCredits: true,
+            timeZone:user[0][0].time_zone
           });
         } else {
           res
@@ -1069,7 +1072,8 @@ const Authentication = {
             id: user[0][0].rowid,
             isTeamMember: user[0][0].is_team_member,
             isTeamid: TeamAdminEmail,
-            accountDetailsModalInBuyCredits: true
+            accountDetailsModalInBuyCredits: true,
+            timeZone:user[0][0].time_zone
           });
         } else {
           res
@@ -1186,6 +1190,7 @@ const Authentication = {
           isTeam: user[0][0].is_team_admin,
           isTeamMember: user[0][0].is_team_member,
           isTeamid: TeamAdminEmail,
+          timeZone:user[0][0].time_zone
 
         });
       } else {
@@ -1245,14 +1250,11 @@ const Authentication = {
       }
       else {
         let deletedUser = await dbConnection.query('SELECT * from registration_deleted where emailid=?', [userEmail])
-        console.log(deletedUser[0][0],deletedUser[0].length)
         let creditFree
         if (deletedUser[0].length > 0) {
-          console.log('first section')
           creditFree = 0
         }
         else {
-          console.log('second section')
           creditFree = 500
         }
         const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,api_key=?,referer=?, credits_free=?  WHERE emailid = ?`;

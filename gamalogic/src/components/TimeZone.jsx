@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTimezoneSelect, allTimezones } from "react-timezone-select";
 import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
+import { useUserState } from "../context/userContext";
 
 const CustomTimeZoneSelect = ({ selectedTimezone, setSelectedTimezone }) => {
   const labelStyle = "original";
@@ -10,7 +11,10 @@ const CustomTimeZoneSelect = ({ selectedTimezone, setSelectedTimezone }) => {
     "Europe/Berlin": "Frankfurt",
   };
 
-  const { options, parseTimezone } = useTimezoneSelect({ labelStyle, timezones });
+  const { options, parseTimezone } = useTimezoneSelect({
+    labelStyle,
+    timezones,
+  });
 
   const handleChange = (e) => {
     const parsedTimezone = parseTimezone(e.target.value);
@@ -39,6 +43,16 @@ const CustomTimeZoneSelect = ({ selectedTimezone, setSelectedTimezone }) => {
 function TimeZone() {
   const [selectedTimezone, setSelectedTimezone] = useState(null);
 
+  let { setUserDetails, userDetails } = useUserState();
+
+  useEffect(() => {
+    if (userDetails.timeZone) {
+      setSelectedTimezone({
+        value: userDetails.timeZone,
+        label: allTimezones[userDetails.timeZone] || userDetails.timeZone,
+      });
+    }
+  }, []);
   const handleUpdateTimezone = async () => {
     if (!selectedTimezone) {
       alert("Please select a timezone.");
@@ -46,12 +60,24 @@ function TimeZone() {
     }
 
     try {
-        console.log(selectedTimezone,'selected timezone')
+      console.log(selectedTimezone, "selected timezone");
       const response = await axiosInstance.post("/update-timezone", {
-        timezone: selectedTimezone.value, 
+        timezone: selectedTimezone.value,
       });
       console.log("Response from backend:", response.data);
       toast.success("Timezone updated successfully!");
+      const storedToken = localStorage.getItem("Gamalogic_token");
+      if (storedToken) {
+        let token;
+        try {
+          token = JSON.parse(storedToken);
+        } catch (error) {
+          token = storedToken;
+        }
+        token.timeZone=selectedTimezone.value
+        localStorage.setItem("Gamalogic_token", JSON.stringify(token));
+        setUserDetails(token);
+      }
     } catch (error) {
       console.error("Error updating timezone:", error);
       toast.error("Failed to update timezone. Please try again.");
