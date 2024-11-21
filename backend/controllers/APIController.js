@@ -1519,7 +1519,7 @@ let APIControllers = {
   loyalityWebhook: async (req, res) => {
     try {
       console.log(req.body,req)
-      res.status(200)
+      res.status(200).json({message:'success'})
     } catch (error) {
       res.status(500)
     }
