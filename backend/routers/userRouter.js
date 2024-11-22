@@ -6,6 +6,7 @@ import dbMiddleware from '../middlewares/dbMiddleware.js';
 import APIDecode from '../middlewares/apiDecode.js';
 import newControllers from '../controllers/newController.js';
 import accountDetailsValidation from '../middlewares/accountDetailsValidation.js';
+import loyalityProgramMiddleware from '../middlewares/LoyaltyMiddleware.js';
 
 const router=express.Router()
 
@@ -82,6 +83,6 @@ router.get('/deleteAccount',dbMiddleware,authcheck,newControllers.deleteAccount)
 router.get('/verifyAccountDeletion',dbMiddleware,newControllers.verifyAccountDelete)
 
 router.get('/affiliateUserId',dbMiddleware,authcheck,APIControllers.affilateUserId)
-router.post('/loyalityProgram',APIControllers.loyalityWebhook)
+router.post('/loyalityProgram',loyalityProgramMiddleware,APIControllers.loyalityWebhook)
 
 export default router;

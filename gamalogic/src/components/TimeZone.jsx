@@ -30,6 +30,9 @@ const CustomTimeZoneSelect = ({ selectedTimezone, setSelectedTimezone }) => {
         value={selectedTimezone?.value || ""}
         onChange={handleChange}
       >
+        <option value="" disabled>
+          Select Timezone
+        </option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

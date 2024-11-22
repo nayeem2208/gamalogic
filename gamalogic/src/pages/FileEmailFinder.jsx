@@ -51,28 +51,33 @@ function FileEmailFinder() {
       if (allFiles.data.length === 0) {
         setHasMore(false);
       } else {
-        const formatDate = (dateTimeString) => {
-          console.log(dateTimeString, typeof dateTimeString, "hiiiii");
-
-          // Split the string into date and time components
-          const [dateString, timeString] = dateTimeString.split("T");
-          console.log(dateString, timeString, "date and time ");
-          // Split the date string further
-          const [year, month, day] = dateString.split("-");
-
-          // Split the time string further
-          const [hours, minutes, seconds] = timeString.split(":");
-
-          // Format the month with leading zero (optional)
-          const formattedMonth = String(parseInt(month)).padStart(2, "0"); // Months are zero-indexed
-
-          // Format the date and time in the desired format
-          return `${formattedMonth}/${day}/${year}, ${hours}:${minutes}`;
+        const formatDate = (dateTimeString, userTimeZone) => {
+          try {
+            const date = typeof dateTimeString === "string" ? new Date(dateTimeString) : dateTimeString;
+        
+            const formatter = new Intl.DateTimeFormat("en-US", {
+              timeZone: userTimeZone,
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              hour12: false, // Set to true if you want AM/PM format
+            });
+        
+            const formattedDate = formatter.format(date);
+        
+            return formattedDate.replace(",", ""); // Remove the comma for cleaner output
+          } catch (error) {
+            console.error("Error formatting date:", error);
+            return null; // Return null or a default value on failure
+          }
         };
         const filesWithProcessedField = allFiles.data.map((file) => ({
           ...file,
           processed: 0,
-          formattedDate: formatDate(file.date_time),
+          formattedDate: formatDate(file.date_time,userDetails.timeZone),
         }));
         const allProcessed = filesWithProcessedField.every(
           (file) => file.processed === 100
@@ -291,18 +296,34 @@ function FileEmailFinder() {
               setLoad(100);
               setCreditBal(creditBal - results.data.length * 10);
               toast.success(response.data.message);
-              const formatDate = (dateTimeString) => {
-                const [dateString, timeString] = dateTimeString.split("T");
-                const [year, month, day] = dateString.split("-");
-                const [hours, minutes, seconds] = timeString.split(":");
-                const formattedMonth = String(parseInt(month)).padStart(2, "0");
-                return `${formattedMonth}/${day}/${year}, ${hours}:${minutes}`;
+              const formatDate = (dateTimeString, userTimeZone) => {
+                try {
+                  const date = typeof dateTimeString === "string" ? new Date(dateTimeString) : dateTimeString;
+              
+                  const formatter = new Intl.DateTimeFormat("en-US", {
+                    timeZone: userTimeZone,
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: false, // Set to true if you want AM/PM format
+                  });
+              
+                  const formattedDate = formatter.format(date);
+              
+                  return formattedDate.replace(",", ""); // Remove the comma for cleaner output
+                } catch (error) {
+                  console.error("Error formatting date:", error);
+                  return null; // Return null or a default value on failure
+                }
               };
               setResultFile((prevResultFiles) => [
                 {
                   ...response.data.files,
                   processed: 0,
-                  formattedDate: formatDate(response.data.files.date_time),
+                  formattedDate: formatDate(response.data.files.date_time,userDetails.timeZone),
                 },
                 ...prevResultFiles,
               ]);
@@ -310,7 +331,7 @@ function FileEmailFinder() {
                 {
                   ...response.data.files,
                   processed: 0,
-                  formattedDate: formatDate(response.data.files.date_time),
+                  formattedDate: formatDate(response.data.files.date_time,userDetails.timeZone),
                 },
                 ...prevResultFiles,
               ]);
