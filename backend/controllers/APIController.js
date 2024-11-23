@@ -1531,10 +1531,30 @@ let APIControllers = {
       if (users.length > 0) {
         const user = users[0];
         const creditValue = req.body.zt_value
-        const newCreditBal = user.credits + creditValue;
+        let newCreditBal
+        let newFreeFinal = null;
+
+        let finalFreeDate = new Date(user.free_final);
+        let currentDate = new Date();
+
+        if (user.credits_free > 0 && finalFreeDate >= currentDate) {
+          newCreditBal = user.credits_free + creditValue
+          finalFreeDate.setDate(finalFreeDate.getDate() + 7);
+          newFreeFinal = finalFreeDate.toISOString().slice(0, 19).replace('T', ' ');
+        } else if (user.credits_free > 0 && finalFreeDate < currentDate) {
+          newCreditBal = creditValue
+
+          const newDate = new Date();
+          newDate.setDate(newDate.getDate() + 7);
+          newFreeFinal = newDate.toISOString().slice(0, 19).replace('T', ' ');
+        } else if (user.credits_free <= 0 && finalFreeDate >= currentDate) {
+          newCreditBal = creditValue
+          finalFreeDate.setDate(finalFreeDate.getDate() + 7);
+          newFreeFinal = finalFreeDate.toISOString().slice(0, 19).replace('T', ' ');
+        }
         await dbConnection.query(
-          `UPDATE registration SET credits = ? WHERE emailid = ?`,
-          [newCreditBal, userEmail]
+          `UPDATE registration SET credits_free = ?,free_final=? WHERE emailid = ?`,
+          [newCreditBal,newFreeFinal, userEmail]
         );
         return res.status(200).json({ message: 'Credits updated successfully' });
       }
