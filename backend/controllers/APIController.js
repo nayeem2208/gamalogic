@@ -1523,6 +1523,7 @@ let APIControllers = {
       if (!req.body.zt_email) {
         return res.status(400).json({ error: 'Required fields zt_email is missing' });
       }
+      const userEmail = req.body.zt_email;
       const [users] = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid = ?`,
         [userEmail]
