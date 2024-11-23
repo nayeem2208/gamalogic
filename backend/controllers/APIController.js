@@ -1545,8 +1545,8 @@ let APIControllers = {
       console.error('Error in loyalityWebhook:', error);
       return res.status(500).json({ error: 'Internal Server Error' });
     } finally {
-      if (dbConnection) {
-        await dbConnection.release();
+      if (req.dbConnection) {
+        await req.dbConnection.release();
       }
     }
   },
