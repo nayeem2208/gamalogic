@@ -83,6 +83,6 @@ router.get('/deleteAccount',dbMiddleware,authcheck,newControllers.deleteAccount)
 router.get('/verifyAccountDeletion',dbMiddleware,newControllers.verifyAccountDelete)
 
 router.get('/affiliateUserId',dbMiddleware,authcheck,APIControllers.affilateUserId)
-router.post('/loyalityProgram',loyalityProgramMiddleware,APIControllers.loyalityWebhook)
+router.post('/loyalityProgram',dbMiddleware,loyalityProgramMiddleware,APIControllers.loyalityWebhook)
 
 export default router;
