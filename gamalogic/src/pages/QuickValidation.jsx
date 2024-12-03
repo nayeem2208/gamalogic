@@ -78,7 +78,7 @@ function QuickValidation() {
   const handleCloseVideoModal = () => {
     setTutorialVideo(false);
     if (userDetails.accountDetailsModal) setAccountDetailsModal(true);
-    window.reloadThriveWidget();
+    // window.reloadThriveWidget();
   };
 
   useEffect(() => {

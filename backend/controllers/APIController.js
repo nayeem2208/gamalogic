@@ -316,6 +316,7 @@ let APIControllers = {
             `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}`,
             data
           );
+          console.log(response.data,'resp . dataaaaa')
           if (response.data.error !== undefined && response.data.error == false) {
             let files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
             let content = `<p>This is to inform you that the batch email verification process for the file ${fileName} has been started.</p>
@@ -334,6 +335,7 @@ let APIControllers = {
             );
             res.status(200).json({ message: response.data.message, files: files[0][0] });
           } else {
+            console.log('hereeeeeee i come')
             const errorMessage = Object.values(response.data)[0];
             let errorREsponse = await ErrorHandler("batchEmailValidation Controller", errorMessage, req);
             res.status(400).json({ error: errorMessage, errorREsponse });

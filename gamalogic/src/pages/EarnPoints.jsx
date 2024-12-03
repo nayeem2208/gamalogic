@@ -13,7 +13,7 @@ function EarnPoints() {
       document.title = "Loyalty | Dashboard";
     }
     window.hideThriveWidget = false;
-    window.reloadThriveWidget();
+    // window.reloadThriveWidget();
   }, []);
 
   useEffect(()=>{

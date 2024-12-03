@@ -9,6 +9,7 @@ function Body() {
   let { setUserDetails, userDetails, setCreditBal, creditBal } = useUserState();
 
   useEffect(() => {
+    
     const storedToken = localStorage.getItem("Gamalogic_token");
     if (storedToken) {
       let parsedToken;
@@ -18,12 +19,15 @@ function Body() {
         parsedToken = storedToken;
       }
       setUserDetails(parsedToken);
-      // console.log(window.ztUserData,parsedToken.HMACDigest,'zt user data')
       if (
-        window.ztUserData &&
-        (window.ztUserData["za_email_id"] === undefined ||
-          window.ztUserData["za_email_id"] === null)
+        ((window.ztUserData &&
+          (window.ztUserData["za_email_id"] === undefined ||
+            window.ztUserData["za_email_id"] === null)) ||
+          window.ztUserData["za_email_id"] == "") &&
+        window.location.pathname.endsWith("EarnPoints")
       ) {
+        window.reloadThriveWidget();
+        console.log("inside body ztuser Dataaaaaaaaaaaaaaaaaaaaaaaa");
         window.ztUserData["za_email_id"] = parsedToken.email;
         window.ztUserData["user_unique_id"] = parsedToken.id;
         window.ztUserData["thrive_digest"] = parsedToken.HMACDigest;
@@ -34,21 +38,31 @@ function Body() {
           import.meta.env.VITE_FRONTEND_URL
         }/signin`;
 
+        if (!document.getElementById("thrive_script")) {
+        // window.reloadThriveWidget();
+        console.log("hereee");
         const thriveScript = document.createElement("script");
         thriveScript.id = "thrive_script";
         thriveScript.src =
           "https://thrive.zohopublic.com/thrive/publicpages/thrivewidget";
         document.body.appendChild(thriveScript);
-        console.log(window.ztUserData, "inside the ztuserdata");
+        // window.reloadThriveWidget();
+        }
+        
       }
       if (window.location.pathname.endsWith("EarnPoints")) {
+        // if (window.hideThriveWidget == true) {
+          console.log("inside true settting when the page is in earn points");
           window.hideThriveWidget = false;
           window.reloadThriveWidget();
+        // }
       } else {
-        if (window.hideThriveWidget == false) {
+        // if (window.hideThriveWidget == false) {
+          console.log("inside false settting when the page is in earn points");
+
           window.hideThriveWidget = true;
           window.reloadThriveWidget();
-        }
+        // }
       }
     } else {
       setUserDetails(null);
@@ -56,7 +70,14 @@ function Body() {
     }
   }, [navigate]);
 
-  // console.log(window.ztUserData,'zt user data',navigate)
+  // console.log(
+  //   window,
+  //   window.google,
+  //   "ddd",
+  //   window.hideThriveWidget,
+  //   "zt user data",
+  //   navigate
+  // );
 
   useEffect(() => {
     const fetchData = async () => {

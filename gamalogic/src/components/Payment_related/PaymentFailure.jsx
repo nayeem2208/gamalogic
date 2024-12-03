@@ -17,7 +17,7 @@ function PaymentFailure({ tryAgain }) {
           <p className="my-2">Your payment was unsuccessfull, please try again.</p>
           <p>
             If you are having any trouble, contact us at,{" "}
-            <a class="dark" href="mailto:support@gamalogic.com">
+            <a className="dark" href="mailto:support@gamalogic.com">
               support@gamalogic.com
             </a>
           </p>

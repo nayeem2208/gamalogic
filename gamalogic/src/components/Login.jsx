@@ -40,8 +40,30 @@ function Login() {
     } else {
       document.title = "Real time Catch all email validation | Gamalogic";
     }
-    window.hideThriveWidget = true;
-    window.reloadThriveWidget();
+    if (
+      window.ztUserData &&
+      window.ztUserData["za_email_id"] &&
+      window.ztUserData["za_email_id"] != ""
+    ) {
+      console.log("zt userData function in login pageeeeeeeeeeeeeee");
+      window.ztUserData["za_email_id"] = "";
+      window.ztUserData["user_unique_id"] = "";
+      window.ztUserData["thrive_digest"] = "";
+      window.ztUserData["signUpPage"] = `${
+        import.meta.env.VITE_FRONTEND_URL
+      }/signup`;
+      window.ztUserData["signInPage"] = `${
+        import.meta.env.VITE_FRONTEND_URL
+      }/signin`;
+
+      // const thriveScript = document.createElement("script");
+      // thriveScript.id = "thrive_script";
+      // thriveScript.src = "";
+      // document.body.appendChild(thriveScript);
+      // console.log(window.ztUserData,thriveScript ,"inside the ztuserdata loginnnnnnnnnnnnnnnnnnnnn");
+      window.hideThriveWidget = true;
+      window.reloadThriveWidget();
+    }
   }, []);
 
   useEffect(() => {
