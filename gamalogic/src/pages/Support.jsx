@@ -3,14 +3,17 @@ import { IoLogoTwitter, IoMail } from "react-icons/io5";
 import { FaFacebookF, FaLinkedinIn } from "react-icons/fa";
 import { useEffect } from "react";
 import { APP } from "../axios/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 export default function Support() {
+  const navigate = useNavigate();
   useEffect(() => {
     if (APP == "beta") {
       document.title = "Support | Beta Dashboard";
     } else {
       document.title = "Support | Dashboard";
     }
+    navigate("/dashboard/quick-validation")
   }, []);
   return (
     <div className="px-6 md:px-20 py-8 text-center sm:text-start">

@@ -23,12 +23,17 @@ import { SlSupport } from "react-icons/sl";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserState } from "../context/userContext";
 import { TbBasketStar } from "react-icons/tb";
+import { MdIntegrationInstructions } from "react-icons/md";
+import { IoIosNotifications } from "react-icons/io";
+import Notification from "./Notifications";
+import MobileNotification from "./NotificationMobile";
 
 function Header() {
   let [dropDown, setDropDown] = useState(false);
   let [uploadfileDropDown, setUploadFileDropDown] = useState(false);
   let [tutorialDropDown, setTutorialDropDown] = useState(false);
   let [settingDropDown, setSettingDropDown] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   let { userDetails, setUserDetails, setLinkedinLoading } = useUserState();
   let navigate = useNavigate();
@@ -39,20 +44,20 @@ function Header() {
 
   const uploadfileDropDownToggle = () => {
     setUploadFileDropDown(!uploadfileDropDown);
-    setSettingDropDown(false)
-    setTutorialDropDown(false)
+    setSettingDropDown(false);
+    setTutorialDropDown(false);
   };
 
   const tutorialDropDownToggle = () => {
     setTutorialDropDown(!tutorialDropDown);
     setUploadFileDropDown(false);
-    setSettingDropDown(false)
+    setSettingDropDown(false);
   };
 
   const settingDropDownToggle = () => {
     setSettingDropDown(!settingDropDown);
     setUploadFileDropDown(false);
-    setTutorialDropDown(false)
+    setTutorialDropDown(false);
   };
 
   function logoutHandler() {
@@ -62,6 +67,13 @@ function Header() {
     navigate("/signin");
     window.reloadThriveWidget();
   }
+  const toggleNotifications = () => {
+    setShowNotifications(!showNotifications);
+  };
+
+  const [notifications, setNotifications] = useState([
+   
+  ]);
 
   return (
     <div className="  items-center text-white lg:hidden ">
@@ -71,7 +83,13 @@ function Header() {
       >
         {" "}
         <p className="font-semibold text-2xl text-center">GAMALOGIC</p>
-        <div>
+        <div className="flex">
+          <p
+            className=" rounded-lg px-4 flex items-center mr-2 cursor-pointer"
+            onClick={toggleNotifications}
+          >
+            <IoIosNotifications className="w-6 h-6 text-white" />
+          </p>
           {dropDown ? (
             <IoCloseSharp onClick={dropDownToggle} className="text-3xl" />
           ) : (
@@ -79,6 +97,14 @@ function Header() {
           )}
         </div>
       </div>
+      {showNotifications && (
+        <div>
+          <MobileNotification
+            notifications={notifications}
+            onClose={() => setShowNotifications(false)}
+          />
+        </div>
+      )}
       {dropDown && (
         <div
           className="pb-10"
@@ -97,12 +123,14 @@ function Header() {
                 Email Finder
               </li>
             </Link>
-            {userDetails.isTeamMember != 1&&(<Link to="/dashboard/apikey" onClick={dropDownToggle}>
-              <li className="py-2 flex underlineLi">
-                <LuKey className="text-teal-800 mt-2 mx-2 text-lg" />
-                API Key
-              </li>
-            </Link>)}
+            {userDetails.isTeamMember != 1 && (
+              <Link to="/dashboard/apikey" onClick={dropDownToggle}>
+                <li className="py-2 flex underlineLi">
+                  <LuKey className="text-teal-800 mt-2 mx-2 text-lg" />
+                  API Key
+                </li>
+              </Link>
+            )}
             <li
               className="py-2 flex underlineLi"
               onClick={uploadfileDropDownToggle}
@@ -134,7 +162,12 @@ function Header() {
                 </Link>
               </ul>
             )}
-
+            <Link to="/dashboard/Integrate" onClick={dropDownToggle}>
+              <li className="py-2 flex underlineLi">
+                <MdIntegrationInstructions className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                Integration
+              </li>
+            </Link>
             <li
               className="py-2 flex underlineLi"
               onClick={tutorialDropDownToggle}
@@ -182,11 +215,13 @@ function Header() {
                 </a>
               </ul>
             )}
+
             <li
               className="py-2 flex underlineLi"
               onClick={settingDropDownToggle}
             >
-              <IoSettingsOutline className="text-teal-800 mt-2 mx-2 text-lg" /> Settings
+              <IoSettingsOutline className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+              Settings
               {!settingDropDown ? (
                 <MdArrowDropDown className="mt-2 text-xl" />
               ) : (
@@ -201,11 +236,8 @@ function Header() {
                     Account Settings
                   </li>
                 </Link>
-                {userDetails.isTeam == 1 && userDetails.isTeamMember != 1&&(
-                  <Link
-                    to="dashboard/team"
-                    onClick={dropDownToggle}
-                  >
+                {userDetails.isTeam == 1 && userDetails.isTeamMember != 1 && (
+                  <Link to="dashboard/team" onClick={dropDownToggle}>
                     <li className="py-2 flex ">
                       <MdOutlineGroups className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
                       Team Settings
@@ -221,18 +253,22 @@ function Header() {
                 Account Settings
               </li>
             </Link> */}
-            {userDetails.isTeamMember != 1&&(<Link to="/dashboard/buy-credits" onClick={dropDownToggle}>
-              <li className="py-2 flex underlineLi">
-                <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
-                Buy Credits
-              </li>
-            </Link>)}
-            {userDetails.isTeamMember != 1&&(<Link to="/dashboard/billing" onClick={dropDownToggle}>
-              <li className="py-2 flex underlineLi">
-                <LuHistory className="text-teal-800 mt-2 mx-2 text-lg" />
-                Billing
-              </li>
-            </Link>)}
+            {userDetails.isTeamMember != 1 && (
+              <Link to="/dashboard/buy-credits" onClick={dropDownToggle}>
+                <li className="py-2 flex underlineLi">
+                  <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
+                  Buy Credits
+                </li>
+              </Link>
+            )}
+            {userDetails.isTeamMember != 1 && (
+              <Link to="/dashboard/billing" onClick={dropDownToggle}>
+                <li className="py-2 flex underlineLi">
+                  <LuHistory className="text-teal-800 mt-2 mx-2 text-lg" />
+                  Billing
+                </li>
+              </Link>
+            )}
             <Link to="/dashboard/affiliate" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
                 <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />
@@ -242,7 +278,7 @@ function Header() {
             <Link to="/dashboard/EarnPoints" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
                 <TbBasketStar className="text-teal-800 mt-2 mx-2 text-lg" />
-                Earn Points
+                Earn Free Credits
               </li>
             </Link>
             {/* {userDetails.isTeam == 1 && (
@@ -253,12 +289,13 @@ function Header() {
                 </li>
               </Link>
             )} */}
-            <Link to="/dashboard/support" onClick={dropDownToggle}>
+            {/* <Link to="/dashboard/support" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
                 <SlSupport className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
                 Support
               </li>
-            </Link>
+            </Link> */}
+
             <li className="py-2 flex underlineLi" onClick={logoutHandler}>
               <IoLogOutOutline className="text-teal-800 mt-2 mx-2 " />
               Logout

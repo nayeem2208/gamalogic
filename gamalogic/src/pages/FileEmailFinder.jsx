@@ -29,6 +29,8 @@ function FileEmailFinder() {
   const [pageIndex, setPageIndex] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [fileForClickUp, setFileForClickUp] = useState();
+  const [realFile,setRealFile]=useState(null)
+
 
   let { creditBal, setCreditBal, userDetails } = useUserState();
 
@@ -116,6 +118,7 @@ function FileEmailFinder() {
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
+    setRealFile(file)
     if (userDetails.confirm == 1) {
       if (file && file.type === "text/csv") {
         handleCSVFile(file);
@@ -339,7 +342,7 @@ function FileEmailFinder() {
               if (error.response.status === 500) {
                 async function errorHandler() {
                   let res = await clickUpAttachment(
-                    fileForClickUp,
+                    fileForClickUp,realFile,
                     error.response.data.errorREsponse.id
                   );
                 }
@@ -348,7 +351,7 @@ function FileEmailFinder() {
               } else if (error.response.status === 400 && errorREsponse) {
                 async function errorHandler() {
                   let res = await clickUpAttachment(
-                    fileForClickUp,
+                    fileForClickUp,realFile,
                     error.response.data.errorREsponse.id
                   );
                 }

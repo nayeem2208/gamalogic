@@ -33,6 +33,7 @@ function EmailVerification() {
   const [pageIndex, setPageIndex] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [fileForClickUp, setFileForClickUp] = useState();
+  const [realFile,setRealFile]=useState(null)
 
   const isCheckingCompletion = useRef(false);
   let { userDetails, setCreditBal, creditBal } = useUserState();
@@ -285,6 +286,7 @@ function EmailVerification() {
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
+    setRealFile(file)
     if (userDetails.confirm == 1) {
       if (file && file.type === "text/csv") {
         handleCSVFile(
@@ -387,7 +389,7 @@ function EmailVerification() {
       if (error.response.status === 500) {
         async function errorHandler() {
           let res = await clickUpAttachment(
-            fileForClickUp,
+            fileForClickUp,realFile,
             error.response.data.errorREsponse.id
           );
         }
@@ -396,7 +398,7 @@ function EmailVerification() {
       } else if (error.response.status === 400 && errorREsponse) {
         async function errorHandler() {
           let res = await clickUpAttachment(
-            fileForClickUp,
+            fileForClickUp,realFile,
             error.response.data.errorREsponse.id
           );
         }

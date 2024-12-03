@@ -2,16 +2,48 @@ import { IoLogOutOutline } from "react-icons/io5";
 import { useUserState } from "../context/userContext";
 import { Link, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SlInfo } from "react-icons/sl";
 import axiosInstance from "../axios/axiosInstance";
 import ServerError from "../pages/ServerError";
+import { IoIosNotifications } from "react-icons/io";
+import Notification from "./Notifications";
 
 function SubHeader(props) {
   let { setUserDetails, userDetails, creditBal, setLinkedinLoading } =
     useUserState();
   let [serverError, setServerError] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   let navigate = useNavigate();
+
+  const [notifications, setNotifications] = useState([
+  ]);
+  
+  const notificationRef = useRef(null);
+
+  const toggleNotifications = () => { setShowNotifications((prevState) => !prevState); };
+
+  const handleClickOutside = (event) => {
+    if (
+      notificationRef.current &&
+      !notificationRef.current.contains(event.target)
+    ) {
+      setShowNotifications(false);
+    }
+  };
+  useEffect(() => {
+    if (showNotifications) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showNotifications]);
+  // const toggleNotifications = () => {
+  //   setShowNotifications(!showNotifications);
+  // };
 
   function logoutHandler() {
     setLinkedinLoading(true);
@@ -44,6 +76,21 @@ function SubHeader(props) {
       <div className="hidden sm:flex  justify-between mt-1 ">
         <p className="orangeUnderline ">{props.SubHeader}</p>
         <div className="flex justify-end subHeaderCredits mt-6 md:mt-0">
+          <p
+            className="bg-gray-100 rounded-lg px-4 flex items-center mr-2 cursor-pointer"
+            onClick={toggleNotifications}
+          >
+            Notifications{" "}
+            <IoIosNotifications className="w-6 h-6 text-red-500" />
+          </p>
+          {showNotifications && (
+            <div ref={notificationRef}>
+              <Notification
+                notifications={notifications}
+                onClose={() => setShowNotifications(false)}
+              />
+            </div>
+          )}
           <p className="bg-gray-100 rounded-lg px-4 flex items-center ">
             {creditBal.toLocaleString("en-US")} Credits Left
           </p>{" "}
@@ -55,6 +102,9 @@ function SubHeader(props) {
       </div>
       <div className="sm:hidden justify-between mt-1 ">
         <div className="flex flex-wrap justify-center subHeaderCredits mb-4 md:mt-0">
+          {/* <p className="bg-gray-100 rounded-lg px-2 flex items-center mr-2">
+           <IoIosNotifications className="w-4 h-4 text-red-500"/>
+          </p> */}
           <p className="bg-gray-100 rounded-lg px-4 flex items-center mt-3">
             {creditBal.toLocaleString("en-US")} Credits Left
           </p>{" "}
@@ -113,7 +163,7 @@ function SubHeader(props) {
             </p>
           </div>
         )}
-        {userDetails.isTeamid && (
+      {userDetails.isTeamid && (
         <div className="my-8 flex bg-gray-100 border border-gray-400 rounded-lg p-2 text-sm 2xl:text-base">
           <p className="text-sm text-gray-500">
             You are part of the team managed by the admin:{" "}
@@ -125,8 +175,5 @@ function SubHeader(props) {
   );
 }
 
-SubHeader.propTypes = {
-  SubHeader: PropTypes.string.isRequired, // Validate SubHeader prop as a required string
-};
 
 export default SubHeader;

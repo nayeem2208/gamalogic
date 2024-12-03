@@ -22,6 +22,7 @@ import { GrMoney } from "react-icons/gr";
 import { MdOutlineGroups } from "react-icons/md";
 import { MdManageAccounts } from "react-icons/md";
 import { TbBasketStar } from "react-icons/tb";
+import { MdIntegrationInstructions } from "react-icons/md";
 
 function SideBar() {
   let [uploadfileDropDown, setUploadFileDropDown] = useState(false);
@@ -104,12 +105,14 @@ function SideBar() {
                 Email Finder
               </li>
             </Link>
-            {userDetails.isTeamMember != 1&&( <Link to="/dashboard/apikey">
-              <li className="my-4 flex">
-                <LuKey className="text-teal-800 mt-2 mx-2 text-lg" />
-                API Key
-              </li>
-            </Link>)}
+            {userDetails.isTeamMember != 1 && (
+              <Link to="/dashboard/apikey">
+                <li className="my-4 flex">
+                  <LuKey className="text-teal-800 mt-2 mx-2 text-lg" />
+                  API Key
+                </li>
+              </Link>
+            )}
 
             <li
               className="my-4 flex cursor-pointer"
@@ -139,7 +142,12 @@ function SideBar() {
                 </Link>
               </ul>
             )}
-
+            <Link to="/dashboard/Integrate">
+              <li className="my-4 flex">
+                <MdIntegrationInstructions className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                Integration
+              </li>
+            </Link>
             <li
               className="my-4 flex cursor-pointer"
               onClick={tutorialDropDownToggle}
@@ -187,6 +195,7 @@ function SideBar() {
                 {/* </Link> */}
               </ul>
             )}
+
             <li
               className="my-4 flex cursor-pointer"
               onClick={settingDropDownToggle}
@@ -224,19 +233,23 @@ function SideBar() {
                 Account Settings
               </li>
             </Link> */}
-            {userDetails.isTeamMember != 1&&(<Link to="/dashboard/buy-credits">
-              {" "}
-              <li className="my-4 flex">
-                <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
-                Buy Credits
-              </li>
-            </Link>)}
-            {userDetails.isTeamMember != 1&&(<Link to="/dashboard/billing">
-              <li className="my-4 flex">
-                <LuHistory className="text-teal-800 mt-2 mx-2 text-lg" />
-                Billing
-              </li>
-            </Link>)}
+            {userDetails.isTeamMember != 1 && (
+              <Link to="/dashboard/buy-credits">
+                {" "}
+                <li className="my-4 flex">
+                  <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
+                  Buy Credits
+                </li>
+              </Link>
+            )}
+            {userDetails.isTeamMember != 1 && (
+              <Link to="/dashboard/billing">
+                <li className="my-4 flex">
+                  <LuHistory className="text-teal-800 mt-2 mx-2 text-lg" />
+                  Billing
+                </li>
+              </Link>
+            )}
             <Link to="/dashboard/affiliate">
               <li className="my-4 flex">
                 <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />
@@ -246,7 +259,7 @@ function SideBar() {
             <Link to="/dashboard/EarnPoints">
               <li className="my-4 flex">
                 <TbBasketStar className="text-teal-800 mt-2 mx-2 text-lg" />
-                Earn Points
+                Earn Free Credits
               </li>
             </Link>
             {/* {userDetails.isTeam == 1 && (
@@ -257,12 +270,13 @@ function SideBar() {
                 </li>
               </Link>
             )} */}
-            <Link to="/dashboard/support">
+            {/* <Link to="/dashboard/support">
               <li className="my-4 flex">
                 <SlSupport className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
                 Support
               </li>
-            </Link>
+            </Link> */}
+
             <li className="my-4 flex cursor-pointer" onClick={logoutHandler}>
               <IoLogOutOutline className="text-teal-800 mt-2 mx-2 " />
               Logout
