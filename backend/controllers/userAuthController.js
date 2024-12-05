@@ -160,7 +160,7 @@ const Authentication = {
             isTeam: user[0][0].is_team_admin,
             isTeamMember: user[0][0].is_team_member,
             isTeamid: TeamAdminEmail,
-            timeZone:user[0][0].time_zone
+            timeZone: user[0][0].time_zone
 
           });
 
@@ -226,7 +226,15 @@ const Authentication = {
       if (userExists[0].length > 0) {
         res.status(401).json({ error: "User already exists" });
       } else {
-
+        const response = await axios.get(
+          `https://gamalogic.com/emailvrf/?emailid=${email}&apikey=${process.env.SIGNUP_API_KEY}&speed_rank=0`
+        );
+        if (response.data && response.data.gamalogic_emailid_vrfy) {
+          console.log(response.data.gamalogic_emailid_vrfy[0].is_disposable, 'is disposible')
+          if (response.data.gamalogic_emailid_vrfy[0].is_disposable) {
+            return res.status(401).json({ error: "Disposable email addresses are not allowed for registration." });
+          }
+        }
         if (req.body.widgetCode && req.body.thriveRefId) {
           const url = `https://thrive.zoho.com/thrive/webhooks/${req.body.widgetCode}/mapreferral`;
 
@@ -405,7 +413,7 @@ const Authentication = {
           isTeam: user[0][0].is_team_admin,
           isTeamMember: user[0][0].is_team_member,
           isTeamid: TeamAdminEmail,
-          timeZone:user[0][0].time_zone
+          timeZone: user[0][0].time_zone
         });
       } else {
         res.status(400).json({
@@ -583,7 +591,7 @@ const Authentication = {
             isTeamMember: user[0][0].is_team_member,
             isTeamid: TeamAdminEmail,
             accountDetailsModalInBuyCredits: true,
-            timeZone:user[0][0].time_zone
+            timeZone: user[0][0].time_zone
           });
         } else {
           res
@@ -1073,7 +1081,7 @@ const Authentication = {
             isTeamMember: user[0][0].is_team_member,
             isTeamid: TeamAdminEmail,
             accountDetailsModalInBuyCredits: true,
-            timeZone:user[0][0].time_zone
+            timeZone: user[0][0].time_zone
           });
         } else {
           res
@@ -1190,7 +1198,7 @@ const Authentication = {
           isTeam: user[0][0].is_team_admin,
           isTeamMember: user[0][0].is_team_member,
           isTeamid: TeamAdminEmail,
-          timeZone:user[0][0].time_zone
+          timeZone: user[0][0].time_zone
 
         });
       } else {
@@ -1244,7 +1252,7 @@ const Authentication = {
       );
       let apiKey = await generateUniqueApiKey(req);
       let confirmedDate = new Date();
-      if (isTeamMember[0][0] &&(isTeamMember[0][0].team_id !== null && isTeamMember[0][0].team_id !== 'null' && isTeamMember[0][0].team_id)) {
+      if (isTeamMember[0][0] && (isTeamMember[0][0].team_id !== null && isTeamMember[0][0].team_id !== 'null' && isTeamMember[0][0].team_id)) {
         const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,api_key=?,referer=? WHERE emailid = ?`;
         await dbConnection.query(query, [confirmedDate, apiKey, referer, userEmail]);
       }
@@ -1258,7 +1266,7 @@ const Authentication = {
           creditFree = 500
         }
         const query = `UPDATE registration SET confirmed = 1 ,confirmed_on=? ,api_key=?,referer=?, credits_free=?  WHERE emailid = ?`;
-        await dbConnection.query(query, [confirmedDate, apiKey, referer, creditFree,userEmail]);
+        await dbConnection.query(query, [confirmedDate, apiKey, referer, creditFree, userEmail]);
       }
       let verifiedUser = await dbConnection.query(
         `SELECT * FROM registration WHERE emailid='${userEmail}' AND confirmed=1`
