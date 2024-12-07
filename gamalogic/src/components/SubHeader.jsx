@@ -77,7 +77,7 @@ function SubHeader(props) {
         <p className="orangeUnderline ">{props.SubHeader}</p>
         <div className="flex justify-end subHeaderCredits mt-6 md:mt-0">
           <p
-            className="bg-gray-100 rounded-lg px-4 flex items-center mr-2 cursor-pointer"
+            className="bg-gray-100 hidden  rounded-lg px-4 lg:flex items-center mr-2 cursor-pointer"
             onClick={toggleNotifications}
           >
             Notifications{" "}

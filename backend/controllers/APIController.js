@@ -227,14 +227,14 @@ let APIControllers = {
       if (req.user[0][0] && req.user[0][0].rowid != null) {
         if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
           let files = await dbConnection.query(
-            `SELECT * FROM useractivity_batch_link WHERE team_member_id='${req.user[0][0].rowid}' AND (error_id IS NULL OR error_id = 0) ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page - 1) * 5};`
+            `SELECT * FROM useractivity_batch_link WHERE team_member_id='${req.user[0][0].rowid}' AND (error_id IS NULL OR error_id = 0) ORDER BY date_time DESC LIMIT 6 OFFSET ${(req.query.page - 1) * 6};`
           );
           console.log('first')
           res.status(200).json(files[0]);
         }
         else {
           let files = await dbConnection.query(
-            `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}' AND (error_id IS NULL OR error_id = 0) ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page - 1) * 5};`
+            `SELECT * FROM useractivity_batch_link WHERE userid='${req.user[0][0].rowid}' AND (error_id IS NULL OR error_id = 0) ORDER BY date_time DESC LIMIT 6 OFFSET ${(req.query.page - 1) * 6};`
           );
           console.log('second')
 
@@ -316,7 +316,6 @@ let APIControllers = {
             `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}`,
             data
           );
-          console.log(response.data,'resp . dataaaaa')
           if (response.data.error !== undefined && response.data.error == false) {
             let files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
             let content = `<p>This is to inform you that the batch email verification process for the file ${fileName} has been started.</p>
@@ -335,7 +334,6 @@ let APIControllers = {
             );
             res.status(200).json({ message: response.data.message, files: files[0][0] });
           } else {
-            console.log('hereeeeeee i come')
             const errorMessage = Object.values(response.data)[0];
             let errorREsponse = await ErrorHandler("batchEmailValidation Controller", errorMessage, req);
             res.status(400).json({ error: errorMessage, errorREsponse });
@@ -420,12 +418,12 @@ let APIControllers = {
       if (req.user[0][0] && req.user[0][0].rowid != null) {
         if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
           let files = await dbConnection.query(
-            `SELECT * FROM useractivity_batch_finder_link WHERE team_member_id='${req.user[0][0].rowid}' AND (error_id IS NULL OR error_id = 0) ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page - 1) * 5};`
+            `SELECT * FROM useractivity_batch_finder_link WHERE team_member_id='${req.user[0][0].rowid}' AND (error_id IS NULL OR error_id = 0) ORDER BY date_time DESC LIMIT 6 OFFSET ${(req.query.page - 1) * 6};`
           );
           console.log('first')
           res.status(200).json(files[0]);
         } else {
-          let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}' AND (error_id IS NULL OR error_id = 0) ORDER BY date_time DESC LIMIT 5 OFFSET ${(req.query.page - 1) * 5};`)
+          let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where userid='${req.user[0][0].rowid}' AND (error_id IS NULL OR error_id = 0) ORDER BY date_time DESC LIMIT 6 OFFSET ${(req.query.page - 1) * 6};`)
           res.status(200).json(files[0])
         }
       }
@@ -932,6 +930,7 @@ let APIControllers = {
 
               let user = await dbConnection.query(`SELECT username,emailid,credits,is_referer_by FROM registration WHERE rowid = '${planInDataBase[0][0].userid}'`);
               if (user[0].length > 0) {
+
                 let newBalance = user[0][0].credits + creditsToAdd;
                 let lastPayment_registration = details.billing_info.last_payment.time ?? new Date().toISOString()
                 await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
@@ -971,7 +970,6 @@ let APIControllers = {
                   basicTemplate(user[0][0].username, content)
                 );
               }
-
             } else {
               // ErrorHandler("update paypal webhook checker step 2", req.body, req);
               console.log('Dates are the same. No update needed.');
@@ -1521,7 +1519,6 @@ let APIControllers = {
   loyalityWebhook: async (req, res) => {
     try {
       let dbConnection = req.dbConnection
-      console.log(req.body)
       if (!req.body.zt_email) {
         return res.status(400).json({ error: 'Required fields zt_email is missing' });
       }
@@ -1556,7 +1553,7 @@ let APIControllers = {
         }
         await dbConnection.query(
           `UPDATE registration SET credits_free = ?,free_final=? WHERE emailid = ?`,
-          [newCreditBal,newFreeFinal, userEmail]
+          [newCreditBal, newFreeFinal, userEmail]
         );
         return res.status(200).json({ message: 'Credits updated successfully' });
       }

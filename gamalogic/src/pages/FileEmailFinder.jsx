@@ -348,7 +348,7 @@ function FileEmailFinder() {
                 }
                 errorHandler();
                 setServerError(true);
-              } else if (error.response.status === 400 && errorREsponse) {
+              } else if (error.response.status === 400 && error.response.data.errorREsponse) {
                 async function errorHandler() {
                   let res = await clickUpAttachment(
                     fileForClickUp,realFile,

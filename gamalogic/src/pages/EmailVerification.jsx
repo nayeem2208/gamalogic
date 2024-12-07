@@ -20,6 +20,8 @@ import {
 import * as XLSX from "xlsx";
 import LinkedinLoading from "../components/LinkedinLoading";
 import MoreFileLoader from "../components/MoreFileLoader";
+import ViewSelector from "../components/File/ViewSelector";
+import FileVerificationTile from "../components/File/FileVerificationTile";
 
 function EmailVerification() {
   let [message, setMessage] = useState("");
@@ -33,7 +35,8 @@ function EmailVerification() {
   const [pageIndex, setPageIndex] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [fileForClickUp, setFileForClickUp] = useState();
-  const [realFile,setRealFile]=useState(null)
+  const [realFile, setRealFile] = useState(null);
+  let [tileView, setTileView] = useState(true);
 
   const isCheckingCompletion = useRef(false);
   let { userDetails, setCreditBal, creditBal } = useUserState();
@@ -45,7 +48,7 @@ function EmailVerification() {
       document.title = "Batch Email Verification | Dashboard";
     }
     fetchAllFiles(pageIndex);
-  }, []); 
+  }, []);
 
   const fetchAllFiles = async (newPageIndex) => {
     try {
@@ -60,11 +63,14 @@ function EmailVerification() {
         const formatDate = (dateTimeString, userTimeZone) => {
           try {
             // Parse dateTimeString to a Date object if it is a string
-            const date = typeof dateTimeString === "string" ? new Date(dateTimeString) : dateTimeString;
-        
-            // Format the date in the user's timezone using Intl.DateTimeFormat
+            const date =
+              typeof dateTimeString === "string"
+                ? new Date(dateTimeString)
+                : dateTimeString;
+
+            const timeZone = userTimeZone || "America/New_York";
             const formatter = new Intl.DateTimeFormat("en-US", {
-              timeZone: userTimeZone,
+              timeZone: timeZone,
               year: "numeric",
               month: "2-digit",
               day: "2-digit",
@@ -73,9 +79,9 @@ function EmailVerification() {
               second: "2-digit",
               hour12: false, // Set to true if you want AM/PM format
             });
-        
+
             const formattedDate = formatter.format(date);
-        
+
             return formattedDate.replace(",", ""); // Remove the comma for cleaner output
           } catch (error) {
             console.error("Error formatting date:", error);
@@ -85,7 +91,7 @@ function EmailVerification() {
         const filesWithProcessedField = allFiles.data.map((file) => ({
           ...file,
           processed: 0,
-          formattedDate: formatDate(file.date_time,userDetails.timeZone),
+          formattedDate: formatDate(file.date_time, userDetails.timeZone),
         }));
 
         setResultFile((prevResultFiles) => [
@@ -257,17 +263,17 @@ function EmailVerification() {
   const downloadExcel = (data, fileName, fileType) => {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(data);
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-    
-    let extension = '';
-    if (fileType === 'xlsx') {
-      extension = '.xlsx';
-    } else if (fileType === 'xls') {
-      extension = '.xls';
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    let extension = "";
+    if (fileType === "xlsx") {
+      extension = ".xlsx";
+    } else if (fileType === "xls") {
+      extension = ".xls";
     } else {
       throw new Error(`Unsupported file type: ${fileType}`);
     }
-    
+
     XLSX.writeFile(wb, `${fileName}${extension}`);
   };
 
@@ -286,7 +292,7 @@ function EmailVerification() {
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
-    setRealFile(file)
+    setRealFile(file);
     if (userDetails.confirm == 1) {
       if (file && file.type === "text/csv") {
         handleCSVFile(
@@ -344,10 +350,14 @@ function EmailVerification() {
         toast.success(response.data.message);
         const formatDate = (dateTimeString, userTimeZone) => {
           try {
-            const date = typeof dateTimeString === "string" ? new Date(dateTimeString) : dateTimeString;
-        
+            const date =
+              typeof dateTimeString === "string"
+                ? new Date(dateTimeString)
+                : dateTimeString;
+
+            const timeZone = userTimeZone || "America/New_York";
             const formatter = new Intl.DateTimeFormat("en-US", {
-              timeZone: userTimeZone,
+              timeZone: timeZone,
               year: "numeric",
               month: "2-digit",
               day: "2-digit",
@@ -356,9 +366,9 @@ function EmailVerification() {
               second: "2-digit",
               hour12: false, // Set to true if you want AM/PM format
             });
-        
+
             const formattedDate = formatter.format(date);
-        
+
             return formattedDate.replace(",", ""); // Remove the comma for cleaner output
           } catch (error) {
             console.error("Error formatting date:", error);
@@ -369,7 +379,10 @@ function EmailVerification() {
           {
             ...response.data.files,
             processed: 0,
-            formattedDate: formatDate(response.data.files.date_time,userDetails.timeZone),
+            formattedDate: formatDate(
+              response.data.files.date_time,
+              userDetails.timeZone
+            ),
           },
           ...prevResultFiles,
         ]);
@@ -377,7 +390,10 @@ function EmailVerification() {
           {
             ...response.data.files,
             processed: 0,
-            formattedDate: formatDate(response.data.files.date_time,userDetails.timeZone),
+            formattedDate: formatDate(
+              response.data.files.date_time,
+              userDetails.timeZone
+            ),
           },
           ...prevResultFiles,
         ]);
@@ -386,23 +402,30 @@ function EmailVerification() {
         toast.error("You dont have enough credits to do this");
       }
     } catch (error) {
+      console.log(error, "error");
       if (error.response.status === 500) {
         async function errorHandler() {
           let res = await clickUpAttachment(
-            fileForClickUp,realFile,
+            fileForClickUp,
+            realFile,
             error.response.data.errorREsponse.id
           );
         }
         errorHandler();
         setServerError(true);
-      } else if (error.response.status === 400 && errorREsponse) {
+      } else if (
+        error.response.status === 400 &&
+        error.response.data.errorREsponse
+      ) {
         async function errorHandler() {
           let res = await clickUpAttachment(
-            fileForClickUp,realFile,
+            fileForClickUp,
+            realFile,
             error.response.data.errorREsponse.id
           );
         }
         errorHandler();
+        toast.error(error.response?.data?.error);
       } else {
         toast.error(error.response?.data?.error);
       }
@@ -413,6 +436,16 @@ function EmailVerification() {
   const handleDismiss = () => {
     setShowAlert(false);
   };
+  const handleViewChanger = () => {
+    setTileView(!tileView);
+  };
+  const tileViewFetchMore = async () => {
+    setPageIndex((prevPageIndex) => {
+      const newPageIndex = prevPageIndex + 1;
+      fetchAllFiles(newPageIndex);
+      return newPageIndex;
+    });
+  };
   if (serverError) {
     return <ServerError />;
   }
@@ -422,7 +455,7 @@ function EmailVerification() {
       <form className="mt-8 sm:mt-14 subHeading flex flex-col sm:flex-none justify-center items-center sm:justify-start sm:items-start">
         <h3>Upload Your File Here | Email Validation</h3>
         <p className="my-7  description">
-        You can upload a file containing email addresses in CSV, Excel, or
+          You can upload a file containing email addresses in CSV, Excel, or
           text format. Depending on the file type you upload, you will receive
           the results in the corresponding format.
         </p>
@@ -475,12 +508,15 @@ function EmailVerification() {
             </div>
           </div>
         )}
-        <input
-          type="file"
-          className="flex h-9 shadow-lg text-white rounded-lg font-semibold  border border-input bg-red-600 hover:bg-red-800 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-xl file:bg-red-900 hover:file:bg-red-600 file:rounded-lg file:px-4 file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
-          accept=".csv, .xlsx, .txt,.xls"
-          onChange={handleFileChange}
-        />
+        <div className="flex flex-col md:flex-row items-center justify-between w-full">
+          <input
+            type="file"
+            className="flex h-9 shadow-lg text-white rounded-lg font-semibold  border border-input bg-red-600 hover:bg-red-800 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-xl file:bg-red-900 hover:file:bg-red-600 file:rounded-lg file:px-4 file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
+            accept=".csv, .xlsx, .txt,.xls"
+            onChange={handleFileChange}
+          />
+          <ViewSelector tileView={tileView} onViewChange={handleViewChanger} />
+        </div>
       </form>
       {loading && (
         <LoadingBar
@@ -489,17 +525,25 @@ function EmailVerification() {
           onLoaderFinished={() => {}}
         />
       )}
-      {resultFile.length > 0 && (
-        <div className="overflow-x-auto">
-          <InfiniteScroll
-            dataLength={resultFile.length}
-            next={fetchMoreFiles}
-            hasMore={hasMore}
-            height={300}
-            loader={
-              resultFile.length >= 4 && (
-                <div className="w-full mt-4  flex justify-center items-center">
-                  {/* <div
+      {resultFile.length > 0 &&
+        (tileView ? (
+          <FileVerificationTile
+          data={resultFile}
+          fetchMoreFiles={tileViewFetchMore}
+          hasMore={hasMore}
+          onDownloadFile={DownloadFile}
+        />
+        ) : (
+          <div className="overflow-x-auto">
+            <InfiniteScroll
+              dataLength={resultFile.length}
+              next={fetchMoreFiles}
+              hasMore={hasMore}
+              height={300}
+              loader={
+                resultFile.length >= 4 && (
+                  <div className="w-full mt-4  flex justify-center items-center">
+                    {/* <div
                     className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
                     role="status"
                   >
@@ -507,63 +551,99 @@ function EmailVerification() {
                       Loading...
                     </span>
                   </div> */}
-                  <MoreFileLoader/>
-                </div>
-              )
-            }
-            // endMessage={<p className="text-xs">No more data to load.</p>}
-          >
-            <table
-              className="text-bgblue w-full  mt-14 min-w-96"
-              style={{ fontFamily: "Raleway,sans-serif" }}
+                    <MoreFileLoader />
+                  </div>
+                )
+              }
+              // endMessage={<p className="text-xs">No more data to load.</p>}
             >
-              <tbody className="overflow-x-auto">
-                <tr className="sm:text-left text-xs sm:text-sm font-medium">
-                  <th className={`  ${userDetails.isTeam==1?'w-1/6':'w-1/5'}`}>File Name</th>
-                  <th className={`  ${userDetails.isTeam==1?'w-1/6':'w-2/5'}`}>Status</th>
-                  {userDetails.isTeam==1&&(<th className={`  ${userDetails.isTeam==1?'w-1/6':'w-1/5'}`}>Uploaded By</th>)}
-                  <th className={`  ${userDetails.isTeam==1?'w-1/6':'w-1/5'}`}>Upload Time</th>
-                  <th className={`  ${userDetails.isTeam==1?'w-1/6':'w-1/5'}`}></th>
-                </tr>
-                {resultFile.map((data, index) => (
-                  <tr key={index} className="text-xs sm:text-sm">
-                    <td className="md:pt-5">{data.file_upload}</td>
-                    <td className="flex ">
-                      <ProgressBar
-                        isLabelVisible={false}
-                        completed={data.processed}
-                        bgColor="#181e4a"
-                        labelSize="13px"
-                        className={`mr-2  ${userDetails.isTeam==1?'w-3/5':'w-2/5'}`}
-                        maxCompleted={100}
-                      />
-                      {data.processed}%
-                    </td>
-                    {userDetails.isTeam==1&&(<td className="md:pt-5">{data.team_member_emailid||'You'}</td>)}
-                    <td className="md:pt-5">{data.formattedDate}</td>
-                    <td className="flex justify-center items-center ">
-                      <div className="sm:hidden">
-                        <IoDownload
-                          className="text-xl"
-                          onClick={() => DownloadFile(data)}
-                        />
-                      </div>
-                      <div className="hidden sm:block">
-                        <button
-                          className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-4 text-xs"
-                          onClick={() => DownloadFile(data)}
-                        >
-                          DOWNLOAD
-                        </button>
-                      </div>
-                    </td>
+              <table
+                className="text-bgblue w-full  mt-14 min-w-96"
+                style={{ fontFamily: "Raleway,sans-serif" }}
+              >
+                <tbody className="overflow-x-auto">
+                  <tr className="sm:text-left text-xs sm:text-sm font-medium">
+                    <th
+                      className={`  ${
+                        userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
+                      }`}
+                    >
+                      File Name
+                    </th>
+                    <th
+                      className={`  ${
+                        userDetails.isTeam == 1 ? "w-1/6" : "w-2/5"
+                      }`}
+                    >
+                      Status
+                    </th>
+                    {userDetails.isTeam == 1 && (
+                      <th
+                        className={`  ${
+                          userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
+                        }`}
+                      >
+                        Uploaded By
+                      </th>
+                    )}
+                    <th
+                      className={`  ${
+                        userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
+                      }`}
+                    >
+                      Upload Time
+                    </th>
+                    <th
+                      className={`  ${
+                        userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
+                      }`}
+                    ></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </InfiniteScroll>
-        </div>
-      )}
+                  {resultFile.map((data, index) => (
+                    <tr key={index} className="text-xs sm:text-sm">
+                      <td className="md:pt-5">{data.file_upload}</td>
+                      <td className="flex ">
+                        <ProgressBar
+                          isLabelVisible={false}
+                          completed={data.processed}
+                          bgColor="#181e4a"
+                          labelSize="13px"
+                          className={`mr-2  ${
+                            userDetails.isTeam == 1 ? "w-3/5" : "w-2/5"
+                          }`}
+                          maxCompleted={100}
+                        />
+                        {data.processed}%
+                      </td>
+                      {userDetails.isTeam == 1 && (
+                        <td className="md:pt-5">
+                          {data.team_member_emailid || "You"}
+                        </td>
+                      )}
+                      <td className="md:pt-5">{data.formattedDate}</td>
+                      <td className="flex justify-center items-center ">
+                        <div className="sm:hidden">
+                          <IoDownload
+                            className="text-xl"
+                            onClick={() => DownloadFile(data)}
+                          />
+                        </div>
+                        <div className="hidden sm:block">
+                          <button
+                            className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-4 text-xs"
+                            onClick={() => DownloadFile(data)}
+                          >
+                            DOWNLOAD
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </InfiniteScroll>
+          </div>
+        ))}
     </div>
   );
 }
