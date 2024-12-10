@@ -37,6 +37,8 @@ function EmailVerification() {
   const [fileForClickUp, setFileForClickUp] = useState();
   const [realFile, setRealFile] = useState(null);
   let [tileView, setTileView] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredFiles, setFilteredFiles] = useState([]);
 
   const isCheckingCompletion = useRef(false);
   let { userDetails, setCreditBal, creditBal } = useUserState();
@@ -49,6 +51,12 @@ function EmailVerification() {
     }
     fetchAllFiles(pageIndex);
   }, []);
+  useEffect(() => {
+    const filteredFilesFinder = resultFile.filter((file) =>
+      file.file_upload.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredFiles(filteredFilesFinder);
+  }, [searchQuery]);
 
   const fetchAllFiles = async (newPageIndex) => {
     try {
@@ -62,7 +70,6 @@ function EmailVerification() {
       } else {
         const formatDate = (dateTimeString, userTimeZone) => {
           try {
-            // Parse dateTimeString to a Date object if it is a string
             const date =
               typeof dateTimeString === "string"
                 ? new Date(dateTimeString)
@@ -145,6 +152,13 @@ function EmailVerification() {
                     : prevFile
                 )
               );
+              setFilteredFiles((prevFilteredFiles) =>
+                prevFilteredFiles.map((prevFile) =>
+                  prevFile.id === file.id
+                    ? { ...prevFile, processed: 100 }
+                    : prevFile
+                )
+              );
               setMessage("");
             } else {
               const progress = Math.round(
@@ -173,6 +187,13 @@ function EmailVerification() {
                       : prevFile
                   )
                 );
+                setFilteredFiles((prevFilteredFiles) =>
+                  prevFilteredFiles.map((prevFile) =>
+                    prevFile.id === file.id
+                      ? { ...prevFile, processed: adjustedProgress }
+                      : prevFile
+                  )
+                );
               }
             }
           }
@@ -188,11 +209,10 @@ function EmailVerification() {
 
     const intervalId = setInterval(checkCompletion, 10000);
     return () => clearInterval(intervalId);
-  }, [filesStatus]);
+  }, [filesStatus,filteredFiles]);
 
   const DownloadFile = async (data) => {
     try {
-      console.log(data, "data is here");
       if (data.processed == 100) {
         setLoading(true);
         setLoad(30);
@@ -356,6 +376,7 @@ function EmailVerification() {
                 : dateTimeString;
 
             const timeZone = userTimeZone || "America/New_York";
+
             const formatter = new Intl.DateTimeFormat("en-US", {
               timeZone: timeZone,
               year: "numeric",
@@ -364,15 +385,15 @@ function EmailVerification() {
               hour: "2-digit",
               minute: "2-digit",
               second: "2-digit",
-              hour12: false, // Set to true if you want AM/PM format
+              hour12: false,
             });
 
             const formattedDate = formatter.format(date);
 
-            return formattedDate.replace(",", ""); // Remove the comma for cleaner output
+            return formattedDate.replace(",", "");
           } catch (error) {
             console.error("Error formatting date:", error);
-            return null; // Return null or a default value on failure
+            return null;
           }
         };
         setResultFile((prevResultFiles) => [
@@ -446,6 +467,78 @@ function EmailVerification() {
       return newPageIndex;
     });
   };
+
+
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+
+    if (!query) {
+      setFilteredFiles([]);
+      setFilesStatus([]);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const searchFiles = await axiosInstance.get(
+        `/validatoinfilesSearch?searchQuery=${query}`
+      );
+
+      const formatDate = (
+        dateTimeString,
+        userTimeZone = "America/New_York"
+      ) => {
+        try {
+          const date = new Date(dateTimeString);
+          const formatter = new Intl.DateTimeFormat("en-US", {
+            timeZone: userTimeZone,
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+          });
+          return formatter.format(date).replace(",", "");
+        } catch {
+          return null;
+        }
+      };
+
+      const filesWithProcessedField = searchFiles.data.map((file) => {
+        const alreadyProcessedFile = resultFile.find(
+          (result) => result.id === file.id && result.processed === 100
+        );
+        return {
+          ...file,
+          processed: alreadyProcessedFile ? 100 : 0,
+          formattedDate: formatDate(file.date_time, userDetails?.timeZone),
+        };
+      });
+  
+      const newFilesForStatus = filesWithProcessedField.filter(
+        (file) => file.processed !== 100
+      );
+
+      setFilteredFiles(filesWithProcessedField);
+      setFilesStatus((prevFilesStatus) => [
+        ...prevFilesStatus,
+        ...newFilesForStatus,
+      ]);
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Update searchQuery state on input change
+  const onSearchInputChange = (e) => {
+    const query = e.target.value.trim();
+    handleSearch(query);
+  };
   if (serverError) {
     return <ServerError />;
   }
@@ -515,7 +608,25 @@ function EmailVerification() {
             accept=".csv, .xlsx, .txt,.xls"
             onChange={handleFileChange}
           />
-          <ViewSelector tileView={tileView} onViewChange={handleViewChanger} />
+          <div className="md:flex justify-center items-center  lg:w-3/6  2xl:w-2/5">
+            {resultFile.length > 0 && (
+              <input
+                type="text"
+                placeholder="Search files by name..."
+                value={searchQuery}
+                onChange={onSearchInputChange}
+                className="w-full my-2 md:my-0 md:mx-4 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            )}
+            {resultFile.length > 0 && (
+              <div className="w-full flex justify-center items-center md:w-2/5">
+                <ViewSelector
+                  tileView={tileView}
+                  onViewChange={handleViewChanger}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </form>
       {loading && (
@@ -527,12 +638,134 @@ function EmailVerification() {
       )}
       {resultFile.length > 0 &&
         (tileView ? (
-          <FileVerificationTile
-          data={resultFile}
-          fetchMoreFiles={tileViewFetchMore}
-          hasMore={hasMore}
-          onDownloadFile={DownloadFile}
-        />
+          searchQuery.length > 0 ? (
+            filteredFiles.length > 0 ? (
+              <FileVerificationTile
+                data={filteredFiles}
+                fetchMoreFiles={tileViewFetchMore}
+                hasMore={hasMore}
+                onDownloadFile={DownloadFile}
+              />
+            ) : (
+              <div className="text-center mt-6 text-gray-500">
+                No files found for "{searchQuery}"
+              </div>
+            )
+          ) : (
+            <FileVerificationTile
+              data={resultFile}
+              fetchMoreFiles={tileViewFetchMore}
+              hasMore={hasMore}
+              onDownloadFile={DownloadFile}
+            />
+          )
+        ) : searchQuery.length > 0 ? (
+          filteredFiles.length > 0 ? (
+            <div className="overflow-x-auto">
+              <InfiniteScroll
+                dataLength={filteredFiles.length}
+                next={fetchMoreFiles}
+                hasMore={hasMore}
+                height={300}
+                loader={
+                  filteredFiles.length >= 4 && (
+                    <div className="w-full mt-4 flex justify-center items-center">
+                      <MoreFileLoader />
+                    </div>
+                  )
+                }
+              >
+                <table
+                  className="text-bgblue w-full mt-14 min-w-96"
+                  style={{ fontFamily: "Raleway,sans-serif" }}
+                >
+                  <tbody className="overflow-x-auto">
+                    <tr className="sm:text-left text-xs sm:text-sm font-medium">
+                      <th
+                        className={`  ${
+                          userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
+                        }`}
+                      >
+                        File Name
+                      </th>
+                      <th
+                        className={`  ${
+                          userDetails.isTeam == 1 ? "w-1/6" : "w-2/5"
+                        }`}
+                      >
+                        Status
+                      </th>
+                      {userDetails.isTeam == 1 && (
+                        <th
+                          className={`  ${
+                            userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
+                          }`}
+                        >
+                          Uploaded By
+                        </th>
+                      )}
+                      <th
+                        className={`  ${
+                          userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
+                        }`}
+                      >
+                        Upload Time
+                      </th>
+                      <th
+                        className={`  ${
+                          userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
+                        }`}
+                      ></th>
+                    </tr>
+                    {filteredFiles.map((data, index) => (
+                      <tr key={index} className="text-xs sm:text-sm">
+                        <td className="md:pt-5">{data.file_upload}</td>
+                        <td className="flex ">
+                          <ProgressBar
+                            isLabelVisible={false}
+                            completed={data.processed}
+                            bgColor="#181e4a"
+                            labelSize="13px"
+                            className={`mr-2  ${
+                              userDetails.isTeam == 1 ? "w-3/5" : "w-2/5"
+                            }`}
+                            maxCompleted={100}
+                          />
+                          {data.processed}%
+                        </td>
+                        {userDetails.isTeam == 1 && (
+                          <td className="md:pt-5">
+                            {data.team_member_emailid || "You"}
+                          </td>
+                        )}
+                        <td className="md:pt-5">{data.formattedDate}</td>
+                        <td className="flex justify-center items-center ">
+                          <div className="sm:hidden">
+                            <IoDownload
+                              className="text-xl"
+                              onClick={() => DownloadFile(data)}
+                            />
+                          </div>
+                          <div className="hidden sm:block">
+                            <button
+                              className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-4 text-xs"
+                              onClick={() => DownloadFile(data)}
+                            >
+                              DOWNLOAD
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </InfiniteScroll>
+            </div>
+          ) : (
+            <div className="text-center mt-6 text-gray-500">
+              No files found for "{searchQuery}"
+            </div>
+          )
         ) : (
           <div className="overflow-x-auto">
             <InfiniteScroll
@@ -542,23 +775,14 @@ function EmailVerification() {
               height={300}
               loader={
                 resultFile.length >= 4 && (
-                  <div className="w-full mt-4  flex justify-center items-center">
-                    {/* <div
-                    className="mt-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-                    role="status"
-                  >
-                    <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-                      Loading...
-                    </span>
-                  </div> */}
+                  <div className="w-full mt-4 flex justify-center items-center">
                     <MoreFileLoader />
                   </div>
                 )
               }
-              // endMessage={<p className="text-xs">No more data to load.</p>}
             >
               <table
-                className="text-bgblue w-full  mt-14 min-w-96"
+                className="text-bgblue w-full mt-14 min-w-96"
                 style={{ fontFamily: "Raleway,sans-serif" }}
               >
                 <tbody className="overflow-x-auto">

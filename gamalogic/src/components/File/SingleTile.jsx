@@ -8,21 +8,36 @@ import { useUserState } from "../../context/userContext";
 
 function SingleTile({ data, onDownloadFile }) {
   let { userDetails } = useUserState();
+  console.log(data, "data in single tile");
+
   return (
     <div
-      className="shadow-xl hover:shadow-2xl flex flex-col justify-center   max-w-72 md:w-64 md:max-w-64 lg:w-64 lg:max-w-64 2xl:w-72   2xl:max-w-72  items-center rounded-2xl py-4  lg:pt-8 lg:pb-5 m-6 "
+      className="shadow-xl hover:shadow-2xl flex flex-col justify-center max-w-72 md:w-64 md:max-w-64 lg:w-64 lg:max-w-64 2xl:w-72 2xl:max-w-72 items-center rounded-2xl py-4 lg:pt-8 lg:pb-5 m-6"
       style={{
         background:
           "linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(225,227,240,1) 100%)",
       }}
     >
-      <h3
-        className="font-semibold text-lg mb-6 w-3/4 text-center truncate overflow-hidden text-ellipsis whitespace-nowrap"
-        title={data.file_upload}
-        style={{ color: "rgba(24, 32, 91)" }}
+      <div
+        className="relative w-full overflow-hidden mb-6"
+        style={{
+          height: "1.5rem",
+        }}
       >
-        {data.file_upload}
-      </h3>
+        <div
+          className={`text-center text-lg font-semibold ${
+            data.file_upload.length > 25 ? "scroll-animation" : ""
+          }`}
+          title={data.file_upload}
+          style={{
+            color: "rgba(24, 32, 91)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {data.file_upload}
+        </div>
+      </div>
+
       <div className="flex justify-center items-center w-2/5 lg:w-3/6 2xl:w-3/5">
         <CircularProgressbar
           value={data.processed}
@@ -33,7 +48,6 @@ function SingleTile({ data, onDownloadFile }) {
             textColor: "#363636",
             pathColor: `rgba(24, 32, 91)`,
             trailColor: "#d6d6d6",
-            // backgroundColor: "#3e98c7",
           })}
         />
       </div>
@@ -55,16 +69,31 @@ function SingleTile({ data, onDownloadFile }) {
         </div>
       </div>
       {userDetails.isTeam == 1 && (
-        <p
-          title={data.team_member_emailid} // Tooltip for full email
-          className="text-xs font-medium text-gray-500 text-center truncate overflow-hidden text-ellipsis whitespace-nowrap w-full"
+        <div
+          className="relative w-full overflow-hidden text-xs font-medium text-gray-500"
+          style={{
+            height: "1.5rem",
+          }}
         >
-          Uploaded By:{data.team_member_emailid || "You"}
-        </p>
+          <div
+            className={`text-center  ${
+              (data.team_member_emailid || "").length > 20
+                ? "scroll-animation"
+                : ""
+            }`}
+            title={data.team_member_emailid}
+            style={{
+              whiteSpace: "nowrap",
+            }}
+          >
+            Uploaded By:
+            {data.team_member_emailid || "You"}
+          </div>
+        </div>
       )}
       <button
         style={{ backgroundColor: "#18205b" }}
-        className="flex  justify-center items-center text-white font-semibold rounded-md w-52   py-2 mt-5"
+        className="flex justify-center items-center text-white font-semibold rounded-md w-52 py-2 mt-5"
         onClick={() => onDownloadFile(data)}
       >
         DOWNLOAD

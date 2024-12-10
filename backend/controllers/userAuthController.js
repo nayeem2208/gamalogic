@@ -1305,7 +1305,7 @@ const Authentication = {
         return res.status(401).json({ error: 'link has expired,please resend email' });
       } else {
         console.log(error);
-        ErrorHandler("verifyEmail Controller", error, req);
+        ErrorHandler("verify Account Email Controller", error, req);
         res.status(500).json({ error: "Internal Server Error" });
       }
     } finally {

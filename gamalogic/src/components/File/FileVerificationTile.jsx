@@ -12,7 +12,7 @@ function FileVerificationTile({ data,fetchMoreFiles,hasMore ,onDownloadFile}) {
           dataLength={data.length}
           next={fetchMoreFiles}
           hasMore={hasMore}
-          height={500}
+          height={650}
           loader={
             data.length >= 4 && (
               <div className="w-full mt-4  flex justify-center items-center">

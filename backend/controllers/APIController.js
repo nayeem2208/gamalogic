@@ -34,7 +34,6 @@ let APIControllers = {
       let creditBal;
       if (user[0][0].is_team_member == 1) {
         let TeamAdmin = await dbConnection.query(`SELECT free_final,credits_free,credits from registration WHERE rowid='${user[0][0].team_id}'`)
-        console.log(TeamAdmin[0][0], 'team admin details')
         let finalFree = new Date(TeamAdmin[0][0].free_final);
         let finalFreeDate = new Date(finalFree);
         let currentDate = new Date();
@@ -101,7 +100,6 @@ let APIControllers = {
       ErrorHandler("resetApiKey Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
-      console.log('getApi end')
       if (req.dbConnection) {
         await req.dbConnection.release();
       }
@@ -260,8 +258,6 @@ let APIControllers = {
   batchEmailValidation: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      // let apiKey = req.user[0][0].api_key;
-      // console.log(apiKey,'apikey')
       const { emails, fileName } = req.body;
       let apiKey
       if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
@@ -278,7 +274,6 @@ let APIControllers = {
             `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}&team_member_api_key=${memberKey}`,
             data
           );
-          console.log(response, 'resppp')
           if (response.data.error !== undefined && response.data.error == false) {
             let files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
             let content = `<p>This is to inform you that the batch email verification process for the file ${fileName} has been started.</p>
@@ -368,7 +363,6 @@ let APIControllers = {
       let emailStatus = await axios.get(
         `https://gamalogic.com/batchstatus/?apikey=${apiKey}&batchid=${req.query.id}`
       );
-      console.log(emailStatus, 'email status')
       res.status(200).json({ emailStatus: emailStatus.data })
     } catch (error) {
       console.log(error);
@@ -482,7 +476,6 @@ let APIControllers = {
             res.status(400).json({ error: errorMessage, errorREsponse });
           }
         } else {
-          console.log('outside the enough credits')
           res.status(400).json({ error: 'You dont have enough to do this' });
         }
 
@@ -671,7 +664,6 @@ let APIControllers = {
       if (user[0][0].is_referer_by == 1) {
         try {
           let resp = await PurchaseApi(req.user[0][0].emailid, details?.purchase_units?.[0]?.amount?.value ?? null, req.body?.data?.orderID ?? null, user[0][0]?.rowid ?? null)
-          console.log(resp, 'resppppppp')
         } catch (error) {
           ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
         }
@@ -712,7 +704,6 @@ let APIControllers = {
   },
   payPalSubscription: async (req, res) => {
     try {
-      console.log(req.body, 'req. bodyyyyyyyyyy')
       const dbConnection = req.dbConnection;
       let user = req.user[0][0]
       const { subscriptionId, planId, paymentDetails } = req.body;
@@ -823,9 +814,7 @@ let APIControllers = {
       if (user.is_referer_by == 1) {
         try {
           let orderId = subscriptionId + new Date().toISOString().split('T')[0];
-          console.log(orderId, 'orderIdddddd')
           let resp = await PurchaseApi(req.user[0][0].emailid, gross_amount || null, orderId, req.user[0][0]?.rowid ?? null)
-          console.log(resp, 'resppppppp')
         } catch (error) {
           ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
           console.log(error)
@@ -870,7 +859,6 @@ let APIControllers = {
           LIMIT 1`);
         if (event_type === 'PAYMENT.SALE.COMPLETED') {
           if (planInDataBase[0].length > 0) {
-            console.log('inside plan base')
             const existingEntry = planInDataBase[0][0];
             const existingEntryCreationDate = new Date(existingEntry.start_time).toISOString().split('T')[0]; // Extract date part
             const currentDate = new Date().toISOString().split('T')[0];
@@ -897,7 +885,6 @@ let APIControllers = {
               const paymentDetails = paypalPrice.find(([planCredits, id, planPeriod]) => {
                 return id == planInDataBase[0][0].plan_id
               });
-              console.log(paymentDetails, 'ismonthly')
               let query = `
                  INSERT INTO paypal_subscription (
                 userid, credits, is_monthly, is_annual,gross_amount, subscription_id, plan_id, start_time, quantity,
@@ -924,7 +911,6 @@ let APIControllers = {
                 details.billing_info.next_billing_time ?? null,
                 new Date().toISOString()
               ];
-              // console.log('ivda vare ellam sheri aaahn')
 
               await dbConnection.query(query, values);
 
