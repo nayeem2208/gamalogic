@@ -8,7 +8,6 @@ import { useUserState } from "../../context/userContext";
 
 function SingleTile({ data, onDownloadFile }) {
   let { userDetails } = useUserState();
-  console.log(data, "data in single tile");
 
   return (
     <div

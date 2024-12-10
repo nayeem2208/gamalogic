@@ -209,7 +209,7 @@ function EmailVerification() {
 
     const intervalId = setInterval(checkCompletion, 10000);
     return () => clearInterval(intervalId);
-  }, [filesStatus,filteredFiles]);
+  }, [filesStatus, filteredFiles]);
 
   const DownloadFile = async (data) => {
     try {
@@ -468,7 +468,6 @@ function EmailVerification() {
     });
   };
 
-
   const handleSearch = async (query) => {
     setSearchQuery(query);
 
@@ -507,7 +506,7 @@ function EmailVerification() {
         }
       };
 
-      const filesWithProcessedField = searchFiles.data.map((file) => {
+      const filesWithProcessedField = searchFiles.data?.map((file) => {
         const alreadyProcessedFile = resultFile.find(
           (result) => result.id === file.id && result.processed === 100
         );
@@ -517,7 +516,7 @@ function EmailVerification() {
           formattedDate: formatDate(file.date_time, userDetails?.timeZone),
         };
       });
-  
+
       const newFilesForStatus = filesWithProcessedField.filter(
         (file) => file.processed !== 100
       );
@@ -533,7 +532,7 @@ function EmailVerification() {
       setLoading(false);
     }
   };
-  
+
   // Update searchQuery state on input change
   const onSearchInputChange = (e) => {
     const query = e.target.value.trim();

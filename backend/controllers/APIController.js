@@ -404,6 +404,48 @@ let APIControllers = {
     }
 
   },
+  searchValidationFiles: async (req, res) => {
+    let dbConnection;
+    try {
+      dbConnection = req.dbConnection;
+      const searchQuery = req.query.searchQuery ? `%${req.query.searchQuery}%` : '%'; // Add wildcard for partial matching
+
+      if (req.user[0][0] && req.user[0][0].rowid != null) {
+        let files;
+        if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
+          files = await dbConnection.query(
+            `SELECT * 
+             FROM useractivity_batch_link 
+             WHERE team_member_id = '${req.user[0][0].rowid}' 
+               AND (error_id IS NULL OR error_id = 0) 
+               AND file_upload LIKE ? ORDER BY date_time DESC;`,
+            [searchQuery]
+          );
+          console.log('first');
+        } else {
+          files = await dbConnection.query(
+            `SELECT * 
+             FROM useractivity_batch_link 
+             WHERE userid = '${req.user[0][0].rowid}' 
+               AND (error_id IS NULL OR error_id = 0) 
+               AND file_upload LIKE ? ORDER BY date_time DESC;`,
+            [searchQuery]
+          );
+          console.log('second');
+        }
+        // console.log(files[0], 'filesssssssss')
+        res.status(200).json(files[0]);
+      }
+    } catch (error) {
+      console.log(error);
+      ErrorHandler("search validation files Controller", error, req);
+      res.status(500).json({ error: "Internal Server Error" });
+    } finally {
+      if (req.dbConnection) {
+        await req.dbConnection.release();
+      }
+    }
+  },
 
 
   getAlreadyCheckedBatchEmailFinderFiles: async (req, res) => {
@@ -584,6 +626,48 @@ let APIControllers = {
       }
     }
 
+  },
+  searchFinderFiles: async (req, res) => {
+    let dbConnection;
+    try {
+      dbConnection = req.dbConnection;
+      const searchQuery = req.query.searchQuery ? `%${req.query.searchQuery}%` : '%';
+
+      if (req.user[0][0] && req.user[0][0].rowid != null) {
+        let files;
+        if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
+          files = await dbConnection.query(
+            `SELECT * 
+             FROM useractivity_batch_finder_link  
+             WHERE team_member_id = '${req.user[0][0].rowid}' 
+               AND (error_id IS NULL OR error_id = 0) 
+               AND file_upload LIKE ? ORDER BY date_time DESC;`,
+            [searchQuery]
+          );
+          console.log('first');
+        } else {
+          files = await dbConnection.query(
+            `SELECT * 
+             FROM useractivity_batch_finder_link  
+             WHERE userid = '${req.user[0][0].rowid}' 
+               AND (error_id IS NULL OR error_id = 0) 
+               AND file_upload LIKE ? ORDER BY date_time DESC;`,
+            [searchQuery]
+          );
+          console.log('second');
+        }
+        // console.log(files[0], 'filesssssssss')
+        res.status(200).json(files[0]);
+      }
+    } catch (error) {
+      console.log(error);
+      ErrorHandler("search validation files Controller", error, req);
+      res.status(500).json({ error: "Internal Server Error" });
+    } finally {
+      if (req.dbConnection) {
+        await req.dbConnection.release();
+      }
+    }
   },
 
   PayPalUpdateCredit: async (req, res) => {
