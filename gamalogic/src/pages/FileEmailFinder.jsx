@@ -16,6 +16,8 @@ import * as XLSX from "xlsx";
 import MoreFileLoader from "../components/MoreFileLoader";
 import FileVerificationTile from "../components/File/FileVerificationTile";
 import ViewSelector from "../components/File/ViewSelector";
+import AddFileForFirstTime from "../components/File/AddFileForFirstTime";
+import DragAndDropBackground from "../components/File/DragAndDropBackground";
 
 function FileEmailFinder() {
   let [message, setMessage] = useState("");
@@ -35,7 +37,7 @@ function FileEmailFinder() {
   let [tileView, setTileView] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredFiles, setFilteredFiles] = useState([]);
-
+  const [dragging, setDragging] = useState(false);
 
   let { creditBal, setCreditBal, userDetails } = useUserState();
 
@@ -57,6 +59,7 @@ function FileEmailFinder() {
       setLoad(100);
       if (allFiles.data.length === 0) {
         setHasMore(false);
+        setLoading(false);
       } else {
         const formatDate = (dateTimeString, userTimeZone) => {
           try {
@@ -64,9 +67,9 @@ function FileEmailFinder() {
               typeof dateTimeString === "string"
                 ? new Date(dateTimeString)
                 : dateTimeString;
-
+            const timeZone = userTimeZone || "America/New_York";
             const formatter = new Intl.DateTimeFormat("en-US", {
-              timeZone: userTimeZone,
+              timeZone: timeZone,
               year: "numeric",
               month: "2-digit",
               day: "2-digit",
@@ -313,9 +316,9 @@ function FileEmailFinder() {
                     typeof dateTimeString === "string"
                       ? new Date(dateTimeString)
                       : dateTimeString;
-
+                  const timeZone = userTimeZone || "America/New_York";
                   const formatter = new Intl.DateTimeFormat("en-US", {
-                    timeZone: userTimeZone,
+                    timeZone: timeZone,
                     year: "numeric",
                     month: "2-digit",
                     day: "2-digit",
@@ -401,7 +404,6 @@ function FileEmailFinder() {
   useEffect(() => {
     if (filesStatus.length === 0 || isCheckingCompletion.current) return;
     isCheckingCompletion.current = true;
-    
 
     const checkCompletion = async () => {
       try {
@@ -479,7 +481,7 @@ function FileEmailFinder() {
 
     const intervalId = setInterval(checkCompletion, 10000);
     return () => clearInterval(intervalId);
-  }, [filesStatus,filteredFiles]);
+  }, [filesStatus, filteredFiles]);
 
   const DownloadFile = async (data) => {
     try {
@@ -657,7 +659,7 @@ function FileEmailFinder() {
           formattedDate: formatDate(file.date_time, userDetails?.timeZone),
         };
       });
-  
+
       const newFilesForStatus = filesWithProcessedField.filter(
         (file) => file.processed !== 100
       );
@@ -680,12 +682,37 @@ function FileEmailFinder() {
     handleSearch(query);
   };
 
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    setDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragging(false);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setDragging(false);
+
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      const fakeEvent = { target: { files: [file] } };
+      handleFileChange(fakeEvent);
+    }
+  };
 
   if (serverError) {
     return <ServerError />;
   }
   return (
-    <div className=" px-6 md:px-20 py-8">
+    <div
+      className=" px-6 md:px-20 py-8"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      {dragging && <DragAndDropBackground />}
       <SubHeader SubHeader={"Upload your file"} />
       {showAlert && (
         <Alert
@@ -697,20 +724,21 @@ function FileEmailFinder() {
         />
       )}
       <div className="mt-8 sm:mt-14 subHeading flex flex-col sm:flex-none justify-center items-center sm:justify-start sm:items-start">
-        <h3>Upload Your File Here | Email Finder</h3>
-        <p className="my-7  description">
+        {/* <p className="my-7  description">
           You can upload a file in CSV, Excel, or text format. Depending on the
           file type you upload, you will receive the results in the
           corresponding format.
-        </p>
+        </p> */}
         <div className="flex flex-col md:flex-row items-center justify-between w-full">
-          <input
+          <h3>Upload Your File Here | Email Finder</h3>
+
+          {/* <input
             type="file"
             className="flex h-9 shadow-lg text-white rounded-lg font-semibold  border border-input bg-red-600 hover:bg-red-800 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-xl file:bg-red-900 hover:file:bg-red-600 file:rounded-lg file:px-4 file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
             onChange={handleFileChange}
             accept=".csv, .xlsx, .txt,.xls"
-          />
-        <div className="md:flex justify-center items-center  lg:w-3/6  2xl:w-2/5">
+          /> */}
+          <div className="md:flex justify-center items-center  lg:w-3/6  2xl:w-2/5">
             {resultFile.length > 0 && (
               <input
                 type="text"
@@ -731,6 +759,14 @@ function FileEmailFinder() {
           </div>
         </div>
       </div>
+      {!tileView && (
+        <input
+          type="file"
+          className="flex h-9 shadow-lg mt-6 text-white rounded-lg font-semibold  border border-input bg-red-600 hover:bg-red-800 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-xl file:bg-red-900 hover:file:bg-red-600 file:rounded-lg file:px-4 file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
+          onChange={handleFileChange}
+          accept=".csv, .xlsx, .txt,.xls"
+        />
+      )}
       {loading && (
         <LoadingBar
           color="#f74c41"
@@ -747,6 +783,7 @@ function FileEmailFinder() {
                 fetchMoreFiles={tileViewFetchMore}
                 hasMore={hasMore}
                 onDownloadFile={DownloadFile}
+                onUpload={handleFileChange}
               />
             ) : (
               <div className="text-center mt-6 text-gray-500">
@@ -759,6 +796,7 @@ function FileEmailFinder() {
               fetchMoreFiles={tileViewFetchMore}
               hasMore={hasMore}
               onDownloadFile={DownloadFile}
+              onUpload={handleFileChange}
             />
           )
         ) : searchQuery.length > 0 ? (
@@ -970,6 +1008,10 @@ function FileEmailFinder() {
             </InfiniteScroll>
           </div>
         ))}
+
+      {resultFile.length == 0 && !loading && (
+        <AddFileForFirstTime onUpload={handleFileChange} />
+      )}
     </div>
   );
 }

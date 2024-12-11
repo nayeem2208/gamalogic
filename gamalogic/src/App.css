@@ -354,6 +354,24 @@ input[type="range"].custom-range:focus::-ms-fill-upper {
   }
 }
 
+.UploadYourFile{
+  background: #0A0E2B;
+  background: linear-gradient(to left, #0A0E2B 0%, #FF0000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+
+}
+
+.UploadYourFileDark{
+  background: #0A0E2B;
+  background: linear-gradient(to left, #0A0E2B 0%, #FF0000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+
+}
+
 
 
   

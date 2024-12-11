@@ -8,6 +8,7 @@ import { useUserState } from "../../context/userContext";
 
 function SingleTile({ data, onDownloadFile }) {
   let { userDetails } = useUserState();
+  // console.log(data, "data in single tile");
 
   return (
     <div
@@ -91,8 +92,8 @@ function SingleTile({ data, onDownloadFile }) {
         </div>
       )}
       <button
-        style={{ backgroundColor: "#18205b" }}
-        className="flex justify-center items-center text-white font-semibold rounded-md w-52 py-2 mt-5"
+        // style={{ backgroundColor: "#18205b" }}
+        className="flex justify-center items-center text-white bg-blue-950 hover:bg-bgblue font-semibold rounded-md w-52 py-2 mt-5"
         onClick={() => onDownloadFile(data)}
       >
         DOWNLOAD

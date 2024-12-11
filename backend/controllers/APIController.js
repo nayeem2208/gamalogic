@@ -661,7 +661,7 @@ let APIControllers = {
       }
     } catch (error) {
       console.log(error);
-      ErrorHandler("search validation files Controller", error, req);
+      ErrorHandler("search finder files Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {

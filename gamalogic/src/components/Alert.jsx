@@ -5,14 +5,14 @@ function Alert({ sizeOfData,onAccept, onDismiss }) {
     if (typeof onAccept === 'function') {
       onAccept(true);
     }
-    setSelection(true); // Update selection state on accept
+    // setSelection(true); // Update selection state on accept
   };
   
   const handleDismiss = () => {
     if (typeof onDismiss === 'function') {
       onDismiss(false);
     }
-    setSelection(false); // Update selection state on dismiss
+    // setSelection(false); // Update selection state on dismiss
   };
       console.log(sizeOfData,'size of data')
   return (
