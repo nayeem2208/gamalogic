@@ -5,28 +5,28 @@ import { FaGift } from "react-icons/fa6";
 import { toast } from "react-toastify";
 
 function EarnPoints() {
-  const [showRewardsButton, setShowRewardsButton] = useState(false);
+  // const [showRewardsButton, setShowRewardsButton] = useState(false);
   useEffect(() => {
     if (APP == "beta") {
       document.title = "Loyalty | Beta Dashboard";
     } else {
       document.title = "Loyalty | Dashboard";
     }
-    window.hideThriveWidget = false;
+    // window.hideThriveWidget = false;
     // window.reloadThriveWidget();
   }, []);
 
-  useEffect(()=>{
-    const timer = setTimeout(() => {
-      setShowRewardsButton(true);
-    }, 3000);
+  // useEffect(()=>{
+  //   const timer = setTimeout(() => {
+  //     setShowRewardsButton(true);
+  //   }, 3000);
 
-    return () => clearTimeout(timer); //
-  },[])
+  //   return () => clearTimeout(timer); //
+  // },[])
 
-  const handleAffiliateUser=()=>{
-    toast.info('Affiliate user cant make free credits through loyalty')
-  }
+  // const handleAffiliateUser=()=>{
+  //   toast.info('Affiliate user cant make free credits through loyalty')
+  // }
 
   return (
     <div className="earn-points-container px-6 md:px-20 py-8 text-center sm:text-start">
@@ -140,11 +140,11 @@ function EarnPoints() {
           />
         </div>
       </div>
-      {showRewardsButton && (
+      {/* {showRewardsButton && (
         <button className="fixed left-[340px] bottom-[50px] ml-3 bg-bgblue rounded-full text-sm font-semibold h-14 w-36 text-white flex justify-center items-center" onClick={handleAffiliateUser}>
           <FaGift className="mr-2 w-5 h-5" /> Rewards
         </button>
-      )}
+      )} */}
     </div>
   );
 }

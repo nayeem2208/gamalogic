@@ -433,7 +433,6 @@ let APIControllers = {
           );
           console.log('second');
         }
-        // console.log(files[0], 'filesssssssss')
         res.status(200).json(files[0]);
       }
     } catch (error) {

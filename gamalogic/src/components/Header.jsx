@@ -275,12 +275,12 @@ function Header() {
                 Become an Affiliate
               </li>
             </Link>
-            <Link to="/dashboard/EarnPoints" onClick={dropDownToggle}>
+            {/* <Link to="/dashboard/EarnPoints" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
                 <TbBasketStar className="text-teal-800 mt-2 mx-2 text-lg" />
                 Earn Free Credits
               </li>
-            </Link>
+            </Link> */}
             {/* {userDetails.isTeam == 1 && (
               <Link to="/dashboard/team" onClick={dropDownToggle}>
                 <li className="py-2 flex underlineLi">

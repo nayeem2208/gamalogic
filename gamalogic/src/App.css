@@ -372,7 +372,303 @@ input[type="range"].custom-range:focus::-ms-fill-upper {
 
 }
 
+/* From Uiverse.io by cssbuttons-io */ 
+.SingleTileDownload button {
+  /* font-weight: 500; */
+  background: var(--btn-bg-color, #172554);
+  color: var(--btn-text-color, white);
+  border: none;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.4em;
+  cursor: pointer;
+  outline: none;
+}
 
+.SingleTileDownload .gradient {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  border-radius: 0.4em;
+  /* margin-top: -0.25em; */
+  background-image: linear-gradient(
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0.1)
+  );
+  pointer-events: none; /* Prevent interference with button click */
+}
+
+.SingleTileDownload .label {
+  position: relative;
+  z-index: 2;
+  top: -10px;
+}
+
+.SingleTileDownload .transition {
+  transition: all 500ms cubic-bezier(0, 0, 0.2, 1);
+  /* background-color: #2db98fbd; */
+  background: linear-gradient(to left, #0a0e2b67 40%, #ff000064 100%);
+  border-radius: 9999px;
+  width: 0;
+  height: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.SingleTileDownload button:hover .transition {
+  width: 20em;
+  height: 14em;
+}
+
+.SingleTileDownload button:active {
+  transform: scale(0.97);
+}
+
+.SingleTileDownloadAppearingDiv{
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin: 0 auto;
+}
+
+.singleTileAppearingDiv {
+  display: flex;
+  justify-content: space-between; 
+  flex-wrap: wrap; 
+  width: 100%; 
+}
+
+@media screen and (max-width: 1026px) {
+  .singleTileAppearingDiv {
+    justify-content: center; /* Maintain center alignment on smaller screens */
+  }
+}
+@media screen and (max-width: 735px) {
+
+  .AddNewFile,
+  .SingleTileForFile {
+    width: 300px;
+    height: 280px;
+  }
+
+  .AddNewFileDashedIcon {
+    margin-top: 1vw;
+    width: 10vw;
+    height: 10vw;
+    margin-bottom: 5px;
+  }
+
+  .singleTileHeading {
+    font-size: 18px;
+  }
+
+  .singleTileProgress {
+    padding: 0 5px;
+    width: 25vw;
+  }
+
+  .SingleTileDownload {
+    font-size: 10px;
+    width: 100%;
+  }
+
+  .singleTileUploadedBy {
+    height: 1rem;
+  }
+
+  .singleTileDateAndTime {
+    font-size: 11px;
+  }
+  .AddNewFileDashedIcon {
+    margin-top: 6.3vw;
+    width: 15.8vw;
+    height: 15.8vw;
+    margin-bottom: 2px;
+  }
+}
+
+@media screen and (min-width: 735px) and  (max-width: 1026px)  {
+
+
+  .AddNewFile,
+  .SingleTileForFile {
+    width: 300px;
+    height: 300px;
+  }
+
+  .AddNewFileDashedIcon {
+    margin-top: 1vw;
+    width: 10vw;
+    height: 10vw;
+    margin-bottom: 5px;
+  }
+
+  .singleTileHeading {
+    font-size: 18px;
+   
+  }
+
+  .singleTileProgress {
+    padding: 0 5px;
+    width: 15vw;
+  }
+
+  .SingleTileDownload {
+    font-size: 10px;
+    width: 100%;
+  }
+
+  .singleTileUploadedBy {
+    height: 1rem;
+  }
+
+  .singleTileDateAndTime {
+    font-size: 11px;
+  }
+  .AddNewFileDashedIcon {
+    margin-top: 3vw;
+    width: 8vw;
+    height: 8vw;
+    margin-bottom: 2px;
+  }
+}
+
+
+@media screen and (min-width: 1026px) and (max-width:1280px){
+ 
+  .AddNewFile,
+  .SingleTileForFile {
+    width: 250px;
+    height: 290px; 
+  }
+  .singleTileHeading {
+    font-size: 16px;
+  }
+  .singleTileProgress {
+    padding: 0 1.5vw;
+  }
+  .SingleTileDownload {
+    font-size: 13px;
+    width: 100%;
+  }
+  .singleTileUploadedBy {
+    height: 1rem;
+  }
+  .singleTileDateAndTime {
+    font-size: 13px;
+  }
+  .AddNewFileDashedIcon {
+    margin-top: 1.3vw;
+    width: 5.8vw;
+    height: 5.8vw;
+    margin-bottom: 2px;
+  }
+}
+
+@media screen and (min-width: 1280px) {
+ 
+  .AddNewFile,
+  .SingleTileForFile {
+    width: 250px;
+    height: 300px;
+  }
+  .singleTileHeading {
+    font-size: 17px;
+  }
+  .singleTileProgress {
+    padding: 0 1vw;
+  }
+  .SingleTileDownload {
+    font-size: 13px;
+    width: 100%;
+  }
+  .singleTileUploadedBy {
+    height: 1rem;
+  }
+  .singleTileDateAndTime {
+    font-size: 13px;
+  }
+  .AddNewFileDashedIcon {
+    margin-top: 1.3vw;
+    width: 5vw;
+    height: 5vw;
+    margin-bottom: 2px;
+  }
+}
+
+@media screen and (min-width: 1440px) and (min-height: 900px) {
+ 
+  .AddNewFile,
+  .SingleTileForFile {
+    width: 270px;
+    height: 310px;
+  }
+  .singleTileHeading {
+    font-size: 18px;
+  }
+  .singleTileProgress {
+    padding: 0 1.2vw;
+  }
+  .singleTileUploadedBy {
+    height: 1rem;
+  }
+  .singleTileDateAndTime {
+    font-size: 14px;
+  }
+  .AddNewFileDashedIcon {
+    margin-top: 1.9vw;
+    width: 6vw;
+    height: 6vw;
+    margin-bottom: 2px;
+  }
+}
+
+@media screen and (min-width: 1600px) and (min-height: 900px) {
+ 
+  .AddNewFile,
+  .SingleTileForFile {
+    width: 300px;
+    height: 300px;
+  }
+  .singleTileProgress {
+    padding: 0 2vw;
+  }
+  .singleTileUploadedBy {
+    height: 1.4rem;
+  }
+  .AddNewFileDashedIcon {
+    margin-top: 1.3vw;
+    width: 4vw;
+    height: 4vw;
+    margin-bottom: 2px;
+  }
+}
+@media screen and (min-width: 1600px) {
+  
+  .AddNewFile,
+  .SingleTileForFile {
+    width: 300px;
+    height: 310px;
+  }
+  .singleTileProgress {
+    padding: 0 2vw;
+  }
+  .singleTileUploadedBy {
+    height: 1.4rem;
+  }
+  .AddNewFileDashedIcon {
+    margin-top: 1.3vw;
+    width: 4vw;
+    height: 4vw;
+    margin-bottom: 2px;
+  }
+}
 
   
 

@@ -256,12 +256,12 @@ function SideBar() {
                 Become an Affiliate
               </li>
             </Link>
-            <Link to="/dashboard/EarnPoints">
+            {/* <Link to="/dashboard/EarnPoints">
               <li className="my-4 flex">
                 <TbBasketStar className="text-teal-800 mt-2 mx-2 text-lg" />
                 Earn Free Credits
               </li>
-            </Link>
+            </Link> */}
             {/* {userDetails.isTeam == 1 && (
               <Link to="dashboard/team">
                 <li className="my-4 flex">

@@ -24,6 +24,8 @@ import ViewSelector from "../components/File/ViewSelector";
 import FileVerificationTile from "../components/File/FileVerificationTile";
 import AddFileForFirstTime from "../components/File/AddFileForFirstTime";
 import DragAndDropBackground from "../components/File/DragAndDropBackground";
+import AddFileInRowView from "../components/File/AddFileInRowView";
+import FileRowViewListing from "../components/File/FileRowView";
 
 function EmailVerification() {
   let [message, setMessage] = useState("");
@@ -38,7 +40,7 @@ function EmailVerification() {
   const [hasMore, setHasMore] = useState(true);
   const [fileForClickUp, setFileForClickUp] = useState();
   const [realFile, setRealFile] = useState(null);
-  let [tileView, setTileView] = useState(true);
+  let [tileView, setTileView] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [dragging, setDragging] = useState(false);
@@ -70,7 +72,7 @@ function EmailVerification() {
       setLoad(100);
       if (allFiles.data.length === 0) {
         setHasMore(false);
-        setLoading(false)
+        setLoading(false);
       } else {
         const formatDate = (dateTimeString, userTimeZone) => {
           try {
@@ -461,8 +463,12 @@ function EmailVerification() {
   const handleDismiss = () => {
     setShowAlert(false);
   };
-  const handleViewChanger = () => {
-    setTileView(!tileView);
+  const handleViewChanger = (data) => {
+    if (data == "tile") {
+      setTileView(true);
+    } else {
+      setTileView(false);
+    }
   };
   const tileViewFetchMore = async () => {
     setPageIndex((prevPageIndex) => {
@@ -566,119 +572,139 @@ function EmailVerification() {
   }
   return (
     <div
-      className=" px-6 md:px-20 py-8 text-center sm:text-left"
+      className="px-6 md:px-10 2xl:px-20  py-8 text-center sm:text-left h-screen overflow-auto"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      id="scrollableDiv"
     >
-       {dragging && (
-        <DragAndDropBackground/>
-      )}
-      <SubHeader SubHeader={"Upload your file"} />
-      <form className="mt-8 sm:mt-14 subHeading flex flex-col sm:flex-none justify-center items-center sm:justify-start sm:items-start">
-        {/* <p className="my-7  description">
-          You can upload a file containing email addresses in CSV, Excel, or
-          text format. Depending on the file type you upload, you will receive
-          the results in the corresponding format.
-        </p> */}
-        {showAlert && (
-          <div
-            role="alert"
-            className="mx-auto max-w-lg rounded-lg border border-stone bg-slate-200 p-4 shadow-xl sm:p-6 lg:p-8 absolute"
-            style={{zIndex:'100'}}
-          >
-            <div className="flex items-center gap-4">
-              <span className="shrink-0 rounded-full bg-bgblue p-2 text-white">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="h-4 w-4"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-              </span>
-
-              <p className="font-medium sm:text-lg text-red-500">
-                New notification!
-              </p>
+      {dragging && <DragAndDropBackground />}
+      <InfiniteScroll
+        dataLength={
+          filteredFiles.length > 0 ? filteredFiles.length : resultFile
+        }
+        next={fetchMoreFiles}
+        hasMore={hasMore}
+        loader={
+          resultFile.length >= 4 && (
+            <div className="w-full mt-4  flex justify-center items-center">
+              <MoreFileLoader />
             </div>
+          )
+        }
+        scrollableTarget="scrollableDiv"
+      >
+        <SubHeader SubHeader={"Upload your file"} />
+        <form className="mt-8 sm:mt-14 subHeading flex flex-col sm:flex-none justify-center items-center sm:justify-start sm:items-start">
+          {showAlert && (
+            <div
+              role="alert"
+              className="mx-auto max-w-lg rounded-lg border border-stone bg-slate-200 p-4 shadow-xl sm:p-6 lg:p-8 absolute"
+              style={{ zIndex: "100" }}
+            >
+              <div className="flex items-center gap-4">
+                <span className="shrink-0 rounded-full bg-bgblue p-2 text-white">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="h-4 w-4"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z"
+                      clipRule="evenodd"
+                    ></path>
+                  </svg>
+                </span>
 
-            <p className="mt-4 text-gray-600">
-              Generating the data might take some time due to its size (
-              {JsonToServer.emails.length} records). Are you sure you want to
-              proceed?{" "}
-            </p>
-
-            <div className="mt-6 sm:flex sm:gap-4">
-              <button
-                className="inline-block w-full rounded-lg bg-bgblue px-5 py-3 text-center text-sm font-semibold text-white sm:w-auto"
-                onClick={handleAccept}
-              >
-                Accept
-              </button>
-
-              <button
-                className="mt-2 inline-block w-full rounded-lg bg-stone-300 px-5 py-3 text-center text-sm font-semibold text-gray-800 sm:mt-0 sm:w-auto"
-                onClick={handleDismiss}
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        )}
-        <div className="flex flex-col md:flex-row items-center justify-between w-full">
-          {/* <input
-            type="file"
-            className="flex h-9 shadow-lg text-white rounded-lg font-semibold  border border-input bg-red-600 hover:bg-red-800 bg-background px-3 py-1 text-sm  transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground file:shadow-xl file:bg-red-900 hover:file:bg-red-600 file:rounded-lg file:px-4 file:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 "
-            accept=".csv, .xlsx, .txt,.xls"
-            onChange={handleFileChange}
-          /> */}
-          <h3>Upload Your File Here | Email Validation</h3>
-
-          <div className="md:flex justify-center items-center  lg:w-3/6  2xl:w-2/5">
-            {resultFile.length > 0 && (
-              <input
-                type="text"
-                placeholder="Search files by name..."
-                value={searchQuery}
-                onChange={onSearchInputChange}
-                className="w-full my-2 md:my-0 md:mx-4 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            )}
-            {resultFile.length > 0 && (
-              <div className="w-full flex justify-center items-center md:w-2/5">
-                <ViewSelector
-                  tileView={tileView}
-                  onViewChange={handleViewChanger}
-                />
+                <p className="font-medium sm:text-lg text-red-500">
+                  New notification!
+                </p>
               </div>
-            )}
+
+              <p className="mt-4 text-gray-600">
+                Generating the data might take some time due to its size (
+                {JsonToServer.emails.length} records). Are you sure you want to
+                proceed?{" "}
+              </p>
+
+              <div className="mt-6 sm:flex sm:gap-4">
+                <button
+                  className="inline-block w-full rounded-lg bg-bgblue px-5 py-3 text-center text-sm font-semibold text-white sm:w-auto"
+                  onClick={handleAccept}
+                >
+                  Accept
+                </button>
+
+                <button
+                  className="mt-2 inline-block w-full rounded-lg bg-stone-300 px-5 py-3 text-center text-sm font-semibold text-gray-800 sm:mt-0 sm:w-auto"
+                  onClick={handleDismiss}
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
+          <div className="flex flex-col md:flex-row items-center justify-between w-full">
+            <h3>Upload Your File Here | Email Validation</h3>
+
+            <div className="md:flex justify-center items-center  lg:w-3/6  2xl:w-2/5">
+              {resultFile.length > 0 && (
+                <input
+                  type="text"
+                  placeholder="Search files by name..."
+                  value={searchQuery}
+                  onChange={onSearchInputChange}
+                  className="w-full my-2 md:my-0 md:mx-4 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              )}
+              {resultFile.length > 0 && (
+                <div className="w-full flex justify-center items-center md:w-2/5">
+                  <ViewSelector
+                    tileView={tileView}
+                    onViewChange={handleViewChanger}
+                  />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </form>
-      {loading && (
-        <LoadingBar
-          color="#f74c41"
-          progress={load}
-          onLoaderFinished={() => {}}
-        />
-      )}
-      {resultFile.length > 0 &&
-        (tileView ? (
-          searchQuery.length > 0 ? (
-            filteredFiles.length > 0 ? (
+        </form>
+        {loading && (
+          <LoadingBar
+            color="#f74c41"
+            progress={load}
+            onLoaderFinished={() => {}}
+          />
+        )}
+        {(!tileView &&resultFile.length>0) && <AddFileInRowView onUpload={handleFileChange} />}
+        {resultFile.length > 0 &&
+          (tileView ? (
+            searchQuery.length > 0 ? (
+              filteredFiles.length > 0 ? (
+                <FileVerificationTile
+                  data={filteredFiles}
+                  onDownloadFile={DownloadFile}
+                  onUpload={handleFileChange}
+                />
+              ) : (
+                <div className="text-center mt-6 text-gray-500">
+                  No files found for "{searchQuery}"
+                </div>
+              )
+            ) : (
               <FileVerificationTile
-                data={filteredFiles}
-                fetchMoreFiles={tileViewFetchMore}
-                hasMore={hasMore}
+                data={resultFile}
                 onDownloadFile={DownloadFile}
                 onUpload={handleFileChange}
-
+              />
+            )
+          ) : searchQuery.length > 0 ? (
+            filteredFiles.length > 0 ? (
+              <FileRowViewListing
+                data={filteredFiles}
+                onDownloadFile={DownloadFile}
+                onUpload={handleFileChange}
               />
             ) : (
               <div className="text-center mt-6 text-gray-500">
@@ -686,227 +712,16 @@ function EmailVerification() {
               </div>
             )
           ) : (
-            <FileVerificationTile
+            <FileRowViewListing
               data={resultFile}
-              fetchMoreFiles={tileViewFetchMore}
-              hasMore={hasMore}
               onDownloadFile={DownloadFile}
               onUpload={handleFileChange}
-
             />
-          )
-        ) : searchQuery.length > 0 ? (
-          filteredFiles.length > 0 ? (
-            <div className="overflow-x-auto">
-              <InfiniteScroll
-                dataLength={filteredFiles.length}
-                next={fetchMoreFiles}
-                hasMore={hasMore}
-                height={300}
-                loader={
-                  filteredFiles.length >= 4 && (
-                    <div className="w-full mt-4 flex justify-center items-center">
-                      <MoreFileLoader />
-                    </div>
-                  )
-                }
-              >
-                <table
-                  className="text-bgblue w-full mt-14 min-w-96"
-                  style={{ fontFamily: "Raleway,sans-serif" }}
-                >
-                  <tbody className="overflow-x-auto">
-                    <tr className="sm:text-left text-xs sm:text-sm font-medium">
-                      <th
-                        className={`  ${
-                          userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
-                        }`}
-                      >
-                        File Name
-                      </th>
-                      <th
-                        className={`  ${
-                          userDetails.isTeam == 1 ? "w-1/6" : "w-2/5"
-                        }`}
-                      >
-                        Status
-                      </th>
-                      {userDetails.isTeam == 1 && (
-                        <th
-                          className={`  ${
-                            userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
-                          }`}
-                        >
-                          Uploaded By
-                        </th>
-                      )}
-                      <th
-                        className={`  ${
-                          userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
-                        }`}
-                      >
-                        Upload Time
-                      </th>
-                      <th
-                        className={`  ${
-                          userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
-                        }`}
-                      ></th>
-                    </tr>
-                    {filteredFiles.map((data, index) => (
-                      <tr key={index} className="text-xs sm:text-sm">
-                        <td className="md:pt-5">{data.file_upload}</td>
-                        <td className="flex ">
-                          <ProgressBar
-                            isLabelVisible={false}
-                            completed={data.processed}
-                            bgColor="#181e4a"
-                            labelSize="13px"
-                            className={`mr-2  ${
-                              userDetails.isTeam == 1 ? "w-3/5" : "w-2/5"
-                            }`}
-                            maxCompleted={100}
-                          />
-                          {data.processed}%
-                        </td>
-                        {userDetails.isTeam == 1 && (
-                          <td className="md:pt-5">
-                            {data.team_member_emailid || "You"}
-                          </td>
-                        )}
-                        <td className="md:pt-5">{data.formattedDate}</td>
-                        <td className="flex justify-center items-center ">
-                          <div className="sm:hidden">
-                            <IoDownload
-                              className="text-xl"
-                              onClick={() => DownloadFile(data)}
-                            />
-                          </div>
-                          <div className="hidden sm:block">
-                            <button
-                              className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-4 text-xs"
-                              onClick={() => DownloadFile(data)}
-                            >
-                              DOWNLOAD
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </InfiniteScroll>
-            </div>
-          ) : (
-            <div className="text-center mt-6 text-gray-500">
-              No files found for "{searchQuery}"
-            </div>
-          )
-        ) : (
-          <div className="overflow-x-auto">
-            <InfiniteScroll
-              dataLength={resultFile.length}
-              next={fetchMoreFiles}
-              hasMore={hasMore}
-              height={300}
-              loader={
-                resultFile.length >= 4 && (
-                  <div className="w-full mt-4 flex justify-center items-center">
-                    <MoreFileLoader />
-                  </div>
-                )
-              }
-            >
-              <table
-                className="text-bgblue w-full mt-14 min-w-96"
-                style={{ fontFamily: "Raleway,sans-serif" }}
-              >
-                <tbody className="overflow-x-auto">
-                  <tr className="sm:text-left text-xs sm:text-sm font-medium">
-                    <th
-                      className={`  ${
-                        userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
-                      }`}
-                    >
-                      File Name
-                    </th>
-                    <th
-                      className={`  ${
-                        userDetails.isTeam == 1 ? "w-1/6" : "w-2/5"
-                      }`}
-                    >
-                      Status
-                    </th>
-                    {userDetails.isTeam == 1 && (
-                      <th
-                        className={`  ${
-                          userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
-                        }`}
-                      >
-                        Uploaded By
-                      </th>
-                    )}
-                    <th
-                      className={`  ${
-                        userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
-                      }`}
-                    >
-                      Upload Time
-                    </th>
-                    <th
-                      className={`  ${
-                        userDetails.isTeam == 1 ? "w-1/6" : "w-1/5"
-                      }`}
-                    ></th>
-                  </tr>
-                  {resultFile.map((data, index) => (
-                    <tr key={index} className="text-xs sm:text-sm">
-                      <td className="md:pt-5">{data.file_upload}</td>
-                      <td className="flex ">
-                        <ProgressBar
-                          isLabelVisible={false}
-                          completed={data.processed}
-                          bgColor="#181e4a"
-                          labelSize="13px"
-                          className={`mr-2  ${
-                            userDetails.isTeam == 1 ? "w-3/5" : "w-2/5"
-                          }`}
-                          maxCompleted={100}
-                        />
-                        {data.processed}%
-                      </td>
-                      {userDetails.isTeam == 1 && (
-                        <td className="md:pt-5">
-                          {data.team_member_emailid || "You"}
-                        </td>
-                      )}
-                      <td className="md:pt-5">{data.formattedDate}</td>
-                      <td className="flex justify-center items-center ">
-                        <div className="sm:hidden">
-                          <IoDownload
-                            className="text-xl"
-                            onClick={() => DownloadFile(data)}
-                          />
-                        </div>
-                        <div className="hidden sm:block">
-                          <button
-                            className="bg-bgblue text-white py-1 px-4 rounded-md ml-2 h-9 mt-4 text-xs"
-                            onClick={() => DownloadFile(data)}
-                          >
-                            DOWNLOAD
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </InfiniteScroll>
-          </div>
-        ))}
-      {(resultFile.length == 0 &&!loading)&& (
-        <AddFileForFirstTime onUpload={handleFileChange} />
-      )}
+          ))}
+        {resultFile.length == 0 && !loading && (
+          <AddFileForFirstTime onUpload={handleFileChange} />
+        )}
+      </InfiniteScroll>
     </div>
   );
 }
