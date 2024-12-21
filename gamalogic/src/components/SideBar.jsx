@@ -23,6 +23,8 @@ import { MdOutlineGroups } from "react-icons/md";
 import { MdManageAccounts } from "react-icons/md";
 import { TbBasketStar } from "react-icons/tb";
 import { MdIntegrationInstructions } from "react-icons/md";
+import { LuLayoutDashboard } from "react-icons/lu";
+
 
 function SideBar() {
   let [uploadfileDropDown, setUploadFileDropDown] = useState(false);
@@ -86,29 +88,35 @@ function SideBar() {
         >
           <Link to="/">
             <p
-              className="font-semibold text-xl text-center mt-2"
+              className="font-semibold text-xl text-center mt-1"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
               GAMALOGIC
             </p>
           </Link>
           <ul className="mt-14 text-lg font-semibold text-left">
+          <Link to="/dashboard/userDashboard">
+              <li className="my-4 flex ">
+                <LuLayoutDashboard className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
+                Dashboard
+              </li>
+            </Link>
             <Link to="/dashboard/quick-validation">
               <li className="my-4 flex ">
-                <GrDocumentVerified className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                <GrDocumentVerified className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                 Quick Validation
               </li>
             </Link>
             <Link to="/dashboard/email-finder">
               <li className="my-4 flex">
-                <IoSearchOutline className="text-teal-800 mt-2 mx-2 text-lg" />
+                <IoSearchOutline className="text-teal-800 mt-1 mx-2 text-lg" />
                 Email Finder
               </li>
             </Link>
             {userDetails.isTeamMember != 1 && (
               <Link to="/dashboard/apikey">
                 <li className="my-4 flex">
-                  <LuKey className="text-teal-800 mt-2 mx-2 text-lg" />
+                  <LuKey className="text-teal-800 mt-1 mx-2 text-lg" />
                   API Key
                 </li>
               </Link>
@@ -118,25 +126,25 @@ function SideBar() {
               className="my-4 flex cursor-pointer"
               onClick={uploadfileDropDownToggle}
             >
-              <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" /> Upload
+              <LuFileUp className="text-teal-800 mt-1 mx-2 text-lg" /> Upload
               Your File
               {!uploadfileDropDown ? (
-                <MdArrowDropDown className="mt-2 text-xl" />
+                <MdArrowDropDown className="mt-1 text-xl" />
               ) : (
-                <MdArrowDropUp className="mt-2 text-xl" />
+                <MdArrowDropUp className="mt-1 text-xl" />
               )}
             </li>
             {uploadfileDropDown && (
               <ul className="ml-6">
                 <Link to="/dashboard/file-upload">
                   <li className="my-4 flex">
-                    <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    <LuFileUp className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                     Email Verification
                   </li>
                 </Link>
                 <Link to="/dashboard/file-upload-finder">
                   <li className="my-4 flex">
-                    <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    <LuFileUp className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                     Email Finder
                   </li>
                 </Link>
@@ -144,7 +152,7 @@ function SideBar() {
             )}
             <Link to="/dashboard/Integrate">
               <li className="my-4 flex">
-                <MdIntegrationInstructions className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                <MdIntegrationInstructions className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                 Integration
               </li>
             </Link>
@@ -152,21 +160,21 @@ function SideBar() {
               className="my-4 flex cursor-pointer"
               onClick={tutorialDropDownToggle}
             >
-              <CgFileDocument className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+              <CgFileDocument className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
               Tutorial
               {!tutorialDropDown ? (
-                <MdArrowDropDown className="mt-2 text-xl" />
+                <MdArrowDropDown className="mt-1 text-xl" />
               ) : (
-                <MdArrowDropUp className="mt-2 text-xl" />
+                <MdArrowDropUp className="mt-1 text-xl" />
               )}
-              {/* <MdArrowDropDown className="mt-2 text-xl" /> */}
+              {/* <MdArrowDropDown className="mt-1 text-xl" /> */}
             </li>
             {tutorialDropDown && (
               <ul className="ml-6">
                 {/* <Link to='/api-docs'> */}
                 <a href="https://docs.gamalogic.com/" target="_blank">
                   <li className="my-4 flex">
-                    <IoMailOutline className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    <IoMailOutline className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                     API Docs
                   </li>
                 </a>
@@ -177,7 +185,7 @@ function SideBar() {
                   target="_blank"
                 >
                   <li className="my-4 flex">
-                    <RiProfileLine className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    <RiProfileLine className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                     Integrate Google sheets
                   </li>
                 </a>
@@ -188,7 +196,7 @@ function SideBar() {
                   target="_blank"
                 >
                   <li className="my-4 flex">
-                    <MdOutlineFindInPage className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    <MdOutlineFindInPage className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                     Find Any Email
                   </li>
                 </a>
@@ -200,12 +208,12 @@ function SideBar() {
               className="my-4 flex cursor-pointer"
               onClick={settingDropDownToggle}
             >
-              <IoSettingsOutline className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+              <IoSettingsOutline className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
               Settings
               {!settingDropDown ? (
-                <MdArrowDropDown className="mt-2 text-xl" />
+                <MdArrowDropDown className="mt-1 text-xl" />
               ) : (
-                <MdArrowDropUp className="mt-2 text-xl" />
+                <MdArrowDropUp className="mt-1 text-xl" />
               )}
             </li>
             {settingDropDown && (
@@ -213,14 +221,14 @@ function SideBar() {
                 {/* <Link to='/api-docs'> */}
                 <Link to="/dashboard/account-settings">
                   <li className="my-4 flex">
-                    <MdManageAccounts className="text-teal-800 mt-2 mx-2 text-lg" />
+                    <MdManageAccounts className="text-teal-800 mt-1 mx-2 text-lg" />
                     Account Settings
                   </li>
                 </Link>
                 {userDetails.isTeam == 1 && userDetails.isTeamMember != 1 && (
                   <Link to="dashboard/team">
                     <li className="my-4 flex">
-                      <MdOutlineGroups className="text-teal-800 mt-2 mx-2 text-lg" />
+                      <MdOutlineGroups className="text-teal-800 mt-1 mx-2 text-lg" />
                       Team Settings
                     </li>
                   </Link>
@@ -229,7 +237,7 @@ function SideBar() {
             )}
             {/* <Link to="/dashboard/account-settings">
               <li className="my-4 flex">
-                <IoSettingsOutline className="text-teal-800 mt-2 mx-2 text-lg" />
+                <IoSettingsOutline className="text-teal-800 mt-1 mx-2 text-lg" />
                 Account Settings
               </li>
             </Link> */}
@@ -237,7 +245,7 @@ function SideBar() {
               <Link to="/dashboard/buy-credits">
                 {" "}
                 <li className="my-4 flex">
-                  <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
+                  <PiCurrencyDollarSimpleBold className="text-teal-800 mt-1 mx-2 text-lg" />
                   Buy Credits
                 </li>
               </Link>
@@ -245,40 +253,40 @@ function SideBar() {
             {userDetails.isTeamMember != 1 && (
               <Link to="/dashboard/billing">
                 <li className="my-4 flex">
-                  <LuHistory className="text-teal-800 mt-2 mx-2 text-lg" />
+                  <LuHistory className="text-teal-800 mt-1 mx-2 text-lg" />
                   Billing
                 </li>
               </Link>
             )}
             <Link to="/dashboard/affiliate">
               <li className="my-4 flex">
-                <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />
+                <GrMoney className="text-teal-800 mt-1 mx-2 text-lg" />
                 Become an Affiliate
               </li>
             </Link>
-            {/* <Link to="/dashboard/EarnPoints">
+            <Link to="/dashboard/EarnPoints">
               <li className="my-4 flex">
-                <TbBasketStar className="text-teal-800 mt-2 mx-2 text-lg" />
+                <TbBasketStar className="text-teal-800 mt-1 mx-2 text-lg" />
                 Earn Free Credits
               </li>
-            </Link> */}
+            </Link>
             {/* {userDetails.isTeam == 1 && (
               <Link to="dashboard/team">
                 <li className="my-4 flex">
-                  <MdOutlineGroups className="text-teal-800 mt-2 mx-2 text-lg" />
+                  <MdOutlineGroups className="text-teal-800 mt-1 mx-2 text-lg" />
                   Team
                 </li>
               </Link>
             )} */}
             {/* <Link to="/dashboard/support">
               <li className="my-4 flex">
-                <SlSupport className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                <SlSupport className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                 Support
               </li>
             </Link> */}
 
             <li className="my-4 flex cursor-pointer" onClick={logoutHandler}>
-              <IoLogOutOutline className="text-teal-800 mt-2 mx-2 " />
+              <IoLogOutOutline className="text-teal-800 mt-1 mx-2 " />
               Logout
             </li>
           </ul>

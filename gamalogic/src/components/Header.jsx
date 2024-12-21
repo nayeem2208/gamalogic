@@ -27,6 +27,8 @@ import { MdIntegrationInstructions } from "react-icons/md";
 import { IoIosNotifications } from "react-icons/io";
 import Notification from "./Notifications";
 import MobileNotification from "./NotificationMobile";
+import { LuLayoutDashboard } from "react-icons/lu";
+
 
 function Header() {
   let [dropDown, setDropDown] = useState(false);
@@ -111,22 +113,28 @@ function Header() {
           style={{ backgroundColor: "rgba(10, 14, 43,0.97)" }}
         >
           <ul className="mb-14 text-lg font-semibold text-left px-8">
+          <Link to="/dashboard/userDashboard" onClick={dropDownToggle}>
+              <li className="py-2 flex underlineLi">
+                <LuLayoutDashboard className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
+                Dashboard
+              </li>
+            </Link>
             <Link to="/dashboard/quick-validation" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
-                <GrDocumentVerified className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                <GrDocumentVerified className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                 Quick Validation
               </li>
             </Link>
             <Link to="/dashboard/email-finder" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
-                <IoSearchOutline className="text-teal-800 mt-2 mx-2 text-lg" />
+                <IoSearchOutline className="text-teal-800 mt-1 mx-2 text-lg" />
                 Email Finder
               </li>
             </Link>
             {userDetails.isTeamMember != 1 && (
               <Link to="/dashboard/apikey" onClick={dropDownToggle}>
                 <li className="py-2 flex underlineLi">
-                  <LuKey className="text-teal-800 mt-2 mx-2 text-lg" />
+                  <LuKey className="text-teal-800 mt-1 mx-2 text-lg" />
                   API Key
                 </li>
               </Link>
@@ -135,19 +143,19 @@ function Header() {
               className="py-2 flex underlineLi"
               onClick={uploadfileDropDownToggle}
             >
-              <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" /> Upload
+              <LuFileUp className="text-teal-800 mt-1 mx-2 text-lg" /> Upload
               Your File
               {!uploadfileDropDown ? (
-                <MdArrowDropDown className="mt-2 text-xl" />
+                <MdArrowDropDown className="mt-1 text-xl" />
               ) : (
-                <MdArrowDropUp className="mt-2 text-xl" />
+                <MdArrowDropUp className="mt-1 text-xl" />
               )}
             </li>
             {uploadfileDropDown && (
               <ul className="ml-6 ">
                 <Link to="/dashboard/file-upload" onClick={dropDownToggle}>
                   <li className="py-2 flex ">
-                    <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    <LuFileUp className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                     Email Verification
                   </li>
                 </Link>
@@ -156,7 +164,7 @@ function Header() {
                   onClick={dropDownToggle}
                 >
                   <li className="py-2 flex ">
-                    <LuFileUp className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    <LuFileUp className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                     Email Finder
                   </li>
                 </Link>
@@ -164,7 +172,7 @@ function Header() {
             )}
             <Link to="/dashboard/Integrate" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
-                <MdIntegrationInstructions className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                <MdIntegrationInstructions className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                 Integration
               </li>
             </Link>
@@ -172,14 +180,14 @@ function Header() {
               className="py-2 flex underlineLi"
               onClick={tutorialDropDownToggle}
             >
-              <CgFileDocument className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+              <CgFileDocument className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
               Tutorial
               {!tutorialDropDown ? (
-                <MdArrowDropDown className="mt-2 text-xl" />
+                <MdArrowDropDown className="mt-1 text-xl" />
               ) : (
-                <MdArrowDropUp className="mt-2 text-xl" />
+                <MdArrowDropUp className="mt-1 text-xl" />
               )}
-              {/* <MdArrowDropDown className="mt-2 text-xl" /> */}
+              {/* <MdArrowDropDown className="mt-1 text-xl" /> */}
             </li>
             {tutorialDropDown && (
               <ul className="ml-6">
@@ -189,7 +197,7 @@ function Header() {
                   onClick={dropDownToggle}
                 >
                   <li className="py-2 flex ">
-                    <IoMailOutline className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    <IoMailOutline className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                     API Docs
                   </li>
                 </a>
@@ -199,7 +207,7 @@ function Header() {
                   onClick={dropDownToggle}
                 >
                   <li className="py-2 flex ">
-                    <MdOutlineFindInPage className="text-teal-800 mt-2 mx-2 text-xl" />{" "}
+                    <MdOutlineFindInPage className="text-teal-800 mt-1 mx-2 text-xl" />{" "}
                     Find Any Email
                   </li>
                 </a>
@@ -209,7 +217,7 @@ function Header() {
                   onClick={dropDownToggle}
                 >
                   <li className="py-2 flex underlineLi">
-                    <RiProfileLine className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    <RiProfileLine className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                     Integrate Google sheets
                   </li>
                 </a>
@@ -220,26 +228,26 @@ function Header() {
               className="py-2 flex underlineLi"
               onClick={settingDropDownToggle}
             >
-              <IoSettingsOutline className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+              <IoSettingsOutline className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
               Settings
               {!settingDropDown ? (
-                <MdArrowDropDown className="mt-2 text-xl" />
+                <MdArrowDropDown className="mt-1 text-xl" />
               ) : (
-                <MdArrowDropUp className="mt-2 text-xl" />
+                <MdArrowDropUp className="mt-1 text-xl" />
               )}
             </li>
             {settingDropDown && (
               <ul className="ml-6 ">
                 <Link to="/dashboard/account-settings" onClick={dropDownToggle}>
                   <li className="py-2 flex ">
-                    <MdManageAccounts className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                    <MdManageAccounts className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                     Account Settings
                   </li>
                 </Link>
                 {userDetails.isTeam == 1 && userDetails.isTeamMember != 1 && (
                   <Link to="dashboard/team" onClick={dropDownToggle}>
                     <li className="py-2 flex ">
-                      <MdOutlineGroups className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                      <MdOutlineGroups className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                       Team Settings
                     </li>
                   </Link>
@@ -249,14 +257,14 @@ function Header() {
 
             {/* <Link to="/dashboard/account-settings" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
-                <IoSettingsOutline className="text-teal-800 mt-2 mx-2 text-lg" />
+                <IoSettingsOutline className="text-teal-800 mt-1 mx-2 text-lg" />
                 Account Settings
               </li>
             </Link> */}
             {userDetails.isTeamMember != 1 && (
               <Link to="/dashboard/buy-credits" onClick={dropDownToggle}>
                 <li className="py-2 flex underlineLi">
-                  <PiCurrencyDollarSimpleBold className="text-teal-800 mt-2 mx-2 text-lg" />
+                  <PiCurrencyDollarSimpleBold className="text-teal-800 mt-1 mx-2 text-lg" />
                   Buy Credits
                 </li>
               </Link>
@@ -264,40 +272,40 @@ function Header() {
             {userDetails.isTeamMember != 1 && (
               <Link to="/dashboard/billing" onClick={dropDownToggle}>
                 <li className="py-2 flex underlineLi">
-                  <LuHistory className="text-teal-800 mt-2 mx-2 text-lg" />
+                  <LuHistory className="text-teal-800 mt-1 mx-2 text-lg" />
                   Billing
                 </li>
               </Link>
             )}
             <Link to="/dashboard/affiliate" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
-                <GrMoney className="text-teal-800 mt-2 mx-2 text-lg" />
+                <GrMoney className="text-teal-800 mt-1 mx-2 text-lg" />
                 Become an Affiliate
               </li>
             </Link>
-            {/* <Link to="/dashboard/EarnPoints" onClick={dropDownToggle}>
+            <Link to="/dashboard/EarnPoints" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
-                <TbBasketStar className="text-teal-800 mt-2 mx-2 text-lg" />
+                <TbBasketStar className="text-teal-800 mt-1 mx-2 text-lg" />
                 Earn Free Credits
               </li>
-            </Link> */}
+            </Link>
             {/* {userDetails.isTeam == 1 && (
               <Link to="/dashboard/team" onClick={dropDownToggle}>
                 <li className="py-2 flex underlineLi">
-                  <MdOutlineGroups className="text-teal-800 mt-2 mx-2 text-lg" />
+                  <MdOutlineGroups className="text-teal-800 mt-1 mx-2 text-lg" />
                   Team
                 </li>
               </Link>
             )} */}
             {/* <Link to="/dashboard/support" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
-                <SlSupport className="text-teal-800 mt-2 mx-2 text-lg" />{" "}
+                <SlSupport className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                 Support
               </li>
             </Link> */}
 
             <li className="py-2 flex underlineLi" onClick={logoutHandler}>
-              <IoLogOutOutline className="text-teal-800 mt-2 mx-2 " />
+              <IoLogOutOutline className="text-teal-800 mt-1 mx-2 " />
               Logout
             </li>
           </ul>

@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import LoadingBar from "react-top-loading-bar";
 import ServerError from "./ServerError";
 import { useUserState } from "../context/userContext";
+import { useNavigate } from "react-router-dom";
 
 function EmailFinder() {
   let [data, setData] = useState({ fullname: "", domain: "" });
@@ -12,6 +13,9 @@ function EmailFinder() {
   let [loading, setLoading] = useState(false);
   let [load, setLoad] = useState(30);
   let [serverError, setServerError] = useState(false);
+
+    const navigate = useNavigate();
+  
 
   let { userDetails, setCreditBal, creditBal } = useUserState();
 
@@ -21,7 +25,24 @@ function EmailFinder() {
     } else {
       document.title = "Email Finder | Dashboard";
     }
+    parseQueryParams();
   }, []);
+
+  const parseQueryParams = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const result = urlParams.get("result");
+    if (result) {
+      try {
+        const parsedDetails = JSON.parse(decodeURIComponent(result));
+        setResult(parsedDetails);
+      } catch (error) {
+        console.error("Invalid result format in URL", error);
+      }
+    }
+    urlParams.delete("result");
+    navigate(`?${urlParams.toString()}`, { replace: true });
+  };
+
 
   function onInputChange(event, inputType) {
     const value = event.target.value;
@@ -32,7 +53,7 @@ function EmailFinder() {
   }
 
   const HandleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     try {
       if (userDetails.confirm == 1) {
         if (creditBal > 9) {
@@ -40,7 +61,6 @@ function EmailFinder() {
           let domain = data.domain.trim();
           let fullname = data.fullname.trim();
           if (domain && fullname) {
-            let fullnameArray = fullname.split(" ");
             setLoading(true);
             setLoad(30);
             let res = await axiosInstance.post("/singleEmailFinder", data);

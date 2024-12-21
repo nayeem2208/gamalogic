@@ -5,8 +5,7 @@ import { toast } from "react-toastify";
 import LoadingBar from "react-top-loading-bar";
 import ServerError from "./ServerError";
 import { useUserState } from "../context/userContext";
-import VideoModal from "../components/VideoModal";
-import AccountDetailsModal from "../components/AccountDetailsModa";
+import { useNavigate } from "react-router-dom";
 
 function QuickValidation() {
   let [email, setEmail] = useState("");
@@ -18,11 +17,9 @@ function QuickValidation() {
     userDetails,
     setCreditBal,
     creditBal,
-    tutorialVideo,
-    setTutorialVideo,
-    accountDetailsModal,
-    setAccountDetailsModal,
   } = useUserState();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (APP == "beta") {
@@ -30,17 +27,31 @@ function QuickValidation() {
     } else {
       document.title = "Quick Validation | Dashboard";
     }
-    localStorage.removeItem("refCode");
+    parseQueryParams();
 
-    const handleEsc = (e) => {
-      if (e.key === "Escape" && tutorialVideo) {
-        handleCloseVideoModal();
-      }
-    };
-    window.addEventListener("keydown", handleEsc);
-
-    return () => window.removeEventListener("keydown", handleEsc);
   }, []);
+
+  const parseQueryParams = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const ValidationResult = urlParams.get("result");
+    console.log(ValidationResult, "validation results");
+    if (ValidationResult) {
+      try {
+        const sanitizedResult = ValidationResult.startsWith("=")
+          ? ValidationResult.slice(1)
+          : ValidationResult;
+
+        const parsedDetails = JSON.parse(decodeURIComponent(sanitizedResult));
+        console.log(parsedDetails, "parsed details");
+        setResult(parsedDetails);
+      } catch (error) {
+        console.error("Invalid ValidationResult format in URL", error);
+      }
+    }
+    urlParams.delete("result");
+    navigate(`?${urlParams.toString()}`, { replace: true });
+  };
+
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -75,55 +86,13 @@ function QuickValidation() {
       }
     }
   };
-  const handleCloseVideoModal = () => {
-    setTutorialVideo(false);
-    if (userDetails.accountDetailsModal) setAccountDetailsModal(true);
-    // window.reloadThriveWidget();
-  };
 
-  useEffect(() => {
-    if (userDetails.accountDetailsModal&&!tutorialVideo) setAccountDetailsModal(true);
-  }, []);
-
-  const selectVideoId = () => {
-    let ids = ["9CnyAJZiQ38", "_ualvh37g9Y", "imageModal", null];
-    let urls = [
-      "https://blog.gamalogic.com/email-validation-google-sheets-add-on/",
-      "https://blog.gamalogic.com/find-email-address-using-name-and-company-on-google-sheets-add-on/",
-      "imageModal",
-      null,
-    ];
-    let texts = [
-      "Learn how to integrate the Gamalogic email validation add-on with Google Sheets",
-      "Learn more to integrate Gamalogic to find email address list on Google sheets",
-      "imageModal",
-      null,
-    ];
-    const index = Math.floor(Math.random() * ids.length);
-    return { id: ids[index], url: urls[index], texts: texts[index] };
-  };
-  const { id, url, texts } = selectVideoId();
 
   if (serverError) {
     return <ServerError />;
   }
   return (
     <div className=" px-6 md:px-20 py-8">
-      {tutorialVideo && (
-        <VideoModal
-          videoId={id}
-          url={url}
-          texts={texts}
-          isOpen={tutorialVideo}
-          onClose={handleCloseVideoModal}
-        />
-      )}
-
-      {accountDetailsModal && (
-        <AccountDetailsModal
-          isOpen={accountDetailsModal}
-        />
-      )}
       <SubHeader SubHeader={"Quick Validation"} />
       <div className="mt-14 text-bgblue subHeading text-center sm:text-left">
         <h3>Single Email Validator</h3>

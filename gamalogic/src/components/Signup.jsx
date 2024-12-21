@@ -71,7 +71,7 @@ function Signup() {
             setCreditBal(token.credit);
             localStorage.setItem("Gamalogic_token", JSON.stringify(token));
             setTutorialVideo(true);
-            navigate("/dashboard/quick-validation");
+            navigate("/dashboard/userDashboard");
           }
         } catch (err) {
           console.error(err);
@@ -209,7 +209,7 @@ function Signup() {
       setCreditBal(token.credit);
       localStorage.setItem("Gamalogic_token", JSON.stringify(token));
       setTutorialVideo(true);
-      navigate("/dashboard/quick-validation");
+      navigate("/dashboard/userDashboard");
     } catch (err) {
       setLinkedinLoading(false);
       if (err.response.status === 500) {

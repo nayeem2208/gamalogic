@@ -9,7 +9,7 @@ import { useUserState } from "../context/userContext";
 import LoadingBar from "react-top-loading-bar";
 import ServerError from "./ServerError";
 import { IoDownload } from "react-icons/io5";
-import { json } from "react-router-dom";
+import { json, useLocation, useNavigate } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 import clickUpAttachment from "../utils/clickup";
 import {
@@ -47,6 +47,9 @@ function EmailVerification() {
 
   const isCheckingCompletion = useRef(false);
   let { userDetails, setCreditBal, creditBal } = useUserState();
+  const location = useLocation();
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     if (APP == "beta") {
@@ -55,7 +58,16 @@ function EmailVerification() {
       document.title = "Batch Email Verification | Dashboard";
     }
     fetchAllFiles(pageIndex);
+    const fileFromDashboard = location.state?.file;
+    console.log(fileFromDashboard,'file from dashboardddddddddddd')
+    if(fileFromDashboard){
+      const fakeEvent = { target: { files: [fileFromDashboard] } };
+      handleFileChange(fakeEvent);
+      navigate(location.pathname, { replace: true });
+    }
+
   }, []);
+
   useEffect(() => {
     const filteredFilesFinder = resultFile.filter((file) =>
       file.file_upload.toLowerCase().includes(searchQuery.toLowerCase())

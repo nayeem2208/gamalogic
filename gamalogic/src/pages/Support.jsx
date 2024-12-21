@@ -13,7 +13,7 @@ export default function Support() {
     } else {
       document.title = "Support | Dashboard";
     }
-    navigate("/dashboard/quick-validation")
+    navigate("/dashboard/userDashboard")
   }, []);
   return (
     <div className="px-6 md:px-20 py-8 text-center sm:text-start">

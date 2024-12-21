@@ -53,8 +53,8 @@ function Body() {
       if (window.location.pathname.endsWith("EarnPoints")) {
         // if (window.hideThriveWidget == true) {
           console.log("inside true settting when the page is in earn points");
-          // window.hideThriveWidget = false;
-          // window.reloadThriveWidget();
+          window.hideThriveWidget = false;
+          window.reloadThriveWidget();
         // }
       } else {
         // if (window.hideThriveWidget == false) {

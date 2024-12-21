@@ -32,6 +32,7 @@ const Billing=lazy(()=>import('../pages/Billings'))
 const Team=lazy(()=>import('../pages/Team'))
 const DeleteAccountSuccess=lazy(()=>import('../components/DeleteAccount/DeleteAccountSuccess'))
 const Integrate=lazy(()=>import('../pages/Integrate'))
+const Dashboard=lazy(()=>import('../pages/Dashboard'))
 
 
 
@@ -44,7 +45,8 @@ function Router() {
   return (
     <Routes>
       <Route path="/" element={<Body />}>
-      <Route index element={<Navigate to={userDetails ? "/dashboard/quick-validation" : "/signin"} />} />
+      <Route index element={<Navigate to={userDetails ? "/dashboard/userDashboard" : "/signin"} />} />
+      <Route  path='dashboard/userDashboard' element={<Suspense fallback={<TopLoader loading={loading} />}><Dashboard setLoading={setLoading}/></Suspense>} />
         <Route  path='dashboard/quick-validation' element={<Suspense fallback={<TopLoader loading={loading} />}><QuickValidation setLoading={setLoading}/></Suspense>} />
         <Route path="dashboard/email-finder" element={<Suspense fallback={<TopLoader loading={loading} />}><EmailFinder setLoading={setLoading}/></Suspense>} />
         <Route path="dashboard/apikey" element={<Suspense fallback={<TopLoader loading={loading} />}><ApiKey setLoading={setLoading}/></Suspense>} />

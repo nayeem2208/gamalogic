@@ -43,7 +43,7 @@ const MicroSoftSignInButton = (props) => {
           setCreditBal(token.credit);
           localStorage.setItem("Gamalogic_token", JSON.stringify(token));
           setTutorialVideo(true);
-          navigate("/dashboard/quick-validation");
+          navigate("/dashboard/userDashboard");
         } catch (error) {
           console.error(
             "Error sending user details to backend:",
@@ -65,7 +65,7 @@ const MicroSoftSignInButton = (props) => {
           setCreditBal(token.credit);
           localStorage.setItem("Gamalogic_token", JSON.stringify(token));
           setTutorialVideo(true);
-          navigate("/dashboard/quick-validation");
+          navigate("/dashboard/userDashboard");
         } catch (err) {
           console.error(err.response);
           toast.error(err.response?.data?.error || "Error processing login");
