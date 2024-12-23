@@ -395,6 +395,10 @@ const Authentication = {
           let TeamAdmin = await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
           TeamAdminEmail = TeamAdmin[0][0].emailid
         }
+        let AppTour={
+          tour:true,
+          showTour:false
+        }
         res.status(200).json({
           name: user[0][0].username,
           email: user[0][0].emailid,
@@ -413,7 +417,8 @@ const Authentication = {
           isTeam: user[0][0].is_team_admin,
           isTeamMember: user[0][0].is_team_member,
           isTeamid: TeamAdminEmail,
-          timeZone: user[0][0].time_zone
+          timeZone: user[0][0].time_zone,
+          AppTour
         });
       } else {
         res.status(400).json({
@@ -925,7 +930,6 @@ const Authentication = {
   microsoftSignUP: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      console.log(req.body, 'req body in micro signup')
       let email = req.body.mail ?? req.body.userPrincipalName
       let invitedUserId = null
       if (!email) {
@@ -990,7 +994,7 @@ const Authentication = {
 
             const response = await axios.post(url, data, { headers });
           } catch (error) {
-            ErrorHandler("Google Auth Controller Thrive signin section", error, req);
+            ErrorHandler("Microsoft Auth Controller Thrive signin section", error, req);
           }
         }
         const userAgent = req.headers["user-agent"];
