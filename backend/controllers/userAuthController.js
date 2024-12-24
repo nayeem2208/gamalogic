@@ -418,7 +418,7 @@ const Authentication = {
           isTeamMember: user[0][0].is_team_member,
           isTeamid: TeamAdminEmail,
           timeZone: user[0][0].time_zone,
-          AppTour
+          // AppTour
         });
       } else {
         res.status(400).json({
