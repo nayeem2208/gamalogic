@@ -31,7 +31,7 @@ function SideBar() {
   let [tutorialDropDown, setTutorialDropDown] = useState(false);
   let [settingDropDown, setSettingDropDown] = useState(false);
 
-  let { setUserDetails, userDetails, setLinkedinLoading } = useUserState();
+  let { setUserDetails, userDetails, setLinkedinLoading,appTour } = useUserState();
   let navigate = useNavigate();
 
   const location = useLocation();
@@ -48,7 +48,11 @@ function SideBar() {
     ) {
       setSettingDropDown(true);
     }
-  }, [location.pathname]);
+
+    if (appTour) {
+      setUploadFileDropDown(true);
+    }
+  }, [location.pathname,appTour]);
 
   const uploadfileDropDownToggle = () => {
     setUploadFileDropDown(!uploadfileDropDown);
@@ -102,13 +106,13 @@ function SideBar() {
               </li>
             </Link>
             <Link to="/dashboard/quick-validation">
-              <li className="my-4 flex ">
+              <li className="my-4 flex email-validation-step">
                 <GrDocumentVerified className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                 Quick Validation
               </li>
             </Link>
             <Link to="/dashboard/email-finder">
-              <li className="my-4 flex">
+              <li className="my-4 flex email-finder-step">
                 <IoSearchOutline className="text-teal-800 mt-1 mx-2 text-lg" />
                 Email Finder
               </li>
@@ -137,13 +141,13 @@ function SideBar() {
             {uploadfileDropDown && (
               <ul className="ml-6">
                 <Link to="/dashboard/file-upload">
-                  <li className="my-4 flex">
+                  <li className="my-4 flex file-validation-step">
                     <LuFileUp className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                     Email Verification
                   </li>
                 </Link>
                 <Link to="/dashboard/file-upload-finder">
-                  <li className="my-4 flex">
+                  <li className="my-4 flex large-set-finder-step">
                     <LuFileUp className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                     Email Finder
                   </li>

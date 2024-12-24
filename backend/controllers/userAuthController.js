@@ -142,6 +142,13 @@ const Authentication = {
             let TeamAdmin = await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
             TeamAdminEmail = TeamAdmin[0][0].emailid
           }
+          let AppTour = null
+          if (user[0][0].app_tour != 1) {
+            AppTour = {
+              tour: true,
+              showTour: false
+            }
+          }
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
@@ -160,7 +167,8 @@ const Authentication = {
             isTeam: user[0][0].is_team_admin,
             isTeamMember: user[0][0].is_team_member,
             isTeamid: TeamAdminEmail,
-            timeZone: user[0][0].time_zone
+            timeZone: user[0][0].time_zone,
+            AppTour
 
           });
 
@@ -395,9 +403,12 @@ const Authentication = {
           let TeamAdmin = await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
           TeamAdminEmail = TeamAdmin[0][0].emailid
         }
-        let AppTour={
-          tour:true,
-          showTour:false
+        let AppTour = null
+        if (user[0][0].app_tour != 1) {
+          AppTour = {
+            tour: true,
+            showTour: false
+          }
         }
         res.status(200).json({
           name: user[0][0].username,
@@ -418,7 +429,7 @@ const Authentication = {
           isTeamMember: user[0][0].is_team_member,
           isTeamid: TeamAdminEmail,
           timeZone: user[0][0].time_zone,
-          // AppTour
+          AppTour
         });
       } else {
         res.status(400).json({
@@ -581,6 +592,10 @@ const Authentication = {
             let TeamAdmin = await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
             TeamAdminEmail = TeamAdmin[0][0].emailid
           }
+          let AppTour = {
+            tour: true,
+            showTour: false
+          }
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
@@ -596,7 +611,8 @@ const Authentication = {
             isTeamMember: user[0][0].is_team_member,
             isTeamid: TeamAdminEmail,
             accountDetailsModalInBuyCredits: true,
-            timeZone: user[0][0].time_zone
+            timeZone: user[0][0].time_zone,
+            AppTour
           });
         } else {
           res
@@ -1071,6 +1087,11 @@ const Authentication = {
             let TeamAdmin = await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
             TeamAdminEmail = TeamAdmin[0][0].emailid
           }
+
+          let AppTour = {
+            tour: true,
+            showTour: false
+          }
           res.json({
             name: user[0][0].username,
             email: user[0][0].emailid,
@@ -1085,7 +1106,8 @@ const Authentication = {
             isTeamMember: user[0][0].is_team_member,
             isTeamid: TeamAdminEmail,
             accountDetailsModalInBuyCredits: true,
-            timeZone: user[0][0].time_zone
+            timeZone: user[0][0].time_zone,
+            AppTour
           });
         } else {
           res
@@ -1184,6 +1206,13 @@ const Authentication = {
           let TeamAdmin = await dbConnection.query(`SELECT emailid from registration where rowid='${user[0][0].team_id}'`)
           TeamAdminEmail = TeamAdmin[0][0].emailid
         }
+        let AppTour = null
+        if (user[0][0].app_tour != 1) {
+          AppTour = {
+            tour: true,
+            showTour: false
+          }
+        }
         res.status(200).json({
           name: user[0][0].username,
           email: user[0][0].emailid,
@@ -1202,7 +1231,8 @@ const Authentication = {
           isTeam: user[0][0].is_team_admin,
           isTeamMember: user[0][0].is_team_member,
           isTeamid: TeamAdminEmail,
-          timeZone: user[0][0].time_zone
+          timeZone: user[0][0].time_zone,
+          AppTour
 
         });
       } else {

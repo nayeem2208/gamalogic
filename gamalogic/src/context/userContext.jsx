@@ -11,6 +11,8 @@ const UserDetailsProvider = ({ children }) => {
   let [linkedinLoading, setLinkedinLoading] = useState(false);
   let [paymentDetails,setPaymentDetails]=useState({cost:7,type:'Pay As You Go',period:'',credits:1000})
   let [accountDetailsModal,setAccountDetailsModal]=useState(false)
+  let [appTour,setAppTour]=useState(null)
+
   return (
     <userDetailsContext.Provider
       value={{
@@ -27,7 +29,9 @@ const UserDetailsProvider = ({ children }) => {
         paymentDetails,
         setPaymentDetails,
         accountDetailsModal,
-        setAccountDetailsModal
+        setAccountDetailsModal,
+        appTour,
+        setAppTour
       }}
     >
       {children}

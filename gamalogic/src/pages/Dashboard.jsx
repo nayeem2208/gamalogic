@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import DragAndDropBackground from "../components/File/DragAndDropBackground";
 import LoadingBar from "react-top-loading-bar";
+import AppTour from "../components/AppTour";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -32,6 +33,8 @@ function Dashboard() {
     setTutorialVideo,
     accountDetailsModal,
     setAccountDetailsModal,
+    appTour,
+    setAppTour
   } = useUserState();
 
   useEffect(() => {
@@ -61,6 +64,37 @@ function Dashboard() {
     if (userDetails.accountDetailsModal && !tutorialVideo)
       setAccountDetailsModal(true);
   }, []);
+
+  useEffect(() => {
+    if (!userDetails.accountDetailsModal && !tutorialVideo) {
+      if (
+        appTour &&
+        appTour.tour &&
+        !appTour.showTour
+      ) {
+        const storedToken = localStorage.getItem("Gamalogic_token");
+  
+        if (storedToken) {
+          let token;
+          try {
+            token = JSON.parse(storedToken);
+          } catch (error) {
+            token = storedToken;
+          }
+  
+          if (token && typeof token === "object") {
+            const updatedToken = {
+              ...token,
+              AppTour: { ...token.AppTour, showTour: true },
+            };
+            localStorage.setItem("Gamalogic_token", JSON.stringify(updatedToken));
+            setAppTour(updatedToken.AppTour)
+          }
+        }
+      }
+    }
+  }, [userDetails.accountDetailsModal, tutorialVideo, appTour]);
+  
 
   const selectVideoId = () => {
     let ids = ["9CnyAJZiQ38", "_ualvh37g9Y", "imageModal", null];
@@ -112,37 +146,13 @@ function Dashboard() {
         toast.error("Please verify your email");
       }
     } catch (error) {
-      console.log(error,'error in validation dashboard')
+      console.log(error, "error in validation dashboard");
       if (error.response.status === 500) {
         setServerError(true);
       } else {
         toast.error(error.response?.data?.error);
       }
     }
-    // e.preventDefault();
-    // if (userDetails.confirm == 1) {
-    //   if (creditBal > 0) {
-    //     if (emailAddress.trim()) {
-    //       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    //       if (!emailRegex.test(emailAddress)) {
-    //         toast.error("Please enter a valid email address.");
-    //         return;
-    //       }
-    //       navigate(
-    //         `/dashboard/quick-validation?email=${encodeURIComponent(
-    //           emailAddress
-    //         )}`
-    //       );
-    //     } else {
-    //       toast.error("Please enter a valid email address.");
-    //     }
-    //   } else {
-    //     toast.error("You dont have enough credits to do this");
-    //   }
-    // } else {
-    //   toast.error("Please verify your email");
-    // }
   };
 
   const handleFinderDetailsChange = (e) => {
@@ -153,28 +163,26 @@ function Dashboard() {
     }));
   };
 
-  const handleEmailFinder = async(e) => {
+  const handleEmailFinder = async (e) => {
     e.preventDefault();
     if (userDetails.confirm == 1) {
       if (creditBal > 9) {
         let domain = finderDetails.domain.trim();
         let fullname = finderDetails.fullname.trim();
         if (domain && fullname) {
-          let data=finderDetails
-         
+          let data = finderDetails;
+
           setLoading(true);
           setLoad(30);
           let res = await axiosInstance.post("/singleEmailFinder", data);
           setLoad(100);
           setCreditBal(creditBal - 10);
           setFinderDetails({ fullname: "", domain: "" });
-           const serializedFinderDetails = encodeURIComponent(
+          const serializedFinderDetails = encodeURIComponent(
             JSON.stringify(res.data)
           );
 
-          navigate(
-            `/dashboard/email-finder?result=${serializedFinderDetails}`
-          );
+          navigate(`/dashboard/email-finder?result=${serializedFinderDetails}`);
         } else {
           toast.error("Please provide valid fullname and domain");
         }

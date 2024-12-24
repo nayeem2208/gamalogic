@@ -528,7 +528,7 @@ const newControllers = {
             }
         }
     },
-    verifyAccountDelete:async(req,res)=>{
+    verifyAccountDelete: async (req, res) => {
         try {
             const dbConnection = req.dbConnection;
             // const decoded = jwt.verify(req.query.email, process.env.JWT_SECRET);
@@ -544,9 +544,9 @@ const newControllers = {
                 return res.status(400).json({ message: "Invalid token." });
             }
             const userEmail = decoded.email;
-            console.log(userEmail,'user Email')
-            let [user]=await dbConnection.query('SELECT username,api_key FROM registration WHERE emailid = ?', [userEmail])
-              let currDate = new Date().toISOString().slice(0, 19).replace("T", " ");
+            console.log(userEmail, 'user Email')
+            let [user] = await dbConnection.query('SELECT username,api_key FROM registration WHERE emailid = ?', [userEmail])
+            let currDate = new Date().toISOString().slice(0, 19).replace("T", " ");
             let response = await axios.post(`http://service.gamalogic.com/delete-account?api_key=${user[0].api_key}&deleted_date_time=${currDate}`)
             if (response.status === 200) {
                 let userContent = `<p>Your account has been successfully deleted. If you did not intend to perform this action or have any concerns, please contact our support team for assistance.</p>`;
@@ -568,7 +568,7 @@ const newControllers = {
             console.log(error)
             ErrorHandler("verify Account Controller", error, req)
             res.status(500).json({ error: error })
-        }finally {
+        } finally {
             if (req.dbConnection) {
                 await req.dbConnection.release();
             }
@@ -587,6 +587,22 @@ const newControllers = {
         } catch (error) {
             console.error('Error in updateTimeZone:', error);
             ErrorHandler("update timeZone Controller", error, req);
+            res.status(500).json({ error: error.message || 'Internal Server Error' });
+        } finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
+    },
+    updateAppTourStatus: async (req, res) => {
+        try {
+            const dbConnection = req.dbConnection;
+            const query = `UPDATE registration SET app_tour = ? WHERE emailid = ?`;
+            await dbConnection.query(query, [1, req.user[0][0].emailid]);
+            res.status(200).json({ message: 'AppTour status successfully updated' });
+        } catch (error) {
+            console.error('Error in AppTour updation:', error);
+            ErrorHandler("update AppTour Controller", error, req);
             res.status(500).json({ error: error.message || 'Internal Server Error' });
         } finally {
             if (req.dbConnection) {

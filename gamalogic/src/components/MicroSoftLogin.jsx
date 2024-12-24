@@ -15,7 +15,7 @@ const MicroSoftSignInButton = (props) => {
   const request = {
     scopes: ["user.read"],
   };
-  console.log(props.page,props.teamId, "page");
+  console.log(props.page, props.teamId, "page");
   const handleLogin = async () => {
     setLinkedinLoading(true);
     const token = await getToken();
@@ -37,7 +37,8 @@ const MicroSoftSignInButton = (props) => {
       if (props.page == "login") {
         try {
           const res = await axiosInstance.post("/microsoftLogin", userDetails);
-          toast.success("Welcome to Gamalogic! You've successfully registered with us.");
+          toast.success("Welcome back! You've successfully logged in");
+
           const token = res.data;
           setUserDetails(token);
           setCreditBal(token.credit);
@@ -57,9 +58,11 @@ const MicroSoftSignInButton = (props) => {
             ...userDetails,
             thriveRefId: props.thriveRefId,
             widgetCode: props.widgetCode,
-            teamId:props.teamId
+            teamId: props.teamId,
           });
-          toast.success("Welcome back! You've successfully logged in");
+          toast.success(
+            "Welcome to Gamalogic! You've successfully registered with us."
+          );
           let token = res.data;
           setUserDetails(token);
           setCreditBal(token.credit);
@@ -73,7 +76,7 @@ const MicroSoftSignInButton = (props) => {
       }
     } catch (error) {
       console.error("Error fetching user details:", error);
-    //   toast.error("Error fetching user details");
+      //   toast.error("Error fetching user details");
     } finally {
       setLinkedinLoading(false);
     }
@@ -97,17 +100,13 @@ const MicroSoftSignInButton = (props) => {
 
   return (
     <button
-    onClick={handleLogin}
-    className="bg-white text-gray-600 flex text-xs font-semibold p-2 w-48 rounded-sm mt-2 justify-center items-center"
-    style={{ maxWidth: "180px",width:'180px' }}
-  >
-    <img
-      src="/microsoft.png"
-      alt="Microsoft Logo"
-      className="w-4 h-4 mr-2"
-    />
-    Sign in with Microsoft
-  </button>
+      onClick={handleLogin}
+      className="bg-white text-gray-600 flex text-xs font-semibold p-2 w-48 rounded-sm mt-2 justify-center items-center"
+      style={{ maxWidth: "180px", width: "180px" }}
+    >
+      <img src="/microsoft.png" alt="Microsoft Logo" className="w-4 h-4 mr-2" />
+      Sign in with Microsoft
+    </button>
   );
 };
 

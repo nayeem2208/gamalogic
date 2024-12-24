@@ -9,6 +9,7 @@ import ServerError from "../pages/ServerError";
 import LinkedInPage from "./Linkedin";
 import LinkedinLoading from "./LinkedinLoading";
 import MicroSoftSignInButton from "./MicroSoftLogin";
+import AppTour from "./AppTour";
 
 function Login() {
   let [data, setData] = useState({ email: "", password: "" });
@@ -18,6 +19,7 @@ function Login() {
     setTutorialVideo,
     linkedinLoading,
     setLinkedinLoading,
+    setAppTour,
   } = useUserState();
   let [passwordVisible, setPasswordVisible] = useState(false);
   let [loading, setLoading] = useState(false);
@@ -117,6 +119,7 @@ function Login() {
         let token = userData.data;
         setUserDetails(token);
         setCreditBal(token.credit);
+        setAppTour(token.AppTour || null);
         localStorage.setItem("Gamalogic_token", JSON.stringify(token));
         setTutorialVideo(true);
         navigate("/dashboard/userDashboard");
@@ -145,6 +148,9 @@ function Login() {
       let token = res.data;
       setUserDetails(token);
       setCreditBal(token.credit);
+      console.log(token.AppTour, "token app tourrrrrrrrrrrrr");
+      setAppTour(token.AppTour || null);
+      console.log(AppTour,'appTourrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
       localStorage.setItem("Gamalogic_token", JSON.stringify(token));
       setTutorialVideo(true);
       navigate("/dashboard/userDashboard");
@@ -264,9 +270,9 @@ function Login() {
             {/* <div className="flex justify-center mt-2 w-full">
               <LinkedInPage endpoint={"signin"} />
             </div> */}
-            {/* <div className="flex justify-center my-2">
+            <div className="flex justify-center my-2">
               <MicroSoftSignInButton page="login" />
-            </div> */}
+            </div>
             <div className="flex justify-center text-xs md:text-sm text-gray-300 mt-3">
               <Link to="/signup">
                 <div className="border-r border-cyan-400 mx-2 px-2">
