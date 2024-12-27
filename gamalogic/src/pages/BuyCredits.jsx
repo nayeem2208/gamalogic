@@ -104,7 +104,6 @@ export default function BuyCredits() {
   }, [userDetails]);
 
   const createOrder = (data, actions) => {
-    console.log(paymentDetails, "payment details");
     return actions.order
       .create({
         purchase_units: [

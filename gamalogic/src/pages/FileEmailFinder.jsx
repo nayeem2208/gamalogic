@@ -296,7 +296,6 @@ function FileEmailFinder() {
   useEffect(() => {
     if (showAlert && Selection !== null) {
       if (Selection === true) {
-        console.log(JsonToServer, "json to server");
         if (creditBal >= JsonToServer.data.length * 10) {
           setShowAlert(false);
           SetSelection(null);
@@ -487,7 +486,6 @@ function FileEmailFinder() {
 
   const DownloadFile = async (data) => {
     try {
-      console.log(data, "data is here");
       if (data.processed == 100) {
         setLoading(true);
         setLoad(30);
@@ -574,7 +572,6 @@ function FileEmailFinder() {
   };
 
   const downloadText = (data, fileName) => {
-    console.log(data, "data to txt file");
     const textData = data
       .map(
         (item) =>

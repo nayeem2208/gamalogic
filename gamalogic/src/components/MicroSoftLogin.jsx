@@ -15,7 +15,6 @@ const MicroSoftSignInButton = (props) => {
   const request = {
     scopes: ["user.read"],
   };
-  console.log(props.page, props.teamId, "page");
   const handleLogin = async () => {
     setLinkedinLoading(true);
     const token = await getToken();

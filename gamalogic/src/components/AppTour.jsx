@@ -166,6 +166,7 @@ const AppTour = () => {
         disableScrolling
         disableBeacon
         disableCloseOnEsc
+        locale={{last:'Finish'}}
         disableOverlayClose
         placement="top-end"
         spotlightClicks

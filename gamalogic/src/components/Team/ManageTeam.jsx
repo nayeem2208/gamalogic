@@ -63,7 +63,6 @@ const ManageTeam = () => {
 
   const handleDeleteAccount = async (emailToDelete) => {
     try {
-      console.log(emailToDelete, "email to delete");
       setLoading(true);
       setLoad(30);
       setAccounts(
@@ -82,7 +81,6 @@ const ManageTeam = () => {
 
   const handleRemoveInvite = async (emailToDelete) => {
     try {
-      console.log(emailToDelete, "invite to delete");
       setLoading(true);
       setLoad(30);
       setInvites(
@@ -130,7 +128,6 @@ const ManageTeam = () => {
       if (emailToDelete) {
         await handleRemoveInvite(emailToDelete);
       }
-      console.log("its workinggggg");
     } catch (error) {
       console.error("Error removing user:", error);
       setShowInvitationAlert(false);
@@ -142,7 +139,6 @@ const ManageTeam = () => {
   };
 
   const handleResendInvite=async(emailToReInvite) => {
-      console.log(emailToReInvite,'eeeeee')
       if (!emailToReInvite) return;
   
       try {

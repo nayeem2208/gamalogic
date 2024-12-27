@@ -147,7 +147,6 @@ const ButtonWrapper = ({ type }) => {
     }
     if (matchedPlan) {
       planIdRef.current = matchedPlan[2];
-      console.log("Plan ID Updated To:", planIdRef.current); // Debugging line
     } else {
       console.warn(
         "No matching plan found for credits:",
@@ -197,7 +196,6 @@ const ButtonWrapper = ({ type }) => {
       }
       toast.success("Payment successful!!");
 
-      console.log("Order details sent to backend successfully");
     } catch (error) {
       console.error(
         "Error handling approval or sending data to backend:",
@@ -222,7 +220,6 @@ const ButtonWrapper = ({ type }) => {
       }
     }
   };
-  console.log(paymentDetails, "payment details");
   return isLoaded ? (
     <PayPalButtons
       createSubscription={(data, actions) => {

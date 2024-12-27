@@ -37,7 +37,6 @@ function Body() {
         window.location.pathname.endsWith("EarnPoints")
       ) {
         window.reloadThriveWidget();
-        console.log("inside body ztuser Dataaaaaaaaaaaaaaaaaaaaaaaa");
         window.ztUserData["za_email_id"] = parsedToken.email;
         window.ztUserData["user_unique_id"] = parsedToken.id;
         window.ztUserData["thrive_digest"] = parsedToken.HMACDigest;
@@ -50,7 +49,6 @@ function Body() {
 
         if (!document.getElementById("thrive_script")) {
           // window.reloadThriveWidget();
-          console.log("hereee");
           const thriveScript = document.createElement("script");
           thriveScript.id = "thrive_script";
           thriveScript.src =
@@ -61,13 +59,11 @@ function Body() {
       }
       if (window.location.pathname.endsWith("EarnPoints")) {
         // if (window.hideThriveWidget == true) {
-        console.log("inside true settting when the page is in earn points");
         window.hideThriveWidget = false;
         window.reloadThriveWidget();
         // }
       } else {
         // if (window.hideThriveWidget == false) {
-        console.log("inside false settting when the page is in earn points");
 
         window.hideThriveWidget = true;
         window.reloadThriveWidget();

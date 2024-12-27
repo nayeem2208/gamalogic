@@ -28,6 +28,8 @@ import { IoIosNotifications } from "react-icons/io";
 import Notification from "./Notifications";
 import MobileNotification from "./NotificationMobile";
 import { LuLayoutDashboard } from "react-icons/lu";
+import { VscPreview } from "react-icons/vsc";
+
 
 
 function Header() {
@@ -287,6 +289,12 @@ function Header() {
               <li className="py-2 flex underlineLi">
                 <TbBasketStar className="text-teal-800 mt-1 mx-2 text-lg" />
                 Earn Free Credits
+              </li>
+            </Link>
+            <Link to="/dashboard/ReviewUs" onClick={dropDownToggle}>
+              <li className="py-2 flex underlineLi">
+                <VscPreview className="text-teal-800 mt-1 mx-2 text-lg" />
+                Review Us
               </li>
             </Link>
             {/* {userDetails.isTeam == 1 && (

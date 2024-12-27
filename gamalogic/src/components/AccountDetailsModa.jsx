@@ -45,7 +45,6 @@ function AccountDetailsModal({ isOpen }) {
     const fetchMoreDetails = async () => {
       try {
         let res = await axiosInstance.get("/getMoreDetails");
-        console.log(res, "ressooo");
         const fetchedData = res.data;
 
         // Map fetched data to form initial values
@@ -101,7 +100,6 @@ function AccountDetailsModal({ isOpen }) {
 
   const handleStateChange = (e) => {
     const selectedStateCode = e.target.value;
-    console.log(selectedStateCode, "state codeeeeeeeeeeeeeeeey");
     setStateid(selectedStateCode);
   };
 

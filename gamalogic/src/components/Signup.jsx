@@ -58,7 +58,6 @@ function Signup() {
           if (codeMatch) {
             const code = codeMatch[1];
             const refData = JSON.parse(localStorage.getItem("refCode"));
-            console.log(refData,'refData is hereeeeeeeeeeee')
             const res = await axiosInstance.post("/linkedinSignUp", {
               code,
               thriveRefId: refData?.refId || null,
@@ -104,7 +103,6 @@ function Signup() {
     }
     setTeamId(teamAdminToken)
   }, []);
-  console.log(thriveRefId, "ref id is here ", widgetCode, "widget codeeeee");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -149,7 +147,6 @@ function Signup() {
                     teamId
                   });
                   setLinkedinLoading(false);
-                  console.log(userData, "userdata");
                   toast.success(userData?.data);
                   navigate("/VerifyYourEmail", {
                     state: { email: data.email },

@@ -63,11 +63,9 @@ function TimeZone() {
     }
 
     try {
-      console.log(selectedTimezone, "selected timezone");
       const response = await axiosInstance.post("/update-timezone", {
         timezone: selectedTimezone.value,
       });
-      console.log("Response from backend:", response.data);
       toast.success("Timezone updated successfully!");
       const storedToken = localStorage.getItem("Gamalogic_token");
       if (storedToken) {

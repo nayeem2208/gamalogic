@@ -59,7 +59,6 @@ function EmailVerification() {
     }
     fetchAllFiles(pageIndex);
     const fileFromDashboard = location.state?.file;
-    console.log(fileFromDashboard,'file from dashboardddddddddddd')
     if(fileFromDashboard){
       const fakeEvent = { target: { files: [fileFromDashboard] } };
       handleFileChange(fakeEvent);

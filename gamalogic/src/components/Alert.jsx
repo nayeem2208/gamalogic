@@ -14,7 +14,6 @@ function Alert({ sizeOfData,onAccept, onDismiss }) {
     }
     // setSelection(false); // Update selection state on dismiss
   };
-      console.log(sizeOfData,'size of data')
   return (
     <div role="alert" className="mx-auto max-w-lg rounded-lg border border-stone bg-slate-200 p-4 shadow-xl sm:p-6 lg:p-8 absolute">
       <div className="flex items-center gap-4">

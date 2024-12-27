@@ -45,7 +45,6 @@ function MoreDetails() {
         setLoad(30);
         let res = await axiosInstance.get("/getMoreDetails");
         setLoad(100);
-        console.log(res, "ressooo");
         const fetchedData = res.data;
 
         // Map fetched data to form initial values
@@ -101,7 +100,6 @@ function MoreDetails() {
 
   const handleStateChange = (e) => {
     const selectedStateCode = e.target.value;
-    console.log(selectedStateCode, "state codeeeeeeeeeeeeeeeey");
     setStateid(selectedStateCode);
   };
 

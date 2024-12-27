@@ -4,7 +4,6 @@ function CancelEmailSuccess({ onOkay }) {
 
 
   const handleOkay = () => {
-    console.log('ivda ethi')
     if (typeof onOkay === 'function') {
       onOkay();
     }

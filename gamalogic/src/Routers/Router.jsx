@@ -33,6 +33,7 @@ const Team=lazy(()=>import('../pages/Team'))
 const DeleteAccountSuccess=lazy(()=>import('../components/DeleteAccount/DeleteAccountSuccess'))
 const Integrate=lazy(()=>import('../pages/Integrate'))
 const Dashboard=lazy(()=>import('../pages/Dashboard'))
+const ReviewUs=lazy(()=>import('../pages/ReviewUs'))
 
 
 
@@ -60,6 +61,7 @@ function Router() {
         <Route path='dashboard/team' element={<Suspense fallback={<TopLoader loading={loading}/>}><Team setLoading={setLoading}/></Suspense>}/>
         <Route path='dashboard/EarnPoints' element={<Suspense fallback={<TopLoader loading={loading}/>}><EarnPoints setLoading={setLoading}/></Suspense>}/>
         <Route path='dashboard/Integrate' element={<Suspense fallback={<TopLoader loading={loading}/>}><Integrate setLoading={setLoading}/></Suspense>}/>
+        <Route path='dashboard/ReviewUs' element={<Suspense fallback={<TopLoader loading={loading}/>}><ReviewUs setLoading={setLoading}/></Suspense>}/>
 
       </Route>
       <Route path="/" element={<Authentication />}>

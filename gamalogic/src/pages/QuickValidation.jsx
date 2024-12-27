@@ -34,7 +34,6 @@ function QuickValidation() {
   const parseQueryParams = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const ValidationResult = urlParams.get("result");
-    console.log(ValidationResult, "validation results");
     if (ValidationResult) {
       try {
         const sanitizedResult = ValidationResult.startsWith("=")
@@ -42,7 +41,6 @@ function QuickValidation() {
           : ValidationResult;
 
         const parsedDetails = JSON.parse(decodeURIComponent(sanitizedResult));
-        console.log(parsedDetails, "parsed details");
         setResult(parsedDetails);
       } catch (error) {
         console.error("Invalid ValidationResult format in URL", error);

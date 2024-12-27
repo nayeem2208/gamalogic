@@ -47,7 +47,6 @@ function Login() {
       window.ztUserData["za_email_id"] &&
       window.ztUserData["za_email_id"] != ""
     ) {
-      console.log("zt userData function in login pageeeeeeeeeeeeeee");
       window.ztUserData["za_email_id"] = "";
       window.ztUserData["user_unique_id"] = "";
       window.ztUserData["thrive_digest"] = "";
@@ -148,9 +147,7 @@ function Login() {
       let token = res.data;
       setUserDetails(token);
       setCreditBal(token.credit);
-      console.log(token.AppTour, "token app tourrrrrrrrrrrrr");
       setAppTour(token.AppTour || null);
-      console.log(AppTour,'appTourrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
       localStorage.setItem("Gamalogic_token", JSON.stringify(token));
       setTutorialVideo(true);
       navigate("/dashboard/userDashboard");

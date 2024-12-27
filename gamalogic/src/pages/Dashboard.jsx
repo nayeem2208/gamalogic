@@ -97,16 +97,18 @@ function Dashboard() {
   
 
   const selectVideoId = () => {
-    let ids = ["9CnyAJZiQ38", "_ualvh37g9Y", "imageModal", null];
+    let ids = [
+      // "9CnyAJZiQ38", "_ualvh37g9Y",
+       "imageModal", null];
     let urls = [
-      "https://blog.gamalogic.com/email-validation-google-sheets-add-on/",
-      "https://blog.gamalogic.com/find-email-address-using-name-and-company-on-google-sheets-add-on/",
+      // "https://blog.gamalogic.com/email-validation-google-sheets-add-on/",
+      // "https://blog.gamalogic.com/find-email-address-using-name-and-company-on-google-sheets-add-on/",
       "imageModal",
       null,
     ];
     let texts = [
-      "Learn how to integrate the Gamalogic email validation add-on with Google Sheets",
-      "Learn more to integrate Gamalogic to find email address list on Google sheets",
+      // "Learn how to integrate the Gamalogic email validation add-on with Google Sheets",
+      // "Learn more to integrate Gamalogic to find email address list on Google sheets",
       "imageModal",
       null,
     ];
@@ -146,7 +148,6 @@ function Dashboard() {
         toast.error("Please verify your email");
       }
     } catch (error) {
-      console.log(error, "error in validation dashboard");
       if (error.response.status === 500) {
         setServerError(true);
       } else {
@@ -203,7 +204,6 @@ function Dashboard() {
 
   const handleDragOver = (event) => {
     event.preventDefault();
-    console.log("its working");
     setDragging(true);
   };
 

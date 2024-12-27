@@ -24,6 +24,8 @@ import { MdManageAccounts } from "react-icons/md";
 import { TbBasketStar } from "react-icons/tb";
 import { MdIntegrationInstructions } from "react-icons/md";
 import { LuLayoutDashboard } from "react-icons/lu";
+import { VscPreview } from "react-icons/vsc";
+
 
 
 function SideBar() {
@@ -272,6 +274,12 @@ function SideBar() {
               <li className="my-4 flex">
                 <TbBasketStar className="text-teal-800 mt-1 mx-2 text-lg" />
                 Earn Free Credits
+              </li>
+            </Link>
+            <Link to="/dashboard/ReviewUs">
+              <li className="my-4 flex">
+                <VscPreview className="text-teal-800 mt-1 mx-2 text-lg" />
+                Review Us
               </li>
             </Link>
             {/* {userDetails.isTeam == 1 && (
