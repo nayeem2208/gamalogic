@@ -46,8 +46,9 @@ function Router() {
   return (
     <Routes>
       <Route path="/" element={<Body />}>
-      <Route index element={<Navigate to={userDetails ? "/dashboard/userDashboard" : "/signin"} />} />
-      <Route  path='dashboard/userDashboard' element={<Suspense fallback={<TopLoader loading={loading} />}><Dashboard setLoading={setLoading}/></Suspense>} />
+      <Route index element={<Navigate to={userDetails ? "/dashboard/user-dashboard" : "/signin"} />} />
+      <Route path="dashboard" element={<Navigate to="/" replace />} />
+      <Route  path='dashboard/user-dashboard' element={<Suspense fallback={<TopLoader loading={loading} />}><Dashboard setLoading={setLoading}/></Suspense>} />
         <Route  path='dashboard/quick-validation' element={<Suspense fallback={<TopLoader loading={loading} />}><QuickValidation setLoading={setLoading}/></Suspense>} />
         <Route path="dashboard/email-finder" element={<Suspense fallback={<TopLoader loading={loading} />}><EmailFinder setLoading={setLoading}/></Suspense>} />
         <Route path="dashboard/apikey" element={<Suspense fallback={<TopLoader loading={loading} />}><ApiKey setLoading={setLoading}/></Suspense>} />

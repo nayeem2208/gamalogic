@@ -744,6 +744,12 @@ let APIControllers = {
 
       await dbConnection.query(query, values);
       updateLeadStatus(req.user[0][0].emailid)
+      let purchaseDetailsForZohoBooks = {
+        rate: details?.purchase_units?.[0]?.amount?.value ?? null,
+        credits: req.body.credits,
+        currency: '2234640000000000061'
+      }
+      ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
       if (user[0][0].is_referer_by == 1) {
         try {
           let resp = await PurchaseApi(req.user[0][0].emailid, details?.purchase_units?.[0]?.amount?.value ?? null, req.body?.data?.orderID ?? null, user[0][0]?.rowid ?? null)

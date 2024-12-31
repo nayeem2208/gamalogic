@@ -86,7 +86,7 @@ function Login() {
             setCreditBal(token.credit);
             localStorage.setItem("Gamalogic_token", JSON.stringify(token));
             setTutorialVideo(true);
-            navigate("/dashboard/userDashboard");
+            navigate("/dashboard/user-dashboard");
           }
         } catch (err) {
           console.error(err);
@@ -121,7 +121,7 @@ function Login() {
         setAppTour(token.AppTour || null);
         localStorage.setItem("Gamalogic_token", JSON.stringify(token));
         setTutorialVideo(true);
-        navigate("/dashboard/userDashboard");
+        navigate("/dashboard/user-dashboard");
       }
     } catch (error) {
       setLinkedinLoading(false);
@@ -150,7 +150,7 @@ function Login() {
       setAppTour(token.AppTour || null);
       localStorage.setItem("Gamalogic_token", JSON.stringify(token));
       setTutorialVideo(true);
-      navigate("/dashboard/userDashboard");
+      navigate("/dashboard/user-dashboard");
     } catch (err) {
       setLinkedinLoading(false);
       if (err.response.status === 500) {

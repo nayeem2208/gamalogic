@@ -101,7 +101,7 @@ function SideBar() {
             </p>
           </Link>
           <ul className="mt-14 text-lg font-semibold text-left">
-          <Link to="/dashboard/userDashboard">
+          <Link to="/dashboard/user-dashboard">
               <li className="my-4 flex ">
                 <LuLayoutDashboard className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                 Dashboard

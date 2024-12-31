@@ -115,7 +115,7 @@ function Header() {
           style={{ backgroundColor: "rgba(10, 14, 43,0.97)" }}
         >
           <ul className="mb-14 text-lg font-semibold text-left px-8">
-          <Link to="/dashboard/userDashboard" onClick={dropDownToggle}>
+          <Link to="/dashboard/user-dashboard" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
                 <LuLayoutDashboard className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                 Dashboard
