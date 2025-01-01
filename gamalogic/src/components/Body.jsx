@@ -36,7 +36,7 @@ function Body() {
           window.ztUserData["za_email_id"] == "") &&
         window.location.pathname.endsWith("EarnPoints")
       ) {
-        window.reloadThriveWidget();
+        // window.reloadThriveWidget();
         window.ztUserData["za_email_id"] = parsedToken.email;
         window.ztUserData["user_unique_id"] = parsedToken.id;
         window.ztUserData["thrive_digest"] = parsedToken.HMACDigest;
@@ -58,10 +58,10 @@ function Body() {
         }
       }
       if (window.location.pathname.endsWith("EarnPoints")) {
-        // if (window.hideThriveWidget == true) {
+        if (window.hideThriveWidget == true) {
         window.hideThriveWidget = false;
         window.reloadThriveWidget();
-        // }
+        }
       } else {
         // if (window.hideThriveWidget == false) {
 

@@ -68,7 +68,7 @@ async function ZohoBooks(user,product) {
         } else {
             console.log(`Email "${emailToCheck}" not found. Creating new contact.`);
             let contactName = emailToCheck.split('@')[0]
-            const newContact = await createZohoContact(accessToken, organizationId, { contact_name: contactName });
+            const newContact = await createZohoContact(accessToken, organizationId, { contact_name: contactName,currency_id:product.currency });
 
             const contactPersonData = {
                 contact_id: newContact.contact.contact_id,
