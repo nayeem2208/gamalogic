@@ -901,6 +901,12 @@ let APIControllers = {
         new Date().toISOString()
       ];
       updateLeadStatus(req.user[0][0].emailid)
+      let purchaseDetailsForZohoBooks = {
+        rate: gross_amount ?? null,
+        credits: paymentDetails.credits,
+        currency: '2234640000000000061'
+      }
+      ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
       if (user.is_referer_by == 1) {
         try {
           let orderId = subscriptionId + new Date().toISOString().split('T')[0];
@@ -1010,6 +1016,12 @@ let APIControllers = {
                 let newBalance = user[0][0].credits + creditsToAdd;
                 let lastPayment_registration = details.billing_info.last_payment.time ?? new Date().toISOString()
                 await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
+                let purchaseDetailsForZohoBooks = {
+                  rate: gross_amount ?? null,
+                  credits: creditsToAdd,
+                  currency: '2234640000000000061'
+                }
+                ZohoBooks(user[0][0], purchaseDetailsForZohoBooks)
                 if (user[0][0].is_referer_by == 1) {
                   try {
                     let orderId = subId + new Date().toISOString().split('T')[0];
@@ -1229,6 +1241,12 @@ let APIControllers = {
         basicTemplate(req.user[0][0].username, content)
       );
       updateLeadStatus(req.user[0][0].emailid)
+      let purchaseDetailsForZohoBooks = {
+        rate: amountInRupees,
+        credits: req.body.credits,
+        currency: '2234640000000000064'
+      }
+      ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
       if (req.user[0][0].is_referer_by == 1) {
         try {
           let DollarRate = await InrToUsdConverter(req.body.credits)
@@ -1391,6 +1409,12 @@ let APIControllers = {
         basicTemplate(req.user[0][0].username, content)
       );
       updateLeadStatus(req.user[0][0].emailid)
+      let purchaseDetailsForZohoBooks = {
+        rate: amount,
+        credits: req.body.credits,
+        currency: '2234640000000000064'
+      }
+      ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
       res.status(200).json('Successfull')
     } catch (error) {
       console.log(error);
