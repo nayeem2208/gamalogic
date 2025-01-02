@@ -1359,6 +1359,7 @@ let APIControllers = {
       ]
 
       await dbConnection.query(query, values);
+      
       if (req.user[0][0].is_referer_by == 1) {
         try {
           let response = await PurchaseApi(req.user[0][0].emailid, DollarRate, resp.order_id || null, req.user[0][0]?.rowid ?? null)
@@ -1500,6 +1501,12 @@ let APIControllers = {
             ]
 
             await dbConnection.query(query, values);
+            let purchaseDetailsForZohoBooks = {
+              rate: amount,
+              credits: planDetails[2] == 'monthly' ? planDetails[0] : planDetails[0] / 12,
+              currency: '2234640000000000064'
+            }
+            ZohoBooks(userDetails[0][0], purchaseDetailsForZohoBooks)
             console.log('outside thriveeeeee')
             if (userDetails[0][0].is_referer_by == 1) {
               try {
