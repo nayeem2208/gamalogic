@@ -4,7 +4,7 @@ import axios from "axios";
 const clientid = process.env.BOOKS_CLIENT_ID;
 const secret = process.env.BOOKS_CLIENT_SECRET;
 const refresh_token = process.env.BOOKS_REFRESH_TOKEN;
-const organization_id=process.env.BOOKS_ORG_ID
+const organization_id = process.env.BOOKS_ORG_ID
 // Validate environment variables
 if (!clientid || !secret || !refresh_token) {
     throw new Error("Environment variables are missing for Zoho API credentials.");
@@ -29,63 +29,75 @@ async function refreshToken() {
 }
 
 // Function to fetch contacts and check if an email exists
-async function ZohoBooks(user,product) {
+async function ZohoBooks(user, product) {
     try {
-        let emailToCheck=user.emailid
+        let emailToCheck = user.emailid
         const accessToken = await refreshToken();
-        const organizationId = organization_id; 
-        const currency = await axios.get("https://www.zohoapis.in/books/v3/settings/currencies", {
-            headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
-            params: { organization_id: organizationId },
-        });
-        console.log(currency.data.currencies,'currency')
-        // Fetch contacts from Zoho Books
-        const response = await axios.get("https://www.zohoapis.in/books/v3/contacts", {
-            headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
-            params: { organization_id: organizationId },
-        });
-
-        const contacts = response.data?.contacts || [];
+        const organizationId = organization_id;
+        let zohoBookContactId = null
         let contactForSales;
-
-        if (contacts.some((contact) => contact.email === emailToCheck)) {
-            console.log(`Email "${emailToCheck}" already exists in contacts.`);
-            contactForSales = contacts.find((contact) => contact.email === emailToCheck);
-
-            const contactResponse = await axios.get(
-                `https://www.zohoapis.in/books/v3/contacts/${contactForSales.contact_id}`,
-                {
-                    headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
-                    params: { organization_id: organizationId },
+        let changeInDb = false
+        if (user.id_zoho_books) {
+            try {
+                const contactResponse = await axios.get(
+                    `https://www.zohoapis.in/books/v3/contacts/${user.id_zoho_books}`,
+                    {
+                        headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
+                        params: { organization_id: organizationId },
+                    }
+                );
+                contactForSales = contactResponse.data.contact
+                const primaryContactId = contactResponse.data?.contact?.primary_contact_id;
+                if (primaryContactId) {
+                    contactForSales.contact_person = { contact_person_id: primaryContactId };
+                } else {
+                    console.log("Primary contact ID not found in the response.");
                 }
-            );
-            const primaryContactId = contactResponse.data?.contact?.primary_contact_id;
-            if (primaryContactId) {
-                contactForSales.contact_person = { contact_person_id: primaryContactId };
-            } else {
-                console.log("Primary contact ID not found in the response.");
+                await updateUserCurrency(accessToken, organizationId, user.id_zoho_books, product.currency);
+
+            } catch (error) {
+                if (error.response?.data?.message === 'Contact does not exist.') {
+                    console.log('contact has in db but not in books')
+                    let contactName = user.username
+                    const newContact = await createZohoContact(accessToken, organizationId, { contact_name: contactName, currency_id: product.currency });
+                    zohoBookContactId = newContact.contact.contact_id
+                    const contactPersonData = {
+                        contact_id: newContact.contact.contact_id,
+                        first_name: user.firstname || null,
+                        last_name: user.lastname || null,
+                        email: emailToCheck || null,
+                        phone: user.phone_number || null,
+                        enable_portal: false,
+                    };
+                    changeInDb = true
+                    contactForSales = await createZohoContactPerson(accessToken, organizationId, contactPersonData);
+                }
+                else {
+                    console.log(error)
+                }
             }
+
         } else {
             console.log(`Email "${emailToCheck}" not found. Creating new contact.`);
-            let contactName = emailToCheck.split('@')[0]
-            const newContact = await createZohoContact(accessToken, organizationId, { contact_name: contactName,currency_id:product.currency });
-
+            let contactName = user.username
+            const newContact = await createZohoContact(accessToken, organizationId, { contact_name: contactName, currency_id: product.currency });
+            zohoBookContactId = newContact.contact.contact_id
             const contactPersonData = {
                 contact_id: newContact.contact.contact_id,
-                first_name: user.firstname||null,
-                last_name: user.lastname||null,
-                email: emailToCheck||null,
-                phone: user.phone_number||null,
-                enable_portal: true,
+                first_name: user.firstname || null,
+                last_name: user.lastname || null,
+                email: emailToCheck || null,
+                phone: user.phone_number || null,
+                enable_portal: false,
             };
-
+            changeInDb = true
             contactForSales = await createZohoContactPerson(accessToken, organizationId, contactPersonData);
         }
         // console.log(contactForSales, 'contttttttttttttttttttttttttttttttttttttt')
         const customerId = contactForSales.contact_id || contactForSales.contact_person?.contact_id;
         const salesDetails = {
             customer_id: customerId,
-            currency_id:product.currency||null,
+            currency_id: product.currency || null,
             contact_persons: [contactForSales.contact_person?.contact_person_id || customerId],
             date: new Date().toISOString().split("T")[0],
             line_items: [
@@ -99,7 +111,11 @@ async function ZohoBooks(user,product) {
         };
 
         await createSalesOrder(accessToken, organizationId, salesDetails);
+        return { zohoBookContactId, changeInDb }
     } catch (error) {
+        if (error.response?.data?.message == 'Contact does not exist.') {
+
+        }
         console.error("Error in ZohoBooks function:", error.response?.data || error.message || error);
         // throw error;
     }
@@ -116,7 +132,6 @@ async function createSalesOrder(accessToken, organizationId, salesOrderData) {
 
     try {
         const response = await axios.post(url, salesOrderData, { headers });
-        console.log("Sales Order Created:", response.data);
         return response.data;
     } catch (error) {
         console.error("Error Creating Sales Order:", error.response?.data || error.message || error);
@@ -158,6 +173,27 @@ async function createZohoContactPerson(accessToken, organizationId, contactPerso
         return response.data;
     } catch (error) {
         console.error("Error Creating Contact Person:", error.response?.data || error.message || error);
+        // throw error;
+    }
+}
+
+async function updateUserCurrency(accessToken, organizationId, contactId, currencyId) {
+    const url = `https://www.zohoapis.in/books/v3/contacts/${contactId}?organization_id=${organizationId}`;
+
+    const headers = {
+        Authorization: `Zoho-oauthtoken ${accessToken}`,
+        "Content-Type": "application/json",
+    };
+
+    const data = {
+        currency_id: currencyId,
+    };
+
+    try {
+        const response = await axios.put(url, data, { headers });
+        return response.data;
+    } catch (error) {
+        console.error("Error updating user currency:", error.response?.data || error.message || error);
         // throw error;
     }
 }
