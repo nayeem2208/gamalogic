@@ -1472,7 +1472,7 @@ let APIControllers = {
               return res.status(500).json({ error: 'Error fetching payment response' });
             }
             let last_payment = new Date().toISOString()
-            await dbConnection.query(`UPDATE registration SET credits = '${newBalance}',last_payment_time='${last_payment}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
+            // await dbConnection.query(`UPDATE registration SET credits = '${newBalance}',last_payment_time='${last_payment}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
             let content
             let creditToConvert
             if (planDetails[2] === 'monthly' || planDetails[2] === 'is_monthly') {
@@ -1530,8 +1530,14 @@ let APIControllers = {
               credits: planDetails[2] == 'monthly' ? planDetails[0] : planDetails[0] / 12,
               currency: '2234640000000000064'
             }
-            ZohoBooks(userDetails[0][0], purchaseDetailsForZohoBooks)
-            console.log('outside thriveeeeee')
+            let zohoBook = await ZohoBooks(userDetails[0][0], purchaseDetailsForZohoBooks)
+            if (zohoBook.zohoBookContactId && zohoBook.changeInDb) {
+              await dbConnection.query(`UPDATE registration SET credits = '${newBalance}',last_payment_time='${last_payment}',id_zoho_books='${zohoBook.zohoBookContactId}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
+
+            } else {
+              await dbConnection.query(`UPDATE registration SET credits = '${newBalance}',last_payment_time='${last_payment}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
+
+            }
             if (userDetails[0][0].is_referer_by == 1) {
               try {
                 let DollarRate = await InrToUsdSubscriptionConverter(creditToConvert, planDetails[2])
