@@ -675,7 +675,6 @@ let APIControllers = {
       const dbConnection = req.dbConnection;
       let user = await dbConnection.query(`SELECT rowid,credits,is_referer_by from registration WHERE emailid='${req.user[0][0].emailid}'`)
       let newBalance = user[0][0].credits + req.body.credits
-      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1 WHERE emailid='${req.user[0][0].emailid}'`)
 
       let content = `
       <p>Your payment for $${Number(req.body.cost).toLocaleString()} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.</p>
@@ -748,9 +747,15 @@ let APIControllers = {
       let purchaseDetailsForZohoBooks = {
         rate: details?.purchase_units?.[0]?.amount?.value ?? null,
         credits: req.body.credits,
-        currency: '2234640000000000061'
+        currency: '2234640000000000061',
       }
-      ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
+      let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
+      if (zohoBook.zohoBookContactId && zohoBook.changeInDb) {
+        await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1,id_zoho_books='${zohoBook.zohoBookContactId}' WHERE emailid='${req.user[0][0].emailid}'`)
+      }
+      else {
+        await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1 WHERE emailid='${req.user[0][0].emailid}'`)
+      }
       if (user[0][0].is_referer_by == 1) {
         try {
           let resp = await PurchaseApi(req.user[0][0].emailid, details?.purchase_units?.[0]?.amount?.value ?? null, req.body?.data?.orderID ?? null, user[0][0]?.rowid ?? null)
@@ -847,20 +852,7 @@ let APIControllers = {
       let newBalance = user.credits + paymentDetails.credits
       const periodColumn = paymentDetails.period === 'monthly' ? 'is_monthly' : 'is_annual';
       // const nonPeriodColumn = paymentDetails.period === 'monthly' ? 'is_annual' : 'is_monthly'
-      const registrationRuery = `
-  UPDATE registration 
-  SET credits = '${newBalance}', 
-      is_premium = 1, 
-      ${periodColumn} = 1 ,
-      subscription_start_time='${details.start_time}',
-      last_payment_time='${details.billing_info.last_payment.time}',
-      is_active=1,
-      is_pay_as_you_go=0,
-      subscription_stop_time=NULL
-  WHERE emailid = '${user.emailid}'
-`;
 
-      await dbConnection.query(registrationRuery);
 
       // await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1 WHERE emailid='${user.emailid}'`)
 
@@ -901,12 +893,48 @@ let APIControllers = {
         new Date().toISOString()
       ];
       updateLeadStatus(req.user[0][0].emailid)
+
       let purchaseDetailsForZohoBooks = {
         rate: gross_amount ?? null,
         credits: paymentDetails.credits,
-        currency: '2234640000000000061'
+        currency: '2234640000000000061',
       }
-      ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
+      let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
+      if (zohoBook.zohoBookContactId && zohoBook.changeInDb) {
+        const registrationRuery = `
+        UPDATE registration 
+        SET credits = '${newBalance}', 
+            is_premium = 1, 
+            ${periodColumn} = 1 ,
+            subscription_start_time='${details.start_time}',
+            last_payment_time='${details.billing_info.last_payment.time}',
+            is_active=1,
+            is_pay_as_you_go=0,
+            subscription_stop_time=NULL,
+            id_zoho_books='${zohoBook.zohoBookContactId}'
+        WHERE emailid = '${user.emailid}'
+      `;
+
+        await dbConnection.query(registrationRuery);
+      }
+      else {
+        const registrationRuery = `
+        UPDATE registration 
+        SET credits = '${newBalance}', 
+            is_premium = 1, 
+            ${periodColumn} = 1 ,
+            subscription_start_time='${details.start_time}',
+            last_payment_time='${details.billing_info.last_payment.time}',
+            is_active=1,
+            is_pay_as_you_go=0,
+            subscription_stop_time=NULL
+        WHERE emailid = '${user.emailid}'
+      `;
+
+        await dbConnection.query(registrationRuery);
+      }
+
+
       if (user.is_referer_by == 1) {
         try {
           let orderId = subscriptionId + new Date().toISOString().split('T')[0];
@@ -1015,13 +1043,19 @@ let APIControllers = {
 
                 let newBalance = user[0][0].credits + creditsToAdd;
                 let lastPayment_registration = details.billing_info.last_payment.time ?? new Date().toISOString()
-                await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
                 let purchaseDetailsForZohoBooks = {
                   rate: gross_amount ?? null,
                   credits: creditsToAdd,
                   currency: '2234640000000000061'
                 }
-                ZohoBooks(user[0][0], purchaseDetailsForZohoBooks)
+                let zohoBook = await ZohoBooks(user[0][0], purchaseDetailsForZohoBooks)
+                if (zohoBook.zohoBookContactId && zohoBook.changeInDb) {
+                  await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}',id_zoho_books='${zohoBook.zohoBookContactId}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
+                }
+                else {
+                  await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
+
+                }
                 if (user[0][0].is_referer_by == 1) {
                   try {
                     let orderId = subId + new Date().toISOString().split('T')[0];
@@ -1143,7 +1177,6 @@ let APIControllers = {
       let user = await dbConnection.query(`SELECT rowid,credits from registration WHERE emailid='${req.user[0][0].emailid}'`)
 
       let newBalance = user[0][0].credits + req.body.credits
-      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1 WHERE emailid='${req.user[0][0].emailid}'`)
 
       var instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET })
       let resp = await instance.payments.fetch(req.body.razorpayPaymentId)
@@ -1246,7 +1279,15 @@ let APIControllers = {
         credits: req.body.credits,
         currency: '2234640000000000064'
       }
-      ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
+      let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
+      if (zohoBook.zohoBookContactId && zohoBook.changeInDb) {
+        await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1,id_zoho_books='${zohoBook.zohoBookContactId}' WHERE emailid='${req.user[0][0].emailid}'`)
+
+      }
+      else {
+        await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1 WHERE emailid='${req.user[0][0].emailid}'`)
+
+      }
       if (req.user[0][0].is_referer_by == 1) {
         try {
           let DollarRate = await InrToUsdConverter(req.body.credits)
@@ -1331,9 +1372,7 @@ let APIControllers = {
       }
 
       const periodColumn = req.body.paymentDetails.period === 'monthly' ? 'is_monthly' : 'is_annual';
-      await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1,is_pay_as_you_go=0,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
-      last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',is_active=1,is_pay_as_you_go=0,subscription_stop_time=NULL
- WHERE emailid='${req.user[0][0].emailid}'`)
+
 
       let DollarRate = await InrToUsdSubscriptionConverter(req.body.credits, periodColumn)
       const query = `
@@ -1377,7 +1416,6 @@ let APIControllers = {
       ]
 
       await dbConnection.query(query, values);
-      
       if (req.user[0][0].is_referer_by == 1) {
         try {
           let response = await PurchaseApi(req.user[0][0].emailid, DollarRate, resp.order_id || null, req.user[0][0]?.rowid ?? null)
@@ -1414,7 +1452,16 @@ let APIControllers = {
         credits: req.body.credits,
         currency: '2234640000000000064'
       }
-      ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
+      let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
+      if (zohoBook.zohoBookContactId && zohoBook.changeInDb) {
+        await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1,is_pay_as_you_go=0,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
+        last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',is_active=1,is_pay_as_you_go=0,subscription_stop_time=NULL,id_zoho_books='${zohoBook.zohoBookContactId}'
+   WHERE emailid='${req.user[0][0].emailid}'`)
+      } else {
+        await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1,is_pay_as_you_go=0,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
+        last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',is_active=1,is_pay_as_you_go=0,subscription_stop_time=NULL
+   WHERE emailid='${req.user[0][0].emailid}'`)
+      }
       res.status(200).json('Successfull')
     } catch (error) {
       console.log(error);
@@ -1472,7 +1519,6 @@ let APIControllers = {
               return res.status(500).json({ error: 'Error fetching payment response' });
             }
             let last_payment = new Date().toISOString()
-            // await dbConnection.query(`UPDATE registration SET credits = '${newBalance}',last_payment_time='${last_payment}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
             let content
             let creditToConvert
             if (planDetails[2] === 'monthly' || planDetails[2] === 'is_monthly') {

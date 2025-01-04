@@ -59,10 +59,11 @@ async function ZohoBooks(user, product) {
                 if (error.response?.data?.message === 'Contact does not exist.') {
                     console.log('contact has in db but not in books')
                     let contactName = user.username
-                    const newContact = await createZohoContact(accessToken, organizationId, { contact_name: contactName, currency_id: product.currency });
+                    const newContact = await createZohoContact(accessToken, organizationId, { contact_name: contactName, currency_id: product.currency }, user);
                     zohoBookContactId = newContact.contact.contact_id
                     const contactPersonData = {
                         contact_id: newContact.contact.contact_id,
+                        salutation: user.title || null,
                         first_name: user.firstname || null,
                         last_name: user.lastname || null,
                         email: emailToCheck || null,
@@ -80,10 +81,11 @@ async function ZohoBooks(user, product) {
         } else {
             console.log(`Email "${emailToCheck}" not found. Creating new contact.`);
             let contactName = user.username
-            const newContact = await createZohoContact(accessToken, organizationId, { contact_name: contactName, currency_id: product.currency });
+            const newContact = await createZohoContact(accessToken, organizationId, { contact_name: contactName, currency_id: product.currency }, user);
             zohoBookContactId = newContact.contact.contact_id
             const contactPersonData = {
                 contact_id: newContact.contact.contact_id,
+                salutation: user.title || null,
                 first_name: user.firstname || null,
                 last_name: user.lastname || null,
                 email: emailToCheck || null,
@@ -132,6 +134,7 @@ async function createSalesOrder(accessToken, organizationId, salesOrderData) {
 
     try {
         const response = await axios.post(url, salesOrderData, { headers });
+        await ApproveSalesOrder(accessToken, organizationId, response.data)
         return response.data;
     } catch (error) {
         console.error("Error Creating Sales Order:", error.response?.data || error.message || error);
@@ -139,8 +142,57 @@ async function createSalesOrder(accessToken, organizationId, salesOrderData) {
     }
 }
 
+async function ApproveSalesOrder(accessToken, organizationId, salesOrderData) {
+    // console.log(salesOrderData,'check chek chekkkkk',salesOrderData.salesorder.salesorder_id,'sales order data for approving')
+    const url = `https://www.zohoapis.in/books/v3/salesorders/${salesOrderData.salesorder.salesorder_id}/status/open?organization_id=${organizationId}`;
+
+    const headers = {
+        Authorization: `Zoho-oauthtoken ${accessToken}`,
+        "Content-Type": "application/json",
+    };
+
+    try {
+        const response = await axios.post(url,salesOrderData, { headers });
+        console.log(response.data, 'response on approving sales data');
+    } catch (error) {
+        console.error("Error Approving Sales Order:", error.response?.data || error.message || error);
+        // throw error;
+    }
+}
+
 // Function to create a new contact in Zoho Books
-async function createZohoContact(accessToken, organizationId, contactData) {
+async function createZohoContact(accessToken, organizationId, contactData, user) {
+    let input = user.phone_country_code;
+    let phCode = input.split(' ').pop();
+    let requestBody = {
+        ...contactData,
+        ...(user.is_company == 1 && { company_name: user.company_name, }),
+        // ...(user.country=='India'&&{gst_no:user.tax_id||null}),
+        customer_sub_type: user.is_company == 1 ? "business" : 'individual',
+        billing_address: {
+            attention: `${user.title}.${user.username}`,
+            address: user.address_line_1,
+            street2: user.address_line_2 || null,
+            city: user.city || null,
+            state: user.state || null,
+            zip: user.pincode,
+            country: user.country,
+            phone: `${phCode} ${user.phone_number}`,
+        },
+        shipping_address: {
+            attention: `${user.title}.${user.username}`,
+            address: user.address_line_1,
+            street2: user.address_line_2 || null,
+            city: user.city || null,
+            state: user.state || null,
+            zip: user.pincode,
+            country: user.country,
+            phone: `${phCode} ${user.phone_number}`,
+        },
+
+    }
+
+    console.log(requestBody, 'request body to create contact ')
     const url = `https://www.zohoapis.in/books/v3/contacts?organization_id=${organizationId}`;
 
     const headers = {
@@ -149,7 +201,7 @@ async function createZohoContact(accessToken, organizationId, contactData) {
     };
 
     try {
-        const response = await axios.post(url, contactData, { headers });
+        const response = await axios.post(url, requestBody, { headers });
         // console.log("Contact Created:", response.data);
         return response.data;
     } catch (error) {
