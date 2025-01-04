@@ -1038,7 +1038,7 @@ let APIControllers = {
 
               await dbConnection.query(query, values);
 
-              let user = await dbConnection.query(`SELECT username,emailid,credits,is_referer_by FROM registration WHERE rowid = '${planInDataBase[0][0].userid}'`);
+              let user = await dbConnection.query(`SELECT * FROM registration WHERE rowid = '${planInDataBase[0][0].userid}'`);
               if (user[0].length > 0) {
 
                 let newBalance = user[0][0].credits + creditsToAdd;
