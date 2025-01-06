@@ -50,6 +50,7 @@ async function AddContacts(firstName, lastName, email) {
                 params: updateData,
                 headers: headers
             });
+            console.log(updateResponse,'update response from zoho campaigns')
         } catch (error) {
             console.log(error)
         }
