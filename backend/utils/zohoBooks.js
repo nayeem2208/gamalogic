@@ -53,7 +53,6 @@ async function ZohoBooks(user, product) {
                 } else {
                     console.log("Primary contact ID not found in the response.");
                 }
-                await updateUserCurrency(accessToken, organizationId, user.id_zoho_books, product.currency);
 
             } catch (error) {
                 if (error.response?.data?.message === 'Contact does not exist.') {
@@ -71,6 +70,7 @@ async function ZohoBooks(user, product) {
                         enable_portal: false,
                     };
                     changeInDb = true
+                    await updateUserCurrency(accessToken, organizationId, newContact.contact.contact_id, product.currency);
                     contactForSales = await createZohoContactPerson(accessToken, organizationId, contactPersonData);
                 }
                 else {
@@ -93,6 +93,7 @@ async function ZohoBooks(user, product) {
                 enable_portal: false,
             };
             changeInDb = true
+            await updateUserCurrency(accessToken, organizationId, newContact.contact.contact_id, product.currency);
             contactForSales = await createZohoContactPerson(accessToken, organizationId, contactPersonData);
         }
         // console.log(contactForSales, 'contttttttttttttttttttttttttttttttttttttt')
