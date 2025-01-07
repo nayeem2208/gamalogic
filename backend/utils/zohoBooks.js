@@ -103,16 +103,21 @@ async function ZohoBooks(user, product) {
             currency_id: product.currency || null,
             contact_persons: [contactForSales.contact_person?.contact_person_id || customerId],
             date: new Date().toISOString().split("T")[0],
+            // gst_treatment: user.country == 'India'
+            //     ? (user.tax_id ? "business_gst" : "business_none")
+            //     : "overseas",
+            // ...(user.country == 'India' && user.tax_id && { gst_no: user.tax_id }),
+            gst_treatment:'overseas',
             line_items: [
                 {
                     rate: product.rate,
-                    name: `${product.credits} credits`,
+                    name: `${product.credits} credits ${product.methord}`,
                     quantity: 1,
                     unit: "Nos",
                 },
             ],
         };
-
+        console.log(salesDetails, 'sales Detailssssssssssssss')
         await createSalesOrder(accessToken, organizationId, salesDetails);
         return { zohoBookContactId, changeInDb }
     } catch (error) {
@@ -153,7 +158,7 @@ async function ApproveSalesOrder(accessToken, organizationId, salesOrderData) {
     };
 
     try {
-        const response = await axios.post(url,salesOrderData, { headers });
+        const response = await axios.post(url, salesOrderData, { headers });
         console.log(response.data, 'response on approving sales data');
     } catch (error) {
         console.error("Error Approving Sales Order:", error.response?.data || error.message || error);
@@ -163,12 +168,19 @@ async function ApproveSalesOrder(accessToken, organizationId, salesOrderData) {
 
 // Function to create a new contact in Zoho Books
 async function createZohoContact(accessToken, organizationId, contactData, user) {
-    let input = user.phone_country_code;
+    let input = user.phone_country_code || "";
     let phCode = input.split(' ').pop();
+    let gstTreatment;
+    if (user.country === 'India') {
+        gstTreatment = user.tax_id ? "business_gst" : "business_none";
+    } else {
+        gstTreatment = "overseas";
+    }
     let requestBody = {
         ...contactData,
         ...(user.is_company == 1 && { company_name: user.company_name, }),
-        // ...(user.country=='India'&&{gst_no:user.tax_id||null}),
+        gst_nogst_treatment: gstTreatment,
+        ...(user.country == 'India' && { gst_no: user.tax_id || null }),
         customer_sub_type: user.is_company == 1 ? "business" : 'individual',
         billing_address: {
             attention: `${user.title}.${user.username}`,

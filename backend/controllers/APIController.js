@@ -747,6 +747,7 @@ let APIControllers = {
       let purchaseDetailsForZohoBooks = {
         rate: details?.purchase_units?.[0]?.amount?.value ?? null,
         credits: req.body.credits,
+        methord: 'Pay as you go',
         currency: '2234640000000000061',
       }
       let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
@@ -894,9 +895,13 @@ let APIControllers = {
       ];
       updateLeadStatus(req.user[0][0].emailid)
 
+      const currentDate = new Date();
       let purchaseDetailsForZohoBooks = {
         rate: gross_amount ?? null,
         credits: paymentDetails.credits,
+        methord: `${paymentDetails.period === 'monthly'
+          ? `Monthly subscription of ${currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`
+          : `Annual subscription of ${currentDate.getFullYear()}`}`,
         currency: '2234640000000000061',
       }
       let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
@@ -1043,9 +1048,13 @@ let APIControllers = {
 
                 let newBalance = user[0][0].credits + creditsToAdd;
                 let lastPayment_registration = details.billing_info.last_payment.time ?? new Date().toISOString()
+                const currentDate = new Date();
                 let purchaseDetailsForZohoBooks = {
                   rate: gross_amount ?? null,
                   credits: creditsToAdd,
+                  methord: `${paymentDetails[2] == 'monthly'
+                    ? `Monthly subscription of ${currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`
+                    : `Annual subscription of ${currentDate.getFullYear()}`}`,          
                   currency: '2234640000000000061'
                 }
                 let zohoBook = await ZohoBooks(user[0][0], purchaseDetailsForZohoBooks)
@@ -1277,6 +1286,7 @@ let APIControllers = {
       let purchaseDetailsForZohoBooks = {
         rate: amountInRupees,
         credits: req.body.credits,
+        methord: 'Pay as you go',
         currency: '2234640000000000064'
       }
       let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
@@ -1447,9 +1457,13 @@ let APIControllers = {
         basicTemplate(req.user[0][0].username, content)
       );
       updateLeadStatus(req.user[0][0].emailid)
+      const currentDate = new Date();
       let purchaseDetailsForZohoBooks = {
         rate: amount,
         credits: req.body.credits,
+        methord: `${req.body.paymentDetails.period === 'monthly'
+          ? `Monthly subscription of ${currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`
+          : `Annual subscription of ${currentDate.getFullYear()}`}`,          
         currency: '2234640000000000064'
       }
       let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
@@ -1571,9 +1585,13 @@ let APIControllers = {
             ]
 
             await dbConnection.query(query, values);
+            const currentDate = new Date();
             let purchaseDetailsForZohoBooks = {
               rate: amount,
               credits: planDetails[2] == 'monthly' ? planDetails[0] : planDetails[0] / 12,
+              methord: `${planDetails[2] =='monthly'
+                ? `Monthly subscription of ${currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`
+                : `Annual subscription of ${currentDate.getFullYear()}`}`,                
               currency: '2234640000000000064'
             }
             let zohoBook = await ZohoBooks(userDetails[0][0], purchaseDetailsForZohoBooks)
