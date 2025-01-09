@@ -35,6 +35,16 @@ async function ZohoBooks(user, product) {
         const accessToken = await refreshToken();
         const organizationId = organization_id;
         let zohoBookContactId = null
+
+        // const taxes = await axios.get(
+        //     `https://www.zohoapis.in/books/v3/settings/taxes?`,
+        //     {
+        //         headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
+        //         params: { organization_id: organizationId },
+        //     }
+        // );
+        // console.log(taxes.data.taxes,'taxessssssssssssss')
+        // console.log(sampleError)
         let contactForSales;
         let changeInDb = false
         if (user.id_zoho_books) {
@@ -103,19 +113,63 @@ async function ZohoBooks(user, product) {
             currency_id: product.currency || null,
             contact_persons: [contactForSales.contact_person?.contact_person_id || customerId],
             date: new Date().toISOString().split("T")[0],
-            // gst_treatment: user.country == 'India'
-            //     ? (user.tax_id ? "business_gst" : "business_none")
-            //     : "overseas",
-            // ...(user.country == 'India' && user.tax_id && { gst_no: user.tax_id }),
-            gst_treatment:'overseas',
+            gst_treatment: user.country == 'India'
+                ? (user.tax_id ? "business_gst" : "business_none")
+                : "overseas",
+            ...(user.country == 'India' && user.tax_id && { gst_no: user.tax_id }),
+            // gst_treatment:'overseas',
+            is_inclusive_tax: true,
             line_items: [
                 {
                     rate: product.rate,
                     name: `${product.credits} credits ${product.methord}`,
-                    quantity: 1,
-                    unit: "Nos",
+                    product_type: 'service',
+                    tax_id: (() => {
+                        if (user.country == 'India') {
+                            if (user.tax_id) {
+                                if (user.state == 'Kerala') {
+                                    return "2234640000000179212";
+                                } else {
+                                    return "2234640000000179110";
+                                }
+                            } else {
+                                if (user.state == 'Kerala') {
+                                    return "2234640000000179194";
+                                } else {
+                                    return null
+                                }
+                            }
+                        }
+                        return null;
+                    })(),
                 },
             ],
+            taxes: [
+                {
+                    tax_id: (() => {
+                        if (user.country === 'India') {
+                            if (user.tax_id) {
+                                console.log(user.state, user.state == 'kerala', 'state of user')
+                                if (user.state == 'Kerala') {
+                                    return "2234640000000179212";
+                                } else {
+                                    return "2234640000000179110";
+                                }
+                            } else {
+                                if (user.state == 'Kerala') {
+                                    return "2234640000000179194";
+                                } else {
+                                    return "2234640000000179104";
+                                }
+                            }
+                        }
+                        return null;
+                    })(),
+                    // tax_name: "GST",
+                }
+            ],
+            // adjustment:product.rate * (1 - 0.18)- ,
+            // adjustment_description: "Adjustment",
         };
         console.log(salesDetails, 'sales Detailssssssssssssss')
         await createSalesOrder(accessToken, organizationId, salesDetails);
@@ -180,7 +234,7 @@ async function createZohoContact(accessToken, organizationId, contactData, user)
         ...contactData,
         ...(user.is_company == 1 && { company_name: user.company_name, }),
         gst_nogst_treatment: gstTreatment,
-        ...(user.country == 'India' && { gst_no: user.tax_id || null }),
+        ...(user.country == 'India' && user.tax_id && { gst_no: user.tax_id || null }),
         customer_sub_type: user.is_company == 1 ? "business" : 'individual',
         billing_address: {
             attention: `${user.title}.${user.username}`,
@@ -192,16 +246,16 @@ async function createZohoContact(accessToken, organizationId, contactData, user)
             country: user.country,
             phone: `${phCode} ${user.phone_number}`,
         },
-        shipping_address: {
-            attention: `${user.title}.${user.username}`,
-            address: user.address_line_1,
-            street2: user.address_line_2 || null,
-            city: user.city || null,
-            state: user.state || null,
-            zip: user.pincode,
-            country: user.country,
-            phone: `${phCode} ${user.phone_number}`,
-        },
+        // shipping_address: {
+        //     attention: `${user.title}.${user.username}`,
+        //     address: user.address_line_1,
+        //     street2: user.address_line_2 || null,
+        //     city: user.city || null,
+        //     state: user.state || null,
+        //     zip: user.pincode,
+        //     country: user.country,
+        //     phone: `${phCode} ${user.phone_number}`,
+        // },
 
     }
 
