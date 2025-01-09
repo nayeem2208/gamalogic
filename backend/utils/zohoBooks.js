@@ -1,4 +1,5 @@
 import axios from "axios";
+import getStateCodeByName from "./stateCodes.js";
 
 // Client credentials
 const clientid = process.env.BOOKS_CLIENT_ID;
@@ -108,11 +109,13 @@ async function ZohoBooks(user, product) {
         }
         // console.log(contactForSales, 'contttttttttttttttttttttttttttttttttttttt')
         const customerId = contactForSales.contact_id || contactForSales.contact_person?.contact_id;
+        const placeOfSupply=getStateCodeByName(user.state)
         const salesDetails = {
             customer_id: customerId,
             currency_id: product.currency || null,
             contact_persons: [contactForSales.contact_person?.contact_person_id || customerId],
             date: new Date().toISOString().split("T")[0],
+            ...(user.country == 'India' && !user.tax_id && user.state != 'Kerala' && { place_of_supply:placeOfSupply}),
             gst_treatment: user.country == 'India'
                 ? (user.tax_id ? "business_gst" : "business_none")
                 : "overseas",
@@ -126,18 +129,10 @@ async function ZohoBooks(user, product) {
                     product_type: 'service',
                     tax_id: (() => {
                         if (user.country == 'India') {
-                            if (user.tax_id) {
-                                if (user.state == 'Kerala') {
-                                    return "2234640000000179212";
-                                } else {
-                                    return "2234640000000179110";
-                                }
+                            if (user.state == 'Kerala') {
+                                return "2234640000000179212";
                             } else {
-                                if (user.state == 'Kerala') {
-                                    return "2234640000000179194";
-                                } else {
-                                    return null
-                                }
+                                return "2234640000000179110";
                             }
                         }
                         return null;
@@ -148,19 +143,11 @@ async function ZohoBooks(user, product) {
                 {
                     tax_id: (() => {
                         if (user.country === 'India') {
-                            if (user.tax_id) {
-                                console.log(user.state, user.state == 'kerala', 'state of user')
-                                if (user.state == 'Kerala') {
-                                    return "2234640000000179212";
-                                } else {
-                                    return "2234640000000179110";
-                                }
+                            console.log(user.state, user.state == 'kerala', 'state of user')
+                            if (user.state == 'Kerala') {
+                                return "2234640000000179212";
                             } else {
-                                if (user.state == 'Kerala') {
-                                    return "2234640000000179194";
-                                } else {
-                                    return "2234640000000179104";
-                                }
+                                return "2234640000000179110";
                             }
                         }
                         return null;
