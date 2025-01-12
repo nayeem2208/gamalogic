@@ -95,7 +95,7 @@ function AccountDetailsModal({ isOpen }) {
     setCountryid(selectedCountryCode);
     const states = getStates(selectedCountryCode);
     setStateList(states);
-    setStateid(""); // Reset state selection when country changes
+    setStateid(""); 
   };
 
   const handleStateChange = (e) => {
@@ -124,18 +124,19 @@ function AccountDetailsModal({ isOpen }) {
       return false;
     }
     if (!moreDetails.firstname || !trimmedfirstname) {
-      // toast.error("First name is required.");
       toast.error("Please add the details");
 
       return false;
     }
     if (!moreDetails.lastname || !trimmedlastname) {
-      // toast.error("Last name is required.");
       toast.error("Please add the details");
       return false;
     }
-    if (!/^\d{10}$/.test(moreDetails.phone_number)) {
-      // toast.error("Phone number should be 10 digits.");
+    if (!moreDetails.phone_country_code||moreDetails.phone_country_code=='Select' ) {
+      toast.error("Please add the details");
+      return false;
+    }
+    if (!/^\d{6,}$/.test(moreDetails.phone_number)) {
       toast.error("Please add the details");
       return false;
     }
@@ -143,34 +144,26 @@ function AccountDetailsModal({ isOpen }) {
       (accountType === "Company" && !moreDetails.company_name) ||
       (accountType === "Company" && !trimmdcompanyName)
     ) {
-      // toast.error("Company name is required for Company account type.");
       toast.error("Please add the details");
       return false;
     }
     if (!moreDetails.address_line_1 || !trimmedAddress) {
-      // toast.error("Address line 1 is required.");
       toast.error("Please add the details");
       return false;
     }
     if (!moreDetails.city) {
-      // toast.error("City is required.");
       toast.error("Please add the details");
       return false;
     }
     if (!moreDetails.pincode) {
-      // toast.error(
-      //   countryid === "in" ? "Pincode is required." : "Zip Code is required."
-      // );
       toast.error("Please add the details");
       return false;
     }
     if (!countryid) {
-      // toast.error("Country is required.");
       toast.error("Please add the details");
       return false;
     }
     if (stateList.length > 0 && !stateid) {
-      // toast.error("State is required.");
       toast.error("Please add the details");
       return false;
     }

@@ -131,8 +131,12 @@ function MoreDetails() {
       toast.error("Last name is required.");
       return false;
     }
-    if (!/^\d{10}$/.test(moreDetails.phone_number)) {
-      toast.error("Phone number should be 10 digits.");
+    if (!moreDetails.phone_country_code||moreDetails.phone_country_code=='Select' ) {
+      toast.error("Please add the details");
+      return false;
+    }
+    if (!/^\d{6,}$/.test(moreDetails.phone_number)) {
+      toast.error("Please add the details");
       return false;
     }
     if (

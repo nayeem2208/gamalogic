@@ -44,7 +44,7 @@ async function ZohoBooks(user, product) {
         //         params: { organization_id: organizationId },
         //     }
         // );
-        // console.log(taxes.data.taxes,'taxessssssssssssss')
+        // console.log(taxes.data.taxes, 'taxessssssssssssss')
         // console.log(sampleError)
         let contactForSales;
         let changeInDb = false
@@ -109,22 +109,22 @@ async function ZohoBooks(user, product) {
         }
         // console.log(contactForSales, 'contttttttttttttttttttttttttttttttttttttt')
         const customerId = contactForSales.contact_id || contactForSales.contact_person?.contact_id;
-        const placeOfSupply=getStateCodeByName(user.state)
+        const placeOfSupply = getStateCodeByName(user.state)
         const salesDetails = {
             customer_id: customerId,
             currency_id: product.currency || null,
             contact_persons: [contactForSales.contact_person?.contact_person_id || customerId],
             date: new Date().toISOString().split("T")[0],
-            ...(user.country == 'India' && !user.tax_id && user.state != 'Kerala' && { place_of_supply:placeOfSupply}),
+            ...(user.country == 'India' && !user.tax_id && user.state != 'Kerala' && { place_of_supply: placeOfSupply }),
             gst_treatment: user.country == 'India'
                 ? (user.tax_id ? "business_gst" : "business_none")
                 : "overseas",
             ...(user.country == 'India' && user.tax_id && { gst_no: user.tax_id }),
             // gst_treatment:'overseas',
-            is_inclusive_tax: true,
+            // is_inclusive_tax: true,
             line_items: [
                 {
-                    rate: product.rate,
+                    rate: user.country === 'India' ? parseFloat((product.rate / 1.18).toFixed(2)) : product.rate,
                     name: `${product.credits} credits ${product.methord}`,
                     product_type: 'service',
                     tax_id: (() => {
@@ -135,8 +135,11 @@ async function ZohoBooks(user, product) {
                                 return "2234640000000179110";
                             }
                         }
-                        return null;
+                        else {
+                            return '2234640000000179104';
+                        }
                     })(),
+                    hsn_or_sac:'998313'
                 },
             ],
             taxes: [
@@ -149,8 +152,9 @@ async function ZohoBooks(user, product) {
                             } else {
                                 return "2234640000000179110";
                             }
+                        } else {
+                            return '2234640000000179104';
                         }
-                        return null;
                     })(),
                     // tax_name: "GST",
                 }
@@ -217,11 +221,14 @@ async function createZohoContact(accessToken, organizationId, contactData, user)
     } else {
         gstTreatment = "overseas";
     }
+    const placeOfSupply = getStateCodeByName(user.state)
+
     let requestBody = {
         ...contactData,
         ...(user.is_company == 1 && { company_name: user.company_name, }),
-        gst_nogst_treatment: gstTreatment,
+        gst_treatment: gstTreatment,
         ...(user.country == 'India' && user.tax_id && { gst_no: user.tax_id || null }),
+        ...(user.country == 'India' && !user.tax_id && user.state != 'Kerala' && { place_of_contact: placeOfSupply }),
         customer_sub_type: user.is_company == 1 ? "business" : 'individual',
         billing_address: {
             attention: `${user.title}.${user.username}`,
