@@ -957,6 +957,11 @@ let APIControllers = {
       ErrorHandler("Paypal subscription Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     }
+    finally {
+      if (req.dbConnection) {
+        await req.dbConnection.release();
+      }
+    }
   },
   payPalWebHook: async (req, res) => {
     try {
@@ -1054,7 +1059,7 @@ let APIControllers = {
                   credits: creditsToAdd,
                   methord: `${paymentDetails[2] == 'monthly'
                     ? `Monthly subscription of ${currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`
-                    : `Annual subscription of ${currentDate.getFullYear()}`}`,          
+                    : `Annual subscription of ${currentDate.getFullYear()}`}`,
                   currency: '2234640000000000061'
                 }
                 let zohoBook = await ZohoBooks(user[0][0], purchaseDetailsForZohoBooks)
@@ -1157,6 +1162,10 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: "Internal Server Error" });
+    }finally{
+      if (req.dbConnection) {
+        await req.dbConnection.release();
+      }
     }
   },
   RazorpayPayment: async (req, res) => {
@@ -1178,6 +1187,11 @@ let APIControllers = {
       console.log(error)
       res.status(500).send(error);
       ErrorHandler("RazorpayPayment Controller", error, req);
+    }
+    finally{
+      if (req.dbConnection) {
+        await req.dbConnection.release();
+      }
     }
   },
   razorPayPaymentSuccess: async (req, res) => {
@@ -1364,6 +1378,11 @@ let APIControllers = {
       console.log(error, 'error adich mooone')
       res.status(500).send(error);
     }
+    finally{
+      if (req.dbConnection) {
+        await req.dbConnection.release();
+      }
+    }
   },
   razorPaySubscriptionSuccess: async (req, res) => {
     try {
@@ -1463,7 +1482,7 @@ let APIControllers = {
         credits: req.body.credits,
         methord: `${req.body.paymentDetails.period === 'monthly'
           ? `Monthly subscription of ${currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`
-          : `Annual subscription of ${currentDate.getFullYear()}`}`,          
+          : `Annual subscription of ${currentDate.getFullYear()}`}`,
         currency: '2234640000000000064'
       }
       let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
@@ -1589,9 +1608,9 @@ let APIControllers = {
             let purchaseDetailsForZohoBooks = {
               rate: amount,
               credits: planDetails[2] == 'monthly' ? planDetails[0] : planDetails[0] / 12,
-              methord: `${planDetails[2] =='monthly'
+              methord: `${planDetails[2] == 'monthly'
                 ? `Monthly subscription of ${currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`
-                : `Annual subscription of ${currentDate.getFullYear()}`}`,                
+                : `Annual subscription of ${currentDate.getFullYear()}`}`,
               currency: '2234640000000000064'
             }
             let zohoBook = await ZohoBooks(userDetails[0][0], purchaseDetailsForZohoBooks)

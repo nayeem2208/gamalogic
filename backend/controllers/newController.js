@@ -549,11 +549,17 @@ const newControllers = {
             if (!user || user.length === 0) {
                 console.warn("No user found with the provided email:", userEmail);
                 return res.status(200).json({
-                    message: "Your account deletion request has been processed. If you believe this is an error, please contact support."
-                });
+                    message: "This account does not exist or has already been deleted. If you believe this is an error, please contact support."                });
             }
             let currDate = new Date().toISOString().slice(0, 19).replace("T", " ");
-            let response = await axios.post(`http://service.gamalogic.com/delete-account?api_key=${user[0].api_key}&deleted_date_time=${currDate}`)
+            let apiKey
+            if (user[0].team_id && user[0].team_id !== 'null' && user[0].team_id !== null) {
+                let [admin] = await dbConnection.query(`SELECT api_key FROM registration WHERE rowid = ${user[0].team_id}`);
+                apiKey = admin[0].api_key;
+            } else {
+                apiKey = user[0].api_key;
+            }
+            let response = await axios.post(`http://service.gamalogic.com/delete-account?api_key=${apiKey}&deleted_date_time=${currDate}`)
             if (response.status === 200) {
                 let userContent = `<p>Your account has been successfully deleted. If you did not intend to perform this action or have any concerns, please contact our support team for assistance.</p>`;
 
