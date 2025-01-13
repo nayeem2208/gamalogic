@@ -145,7 +145,7 @@ function QuickValidation() {
                     ) : (
                       <div className="bg-red-400 w-3 h-3 rounded"></div>
                     )}
-                    <p className="ml-2">{result.is_catchall.toString()}</p>
+                    <p className="ml-2">{result.is_catchall?.toString()}</p>
                   </td>
                 </tr>
                 <tr>
@@ -156,7 +156,7 @@ function QuickValidation() {
                     ) : (
                       <div className="bg-red-400 w-3 h-3 rounded"></div>
                     )}
-                    <p className="ml-2">{result.is_disposable.toString()}</p>
+                    <p className="ml-2">{result.is_disposable?.toString()}</p>
                   </td>
                 </tr>
                 <tr>
@@ -167,7 +167,7 @@ function QuickValidation() {
                     ) : (
                       <div className="bg-red-400 w-3 h-3 rounded"></div>
                     )}
-                    <p className="ml-2">{result.is_role.toString()}</p>
+                    <p className="ml-2">{result.is_role?.toString()}</p>
                   </td>
                 </tr>
                 <tr>
@@ -178,7 +178,7 @@ function QuickValidation() {
                     ) : (
                       <div className="bg-red-400 w-3 h-3 rounded"></div>
                     )}
-                    <p className="ml-2">{result.is_syntax_valid.toString()}</p>
+                    <p className="ml-2">{result.is_syntax_valid?.toString()}</p>
                   </td>
                 </tr>
                 <tr>
@@ -189,7 +189,7 @@ function QuickValidation() {
                     ) : (
                       <div className="bg-red-400 w-3 h-3 rounded"></div>
                     )}
-                    <p className="ml-2">{result.is_unknown.toString()}</p>{" "}
+                    <p className="ml-2">{result.is_unknown?.toString()}</p>{" "}
                   </td>
                 </tr>
                 <tr>

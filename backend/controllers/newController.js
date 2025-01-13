@@ -546,6 +546,12 @@ const newControllers = {
             const userEmail = decoded.email;
             console.log(userEmail, 'user Email')
             let [user] = await dbConnection.query('SELECT username,api_key FROM registration WHERE emailid = ?', [userEmail])
+            if (!user || user.length === 0) {
+                console.warn("No user found with the provided email:", userEmail);
+                return res.status(200).json({
+                    message: "Your account deletion request has been processed. If you believe this is an error, please contact support."
+                });
+            }
             let currDate = new Date().toISOString().slice(0, 19).replace("T", " ");
             let response = await axios.post(`http://service.gamalogic.com/delete-account?api_key=${user[0].api_key}&deleted_date_time=${currDate}`)
             if (response.status === 200) {
@@ -566,7 +572,7 @@ const newControllers = {
 
         } catch (error) {
             console.log(error)
-            ErrorHandler("verify Account Controller", error, req)
+            ErrorHandler("verify Account Delete Controller", error, req)
             res.status(500).json({ error: error })
         } finally {
             if (req.dbConnection) {
