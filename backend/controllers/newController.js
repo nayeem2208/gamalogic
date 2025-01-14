@@ -506,7 +506,7 @@ const newControllers = {
     },
     deleteAccount: async (req, res) => {
         try {
-            if (req.user[0][0].is_premium == 1 && (req.user[0][0].is_monthly == 1 || req.user[0][0].is_annual == 1)) {
+            if (req.user[0][0].is_premium == 1 && (req.user[0][0].is_monthly == 1 || req.user[0][0].is_annual == 1)&&req.user[0][0].is_active == 1) {
 
                 return res.status(200).json({
                     error: "You must cancel your subscription before deleting your account."
