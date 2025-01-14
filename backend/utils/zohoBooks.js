@@ -45,6 +45,15 @@ async function ZohoBooks(user, product) {
         //     }
         // );
         // console.log(taxes.data.taxes, 'taxessssssssssssss')
+        // /books/v3/salesorders/460000000039129?organization_id=10234695
+        // const pdf = await axios.get(
+        //     `https://www.zohoapis.in/books/v3/salesorders/460000000039129/pdf?`,
+        //     {
+        //         headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
+        //         params: { organization_id: organizationId },
+        //     }
+        // );
+        // console.log(pdf,'pdfffff')
         // console.log(sampleError)
         let contactForSales;
         let changeInDb = false
@@ -68,7 +77,7 @@ async function ZohoBooks(user, product) {
             } catch (error) {
                 if (error.response?.data?.message === 'Contact does not exist.') {
                     console.log('contact has in db but not in books')
-                    let contactName = user.username
+                    let contactName = user.is_company == 1 ? user.company_name : user.username
                     const newContact = await createZohoContact(accessToken, organizationId, { contact_name: contactName, currency_id: product.currency }, user);
                     zohoBookContactId = newContact.contact.contact_id
                     const contactPersonData = {
@@ -91,7 +100,7 @@ async function ZohoBooks(user, product) {
 
         } else {
             console.log(`Email "${emailToCheck}" not found. Creating new contact.`);
-            let contactName = user.username
+            let contactName = user.is_company == 1 ? user.company_name : user.username
             const newContact = await createZohoContact(accessToken, organizationId, { contact_name: contactName, currency_id: product.currency }, user);
             zohoBookContactId = newContact.contact.contact_id
             const contactPersonData = {

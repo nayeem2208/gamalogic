@@ -548,8 +548,7 @@ const newControllers = {
             let [user] = await dbConnection.query('SELECT username,api_key FROM registration WHERE emailid = ?', [userEmail])
             if (!user || user.length === 0) {
                 console.warn("No user found with the provided email:", userEmail);
-                return res.status(200).json({
-                    message: "This account does not exist or has already been deleted. If you believe this is an error, please contact support."                });
+                return res.redirect(`${urls.frontendUrl}/DeleteAccountSuccess`);
             }
             let currDate = new Date().toISOString().slice(0, 19).replace("T", " ");
             let apiKey
