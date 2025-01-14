@@ -1162,7 +1162,7 @@ let APIControllers = {
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: "Internal Server Error" });
-    }finally{
+    } finally {
       if (req.dbConnection) {
         await req.dbConnection.release();
       }
@@ -1188,7 +1188,7 @@ let APIControllers = {
       res.status(500).send(error);
       ErrorHandler("RazorpayPayment Controller", error, req);
     }
-    finally{
+    finally {
       if (req.dbConnection) {
         await req.dbConnection.release();
       }
@@ -1378,7 +1378,7 @@ let APIControllers = {
       console.log(error, 'error adich mooone')
       res.status(500).send(error);
     }
-    finally{
+    finally {
       if (req.dbConnection) {
         await req.dbConnection.release();
       }
@@ -1522,7 +1522,10 @@ let APIControllers = {
           LIMIT 1`)
       if (subscriptionDetails[0].length > 0) {
         let userDetails = await dbConnection.query(`SELECT * FROM registration WHERE rowid='${subscriptionDetails[0][0].customer_id}'`)
-
+        if (userDetails.length === 0 || !userDetails[0][0]) {
+          console.error('No user details found for the given customer_id.');
+          return res.status(404).json({ error: 'User not found.' });
+        }
         let planDetails = RazorpayPrice.find(([credit, id, period]) => id == subscriptionDetails[0][0].plan_id)
         console.log(planDetails, 'plan details')
 

@@ -506,6 +506,12 @@ const newControllers = {
     },
     deleteAccount: async (req, res) => {
         try {
+            if (req.user[0][0].is_premium == 1 && (req.user[0][0].is_monthly == 1 || req.user[0][0].is_annual == 1)) {
+
+                return res.status(200).json({
+                    error: "You must cancel your subscription before deleting your account."
+                });
+            }
             let token = subscriptionCancelConfirmationToken(req.user[0][0].emailid)
             let link = `${urls.frontendUrl}/api/verifyAccountDeletion?email=${token}`
 
@@ -550,6 +556,75 @@ const newControllers = {
                 console.warn("No user found with the provided email:", userEmail);
                 return res.redirect(`${urls.frontendUrl}/DeleteAccountSuccess`);
             }
+            // if (user[0].is_premium == 1 && (user[0].is_monthly == 1 || user[0].is_annual == 1)) {
+            //     console.log('inside premium in deletion')
+            //     const [paypalSub] = await dbConnection.query(`
+            //         SELECT * FROM paypal_subscription 
+            //         WHERE userid='${user[0].rowid}' 
+            //         ORDER BY id DESC
+            //     `);
+
+            //     const [razorPaySub] = await dbConnection.query(`
+            //         SELECT * FROM razorpay_subscription 
+            //         WHERE customer_id='${user[0].rowid}' 
+            //         ORDER BY glid DESC
+            //     `);
+            //     // console.log(paypalSub,razorPaySub,'razorpay and paypal')
+            //     if (paypalSub.length > 0) {
+            //         console.log('inside the paypal subbbbs')
+            //         const clientId = process.env.PAYPAL_CLIENTID;
+            //         const clientSecret = process.env.PAYPAL_CLIENTSECRET;
+            //         const paypalAuthUrl = `${urls.paypalUrl}/v1/oauth2/token`;
+
+            //         const tokenData = new URLSearchParams({ grant_type: 'client_credentials' });
+            //         const paypalHeaders = {
+            //             'Content-Type': 'application/x-www-form-urlencoded',
+            //             'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+            //         };
+
+            //         try {
+            //             const payPalTokenResponse = await axios.post(paypalAuthUrl, tokenData, { headers: paypalHeaders });
+            //             const payPalToken = payPalTokenResponse.data.access_token;
+
+            //             for (const subscription of paypalSub) {
+            //                 console.log(subscription, 'paypal subscription')
+            //                 try {
+            //                     await axios.post(
+            //                         `${urls.paypalUrl}/v1/billing/subscriptions/${subscription.subscription_id}/cancel`,
+            //                         { reason: 'Account deletion' },
+            //                         {
+            //                             headers: {
+            //                                 'Authorization': `Bearer ${payPalToken}`,
+            //                             },
+            //                         }
+            //                     );
+            //                     console.log(`PayPal subscription ${subscription.subscription_id} canceled successfully.`);
+            //                 } catch (err) {
+            //                     console.error(`Failed to cancel PayPal subscription ${subscription.subscription_id}:`, err.message);
+            //                 }
+            //             }
+            //         } catch (err) {
+            //             console.error("Failed to authenticate with PayPal:", err.message);
+            //         }
+            //     }
+
+            //     if (razorPaySub.length > 0) {
+            //         const razorpayInstance = new Razorpay({
+            //             key_id: process.env.RAZORPAY_KEY_ID,
+            //             key_secret: process.env.RAZORPAY_SECRET,
+            //         });
+
+            //         for (const subscription of razorPaySub) {
+            //             console.log(subscription, 'razorapy subscription')
+            //             try {
+            //                 await razorpayInstance.subscriptions.cancel(subscription.subscription_id);
+            //                 console.log(`Razorpay subscription ${subscription.subscription_id} canceled successfully.`);
+            //             } catch (err) {
+            //                 console.error(`Failed to cancel Razorpay subscription ${subscription.subscription_id}:`, err.message);
+            //             }
+            //         }
+            //     }
+            // }
             let currDate = new Date().toISOString().slice(0, 19).replace("T", " ");
             let apiKey
             if (user[0].team_id && user[0].team_id !== 'null' && user[0].team_id !== null) {

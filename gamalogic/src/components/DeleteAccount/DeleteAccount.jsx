@@ -35,7 +35,15 @@ function DeleteAccount({ handleDeleteAccount }) {
         // } else {
         //   toast.error("Error deleting account");
         // }
-        toast.success("A link to delete your account has been sent to your email.");
+        if (res.data?.message === "Email sent successfully") {
+          toast.success(
+            "A link to delete your account has been sent to your email."
+          );
+        } else if (res.data?.error) {
+          toast.error(res.data.error);
+        } else {
+          toast.error("An unexpected error occurred. Please try again later.");
+        }
       } catch (error) {
         console.log(error);
       }
