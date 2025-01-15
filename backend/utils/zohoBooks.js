@@ -6,14 +6,16 @@ const clientid = process.env.BOOKS_CLIENT_ID;
 const secret = process.env.BOOKS_CLIENT_SECRET;
 const refresh_token = process.env.BOOKS_REFRESH_TOKEN;
 const organization_id = process.env.BOOKS_ORG_ID
+const APP = process.env.APP
 // Validate environment variables
 if (!clientid || !secret || !refresh_token) {
     throw new Error("Environment variables are missing for Zoho API credentials.");
 }
 
+let BOOKS_BASE_URL = APP == 'Beta' ? "https://www.zohoapis.in" : "https://www.zohoapis.com";
 // Function to refresh the access token
 async function refreshToken() {
-    const Accounts_URL = "https://accounts.zoho.in";
+    let Accounts_URL = APP == 'Beta' ? "https://accounts.zoho.in" : "https://accounts.zoho.com";
     const formData = new URLSearchParams();
     formData.append("refresh_token", refresh_token);
     formData.append("client_id", clientid);
@@ -33,21 +35,21 @@ async function refreshToken() {
 async function ZohoBooks(user, product) {
     try {
         let emailToCheck = user.emailid
-        const accessToken = await refreshToken();
+        let accessToken = await refreshToken();
         const organizationId = organization_id;
         let zohoBookContactId = null
 
-        // const taxes = await axios.get(
-        //     `https://www.zohoapis.in/books/v3/settings/taxes?`,
+        // const currencies = await axios.get(
+        //     `${BOOKS_BASE_URL}/books/v3/settings/taxes?`,
         //     {
         //         headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
         //         params: { organization_id: organizationId },
         //     }
         // );
-        // console.log(taxes.data.taxes, 'taxessssssssssssss')
+        // console.log(currencies.data, 'currencies')
         // /books/v3/salesorders/460000000039129?organization_id=10234695
         // const pdf = await axios.get(
-        //     `https://www.zohoapis.in/books/v3/salesorders/460000000039129/pdf?`,
+        //     `${BOOKS_BASE_URL}/books/v3/salesorders/460000000039129/pdf?`,
         //     {
         //         headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
         //         params: { organization_id: organizationId },
@@ -60,7 +62,7 @@ async function ZohoBooks(user, product) {
         if (user.id_zoho_books) {
             try {
                 const contactResponse = await axios.get(
-                    `https://www.zohoapis.in/books/v3/contacts/${user.id_zoho_books}`,
+                    `${BOOKS_BASE_URL}/books/v3/contacts/${user.id_zoho_books}`,
                     {
                         headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
                         params: { organization_id: organizationId },
@@ -139,16 +141,16 @@ async function ZohoBooks(user, product) {
                     tax_id: (() => {
                         if (user.country == 'India') {
                             if (user.state == 'Kerala') {
-                                return "2234640000000179212";
+                                return process.env.BOOKS_GST_18;
                             } else {
-                                return "2234640000000179110";
+                                return process.env.BOOKS_IGST_18;
                             }
                         }
                         else {
-                            return '2234640000000179104';
+                            return process.env.BOOKS_IGST_0;
                         }
                     })(),
-                    hsn_or_sac:'998313'
+                    hsn_or_sac: '998313'
                 },
             ],
             taxes: [
@@ -157,12 +159,12 @@ async function ZohoBooks(user, product) {
                         if (user.country === 'India') {
                             console.log(user.state, user.state == 'kerala', 'state of user')
                             if (user.state == 'Kerala') {
-                                return "2234640000000179212";
+                                return process.env.BOOKS_GST_18;
                             } else {
-                                return "2234640000000179110";
+                                return process.env.BOOKS_IGST_18;
                             }
                         } else {
-                            return '2234640000000179104';
+                            return process.env.BOOKS_IGST_0;
                         }
                     })(),
                     // tax_name: "GST",
@@ -175,6 +177,7 @@ async function ZohoBooks(user, product) {
         await createSalesOrder(accessToken, organizationId, salesDetails);
         return { zohoBookContactId, changeInDb }
     } catch (error) {
+        console.log(error)
         if (error.response?.data?.message == 'Contact does not exist.') {
 
         }
@@ -185,7 +188,7 @@ async function ZohoBooks(user, product) {
 
 // Function to create a sales order in Zoho Books
 async function createSalesOrder(accessToken, organizationId, salesOrderData) {
-    const url = `https://www.zohoapis.in/books/v3/salesorders?organization_id=${organizationId}`;
+    const url = `${BOOKS_BASE_URL}/books/v3/salesorders?organization_id=${organizationId}`;
 
     const headers = {
         Authorization: `Zoho-oauthtoken ${accessToken}`,
@@ -204,7 +207,7 @@ async function createSalesOrder(accessToken, organizationId, salesOrderData) {
 
 async function ApproveSalesOrder(accessToken, organizationId, salesOrderData) {
     // console.log(salesOrderData,'check chek chekkkkk',salesOrderData.salesorder.salesorder_id,'sales order data for approving')
-    const url = `https://www.zohoapis.in/books/v3/salesorders/${salesOrderData.salesorder.salesorder_id}/status/open?organization_id=${organizationId}`;
+    const url = `${BOOKS_BASE_URL}/books/v3/salesorders/${salesOrderData.salesorder.salesorder_id}/status/open?organization_id=${organizationId}`;
 
     const headers = {
         Authorization: `Zoho-oauthtoken ${accessToken}`,
@@ -263,7 +266,7 @@ async function createZohoContact(accessToken, organizationId, contactData, user)
     }
 
     console.log(requestBody, 'request body to create contact ')
-    const url = `https://www.zohoapis.in/books/v3/contacts?organization_id=${organizationId}`;
+    const url = `${BOOKS_BASE_URL}/books/v3/contacts?organization_id=${organizationId}`;
 
     const headers = {
         Authorization: `Zoho-oauthtoken ${accessToken}`,
@@ -282,7 +285,7 @@ async function createZohoContact(accessToken, organizationId, contactData, user)
 
 // Function to create a contact person for an existing contact in Zoho Books
 async function createZohoContactPerson(accessToken, organizationId, contactPersonData) {
-    const url = `https://www.zohoapis.in/books/v3/contacts/contactpersons?organization_id=${organizationId}`;
+    const url = `${BOOKS_BASE_URL}/books/v3/contacts/contactpersons?organization_id=${organizationId}`;
 
     const headers = {
         Authorization: `Zoho-oauthtoken ${accessToken}`,
@@ -300,7 +303,7 @@ async function createZohoContactPerson(accessToken, organizationId, contactPerso
 }
 
 async function updateUserCurrency(accessToken, organizationId, contactId, currencyId) {
-    const url = `https://www.zohoapis.in/books/v3/contacts/${contactId}?organization_id=${organizationId}`;
+    const url = `${BOOKS_BASE_URL}/books/v3/contacts/${contactId}?organization_id=${organizationId}`;
 
     const headers = {
         Authorization: `Zoho-oauthtoken ${accessToken}`,

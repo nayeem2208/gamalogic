@@ -748,10 +748,10 @@ let APIControllers = {
         rate: details?.purchase_units?.[0]?.amount?.value ?? null,
         credits: req.body.credits,
         methord: 'Pay as you go',
-        currency: '2234640000000000061',
+        currency: process.env.BOOKS_USD_CURRENCY,
       }
       let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
-      if (zohoBook.zohoBookContactId && zohoBook.changeInDb) {
+      if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
         await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1,id_zoho_books='${zohoBook.zohoBookContactId}' WHERE emailid='${req.user[0][0].emailid}'`)
       }
       else {
@@ -902,10 +902,10 @@ let APIControllers = {
         methord: `${paymentDetails.period === 'monthly'
           ? `Monthly subscription of ${currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`
           : `Annual subscription of ${currentDate.getFullYear()}`}`,
-        currency: '2234640000000000061',
+        currency: process.env.BOOKS_USD_CURRENCY,
       }
       let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
-      if (zohoBook.zohoBookContactId && zohoBook.changeInDb) {
+      if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
         const registrationRuery = `
         UPDATE registration 
         SET credits = '${newBalance}', 
@@ -1060,10 +1060,10 @@ let APIControllers = {
                   methord: `${paymentDetails[2] == 'monthly'
                     ? `Monthly subscription of ${currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`
                     : `Annual subscription of ${currentDate.getFullYear()}`}`,
-                  currency: '2234640000000000061'
+                  currency: process.env.BOOKS_USD_CURRENCY
                 }
                 let zohoBook = await ZohoBooks(user[0][0], purchaseDetailsForZohoBooks)
-                if (zohoBook.zohoBookContactId && zohoBook.changeInDb) {
+                if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
                   await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}',id_zoho_books='${zohoBook.zohoBookContactId}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
                 }
                 else {
@@ -1301,10 +1301,10 @@ let APIControllers = {
         rate: amountInRupees,
         credits: req.body.credits,
         methord: 'Pay as you go',
-        currency: '2234640000000000064'
+        currency: process.env.BOOKS_INR_CURRENCY
       }
       let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
-      if (zohoBook.zohoBookContactId && zohoBook.changeInDb) {
+      if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
         await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1,id_zoho_books='${zohoBook.zohoBookContactId}' WHERE emailid='${req.user[0][0].emailid}'`)
 
       }
@@ -1483,10 +1483,10 @@ let APIControllers = {
         methord: `${req.body.paymentDetails.period === 'monthly'
           ? `Monthly subscription of ${currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`
           : `Annual subscription of ${currentDate.getFullYear()}`}`,
-        currency: '2234640000000000064'
+        currency: process.env.BOOKS_INR_CURRENCY
       }
       let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
-      if (zohoBook.zohoBookContactId && zohoBook.changeInDb) {
+      if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
         await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1,is_pay_as_you_go=0,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
         last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',is_active=1,is_pay_as_you_go=0,subscription_stop_time=NULL,id_zoho_books='${zohoBook.zohoBookContactId}'
    WHERE emailid='${req.user[0][0].emailid}'`)
@@ -1614,10 +1614,10 @@ let APIControllers = {
               methord: `${planDetails[2] == 'monthly'
                 ? `Monthly subscription of ${currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}`
                 : `Annual subscription of ${currentDate.getFullYear()}`}`,
-              currency: '2234640000000000064'
+              currency: process.env.BOOKS_INR_CURRENCY
             }
             let zohoBook = await ZohoBooks(userDetails[0][0], purchaseDetailsForZohoBooks)
-            if (zohoBook.zohoBookContactId && zohoBook.changeInDb) {
+            if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
               await dbConnection.query(`UPDATE registration SET credits = '${newBalance}',last_payment_time='${last_payment}',id_zoho_books='${zohoBook.zohoBookContactId}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
 
             } else {
