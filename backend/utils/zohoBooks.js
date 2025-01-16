@@ -136,7 +136,7 @@ async function ZohoBooks(user, product) {
             line_items: [
                 {
                     rate: user.country === 'India' ? parseFloat((product.rate / 1.18).toFixed(2)) : product.rate,
-                    name: `${product.credits} credits ${product.methord}`,
+                    name: `${Number(product.credits).toLocaleString("en-US")} credits ${product.methord}`,
                     product_type: 'service',
                     tax_id: (() => {
                         if (user.country == 'India') {
