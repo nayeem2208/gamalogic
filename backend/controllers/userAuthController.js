@@ -192,6 +192,11 @@ const Authentication = {
   registerUser: async (req, res) => {
     try {
       const { firstname, lastname, email, password } = req.body.data;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        return res.status(400).json({ error: "Invalid email format." });
+      }
+
       let invitedUserId = null
       console.log(req.body.teamId, 'team id is here')
       const userAgent = req.headers["user-agent"];

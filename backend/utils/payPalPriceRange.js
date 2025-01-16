@@ -42,6 +42,7 @@ else{
         [500000, "P-9S581294M0625541AM3U27FA", "monthly"],
         [750000, "P-8L4996302T506635GM3U27UA", "monthly"],
         [1000000, "P-22G689928N540831NM3U3COQ", "monthly"],
+        [3000000, "P-00M87965TJ806534UMRJLMVA", "monthly"],
         [12000, "P-09P99448F15622802M3U3DHA", "annually"],
         [30000, "P-4P1083047P145962AM3U3EHQ", "annually"],
         [60000, "P-8FJ05805WK865450TM3U3FKI", "annually"],
