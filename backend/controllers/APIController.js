@@ -750,11 +750,17 @@ let APIControllers = {
         methord: 'Pay as you go',
         currency: process.env.BOOKS_USD_CURRENCY,
       }
-      let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
-      if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
-        await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1,id_zoho_books='${zohoBook.zohoBookContactId}' WHERE emailid='${req.user[0][0].emailid}'`)
-      }
-      else {
+      try {
+        let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
+        if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
+          await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1,id_zoho_books='${zohoBook.zohoBookContactId}' WHERE emailid='${req.user[0][0].emailid}'`)
+        }
+        else {
+          await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1 WHERE emailid='${req.user[0][0].emailid}'`)
+        }
+
+      } catch (error) {
+        console.error("Error occurred in ZohoBooks function:", error);
         await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1 WHERE emailid='${req.user[0][0].emailid}'`)
       }
       if (user[0][0].is_referer_by == 1) {
@@ -904,40 +910,58 @@ let APIControllers = {
           : `Annual subscription of ${currentDate.getFullYear()}`}`,
         currency: process.env.BOOKS_USD_CURRENCY,
       }
-      let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
-      if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
+      try {
+        let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
+        if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
+          const registrationRuery = `
+          UPDATE registration 
+          SET credits = '${newBalance}', 
+              is_premium = 1, 
+              ${periodColumn} = 1 ,
+              subscription_start_time='${details.start_time}',
+              last_payment_time='${details.billing_info.last_payment.time}',
+              is_active=1,
+              is_pay_as_you_go=0,
+              subscription_stop_time=NULL,
+              id_zoho_books='${zohoBook.zohoBookContactId}'
+          WHERE emailid = '${user.emailid}'
+        `;
+
+          await dbConnection.query(registrationRuery);
+        }
+        else {
+          const registrationRuery = `
+          UPDATE registration 
+          SET credits = '${newBalance}', 
+              is_premium = 1, 
+              ${periodColumn} = 1 ,
+              subscription_start_time='${details.start_time}',
+              last_payment_time='${details.billing_info.last_payment.time}',
+              is_active=1,
+              is_pay_as_you_go=0,
+              subscription_stop_time=NULL
+          WHERE emailid = '${user.emailid}'
+        `;
+
+          await dbConnection.query(registrationRuery);
+        }
+      } catch (error) {
         const registrationRuery = `
-        UPDATE registration 
-        SET credits = '${newBalance}', 
-            is_premium = 1, 
-            ${periodColumn} = 1 ,
-            subscription_start_time='${details.start_time}',
-            last_payment_time='${details.billing_info.last_payment.time}',
-            is_active=1,
-            is_pay_as_you_go=0,
-            subscription_stop_time=NULL,
-            id_zoho_books='${zohoBook.zohoBookContactId}'
-        WHERE emailid = '${user.emailid}'
-      `;
+          UPDATE registration 
+          SET credits = '${newBalance}', 
+              is_premium = 1, 
+              ${periodColumn} = 1 ,
+              subscription_start_time='${details.start_time}',
+              last_payment_time='${details.billing_info.last_payment.time}',
+              is_active=1,
+              is_pay_as_you_go=0,
+              subscription_stop_time=NULL
+          WHERE emailid = '${user.emailid}'
+        `;
 
         await dbConnection.query(registrationRuery);
       }
-      else {
-        const registrationRuery = `
-        UPDATE registration 
-        SET credits = '${newBalance}', 
-            is_premium = 1, 
-            ${periodColumn} = 1 ,
-            subscription_start_time='${details.start_time}',
-            last_payment_time='${details.billing_info.last_payment.time}',
-            is_active=1,
-            is_pay_as_you_go=0,
-            subscription_stop_time=NULL
-        WHERE emailid = '${user.emailid}'
-      `;
 
-        await dbConnection.query(registrationRuery);
-      }
 
 
       if (user.is_referer_by == 1) {
@@ -1062,11 +1086,16 @@ let APIControllers = {
                     : `Annual subscription of ${currentDate.getFullYear()}`}`,
                   currency: process.env.BOOKS_USD_CURRENCY
                 }
-                let zohoBook = await ZohoBooks(user[0][0], purchaseDetailsForZohoBooks)
-                if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
-                  await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}',id_zoho_books='${zohoBook.zohoBookContactId}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
-                }
-                else {
+                try {
+                  let zohoBook = await ZohoBooks(user[0][0], purchaseDetailsForZohoBooks)
+                  if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
+                    await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}',id_zoho_books='${zohoBook.zohoBookContactId}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
+                  }
+                  else {
+                    await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
+
+                  }
+                } catch (error) {
                   await dbConnection.query(`UPDATE registration SET credits = '${newBalance}', is_premium = 1,last_payment_time='${lastPayment_registration}' WHERE rowid = '${planInDataBase[0][0].userid}'`);
 
                 }
@@ -1303,15 +1332,20 @@ let APIControllers = {
         methord: 'Pay as you go',
         currency: process.env.BOOKS_INR_CURRENCY
       }
-      let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
-      if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
-        await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1,id_zoho_books='${zohoBook.zohoBookContactId}' WHERE emailid='${req.user[0][0].emailid}'`)
+      try {
+        let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
+        if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
+          await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1,id_zoho_books='${zohoBook.zohoBookContactId}' WHERE emailid='${req.user[0][0].emailid}'`)
 
-      }
-      else {
+        }
+        else {
+          await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1 WHERE emailid='${req.user[0][0].emailid}'`)
+
+        }
+      } catch (error) {
         await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,is_pay_as_you_go=1 WHERE emailid='${req.user[0][0].emailid}'`)
-
       }
+
       if (req.user[0][0].is_referer_by == 1) {
         try {
           let DollarRate = await InrToUsdConverter(req.body.credits)
@@ -1485,16 +1519,24 @@ let APIControllers = {
           : `Annual subscription of ${currentDate.getFullYear()}`}`,
         currency: process.env.BOOKS_INR_CURRENCY
       }
-      let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
-      if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
-        await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1,is_pay_as_you_go=0,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
-        last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',is_active=1,is_pay_as_you_go=0,subscription_stop_time=NULL,id_zoho_books='${zohoBook.zohoBookContactId}'
-   WHERE emailid='${req.user[0][0].emailid}'`)
-      } else {
+      try {
+        let zohoBook = await ZohoBooks(req.user[0][0], purchaseDetailsForZohoBooks)
+        if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
+          await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1,is_pay_as_you_go=0,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
+          last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',is_active=1,is_pay_as_you_go=0,subscription_stop_time=NULL,id_zoho_books='${zohoBook.zohoBookContactId}'
+     WHERE emailid='${req.user[0][0].emailid}'`)
+        } else {
+          await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1,is_pay_as_you_go=0,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
+          last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',is_active=1,is_pay_as_you_go=0,subscription_stop_time=NULL
+     WHERE emailid='${req.user[0][0].emailid}'`)
+        }
+      } catch (error) {
         await dbConnection.query(`UPDATE registration SET credits='${newBalance}',is_premium=1,${periodColumn} = 1,is_pay_as_you_go=0,subscription_start_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',
         last_payment_time='${new Date(subscriptinDetails.created_at * 1000).toISOString()}',is_active=1,is_pay_as_you_go=0,subscription_stop_time=NULL
    WHERE emailid='${req.user[0][0].emailid}'`)
+
       }
+
       res.status(200).json('Successfull')
     } catch (error) {
       console.log(error);
@@ -1616,11 +1658,17 @@ let APIControllers = {
                 : `Annual subscription of ${currentDate.getFullYear()}`}`,
               currency: process.env.BOOKS_INR_CURRENCY
             }
-            let zohoBook = await ZohoBooks(userDetails[0][0], purchaseDetailsForZohoBooks)
-            if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
-              await dbConnection.query(`UPDATE registration SET credits = '${newBalance}',last_payment_time='${last_payment}',id_zoho_books='${zohoBook.zohoBookContactId}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
+            try {
+              let zohoBook = await ZohoBooks(userDetails[0][0], purchaseDetailsForZohoBooks)
+              if (zohoBook?.zohoBookContactId && zohoBook?.changeInDb) {
+                await dbConnection.query(`UPDATE registration SET credits = '${newBalance}',last_payment_time='${last_payment}',id_zoho_books='${zohoBook.zohoBookContactId}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
 
-            } else {
+              } else {
+                await dbConnection.query(`UPDATE registration SET credits = '${newBalance}',last_payment_time='${last_payment}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
+
+              }
+
+            } catch (error) {
               await dbConnection.query(`UPDATE registration SET credits = '${newBalance}',last_payment_time='${last_payment}' WHERE rowid = '${subscriptionDetails[0][0].customer_id}'`);
 
             }

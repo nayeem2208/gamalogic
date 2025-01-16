@@ -174,7 +174,7 @@ async function ZohoBooks(user, product) {
             // adjustment_description: "Adjustment",
         };
         console.log(salesDetails, 'sales Detailssssssssssssss')
-        await createSalesOrder(accessToken, organizationId, salesDetails);
+        await createSalesOrder(accessToken, organizationId, salesDetails,user);
         return { zohoBookContactId, changeInDb }
     } catch (error) {
         console.log(error)
@@ -187,7 +187,7 @@ async function ZohoBooks(user, product) {
 }
 
 // Function to create a sales order in Zoho Books
-async function createSalesOrder(accessToken, organizationId, salesOrderData) {
+async function createSalesOrder(accessToken, organizationId, salesOrderData,user) {
     const url = `${BOOKS_BASE_URL}/books/v3/salesorders?organization_id=${organizationId}`;
 
     const headers = {
@@ -197,10 +197,41 @@ async function createSalesOrder(accessToken, organizationId, salesOrderData) {
 
     try {
         const response = await axios.post(url, salesOrderData, { headers });
-        await ApproveSalesOrder(accessToken, organizationId, response.data)
+        ApproveSalesOrder(accessToken, organizationId, response.data)
+        EmailSalesOrder(accessToken, organizationId, response.data,user)
         return response.data;
     } catch (error) {
         console.error("Error Creating Sales Order:", error.response?.data || error.message || error);
+        // throw error;
+    }
+}
+
+async function EmailSalesOrder(accessToken, organizationId, salesOrderData,user) {
+    const url = `${BOOKS_BASE_URL}/books/v3/salesorders/${salesOrderData.salesorder.salesorder_id}/email?organization_id=${organizationId}`;
+
+    const headers = {
+        Authorization: `Zoho-oauthtoken ${accessToken}`,
+        "Content-Type": "application/json",
+    };
+    console.log(user.emailid,'email to send')
+    let bodyOfEmail =
+    {
+        // from_address_id: "johnRoberts@safInstrument.com",
+        send_from_org_email_id: true,
+        to_mail_ids: [
+            user.emailid
+        ],
+        subject: `Sales Order from Gamalogic (Sales Order #: ${ salesOrderData?.salesorder?.salesorder_number})`,
+        documents: "string",
+        body: `<br>Dear  ${user.username},&nbsp;<br><br>Thanks for your interest in our services. Please find our sales order attached with this mail.<br><br> An overview of the sales order is available below for your reference: &nbsp;<br><br> ----------------------------------------------------------------------------------------<br> <h2>Sales Order&nbsp;# :&nbsp;${ salesOrderData?.salesorder?.salesorder_number}</h2><br> ----------------------------------------------------------------------------------------<br> <b>&nbsp;Order Date &nbsp; &nbsp;&nbsp;&nbsp;: &nbsp;${ salesOrderData?.salesorder?.date}</b><br><b>&nbsp;Amount &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : &nbsp;&nbsp;${ salesOrderData?.salesorder?.total}</b><br>----------------------------------------------------------------------------------------<br><br><span>Assuring you of our best services at all times.</span><br><br><br>Regards,<br>Gamalogic<br><br><br>`
+    }
+
+
+    try {
+        const response = await axios.post(url, bodyOfEmail, { headers });
+        console.log(response.data, 'response on Email sales Order');
+    } catch (error) {
+        console.error("Error Sending salesOrder on Email :", error.response?.data || error.message || error);
         // throw error;
     }
 }
