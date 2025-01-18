@@ -198,7 +198,7 @@ async function createSalesOrder(accessToken, organizationId, salesOrderData,user
     try {
         const response = await axios.post(url, salesOrderData, { headers });
         ApproveSalesOrder(accessToken, organizationId, response.data)
-        EmailSalesOrder(accessToken, organizationId, response.data,user)
+        // EmailSalesOrder(accessToken, organizationId, response.data,user)
         return response.data;
     } catch (error) {
         console.error("Error Creating Sales Order:", error.response?.data || error.message || error);
