@@ -695,6 +695,36 @@ const newControllers = {
                 await req.dbConnection.release();
             }
         }
+    },
+    downloadInvoice: async (req, res) => {
+        try {
+            const fileId = req.params.id;
+            const pdfData = await downloadSalesInvoice(fileId);
+            res.status(200).json({ invoiceHTML: pdfData });
+        } catch (error) {
+            console.error('Error in download Invoice:', error);
+            ErrorHandler("download Invoice Controller", error, req);
+            res.status(500).json({ error: error.message || 'Internal Server Error' });
+        } finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
+    },
+    listInvoices: async (req, res) => {
+        try {
+            let id = req.user[0][0].id_zoho_books
+            let salesOrders = await listSalesOrders(id)
+            res.status(200).json(salesOrders)
+        } catch (error) {
+            console.error('Error in list Invoice:', error);
+            ErrorHandler("list Invoice Controller", error, req);
+            res.status(500).json({ error: error.message || 'Internal Server Error' });
+        } finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
     }
 
 

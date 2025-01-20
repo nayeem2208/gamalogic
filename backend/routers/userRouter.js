@@ -62,10 +62,12 @@ router.post('/razorPaySubscription',dbMiddleware,authcheck,accountDetailsValidat
 router.post('/RazorPaySubscriptionPaymentSuccess',dbMiddleware,authcheck,APIControllers.razorPaySubscriptionSuccess)
 router.post('/RazorPayWebhook',dbMiddleware,APIControllers.razorPayWebhook)
 
-//cancelling subscriptions
+//Billing
 router.get('/getPlanDetails',dbMiddleware,authcheck,APIControllers.getPlanDetails)
 router.get('/cancelSubscription',dbMiddleware,authcheck,newControllers.cancelSubscription)
 router.get('/ConfirmSubscriptionCancellation',dbMiddleware,newControllers.verifyCancelSubscription)
+router.get('/listSalesOrders',dbMiddleware,authcheck,newControllers.listInvoices)
+router.get('/downloadInvoice/:id',dbMiddleware,authcheck,newControllers.downloadInvoice)
 
 //userDetails based
 router.post('/updateMoreDetails',dbMiddleware,authcheck,newControllers.addMoreDetails)

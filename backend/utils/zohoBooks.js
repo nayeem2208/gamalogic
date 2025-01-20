@@ -1,7 +1,9 @@
 import axios from "axios";
 import getStateCodeByName from "./stateCodes.js";
+import NodeCache from "node-cache";
 
 // Client credentials
+const cache = new NodeCache();
 const clientid = process.env.BOOKS_CLIENT_ID;
 const secret = process.env.BOOKS_CLIENT_SECRET;
 const refresh_token = process.env.BOOKS_REFRESH_TOKEN;
@@ -24,11 +26,26 @@ async function refreshToken() {
 
     try {
         const response = await axios.post(`${Accounts_URL}/oauth/v2/token`, formData);
-        return response.data.access_token;
+        const { access_token, expires_in } = response.data;
+
+        cache.set("zoho_access_token", access_token, expires_in - 60);
+
+        return access_token;
     } catch (error) {
         console.error("Error refreshing access token:", error.response?.data || error.message || error);
         // throw error;
     }
+}
+
+async function getAccessToken() {
+    let token = cache.get("zoho_access_token");
+    console.log(token,'token is available')
+    if (!token) {
+        console.log("Access token expired or not found. Refreshing token...");
+        token = await refreshToken();
+    }
+
+    return token;
 }
 
 // Function to fetch contacts and check if an email exists
@@ -36,27 +53,11 @@ async function ZohoBooks(user, product) {
     try {
         let emailToCheck = user.emailid
         let accessToken = await refreshToken();
+        console.log(accessToken, 'accessToken')
         const organizationId = organization_id;
         let zohoBookContactId = null
 
-        // const currencies = await axios.get(
-        //     `${BOOKS_BASE_URL}/books/v3/settings/taxes?`,
-        //     {
-        //         headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
-        //         params: { organization_id: organizationId },
-        //     }
-        // );
-        // console.log(currencies.data, 'currencies')
-        // /books/v3/salesorders/460000000039129?organization_id=10234695
-        // const pdf = await axios.get(
-        //     `${BOOKS_BASE_URL}/books/v3/salesorders/460000000039129/pdf?`,
-        //     {
-        //         headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
-        //         params: { organization_id: organizationId },
-        //     }
-        // );
-        // console.log(pdf,'pdfffff')
-        // console.log(sampleError)
+
         let contactForSales;
         let changeInDb = false
         if (user.id_zoho_books) {
@@ -174,7 +175,7 @@ async function ZohoBooks(user, product) {
             // adjustment_description: "Adjustment",
         };
         console.log(salesDetails, 'sales Detailssssssssssssss')
-        await createSalesOrder(accessToken, organizationId, salesDetails,user);
+        await createSalesOrder(accessToken, organizationId, salesDetails, user);
         return { zohoBookContactId, changeInDb }
     } catch (error) {
         console.log(error)
@@ -187,7 +188,7 @@ async function ZohoBooks(user, product) {
 }
 
 // Function to create a sales order in Zoho Books
-async function createSalesOrder(accessToken, organizationId, salesOrderData,user) {
+async function createSalesOrder(accessToken, organizationId, salesOrderData, user) {
     const url = `${BOOKS_BASE_URL}/books/v3/salesorders?organization_id=${organizationId}`;
 
     const headers = {
@@ -198,7 +199,7 @@ async function createSalesOrder(accessToken, organizationId, salesOrderData,user
     try {
         const response = await axios.post(url, salesOrderData, { headers });
         ApproveSalesOrder(accessToken, organizationId, response.data)
-        // EmailSalesOrder(accessToken, organizationId, response.data,user)
+        // EmailSalesOrder(accessToken, organizationId, response.data, user)
         return response.data;
     } catch (error) {
         console.error("Error Creating Sales Order:", error.response?.data || error.message || error);
@@ -206,24 +207,22 @@ async function createSalesOrder(accessToken, organizationId, salesOrderData,user
     }
 }
 
-async function EmailSalesOrder(accessToken, organizationId, salesOrderData,user) {
+async function EmailSalesOrder(accessToken, organizationId, salesOrderData, user) {
     const url = `${BOOKS_BASE_URL}/books/v3/salesorders/${salesOrderData.salesorder.salesorder_id}/email?organization_id=${organizationId}`;
 
     const headers = {
         Authorization: `Zoho-oauthtoken ${accessToken}`,
         "Content-Type": "application/json",
     };
-    console.log(user.emailid,'email to send')
     let bodyOfEmail =
     {
-        // from_address_id: "johnRoberts@safInstrument.com",
         send_from_org_email_id: true,
         to_mail_ids: [
             user.emailid
         ],
-        subject: `Sales Order from Gamalogic (Sales Order #: ${ salesOrderData?.salesorder?.salesorder_number})`,
+        subject: `Sales Order from Gamalogic (Sales Order #: ${salesOrderData?.salesorder?.salesorder_number})`,
         documents: "string",
-        body: `<br>Dear  ${user.username},&nbsp;<br><br>Thanks for your interest in our services. Please find our sales order attached with this mail.<br><br> An overview of the sales order is available below for your reference: &nbsp;<br><br> ----------------------------------------------------------------------------------------<br> <h2>Sales Order&nbsp;# :&nbsp;${ salesOrderData?.salesorder?.salesorder_number}</h2><br> ----------------------------------------------------------------------------------------<br> <b>&nbsp;Order Date &nbsp; &nbsp;&nbsp;&nbsp;: &nbsp;${ salesOrderData?.salesorder?.date}</b><br><b>&nbsp;Amount &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : &nbsp;&nbsp;${ salesOrderData?.salesorder?.total}</b><br>----------------------------------------------------------------------------------------<br><br><span>Assuring you of our best services at all times.</span><br><br><br>Regards,<br>Gamalogic<br><br><br>`
+        body: `<br>Dear  ${user.username},&nbsp;<br><br>Thanks for your interest in our services. Please find our sales order attached with this mail.<br><br> An overview of the sales order is available below for your reference: &nbsp;<br><br> ----------------------------------------------------------------------------------------<br> <h2>Sales Order&nbsp;# :&nbsp;${salesOrderData?.salesorder?.salesorder_number}</h2><br> ----------------------------------------------------------------------------------------<br> <b>&nbsp;Order Date &nbsp; &nbsp;&nbsp;&nbsp;: &nbsp;${salesOrderData?.salesorder?.date}</b><br><b>&nbsp;Amount &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : &nbsp;&nbsp;${salesOrderData?.salesorder?.total}</b><br>----------------------------------------------------------------------------------------<br><br><span>Assuring you of our best services at all times.</span><br><br><br>Regards,<br>Gamalogic<br><br><br>`
     }
 
 
@@ -231,7 +230,7 @@ async function EmailSalesOrder(accessToken, organizationId, salesOrderData,user)
         const response = await axios.post(url, bodyOfEmail, { headers });
         console.log(response.data, 'response on Email sales Order');
     } catch (error) {
-        console.error("Error Sending salesOrder on Email :", error.response?.data || error.message || error);
+        console.error("Error Sending Email:", error.response?.data || error.message || error);
         // throw error;
     }
 }
@@ -350,6 +349,62 @@ async function updateUserCurrency(accessToken, organizationId, contactId, curren
         return response.data;
     } catch (error) {
         console.error("Error updating user currency:", error.response?.data || error.message || error);
+        // throw error;
+    }
+}
+
+export async function downloadSalesInvoice(id) {
+    let accessToken = await getAccessToken();
+
+    try {
+        // const SalesOrders = await axios.get(
+        //     `${BOOKS_BASE_URL}/books/v3/salesorders?`,
+        //     {
+        //         headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
+        //         params: {
+        //             organization_id: organization_id,
+        //             customer_id:'2234640000000137001'
+        //         },
+        //     }
+        // );
+        // console.log(SalesOrders.data,'sales orders')
+        const pdf = await axios.get(
+            `${BOOKS_BASE_URL}/books/v3/salesorders/${id}?`,
+            {
+                headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
+                params: {
+                    organization_id: organization_id,
+                    accept: "html",
+                },
+            }
+        );
+        console.log(pdf, 'pdfffff')
+        return pdf.data;
+    } catch (error) {
+        console.error("Error Creating Sales Order:", error.response?.data || error.message || error);
+        // throw error;
+    }
+}
+
+export async function listSalesOrders(id) {
+    let accessToken = await getAccessToken();
+
+    try {
+        console.log(id,'id to get salesorders')
+        const SalesOrders = await axios.get(
+            `${BOOKS_BASE_URL}/books/v3/salesorders?`,
+            {
+                headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
+                params: {
+                    organization_id: organization_id,
+                    customer_id:id
+                },
+            }
+        );
+        // console.log(SalesOrders.data,'sales orders')
+        return SalesOrders.data;
+    } catch (error) {
+        console.error("Error listing Sales Order:", error.response?.data || error.message || error);
         // throw error;
     }
 }

@@ -14,6 +14,7 @@ import SubscriptionCancellationConfirmed from "../components/SubscriptionCancell
 import SubscriptionCancellationError from "../components/SubscriptionCancellationError";
 import CancelEmailSuccess from "../components/cancelModal/CancelLinkSuccess";
 import CancelEmailFail from "../components/cancelModal/CancelLinkFail";
+import BillingHistory from "../components/BillingHistory";
 
 const override = {
   display: "block",
@@ -169,6 +170,7 @@ function Billings() {
                   </h2>
                 </div>
               ) : billingDetails.isPremium == 1 ? (
+                <>
                 <div className="p-6 bg-white rounded-lg shadow-md">
                   <h2 className="font-semibold mb-2 flex items-center">
                     You are a Premium user
@@ -396,6 +398,8 @@ function Billings() {
                     </div>
                   )}
                 </div>
+                <BillingHistory/>
+                </>
               ) : (
                 //...........freeee trial....................
                 <div className="text-gray-700 p-6 bg-white rounded-lg shadow-md">
