@@ -402,7 +402,7 @@ export async function downloadSalesInvoice(id) {
                 },
             }
         );
-        console.log(pdf, 'pdfffff')
+        // console.log(pdf, 'pdfffff')
         return pdf.data;
     } catch (error) {
         console.error("Error Creating Sales Order:", error.response?.data || error.message || error);
