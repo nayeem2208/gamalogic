@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../axios/axiosInstance";
+import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import LoadingBar from "react-top-loading-bar";
+import GridLoader from "react-spinners/GridLoader";
 
+const override = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "red",
+};
 function BillingHistory() {
   const [billingData, setBillingData] = useState([]);
   let [loading, setLoading] = useState(false);
   let [load, setLoad] = useState(30);
+  let [invoicesLoad, setInvoicesLoad] = useState(true);
+  // let [color, setColor] = useState("#1da6b8");
 
   useEffect(() => {
     const fetchInvoices = async () => {
@@ -15,10 +24,11 @@ function BillingHistory() {
         // setLoading(true);
         // setLoad(30);
         const res = await axiosInstance.get("/listSalesOrders");
+        setInvoicesLoad(false);
         console.log(res, "API Response");
         // setLoad(100);
-        if (res.data?.salesorders) {
-          setBillingData(res.data.salesorders);
+        if (res.data) {
+          setBillingData(res.data);
         } else {
           console.warn("No sales orders found in the response");
           setBillingData([]);
@@ -38,60 +48,51 @@ function BillingHistory() {
       setLoad(30);
       const response = await axiosInstance.get(`downloadInvoice/${fileId}`);
       const invoiceHTML = response.data.invoiceHTML;
+  
       if (!invoiceHTML) {
         throw new Error("Invoice HTML not found");
       }
+  
       setLoad(40);
-      // Create a temporary container for the HTML
+  
       const container = document.createElement("div");
       container.innerHTML = invoiceHTML;
-
       container.style.position = "absolute";
       container.style.left = "-9999px";
-      container.style.width = "210mm"; // Set to A4 width
-      container.style.minHeight = "297mm"; // Set to A4 height
-      container.style.overflow = "hidden"; // Prevent overflow
+      container.style.width = "210mm";
+      container.style.minHeight = "297mm";
       document.body.appendChild(container);
-      setLoad(50);
-      // Wait for all images and fonts to load
+  
       await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Get the container dimensions
-      const containerWidth = container.scrollWidth;
-      const containerHeight = container.scrollHeight;
-
-      // Define the PDF page dimensions
+  
+      const canvas = await html2canvas(container, {
+        scale: 3,
+        useCORS: true,
+        allowTaint: false,
+        width: container.scrollWidth,
+        height: container.scrollHeight,
+      });
+  
+      setLoad(70);
+      const imgData = canvas.toDataURL("image/png");
+  
       const pdf = new jsPDF("p", "mm", "a4");
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      setLoad(60);
-      // Use a higher scaling factor for better clarity
-      const scaleFactor = 3; // Adjust this value for higher clarity (e.g., 2, 3, or 4)
-
-      // Render the HTML as a high-resolution canvas
-      const canvas = await html2canvas(container, {
-        scale: scaleFactor, // Increase the scale for higher DPI
-        useCORS: true,
-        allowTaint: true,
-        width: containerWidth,
-        height: containerHeight,
-      });
-      setLoad(70);
-      const imgData = canvas.toDataURL("image/png");
-
-      // Add the image to the PDF
+  
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+  
       setLoad(100);
-
-      pdf.save(`invoice_${fileId}.pdf`);
-
-      // Clean up the temporary container
+      const blob = pdf.output("blob");
+      saveAs(blob, `invoice_${fileId}.pdf`);
+  
       document.body.removeChild(container);
     } catch (error) {
       console.error("Error while downloading file:", error);
       alert("Failed to download the file. Please try again.");
     }
   };
+  
 
   return (
     <div className="mt-12 font-sans">
@@ -102,6 +103,7 @@ function BillingHistory() {
           onLoaderFinished={() => {}}
         />
       )}
+
       {billingData && billingData.length > 0 ? (
         <>
           <h2 className="text-xl font-bold mb-4">Billing History</h2>
@@ -133,7 +135,7 @@ function BillingHistory() {
                       {entry.date || "N/A"}
                     </td>
                     <td className="px-6 py-4 border-b border-gray-200">
-                      {entry.description || "No description available"}
+                      {entry.items || "No description available"}
                     </td>
                     <td className="px-6 py-4 border-b border-gray-200">
                       {entry.currency_code == "INR" ? "₹" : "$"}
@@ -160,7 +162,19 @@ function BillingHistory() {
           </div>
         </>
       ) : (
-        <p>No billing data available.</p>
+        !invoicesLoad && <p>No billing data available.</p>
+      )}
+      {invoicesLoad && (
+        <div className=" h-96 flex items-center">
+          <GridLoader
+            color={"#1da6b8"}
+            loading={invoicesLoad}
+            cssOverride={override}
+            size={20}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+        </div>
       )}
     </div>
   );

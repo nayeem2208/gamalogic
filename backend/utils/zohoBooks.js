@@ -15,9 +15,11 @@ if (!clientid || !secret || !refresh_token) {
 }
 
 let BOOKS_BASE_URL = APP == 'Beta' ? "https://www.zohoapis.in" : "https://www.zohoapis.com";
+//  console.log(BOOKS_BASE_URL,'bases url')
 // Function to refresh the access token
 async function refreshToken() {
     let Accounts_URL = APP == 'Beta' ? "https://accounts.zoho.in" : "https://accounts.zoho.com";
+    // console.log(Accounts_URL, 'account url')
     const formData = new URLSearchParams();
     formData.append("refresh_token", refresh_token);
     formData.append("client_id", clientid);
@@ -176,6 +178,7 @@ async function ZohoBooks(user, product) {
         };
         console.log(salesDetails, 'sales Detailssssssssssssss')
         await createSalesOrder(accessToken, organizationId, salesDetails, user);
+
         return { zohoBookContactId, changeInDb }
     } catch (error) {
         console.log(error)
@@ -198,6 +201,7 @@ async function createSalesOrder(accessToken, organizationId, salesOrderData, use
 
     try {
         const response = await axios.post(url, salesOrderData, { headers });
+        console.log(response.data, 'sales responseeeeeeeeeee')
         ApproveSalesOrder(accessToken, organizationId, response.data)
         // EmailSalesOrder(accessToken, organizationId, response.data, user)
         return response.data;
@@ -214,6 +218,7 @@ async function EmailSalesOrder(accessToken, organizationId, salesOrderData, user
         Authorization: `Zoho-oauthtoken ${accessToken}`,
         "Content-Type": "application/json",
     };
+    console.log(user.emailid, 'email to send')
     let bodyOfEmail =
     {
         send_from_org_email_id: true,
@@ -353,6 +358,25 @@ async function updateUserCurrency(accessToken, organizationId, contactId, curren
     }
 }
 
+export async function Templates() {
+    let accessToken = await getAccessToken();
+
+    try {
+        const templates = await axios.get(
+            `${BOOKS_BASE_URL}/books/v3/invoices/templates?`,
+            {
+                headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
+                params: {
+                    organization_id: organization_id,
+                },
+            }
+        );
+        console.log(templates.data.templates, 'templates')
+    } catch (error) {
+        console.error("Error Creating Sales Order:", error.response?.data || error.message || error);
+        // throw error;
+    }
+}
 export async function downloadSalesInvoice(id) {
     let accessToken = await getAccessToken();
 
@@ -390,23 +414,44 @@ export async function listSalesOrders(id) {
     let accessToken = await getAccessToken();
 
     try {
-        console.log(id,'id to get salesorders')
+        
         const SalesOrders = await axios.get(
-            `${BOOKS_BASE_URL}/books/v3/salesorders?`,
+            `${BOOKS_BASE_URL}/books/v3/salesorders`,
             {
                 headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
                 params: {
                     organization_id: organization_id,
-                    customer_id:id
+                    customer_id: id,
                 },
             }
         );
-        // console.log(SalesOrders.data,'sales orders')
-        return SalesOrders.data;
+
+        const fullData = await Promise.all(
+            SalesOrders?.data?.salesorders.map(async (order) => {
+                const salesOrderDetails = await axios.get(
+                    `${BOOKS_BASE_URL}/books/v3/salesorders/${order.salesorder_id}`,
+                    {
+                        headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
+                        params: {
+                            organization_id: organization_id,
+                        },
+                    }
+                );
+                console.log(salesOrderDetails.data?.salesorder?.line_items[0].name,'salesorderDetailssssssssss')
+                return {
+                    ...order,
+                    items: salesOrderDetails?.data?.salesorder?.line_items[0].name,
+                };
+            })
+        );
+
+        // console.log(fullData, 'Full sales orders with items and descriptions');
+        return fullData;
     } catch (error) {
         console.error("Error listing Sales Order:", error.response?.data || error.message || error);
         // throw error;
     }
 }
+
 
 export default ZohoBooks;
