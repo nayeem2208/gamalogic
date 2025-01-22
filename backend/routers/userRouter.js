@@ -12,6 +12,7 @@ const router=express.Router()
 
 router.get('/sampleCheck',dbMiddleware,Authentication.sample)
 router.post('/sampleCheck1',Authentication.samplePost)
+router.get('/proxy-image',Authentication.proxyServer)
 
 //authentication based
 router.post('/login',dbMiddleware,Authentication.login)

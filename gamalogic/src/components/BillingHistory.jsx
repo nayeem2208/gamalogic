@@ -44,54 +44,74 @@ function BillingHistory() {
   console.log(billingData, "billing dataaaaaaa");
   const handleDownload = async (fileId) => {
     try {
-      setLoading(true);
-      setLoad(30);
-      const response = await axiosInstance.get(`downloadInvoice/${fileId}`);
-      const invoiceHTML = response.data.invoiceHTML;
-  
-      if (!invoiceHTML) {
-        throw new Error("Invoice HTML not found");
-      }
-  
-      setLoad(40);
-  
-      const container = document.createElement("div");
-      container.innerHTML = invoiceHTML;
-      container.style.position = "absolute";
-      container.style.left = "-9999px";
-      container.style.width = "210mm";
-      container.style.minHeight = "297mm";
-      document.body.appendChild(container);
-  
-      await new Promise((resolve) => setTimeout(resolve, 500));
-  
-      const canvas = await html2canvas(container, {
-        scale: 3,
-        useCORS: true,
-        allowTaint: false,
-        width: container.scrollWidth,
-        height: container.scrollHeight,
-      });
-  
-      setLoad(70);
-      const imgData = canvas.toDataURL("image/png");
-  
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-  
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-  
-      setLoad(100);
-      const blob = pdf.output("blob");
-      saveAs(blob, `invoice_${fileId}.pdf`);
-  
-      document.body.removeChild(container);
+        setLoading(true);
+        setLoad(30);
+
+        const response = await axiosInstance.get(`downloadInvoice/${fileId}`);
+        let invoiceHTML = response.data.invoiceHTML;
+        console.log(invoiceHTML, 'invoice HTMLLLLLLLLLLL');
+        if (!invoiceHTML) {
+            throw new Error("Invoice HTML not found");
+        }
+
+        const replaceImageURLs = (html) => {
+            const proxyUrl = `${import.meta.env.VITE_FRONTEND_URL}/api/proxy-image`;
+            const regex = /<img\s+[^>]*src="([^"]+)"[^>]*>/g;
+            return html.replace(regex, (match, src) => {
+                const proxySrc = `${proxyUrl}?imageUrl=${encodeURIComponent(src)}`;
+                return match.replace(src, proxySrc);
+            });
+        };
+
+        // Replace image URLs in the HTML content
+        invoiceHTML = replaceImageURLs(invoiceHTML);
+        setLoad(40);
+
+        const container = document.createElement("div");
+        container.innerHTML = invoiceHTML;
+        container.style.position = "absolute";
+        container.style.left = "-9999px";
+        container.style.width = "210mm";
+        container.style.minHeight = "297mm";
+        document.body.appendChild(container);
+        console.log(container, 'container');
+        await new Promise((resolve) => setTimeout(resolve, 100)); // Allow DOM to render
+        console.log('after render');
+        const canvas = await html2canvas(container, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: false,
+            width: container.scrollWidth,
+            height: container.scrollHeight,
+        });
+        console.log(canvas, 'canvasssss');
+        setLoad(70);
+
+        const imgData = canvas.toDataURL("image/png");
+        console.log(imgData, 'imgdataaaaaa');
+        const pdf = new jsPDF("p", "mm", "a4");
+        console.log(pdf, 'pdfffffffffffffff');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+        setLoad(100);
+        console.log('before blob');
+        const blob = pdf.output("blob");
+        console.log(blob, 'blooooooob');
+        saveAs(blob, `invoice_${fileId}.pdf`);
+        console.log('after blobbbbbbb');
+
+        document.body.removeChild(container);
     } catch (error) {
-      console.error("Error while downloading file:", error);
-      alert("Failed to download the file. Please try again.");
+        console.error("Error while downloading file:", error);
+        alert("Failed to download the file. Please try again.");
+    } finally {
+        setLoading(false);
     }
-  };
+};
+
+  
   
 
   return (
@@ -107,6 +127,7 @@ function BillingHistory() {
       {billingData && billingData.length > 0 ? (
         <>
           <h2 className="text-xl font-bold mb-4">Billing History</h2>
+          
           <div className="overflow-x-auto shadow-lg rounded-lg">
             <table className="w-full border-collapse text-left rounded-lg shadow-lg overflow-hidden">
               <thead>
@@ -120,7 +141,7 @@ function BillingHistory() {
                   <th className="px-6 py-2 bg-gray-300 border-b border-gray-200">
                     Amount
                   </th>
-                  <th className="px-6 py-2 bg-gray-300 border-b border-gray-200">
+                  <th className="px-6 py-2 bg-gray-300 border-b border-gray-200 text-center">
                     Actions
                   </th>
                 </tr>
