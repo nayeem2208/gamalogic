@@ -47,8 +47,8 @@ function EmailVerifiedPage() {
           </div>
         </div>
         <div className="verify-foot-p my-6">
-          <p className="description font-thin">
-            Use our Cutting-Edge AI technology to verify your Email Address.
+        <p className="description font-thin text-center text-sm md:text-base">
+        Use our Cutting-Edge AI technology to verify your Email Address.
           </p>
           <div className="my-6 flex justify-center">
           <button

@@ -26,6 +26,7 @@
     "framer-motion": "^11.3.21",
     "gamalogic": "file:",
     "html2canvas": "^1.4.1",
+    "html2canvas-pro": "^1.5.8",
     "jsonexport": "^3.2.0",
     "jspdf": "^2.5.2",
     "luxon": "^3.5.0",

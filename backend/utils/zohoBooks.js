@@ -393,7 +393,7 @@ export async function downloadSalesInvoice(id) {
         // );
         // console.log(SalesOrders.data,'sales orders')
         const pdf = await axios.get(
-            `${BOOKS_BASE_URL}/books/v3/salesorders/${id}?`,
+            `${BOOKS_BASE_URL}/books/v3/invoices/${id}?`,
             {
                 headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
                 params: {
@@ -415,8 +415,8 @@ export async function listSalesOrders(id) {
 
     try {
         
-        const SalesOrders = await axios.get(
-            `${BOOKS_BASE_URL}/books/v3/salesorders`,
+        const invoices = await axios.get(
+            `${BOOKS_BASE_URL}/books/v3/invoices`,
             {
                 headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
                 params: {
@@ -427,9 +427,9 @@ export async function listSalesOrders(id) {
         );
 
         const fullData = await Promise.all(
-            SalesOrders?.data?.salesorders.map(async (order) => {
-                const salesOrderDetails = await axios.get(
-                    `${BOOKS_BASE_URL}/books/v3/salesorders/${order.salesorder_id}`,
+            invoices?.data?.invoices.map(async (order) => {
+                const invoiceDetails = await axios.get(
+                    `${BOOKS_BASE_URL}/books/v3/invoices/${order.invoice_id}`,
                     {
                         headers: { Authorization: `Zoho-oauthtoken ${accessToken}` },
                         params: {
@@ -437,10 +437,10 @@ export async function listSalesOrders(id) {
                         },
                     }
                 );
-                console.log(salesOrderDetails.data?.salesorder?.line_items[0].name,'salesorderDetailssssssssss')
+                // console.log(invoiceDetails.data?.invoice?.line_items[0].name,'invoiceDetailssssssssss')
                 return {
                     ...order,
-                    items: salesOrderDetails?.data?.salesorder?.line_items[0].name,
+                    items: invoiceDetails?.data?.invoice?.line_items[0].name,
                 };
             })
         );

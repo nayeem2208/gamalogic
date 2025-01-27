@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../axios/axiosInstance";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 import LoadingBar from "react-top-loading-bar";
 import GridLoader from "react-spinners/GridLoader";
 
@@ -42,77 +42,135 @@ function BillingHistory() {
     fetchInvoices();
   }, []);
   console.log(billingData, "billing dataaaaaaa");
+  const isSafari = () => {
+    return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  };
+  
+  const isIOS = () => {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  };
   const handleDownload = async (fileId) => {
     try {
-        setLoading(true);
-        setLoad(30);
+      setLoading(true);
+      setLoad(30);
 
-        const response = await axiosInstance.get(`downloadInvoice/${fileId}`);
-        let invoiceHTML = response.data.invoiceHTML;
-        console.log(invoiceHTML, 'invoice HTMLLLLLLLLLLL');
-        if (!invoiceHTML) {
-            throw new Error("Invoice HTML not found");
+      const response = await axiosInstance.get(`downloadInvoice/${fileId}`);
+      let invoiceHTML = response.data.invoiceHTML;
+      // console.log(invoiceHTML, "invoice HTMLLLLLLLLLLL");
+      if (!invoiceHTML) {
+        throw new Error("Invoice HTML not found");
+      }
+
+      // const replaceImageURLs = (html) => {
+      //   const proxyUrl = `${import.meta.env.VITE_FRONTEND_URL}/api/proxy-image`;
+      //   const regex = /<img\s+[^>]*src="([^"]+)"[^>]*>/g;
+      //   return html.replace(regex, (match, src) => {
+      //     const proxySrc = `${proxyUrl}?imageUrl=${encodeURIComponent(src)}`;
+      //     return match.replace(src, proxySrc);
+      //   });
+      // };
+
+      // // Replace image URLs in the HTML content
+      // invoiceHTML = replaceImageURLs(invoiceHTML);
+
+      const replaceExternalResources = (html) => {
+        const proxyUrl = `${import.meta.env.VITE_FRONTEND_URL}/api/proxy-image`;
+        
+        // Replace image URLs
+        const imageRegex = /<img\s+[^>]*src="([^"]+)"[^>]*>/g;
+        html = html.replace(imageRegex, (match, src) => {
+          console.log('image proxy');
+          const proxySrc = `${proxyUrl}?resourceUrl=${encodeURIComponent(src)}`;
+          return match.replace(src, proxySrc);
+        });
+
+        if (isSafari() || isIOS()) {
+          // Replace font URLs
+          const fontRegex = /@font-face\s*\{[^}]*\}/g;
+          html = html.replace(fontRegex, () => {
+            return `
+              @font-face {
+                font-family: Arial, Helvetica, sans-serif;
+              }
+            `;
+          });
+  
+          // Replace all instances of the custom font with standard fonts
+          const pcsTemplateRegex = /\.pcs-template\s*\{[^}]*\}/g;
+          html = html.replace(pcsTemplateRegex, () => {
+            return `
+              .pcs-template {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 9pt;
+                color: #333333;
+                background: #ffffff;
+              }
+            `;
+          });
         }
 
-        const replaceImageURLs = (html) => {
-            const proxyUrl = `${import.meta.env.VITE_FRONTEND_URL}/api/proxy-image`;
-            const regex = /<img\s+[^>]*src="([^"]+)"[^>]*>/g;
-            return html.replace(regex, (match, src) => {
-                const proxySrc = `${proxyUrl}?imageUrl=${encodeURIComponent(src)}`;
-                return match.replace(src, proxySrc);
-            });
-        };
+  
+        return html;
+      };
+  
+      // Replace external resource URLs in the HTML content
+      invoiceHTML = replaceExternalResources(invoiceHTML);
+      
+      // Use standard fonts
+      invoiceHTML = invoiceHTML.replace(/font-family: 'WebFont-Ubuntu'/g, "font-family: Arial, Helvetica, sans-serif");
+      console.log(invoiceHTML,'invoice after text and image')
+      setLoad(40);
 
-        // Replace image URLs in the HTML content
-        invoiceHTML = replaceImageURLs(invoiceHTML);
-        setLoad(40);
+      const container = document.createElement("div");
+      container.innerHTML = invoiceHTML;
+      container.style.position = "absolute";
+      container.style.left = "-9999px";
+      container.style.width = "210mm";
+      container.style.minHeight = "297mm";
+      document.body.appendChild(container);
+      console.log(container, "container");
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Allow DOM to render
+      console.log("after render");
+      const canvas = await html2canvas(container, {
+        scale: 3,
+        useCORS: true,
+        allowTaint: true,
+        width: container.scrollWidth,
+        height: container.scrollHeight,
+        logging: true, 
+        ignoreElements: (element) => {
+          return element.nodeName.toLowerCase() === "head";
+        },
+        onclone: (documentClone) => {
+          console.log("Cloned document:", documentClone);
+        },
+      });
+      console.log(canvas, "canvasssss");
+      setLoad(70);
 
-        const container = document.createElement("div");
-        container.innerHTML = invoiceHTML;
-        container.style.position = "absolute";
-        container.style.left = "-9999px";
-        container.style.width = "210mm";
-        container.style.minHeight = "297mm";
-        document.body.appendChild(container);
-        console.log(container, 'container');
-        await new Promise((resolve) => setTimeout(resolve, 100)); // Allow DOM to render
-        console.log('after render');
-        const canvas = await html2canvas(container, {
-            scale: 3,
-            useCORS: true,
-            allowTaint: false,
-            width: container.scrollWidth,
-            height: container.scrollHeight,
-        });
-        console.log(canvas, 'canvasssss');
-        setLoad(70);
+      const imgData = canvas.toDataURL("image/png");
+      console.log(imgData, "imgdataaaaaa");
+      const pdf = new jsPDF("p", "mm", "a4");
+      console.log(pdf, "pdfffffffffffffff");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
-        const imgData = canvas.toDataURL("image/png");
-        console.log(imgData, 'imgdataaaaaa');
-        const pdf = new jsPDF("p", "mm", "a4");
-        console.log(pdf, 'pdfffffffffffffff');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      setLoad(100);
+      console.log("before blob");
+      const blob = pdf.output("blob");
+      console.log(blob, "blooooooob");
+      saveAs(blob, `invoice_${fileId}.pdf`);
+      console.log("after blobbbbbbb");
 
-        setLoad(100);
-        console.log('before blob');
-        const blob = pdf.output("blob");
-        console.log(blob, 'blooooooob');
-        saveAs(blob, `invoice_${fileId}.pdf`);
-        console.log('after blobbbbbbb');
-
-        document.body.removeChild(container);
+      document.body.removeChild(container);
     } catch (error) {
-        console.error("Error while downloading file:", error);
-        alert("Failed to download the file. Please try again.");
+      console.error("Error while downloading file:", error);
+      alert("Failed to download the file. Please try again.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
-
-  
-  
+  };
 
   return (
     <div className="mt-12 font-sans">
@@ -127,7 +185,7 @@ function BillingHistory() {
       {billingData && billingData.length > 0 ? (
         <>
           <h2 className="text-xl font-bold mb-4">Billing History</h2>
-          
+
           <div className="overflow-x-auto shadow-lg rounded-lg">
             <table className="w-full border-collapse text-left rounded-lg shadow-lg overflow-hidden">
               <thead>
@@ -165,7 +223,7 @@ function BillingHistory() {
                     <td className="px-6 py-4 border-b border-gray-200 text-center">
                       <button
                         className="cursor-pointer relative group overflow-hidden border-2 px-0 w-28 py-1 border-red-500 text-sm rounded mt-4 md:mt-0"
-                        onClick={() => handleDownload(entry.salesorder_id)}
+                        onClick={() => handleDownload(entry.invoice_id)}
                       >
                         <span className="font-bold text-red-500 text-xs relative z-10 group-hover:text-white duration-500">
                           DOWNLOAD
