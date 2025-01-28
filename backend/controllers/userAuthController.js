@@ -50,8 +50,8 @@ const Authentication = {
   },
   proxyServer: async (req, res) => {
     try {
-      const { imageUrl } = req.query;
-      const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+      const { resourceUrl } = req.query;
+      const response = await axios.get(resourceUrl, { responseType: 'arraybuffer' });
       res.set('Content-Type', response.headers['content-type']);
       res.send(response.data);
     } catch (error) {
