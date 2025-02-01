@@ -20,6 +20,7 @@ import AddFileForFirstTime from "../components/File/AddFileForFirstTime";
 import DragAndDropBackground from "../components/File/DragAndDropBackground";
 import AddFileInRowView from "../components/File/AddFileInRowView";
 import FileRowViewListing from "../components/File/FileRowView";
+import Spreadsheet from "../components/TableCheck";
 
 function FileEmailFinder() {
   let [message, setMessage] = useState("");
@@ -40,6 +41,7 @@ function FileEmailFinder() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [dragging, setDragging] = useState(false);
+  const [spreadSheet, setSpreadSheet] = useState(false);
 
   let { creditBal, setCreditBal, userDetails } = useUserState();
 
@@ -70,6 +72,7 @@ function FileEmailFinder() {
                 ? new Date(dateTimeString)
                 : dateTimeString;
             const timeZone = userTimeZone || "America/New_York";
+
             const formatter = new Intl.DateTimeFormat("en-US", {
               timeZone: timeZone,
               year: "numeric",
@@ -160,29 +163,6 @@ function FileEmailFinder() {
         header: true,
         complete: async function (results) {
           results.fileName = file.name;
-          results.data = results.data
-            .map((item) => {
-              if (
-                !item.hasOwnProperty("first_name") &&
-                !item.hasOwnProperty("last_name") &&
-                !item.hasOwnProperty("domain")
-              ) {
-                return {
-                  first_name: item[Object.keys(item)[0]], // First column if named keys are not found
-                  last_name: item[Object.keys(item)[1]], // Second column if named keys are not found
-                  domain: item[Object.keys(item)[2]] || "", // Third column if named keys are not found
-                };
-              } else {
-                return {
-                  first_name: item.first_name || item.firstname || "",
-                  last_name: item.last_name || item.lastname || "",
-                  domain: item.domain || item.url || "",
-                };
-              }
-            })
-            .filter((item) => {
-              return item.first_name && item.last_name && item.domain;
-            });
 
           if (results.data.length <= 100000 && results.data.length > 0) {
             setJsonToServer(results);
@@ -214,29 +194,24 @@ function FileEmailFinder() {
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
       const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-      const contacts = rows
-        .filter((contact, index) => index !== 0 && contact[1] !== undefined) // Skip header row if present and check if there's a valid first name
-        .map((contact) => {
-          if (
-            !("first_name" in contact) &&
-            !("last_name" in contact) &&
-            !("domain" in contact)
-          ) {
-            return {
-              first_name: contact[0], // First column
-              last_name: contact[1], // Second column
-              domain: contact[2], // Third column
-            };
-          } else {
-            return {
-              first_name: contact.first_name || contact.firstname || "",
-              last_name: contact.last_name || contact.lastname || "",
-              domain: contact.domain || contact.url || "",
-            };
-          }
-        });
-      const fileName = file.name;
+      if (rows.length > 0) {
+        rows[0][0] = rows[0][0].replace(/^\uFEFF/, "");
+      }
 
+      // Extract and clean headers
+      const headers = rows[0].map((header) => header.trim());
+
+      // Map the rows to objects using the cleaned headers
+      const contacts = rows.slice(1).map((row) => {
+        const contact = {};
+        row.forEach((value, index) => {
+          contact[headers[index]] = value;
+        });
+        return contact;
+      });
+
+      const fileName = file.name;
+      console.log(contacts, "contacts in xls");
       if (contacts.length <= 100000 && contacts.length > 0) {
         setJsonToServer({ data: contacts, fileName: fileName });
         setShowAlert(true);
@@ -254,6 +229,7 @@ function FileEmailFinder() {
     reader.readAsArrayBuffer(file);
   };
 
+
   const handleTXTFile = async (file) => {
     setFileForClickUp(file);
 
@@ -262,27 +238,51 @@ function FileEmailFinder() {
       const text = e.target.result;
       const lines = text.split("\n");
       let err = false;
+
+      // Generate column names A, B, C, ... Z, AA, AB, ...
+      const generateColumnNames = (num) => {
+        const columnNames = [];
+        let charCode = 65; // 'A'
+        while (columnNames.length < num) {
+          let columnName = "";
+          let tempNum = columnNames.length;
+          do {
+            columnName =
+              String.fromCharCode(charCode + (tempNum % 26)) + columnName;
+            tempNum = Math.floor(tempNum / 26) - 1;
+          } while (tempNum >= 0);
+          columnNames.push(columnName);
+        }
+        return columnNames;
+      };
+
       const contacts = lines
         .filter((line) => line.trim() !== "")
-        .map((line) => {
-          const [first_name, last_name, domain] = line
-            .split(/[,\s]+/)
-            .map((item) => item.trim());
-          if (!first_name || !last_name || !domain) {
-            err = true;
-            return null;
-          }
-          return { first_name, last_name, domain };
+        .map((line) => line.split(/[,\s]+/).map((item) => item.trim()));
+
+      // Get the maximum number of columns in any row
+      const maxColumns = Math.max(...contacts.map((row) => row.length));
+      const columnNames = generateColumnNames(maxColumns);
+
+      // Convert each row to an object with columns A, B, C, ...
+      const contactsWithColumns = contacts.map((row) => {
+        const contact = {};
+        row.forEach((item, index) => {
+          contact[columnNames[index]] = item;
         });
-      if (err == true) {
+        return contact;
+      });
+
+      if (err) {
         toast.error(
-          "Please upload a file with columns first name, last name and domain"
+          "Please upload a file with consistent column headers and values."
         );
         return;
       }
+
       const fileName = file.name;
-      if (contacts.length <= 100000) {
-        setJsonToServer({ data: contacts, fileName: fileName });
+      if (contactsWithColumns.length <= 100000) {
+        setJsonToServer({ data: contactsWithColumns, fileName: fileName });
         setShowAlert(true);
       } else {
         toast.error(
@@ -300,95 +300,7 @@ function FileEmailFinder() {
           setShowAlert(false);
           SetSelection(null);
           setLoading(true);
-          setLoad(30);
-          let results = JsonToServer;
-          async function BatchFileFinder() {
-            try {
-              const response = await axiosInstance.post(
-                "/batchEmailFinder",
-                results
-              );
-              setLoad(100);
-              setCreditBal(creditBal - results.data.length * 10);
-              toast.success(response.data.message);
-              const formatDate = (dateTimeString, userTimeZone) => {
-                try {
-                  const date =
-                    typeof dateTimeString === "string"
-                      ? new Date(dateTimeString)
-                      : dateTimeString;
-                  const timeZone = userTimeZone || "America/New_York";
-                  const formatter = new Intl.DateTimeFormat("en-US", {
-                    timeZone: timeZone,
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                    hour12: false, // Set to true if you want AM/PM format
-                  });
-
-                  const formattedDate = formatter.format(date);
-
-                  return formattedDate.replace(",", ""); // Remove the comma for cleaner output
-                } catch (error) {
-                  console.error("Error formatting date:", error);
-                  return null; // Return null or a default value on failure
-                }
-              };
-              setResultFile((prevResultFiles) => [
-                {
-                  ...response.data.files,
-                  processed: 0,
-                  formattedDate: formatDate(
-                    response.data.files.date_time,
-                    userDetails.timeZone
-                  ),
-                },
-                ...prevResultFiles,
-              ]);
-              setFilesStatus((prevResultFiles) => [
-                {
-                  ...response.data.files,
-                  processed: 0,
-                  formattedDate: formatDate(
-                    response.data.files.date_time,
-                    userDetails.timeZone
-                  ),
-                },
-                ...prevResultFiles,
-              ]);
-            } catch (error) {
-              if (error.response.status === 500) {
-                async function errorHandler() {
-                  let res = await clickUpAttachment(
-                    fileForClickUp,
-                    realFile,
-                    error.response.data.errorREsponse.id
-                  );
-                }
-                errorHandler();
-                setServerError(true);
-              } else if (
-                error.response.status === 400 &&
-                error.response.data.errorREsponse
-              ) {
-                async function errorHandler() {
-                  let res = await clickUpAttachment(
-                    fileForClickUp,
-                    realFile,
-                    error.response.data.errorREsponse.id
-                  );
-                }
-                errorHandler();
-              } else {
-                toast.error(error.response?.data?.error);
-              }
-              setLoading(false);
-            }
-          }
-          BatchFileFinder();
+          setSpreadSheet(true);
         } else {
           setShowAlert(false);
           SetSelection(null);
@@ -705,18 +617,125 @@ function FileEmailFinder() {
     }
   };
 
+  const handleMappingColumns = (data) => {
+    setLoad(30);
+    const transformedData = JsonToServer.data.map((item) => ({
+      first_name: item[data.firstNameField],
+      last_name: item[data.lastNameField],
+      domain: item[data.domainField],
+    }));
+    setLoad(50);
+    let results = JsonToServer;
+    results.data = transformedData;
+    setLoad(60);
+    if (creditBal >= JsonToServer.data.length * 10) {
+      
+    }
+
+    async function BatchFileFinder() {
+      try {
+        const response = await axiosInstance.post("/batchEmailFinder", results);
+        setLoad(100);
+        setCreditBal(creditBal - results.data.length * 10);
+        toast.success(response.data.message);
+        const formatDate = (dateTimeString, userTimeZone) => {
+          try {
+            const date =
+              typeof dateTimeString === "string"
+                ? new Date(dateTimeString)
+                : dateTimeString;
+            const timeZone = userTimeZone || "America/New_York";
+
+            const formatter = new Intl.DateTimeFormat("en-US", {
+              timeZone: timeZone,
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              hour12: false, // Set to true if you want AM/PM format
+            });
+
+            const formattedDate = formatter.format(date);
+
+            return formattedDate.replace(",", ""); // Remove the comma for cleaner output
+          } catch (error) {
+            console.error("Error formatting date:", error);
+            return null; // Return null or a default value on failure
+          }
+        };
+        setResultFile((prevResultFiles) => [
+          {
+            ...response.data.files,
+            processed: 0,
+            formattedDate: formatDate(
+              response.data.files.date_time,
+              userDetails.timeZone
+            ),
+          },
+          ...prevResultFiles,
+        ]);
+        setFilesStatus((prevResultFiles) => [
+          {
+            ...response.data.files,
+            processed: 0,
+            formattedDate: formatDate(
+              response.data.files.date_time,
+              userDetails.timeZone
+            ),
+          },
+          ...prevResultFiles,
+        ]);
+      } catch (error) {
+        if (error.response.status === 500) {
+          async function errorHandler() {
+            let res = await clickUpAttachment(
+              fileForClickUp,
+              error.response.data.errorREsponse.id
+            );
+          }
+          errorHandler();
+          setServerError(true);
+        } else if (
+          error.response.status === 400 &&
+          error.response.data.errorREsponse
+        ) {
+          async function errorHandler() {
+            let res = await clickUpAttachment(
+              fileForClickUp,
+              error.response.data.errorREsponse.id
+            );
+          }
+          errorHandler();
+        } else {
+          toast.error(error.response?.data?.error);
+        }
+        setLoading(false);
+      }
+    }
+    BatchFileFinder();
+    setSpreadSheet(false);
+  };
+
+  const handleMappingCancel = () => {
+    setSpreadSheet(false);
+    setJsonToServer(null);
+    setLoad(100);
+  };
+
   if (serverError) {
     return <ServerError />;
   }
   return (
     <div
-      className="px-6 md:px-10 2xl:px-20  py-8 text-center sm:text-left h-screen overflow-auto"
+      className="text-center sm:text-left h-screen overflow-auto"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       id="scrollableDivFinder"
     >
-      {dragging && <DragAndDropBackground />}
+      {dragging && !spreadSheet && <DragAndDropBackground />}
       <InfiniteScroll
         dataLength={
           filteredFiles.length > 0 ? filteredFiles.length : resultFile.length
@@ -731,6 +750,7 @@ function FileEmailFinder() {
           )
         }
         scrollableTarget="scrollableDivFinder"
+        className="px-6 md:px-10 2xl:px-20  py-8 "
       >
         <SubHeader SubHeader={"Upload your file"} />
         {showAlert && (
@@ -742,6 +762,7 @@ function FileEmailFinder() {
             onDismiss={() => SetSelection(false)} // Update selection on dismiss
           />
         )}
+          {!spreadSheet && (
         <div className="mt-8 sm:mt-14 subHeading flex flex-col sm:flex-none justify-center items-center sm:justify-start sm:items-start">
           <div className="flex flex-col md:flex-row items-center justify-between w-full">
             <h3>Upload Your File Here | Email Finder</h3>
@@ -767,7 +788,8 @@ function FileEmailFinder() {
             </div>
           </div>
         </div>
-        {!tileView && resultFile.length > 0 && (
+        )}
+        {!tileView && resultFile.length > 0 && !spreadSheet && (
           <AddFileInRowView onUpload={handleFileChange} />
         )}
         {loading && (
@@ -778,6 +800,7 @@ function FileEmailFinder() {
           />
         )}
         {resultFile.length > 0 &&
+          !spreadSheet &&
           (tileView ? (
             searchQuery.length > 0 ? (
               filteredFiles.length > 0 ? (
@@ -818,10 +841,17 @@ function FileEmailFinder() {
             />
           ))}
 
-        {resultFile.length == 0 && !loading && (
+        {resultFile.length == 0 && !loading && !spreadSheet && (
           <AddFileForFirstTime onUpload={handleFileChange} />
         )}
       </InfiniteScroll>
+        {spreadSheet && (
+          <Spreadsheet
+            jsonData={JsonToServer}
+            onUpload={handleMappingColumns}
+            onCancel={handleMappingCancel}
+          />
+        )}
     </div>
   );
 }

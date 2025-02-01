@@ -25,7 +25,6 @@ function BillingHistory() {
         // setLoad(30);
         const res = await axiosInstance.get("/listSalesOrders");
         setInvoicesLoad(false);
-        console.log(res, "API Response");
         // setLoad(100);
         if (res.data) {
           setBillingData(res.data);
@@ -41,11 +40,10 @@ function BillingHistory() {
 
     fetchInvoices();
   }, []);
-  console.log(billingData, "billing dataaaaaaa");
   const isSafari = () => {
     return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
   };
-  
+
   const isIOS = () => {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   };
@@ -56,7 +54,6 @@ function BillingHistory() {
 
       const response = await axiosInstance.get(`downloadInvoice/${fileId}`);
       let invoiceHTML = response.data.invoiceHTML;
-      // console.log(invoiceHTML, "invoice HTMLLLLLLLLLLL");
       if (!invoiceHTML) {
         throw new Error("Invoice HTML not found");
       }
@@ -75,11 +72,9 @@ function BillingHistory() {
 
       const replaceExternalResources = (html) => {
         const proxyUrl = `${import.meta.env.VITE_FRONTEND_URL}/api/proxy-image`;
-        
         // Replace image URLs
         const imageRegex = /<img\s+[^>]*src="([^"]+)"[^>]*>/g;
         html = html.replace(imageRegex, (match, src) => {
-          console.log('image proxy');
           const proxySrc = `${proxyUrl}?resourceUrl=${encodeURIComponent(src)}`;
           return match.replace(src, proxySrc);
         });
@@ -94,7 +89,7 @@ function BillingHistory() {
               }
             `;
           });
-  
+
           // Replace all instances of the custom font with standard fonts
           const pcsTemplateRegex = /\.pcs-template\s*\{[^}]*\}/g;
           html = html.replace(pcsTemplateRegex, () => {
@@ -108,17 +103,23 @@ function BillingHistory() {
             `;
           });
         }
+        html = html.replace(/display:\s*flex;/g, "display: block;");
+        html = html.replace(/flex-direction:\s*column;/g, "display: block;");
 
-  
+        // Add fallback for grid
+        html = html.replace(/display:\s*grid;/g, "display: block;");
+
         return html;
       };
-  
+
       // Replace external resource URLs in the HTML content
       invoiceHTML = replaceExternalResources(invoiceHTML);
-      
+
       // Use standard fonts
-      invoiceHTML = invoiceHTML.replace(/font-family: 'WebFont-Ubuntu'/g, "font-family: Arial, Helvetica, sans-serif");
-      console.log(invoiceHTML,'invoice after text and image')
+      // invoiceHTML = invoiceHTML.replace(
+      //   /font-family: 'WebFont-Ubuntu'/g,
+      //   "font-family: Arial, Helvetica, sans-serif"
+      // );
       setLoad(40);
 
       const container = document.createElement("div");
@@ -128,16 +129,14 @@ function BillingHistory() {
       container.style.width = "210mm";
       container.style.minHeight = "297mm";
       document.body.appendChild(container);
-      console.log(container, "container");
       await new Promise((resolve) => setTimeout(resolve, 500)); // Allow DOM to render
-      console.log("after render");
       const canvas = await html2canvas(container, {
         scale: 3,
         useCORS: true,
         allowTaint: true,
         width: container.scrollWidth,
         height: container.scrollHeight,
-        logging: true, 
+        logging: true,
         ignoreElements: (element) => {
           return element.nodeName.toLowerCase() === "head";
         },
@@ -145,23 +144,17 @@ function BillingHistory() {
           console.log("Cloned document:", documentClone);
         },
       });
-      console.log(canvas, "canvasssss");
       setLoad(70);
 
       const imgData = canvas.toDataURL("image/png");
-      console.log(imgData, "imgdataaaaaa");
       const pdf = new jsPDF("p", "mm", "a4");
-      console.log(pdf, "pdfffffffffffffff");
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
       setLoad(100);
-      console.log("before blob");
       const blob = pdf.output("blob");
-      console.log(blob, "blooooooob");
       saveAs(blob, `invoice_${fileId}.pdf`);
-      console.log("after blobbbbbbb");
 
       document.body.removeChild(container);
     } catch (error) {
