@@ -3,18 +3,21 @@ import React, { useEffect, useRef, useState } from "react";
 import jspreadsheet from "jspreadsheet-ce";
 import "jspreadsheet-ce/dist/jspreadsheet.css";
 import { toast } from "react-toastify";
+import { LuTable } from "react-icons/lu";
 
 const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
-  const spreadsheetRef = useRef(null); // Reference for the spreadsheet container
+  const spreadsheetRef = useRef(null);
+  const currentFieldRef=useRef('')
   const [columns, setColumns] = useState([]); // Store column names dynamically
   const [formData, setFormData] = useState({
     firstNameField: "",
     lastNameField: "",
     domainField: "",
   });
-  const [originalHeaders, setOriginalHeaders] = useState([]); 
+  const [originalHeaders, setOriginalHeaders] = useState([]);
   const [tableInstance, setTableInstance] = useState(null);
-  console.log(originalHeaders,'orginial ',columns,'columsn ',formData)
+  const [isSelectingColumn, setIsSelectingColumn] = useState(false);
+  const [currentField, setCurrentField] = useState("");
   useEffect(() => {
     if (
       spreadsheetRef.current &&
@@ -27,14 +30,12 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
       const headers = Object.keys(rows[0]); // Get column headers dynamically
       const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       const dynamicColumns = headers.map((header) => ({
-        // title: header,
         width: 200, // Adjust column width as needed
       }));
 
       const rowData = rows.map((row) => headers.map((header) => row[header]));
       const screenHeight = window.innerHeight;
 
-      // Initialize JSpreadsheet only once
       let minRow = rowData.length + 1000;
       if (!tableInstance) {
         const table = jspreadsheet(spreadsheetRef.current, {
@@ -42,16 +43,37 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
           columns: dynamicColumns,
           tableOverflow: true,
           license: "MIT",
-          minDimensions: [15, minRow], // Minimum dimensions for the table
-          lazyLoading: true, // Enable virtual scrolling
-          autoColumnWidth: false, // Disable auto column width for better performance
-          autoIncrement: true, // Enable auto-increment for rows and columns
-          tableHeight: `${screenHeight * 0.8}px`,
+          minDimensions: [25, minRow], // Minimum dimensions for the table
+          // lazyLoading: true, // Enable virtual scrolling
+          // autoColumnWidth: false, // Disable auto column width for better performance
+          // autoIncrement: true, // Enable auto-increment for rows and columns
+          tableHeight: `${screenHeight - 190}px`,
+          onselection: (instance, x1, y1, x2, y2) => {
+            // Check if the selection is in the header row (y1 === 0)
+            if (y1 === 0) {
+              console.log(x1,'x1')
+              const selectedColumnIndex = x1; // Get the selected column index
+              const selectedColumnName = alphabet[selectedColumnIndex] || `Column ${selectedColumnIndex + 1}`; // Get the column name
+              console.log(currentField,'current field in selection')
+              console.log(currentFieldRef,'current field ref')
+              // Save the selected column name
+              setFormData((prev) => ({
+                ...prev,
+                [currentFieldRef.current]: selectedColumnName,
+              }));
+  
+              // Notify the user
+              // toast.success(`Column selected`);
+              setIsSelectingColumn(false); // Disable column selection mode
+            }
+          },
         });
 
         // Set the table instance
         setTableInstance(table);
-        const alphabetHeaders=headers.map((_, index) => alphabet[index] || `Column ${index + 1}`);
+        const alphabetHeaders = headers.map(
+          (_, index) => alphabet[index] || `Column ${index + 1}`
+        );
         setColumns(alphabetHeaders);
         setOriginalHeaders(headers);
 
@@ -60,15 +82,15 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
         spreadsheetRef.current.style.overflowX = "auto"; // Add horizontal scroll
 
         // Ensure the table inside the spreadsheet takes full width and height
-        const tableElement = spreadsheetRef.current.querySelector("table");
-        if (tableElement) {
-          tableElement.style.width = "100%";
-          tableElement.style.height = "100%";
-          tableElement.style.tableLayout = "fixed"; // Ensures columns respect the width
-        }
+        // const tableElement = spreadsheetRef.current.querySelector("table");
+        // if (tableElement) {
+        //   tableElement.style.width = "100%";
+        //   tableElement.style.height = "100%";
+        //   tableElement.style.tableLayout = "fixed"; // Ensures columns respect the width
+        // }
       }
     }
-  }, [jsonData, tableInstance]);
+  }, [jsonData, tableInstance,isSelectingColumn,currentField]);
 
   useEffect(() => {
     if (tableInstance) {
@@ -115,17 +137,48 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
       return () => {
         if (spreadsheetRef.current) {
           spreadsheetRef.current.removeEventListener("scroll", handleScroll);
-        }        // if (verticalScrollContainer) {
+        } // if (verticalScrollContainer) {
         //   verticalScrollContainer.removeEventListener("scroll", handleScroll);
         // }
       };
     }
   }, [tableInstance]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const container = spreadsheetRef.current;
+      if (!container) return;
+
+      const { scrollLeft } = container;
+      const cellSize = 20; // Adjust this based on your cell size
+
+      switch (e.key) {
+        case "ArrowRight":
+          container.scrollLeft = scrollLeft + cellSize;
+          break;
+        case "ArrowLeft":
+          container.scrollLeft = scrollLeft - cellSize;
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  const handleColumnSelect = (field) => {
+    console.log(field,'fielddddddddddd')
+    setIsSelectingColumn(true);
+    setCurrentField(field);
+    currentFieldRef.current=field
+    toast.info("Click on the table to select a column.");
   };
+  console.log(currentField,'current field ')
 
   const handleUpload = () => {
     // Pass the form data to the parent via the `onUpload` callback
@@ -142,9 +195,10 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
       lastNameField: originalHeaders[columns.indexOf(formData.lastNameField)],
       domainField: originalHeaders[columns.indexOf(formData.domainField)],
     };
-      if (onUpload) onUpload(newFormData);
+    console.log(newFormData,'new formdata for updload')
+    if (onUpload) onUpload(newFormData);
   };
-
+  console.log(formData,'formData')
   const handleCancel = () => {
     setFormData({
       firstNameField: "",
@@ -184,60 +238,57 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
 
         {/* Dropdowns for Field Selection */}
         <div className="mb-4">
-          <label className="block mb-2 font-medium">First Name Field:</label>
-          <select
-            name="firstNameField"
-            value={formData.firstNameField}
-            onChange={handleInputChange}
-            className="w-full px-3 py-2 border rounded bg-white text-sm"
-          >
-            <option value="" className="">
-              Select Field
-            </option>
-            {columns.map((col, idx) => (
-              <option key={idx} value={col}>
-                {col}
-              </option>
-            ))}
-          </select>
+          <label className="block mb-2 font-medium ">First Name Field:</label>
+          <div className="flex  items-center ">
+            <input
+              type="text"
+              className="w-3/6 h-8 border rounded px-2"
+              value={formData.firstNameField}
+              readOnly
+            />
+            <LuTable
+              className="w-6 h-6 cursor-pointer ml-3"
+              onClick={() => handleColumnSelect("firstNameField")}
+            />
+          </div>
         </div>
 
         <div className="mb-4">
           <label className="block mb-2 font-medium">Last Name Field:</label>
-          <select
-            name="lastNameField"
-            value={formData.lastNameField}
-            onChange={handleInputChange}
-            className="w-full px-3 py-2 border rounded bg-white text-sm"
-          >
-            <option value="">Select Field</option>
-            {columns.map((col, idx) => (
-              <option key={idx} value={col}>
-                {col}
-              </option>
-            ))}
-          </select>
+          
+          <div className="flex  items-center ">
+            <input
+              type="text"
+              className="w-3/6 h-8 border rounded px-2"
+              value={formData.lastNameField}
+              readOnly
+            />
+            <LuTable
+              className="w-6 h-6 cursor-pointer ml-3"
+              onClick={() => handleColumnSelect("lastNameField")}
+            />
+          </div>
         </div>
 
         <div className="mb-4">
           <label className="block mb-2 font-medium">Domain Field:</label>
-          <select
-            name="domainField"
-            value={formData.domainField}
-            onChange={handleInputChange}
-            className="w-full px-3 py-2 border rounded bg-white text-sm"
-          >
-            <option value="">Select Field</option>
-            {columns.map((col, idx) => (
-              <option key={idx} value={col}>
-                {col}
-              </option>
-            ))}
-          </select>
+      
+          <div className="flex  items-center ">
+            <input
+              type="text"
+              className="w-3/6 h-8 border rounded px-2"
+              value={formData.domainField}
+              readOnly
+            />
+            <LuTable
+              className="w-6 h-6 cursor-pointer ml-3 "
+              onClick={() => handleColumnSelect("domainField")}
+            />
+          </div>
         </div>
 
         {/* Buttons */}
-        <div className="flex justify-center gap-2 text-sm">
+        <div className="flex  gap-2 text-sm">
           <button
             onClick={handleCancel}
             class="font-semibold w-32 h-8 rounded bg-red-500 text-white relative overflow-hidden group z-10 hover:text-white duration-1000"
@@ -255,6 +306,19 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
             <span class="absolute bg-emerald-900 w-36 h-36 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>
             Upload
           </button>
+        </div>
+        <div
+          style={{
+            backgroundColor: "rgba(247, 76, 65 , 0.05)",
+            color: "rgba(247, 76, 65 , 0.6)",
+            
+          }}
+          className="mt-4 p-3  border border-orange-300 rounded-lg text-sm "
+        >
+          <p className=" items-center">
+              Click the <strong>table icon </strong>next to a field and select
+              the respective header from the spreadsheet.
+          </p>
         </div>
       </div>
     </div>
