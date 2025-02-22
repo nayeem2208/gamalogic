@@ -7,17 +7,19 @@ import { LuTable } from "react-icons/lu";
 
 const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
   const spreadsheetRef = useRef(null);
-  const currentFieldRef=useRef('')
+  const currentFieldRef = useRef("");
   const [columns, setColumns] = useState([]); // Store column names dynamically
   const [formData, setFormData] = useState({
     firstNameField: "",
     lastNameField: "",
     domainField: "",
+    emailField:""
   });
   const [originalHeaders, setOriginalHeaders] = useState([]);
   const [tableInstance, setTableInstance] = useState(null);
   const [isSelectingColumn, setIsSelectingColumn] = useState(false);
   const [currentField, setCurrentField] = useState("");
+  const [selectedColumn, setSelectedColumn] = useState("");
   useEffect(() => {
     if (
       spreadsheetRef.current &&
@@ -49,22 +51,12 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
           // autoIncrement: true, // Enable auto-increment for rows and columns
           tableHeight: `${screenHeight - 190}px`,
           onselection: (instance, x1, y1, x2, y2) => {
-            // Check if the selection is in the header row (y1 === 0)
             if (y1 === 0) {
-              console.log(x1,'x1')
-              const selectedColumnIndex = x1; // Get the selected column index
-              const selectedColumnName = alphabet[selectedColumnIndex] || `Column ${selectedColumnIndex + 1}`; // Get the column name
-              console.log(currentField,'current field in selection')
-              console.log(currentFieldRef,'current field ref')
-              // Save the selected column name
-              setFormData((prev) => ({
-                ...prev,
-                [currentFieldRef.current]: selectedColumnName,
-              }));
-  
-              // Notify the user
-              // toast.success(`Column selected`);
-              setIsSelectingColumn(false); // Disable column selection mode
+              const selectedColumnIndex = x1;
+              const selectedColumnName =
+                alphabet[selectedColumnIndex] ||
+                `Column ${selectedColumnIndex + 1}`;
+              setSelectedColumn(selectedColumnName);
             }
           },
         });
@@ -90,7 +82,7 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
         // }
       }
     }
-  }, [jsonData, tableInstance,isSelectingColumn,currentField]);
+  }, [jsonData, tableInstance, isSelectingColumn, currentField]);
 
   useEffect(() => {
     if (tableInstance) {
@@ -144,7 +136,6 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
     }
   }, [tableInstance]);
 
-
   useEffect(() => {
     const handleKeyDown = (e) => {
       const container = spreadsheetRef.current;
@@ -172,20 +163,23 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
   }, []);
 
   const handleColumnSelect = (field) => {
-    console.log(field,'fielddddddddddd')
-    setIsSelectingColumn(true);
-    setCurrentField(field);
-    currentFieldRef.current=field
-    toast.info("Click on the table to select a column.");
+    if (!selectedColumn) {
+      toast.error("Please select a column to choose");
+    }
+    setFormData((prev) => ({
+      ...prev,
+      [field]: selectedColumn,
+    }));
+    setSelectedColumn("");
   };
-  console.log(currentField,'current field ')
 
   const handleUpload = () => {
     // Pass the form data to the parent via the `onUpload` callback
     if (
       !formData.firstNameField ||
       !formData.lastNameField ||
-      !formData.domainField
+      !formData.domainField||
+      !formData.emailField
     ) {
       toast.error("Please select the columns");
       return;
@@ -194,16 +188,17 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
       firstNameField: originalHeaders[columns.indexOf(formData.firstNameField)],
       lastNameField: originalHeaders[columns.indexOf(formData.lastNameField)],
       domainField: originalHeaders[columns.indexOf(formData.domainField)],
+      emailField:formData.emailField,
     };
-    console.log(newFormData,'new formdata for updload')
+    console.log(newFormData, "new formdata for updload");
     if (onUpload) onUpload(newFormData);
   };
-  console.log(formData,'formData')
   const handleCancel = () => {
     setFormData({
       firstNameField: "",
       lastNameField: "",
       domainField: "",
+      emailField:""
     });
     // Notify the parent component using the `onCancel` callback
     if (spreadsheetRef.current) {
@@ -255,7 +250,7 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
 
         <div className="mb-4">
           <label className="block mb-2 font-medium">Last Name Field:</label>
-          
+
           <div className="flex  items-center ">
             <input
               type="text"
@@ -272,7 +267,7 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
 
         <div className="mb-4">
           <label className="block mb-2 font-medium">Domain Field:</label>
-      
+
           <div className="flex  items-center ">
             <input
               type="text"
@@ -286,24 +281,41 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
             />
           </div>
         </div>
+        <div className="mb-4">
+          <label className="block mb-2 font-medium">
+            Email Field (Output Location):
+          </label>
+          <div className="flex items-center">
+            <input
+              type="text"
+              className="w-3/6 h-8 border rounded px-2"
+              value={formData.emailField} 
+              readOnly
+            />
+            <LuTable
+              className="w-6 h-6 cursor-pointer ml-3"
+              onClick={() => handleColumnSelect("emailField")} 
+            />
+          </div>
+        </div>
 
         {/* Buttons */}
         <div className="flex  gap-2 text-sm">
           <button
             onClick={handleCancel}
-            class="font-semibold w-32 h-8 rounded bg-red-500 text-white relative overflow-hidden group z-10 hover:text-white duration-1000"
+            className="font-semibold w-32 h-8 rounded bg-red-500 text-white relative overflow-hidden group z-10 hover:text-white duration-1000"
           >
-            <span class="absolute bg-red-600 w-36 h-28 rounded-full group-hover:scale-100 scale-0 -z-10 -left-2 -top-10 group-hover:duration-500 duration-700 origin-center transform transition-all"></span>
-            <span class="absolute bg-red-800 w-36 h-28 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>
+            <span className="absolute bg-red-600 w-36 h-28 rounded-full group-hover:scale-100 scale-0 -z-10 -left-2 -top-10 group-hover:duration-500 duration-700 origin-center transform transition-all"></span>
+            <span className="absolute bg-red-800 w-36 h-28 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>
             Cancel
           </button>
 
           <button
             onClick={handleUpload}
-            class="font-semibold w-32 h-8 rounded bg-emerald-600 text-white relative overflow-hidden group z-10 hover:text-white duration-1000"
+            className="font-semibold w-32 h-8 rounded bg-emerald-600 text-white relative overflow-hidden group z-10 hover:text-white duration-1000"
           >
-            <span class="absolute bg-emerald-700 w-36 h-36 rounded-full group-hover:scale-100 scale-0 -z-10 -left-2 -top-10 group-hover:duration-500 duration-700 origin-center transform transition-all"></span>
-            <span class="absolute bg-emerald-900 w-36 h-36 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>
+            <span className="absolute bg-emerald-700 w-36 h-36 rounded-full group-hover:scale-100 scale-0 -z-10 -left-2 -top-10 group-hover:duration-500 duration-700 origin-center transform transition-all"></span>
+            <span className="absolute bg-emerald-900 w-36 h-36 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>
             Upload
           </button>
         </div>
@@ -311,13 +323,12 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
           style={{
             backgroundColor: "rgba(247, 76, 65 , 0.05)",
             color: "rgba(247, 76, 65 , 0.6)",
-            
           }}
           className="mt-4 p-3  border border-orange-300 rounded-lg text-sm "
         >
-          <p className=" items-center">
-              Click the <strong>table icon </strong>next to a field and select
-              the respective header from the spreadsheet.
+          <p className="items-center">
+            First, select the respective header from the spreadsheet, then click
+            the <strong>table icon</strong> next to a field.
           </p>
         </div>
       </div>

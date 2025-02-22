@@ -631,90 +631,109 @@ function FileEmailFinder() {
     if (creditBal >= JsonToServer.data.length * 10) {
       
     }
-
-    async function BatchFileFinder() {
+    async function uploadRowFile() {
+      const formData = new FormData();
+      formData.append("file", fileForClickUp);
       try {
-        const response = await axiosInstance.post("/batchEmailFinder", results);
-        setLoad(100);
-        setCreditBal(creditBal - results.data.length * 10);
-        toast.success(response.data.message);
-        const formatDate = (dateTimeString, userTimeZone) => {
-          try {
-            const date =
-              typeof dateTimeString === "string"
-                ? new Date(dateTimeString)
-                : dateTimeString;
-            const timeZone = userTimeZone || "America/New_York";
-
-            const formatter = new Intl.DateTimeFormat("en-US", {
-              timeZone: timeZone,
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-              hour12: false, // Set to true if you want AM/PM format
-            });
-
-            const formattedDate = formatter.format(date);
-
-            return formattedDate.replace(",", ""); // Remove the comma for cleaner output
-          } catch (error) {
-            console.error("Error formatting date:", error);
-            return null; // Return null or a default value on failure
+        const response = await axiosInstance.post(
+          `/batchFinderFileUpload`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           }
-        };
-        setResultFile((prevResultFiles) => [
-          {
-            ...response.data.files,
-            processed: 0,
-            formattedDate: formatDate(
-              response.data.files.date_time,
-              userDetails.timeZone
-            ),
-          },
-          ...prevResultFiles,
-        ]);
-        setFilesStatus((prevResultFiles) => [
-          {
-            ...response.data.files,
-            processed: 0,
-            formattedDate: formatDate(
-              response.data.files.date_time,
-              userDetails.timeZone
-            ),
-          },
-          ...prevResultFiles,
-        ]);
+        );
+
+        console.log("File uploaded successfully:", response.data);
       } catch (error) {
-        if (error.response.status === 500) {
-          async function errorHandler() {
-            let res = await clickUpAttachment(
-              fileForClickUp,
-              error.response.data.errorREsponse.id
-            );
-          }
-          errorHandler();
-          setServerError(true);
-        } else if (
-          error.response.status === 400 &&
-          error.response.data.errorREsponse
-        ) {
-          async function errorHandler() {
-            let res = await clickUpAttachment(
-              fileForClickUp,
-              error.response.data.errorREsponse.id
-            );
-          }
-          errorHandler();
-        } else {
-          toast.error(error.response?.data?.error);
-        }
-        setLoading(false);
+        console.error("Error uploading file:", error);
       }
     }
-    BatchFileFinder();
+    uploadRowFile();
+    // async function BatchFileFinder() {
+    //   try {
+    //     const response = await axiosInstance.post("/batchEmailFinder", results);
+    //     setLoad(100);
+    //     setCreditBal(creditBal - results.data.length * 10);
+    //     toast.success(response.data.message);
+    //     const formatDate = (dateTimeString, userTimeZone) => {
+    //       try {
+    //         const date =
+    //           typeof dateTimeString === "string"
+    //             ? new Date(dateTimeString)
+    //             : dateTimeString;
+    //         const timeZone = userTimeZone || "America/New_York";
+
+    //         const formatter = new Intl.DateTimeFormat("en-US", {
+    //           timeZone: timeZone,
+    //           year: "numeric",
+    //           month: "2-digit",
+    //           day: "2-digit",
+    //           hour: "2-digit",
+    //           minute: "2-digit",
+    //           second: "2-digit",
+    //           hour12: false, // Set to true if you want AM/PM format
+    //         });
+
+    //         const formattedDate = formatter.format(date);
+
+    //         return formattedDate.replace(",", ""); // Remove the comma for cleaner output
+    //       } catch (error) {
+    //         console.error("Error formatting date:", error);
+    //         return null; // Return null or a default value on failure
+    //       }
+    //     };
+    //     setResultFile((prevResultFiles) => [
+    //       {
+    //         ...response.data.files,
+    //         processed: 0,
+    //         formattedDate: formatDate(
+    //           response.data.files.date_time,
+    //           userDetails.timeZone
+    //         ),
+    //       },
+    //       ...prevResultFiles,
+    //     ]);
+    //     setFilesStatus((prevResultFiles) => [
+    //       {
+    //         ...response.data.files,
+    //         processed: 0,
+    //         formattedDate: formatDate(
+    //           response.data.files.date_time,
+    //           userDetails.timeZone
+    //         ),
+    //       },
+    //       ...prevResultFiles,
+    //     ]);
+    //   } catch (error) {
+    //     if (error.response.status === 500) {
+    //       async function errorHandler() {
+    //         let res = await clickUpAttachment(
+    //           fileForClickUp,
+    //           error.response.data.errorREsponse.id
+    //         );
+    //       }
+    //       errorHandler();
+    //       setServerError(true);
+    //     } else if (
+    //       error.response.status === 400 &&
+    //       error.response.data.errorREsponse
+    //     ) {
+    //       async function errorHandler() {
+    //         let res = await clickUpAttachment(
+    //           fileForClickUp,
+    //           error.response.data.errorREsponse.id
+    //         );
+    //       }
+    //       errorHandler();
+    //     } else {
+    //       toast.error(error.response?.data?.error);
+    //     }
+    //     setLoading(false);
+    //   }
+    // }
+    // BatchFileFinder();
     setSpreadSheet(false);
   };
 

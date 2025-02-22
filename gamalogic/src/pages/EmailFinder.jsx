@@ -108,7 +108,7 @@ function EmailFinder() {
             <p>Full Name</p>
             <input
               type="text"
-              placeholder="Elon Musk"
+              placeholder="Tim cook"
               className=" border border-gray-400 rounded-md py-2 px-4 sm:mr-3 w-4/5"
               value={data.fullname}
               onChange={(e) => onInputChange(e, "fullname")}
@@ -116,7 +116,7 @@ function EmailFinder() {
             <p className="mt-4">Domain Name</p>
             <input
               type="text"
-              placeholder="tesla.com"
+              placeholder="apple.com"
               className=" border border-gray-400 rounded-md py-2 px-4 sm:mr-3 w-4/5"
               value={data.domain}
               onChange={(e) => onInputChange(e, "domain")}

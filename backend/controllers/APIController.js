@@ -16,6 +16,8 @@ import PurchaseApi from "../utils/thrive.js";
 import InrToUsdConverter from "../utils/INRtoUSD.js";
 import InrToUsdSubscriptionConverter from "../utils/INRtoUSDSubscription.js";
 import ZohoBooks from "../utils/zohoBooks.js";
+import streamifier from 'streamifier';
+import FormData from 'form-data'
 
 
 let APIControllers = {
@@ -572,6 +574,38 @@ let APIControllers = {
       }
     }
 
+  },
+  batchEmailFinderFileUpload: async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+      console.log(req.file.buffer,'reqqqqqqqqqqq')
+      const formData = new FormData();
+      formData.append('file', streamifier.createReadStream(req.file.buffer), {
+        filename: req.file.originalname,
+        contentType: req.file.mimetype,
+      });
+      console.log(req.user[0][0].api_key,'req.userrrrrrrrrr')
+      const response = await axios.post(
+        `http://service.gamalogic.com/dashboard-file-upload?is_dashboard=1&apikey=${req.user[0][0].api_key}`,
+        formData,
+        {
+          headers: {
+            ...formData.getHeaders(),
+          },
+        }
+      );
+      console.log(response,'response from api')
+      res.json(response.data);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } finally {
+      if (req.dbConnection) {
+        await req.dbConnection.release();
+      }
+    }
   },
   batchEmailFinderStatus: async (req, res) => {
     try {

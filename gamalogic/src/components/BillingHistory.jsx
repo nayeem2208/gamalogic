@@ -5,6 +5,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas-pro";
 import LoadingBar from "react-top-loading-bar";
 import GridLoader from "react-spinners/GridLoader";
+import { Link } from "react-router-dom";
 
 const override = {
   display: "block",
@@ -234,7 +235,22 @@ function BillingHistory() {
           </div>
         </>
       ) : (
-        !invoicesLoad && <p>No billing data available.</p>
+        !invoicesLoad && <div className="flex flex-col items-center justify-center p-6  rounded-lg ">
+        <h2 className="text-lg font-semibold text-gray-700">
+          No Billing Data Available
+        </h2>
+        <Link to="/dashboard/buy-credits">
+          <button className="overflow-hidden md:mt-3 w-48 p-2 h-12 bg-bgblue text-white border-none rounded-md text-sm font-medium cursor-pointer relative z-10 group">
+            Explore Plans
+            <span className="absolute w-52 h-20 -top-8  -left-2 bg-blue-300 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-500 duration-1000 origin-left"></span>
+            <span className="absolute w-52 h-20 -top-8  -left-2 bg-blue-800 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-700 duration-700 origin-left"></span>
+            <span className="absolute w-52 h-20 -top-8  -left-2 bg-blue-900 rotate-6 transform scale-x-0 group-hover:scale-x-100 transition-transform group-hover:duration-1000 duration-500 origin-left"></span>
+            <span className="group-hover:opacity-100 group-hover:duration-1000 duration-100 opacity-0 absolute  left-6 z-10">
+              Explore Plans
+            </span>
+          </button>
+        </Link>
+      </div>
       )}
       {invoicesLoad && (
         <div className=" h-96 flex items-center">

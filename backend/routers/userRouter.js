@@ -7,8 +7,10 @@ import APIDecode from '../middlewares/apiDecode.js';
 import newControllers from '../controllers/newController.js';
 import accountDetailsValidation from '../middlewares/accountDetailsValidation.js';
 import loyalityProgramMiddleware from '../middlewares/LoyaltyMiddleware.js';
+import multer from 'multer'
 
 const router=express.Router()
+const upload = multer();
 
 router.get('/sampleCheck',dbMiddleware,Authentication.sample)
 router.post('/sampleCheck1',Authentication.samplePost)
@@ -46,6 +48,7 @@ router.post('/batchEmailFinder',dbMiddleware,authcheck,APIControllers.batchEmail
 router.get('/getBatchFinderStatus',dbMiddleware,APIDecode,APIControllers.batchEmailFinderStatus)
 router.get('/downloadEmailFinderFile',dbMiddleware,authcheck,APIControllers.downloadEmailFinderResultFile)
 router.get('/finderfilesSearch',dbMiddleware,authcheck,APIControllers.searchFinderFiles)
+router.post('/batchFinderFileUpload',upload.single('file'),dbMiddleware,authcheck,APIControllers.batchEmailFinderFileUpload)
 
 //api key related
 router.get('/getApiKey',APIDecode,APIControllers.getApi)
