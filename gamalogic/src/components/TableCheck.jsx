@@ -13,7 +13,7 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
     firstNameField: "",
     lastNameField: "",
     domainField: "",
-    emailField:""
+    // emailField:""
   });
   const [originalHeaders, setOriginalHeaders] = useState([]);
   const [tableInstance, setTableInstance] = useState(null);
@@ -178,17 +178,17 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
     if (
       !formData.firstNameField ||
       !formData.lastNameField ||
-      !formData.domainField||
-      !formData.emailField
+      !formData.domainField
+      // !formData.emailField
     ) {
       toast.error("Please select the columns");
       return;
     }
     const newFormData = {
-      firstNameField: originalHeaders[columns.indexOf(formData.firstNameField)],
-      lastNameField: originalHeaders[columns.indexOf(formData.lastNameField)],
-      domainField: originalHeaders[columns.indexOf(formData.domainField)],
-      emailField:formData.emailField,
+      firstNameField: [originalHeaders[columns.indexOf(formData.firstNameField)],formData.firstNameField],
+      lastNameField: [originalHeaders[columns.indexOf(formData.lastNameField)],formData.lastNameField],
+      domainField: [originalHeaders[columns.indexOf(formData.domainField)],formData.domainField],
+      // emailField:formData.emailField,
     };
     console.log(newFormData, "new formdata for updload");
     if (onUpload) onUpload(newFormData);
@@ -197,8 +197,8 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
     setFormData({
       firstNameField: "",
       lastNameField: "",
-      domainField: "",
-      emailField:""
+      domainField: ""
+      // emailField:""
     });
     // Notify the parent component using the `onCancel` callback
     if (spreadsheetRef.current) {
@@ -281,7 +281,7 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
             />
           </div>
         </div>
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="block mb-2 font-medium">
             Email Field (Output Location):
           </label>
@@ -297,7 +297,7 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
               onClick={() => handleColumnSelect("emailField")} 
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Buttons */}
         <div className="flex  gap-2 text-sm">

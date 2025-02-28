@@ -401,28 +401,30 @@ function FileEmailFinder() {
       if (data.processed == 100) {
         setLoading(true);
         setLoad(30);
+        const interval = setInterval(() => {
+          setLoad((prev) => (prev < 90 ? prev + 4 : prev));
+        }, 1000);
         let res = await axiosInstance.get(
           `/downloadEmailFinderFile?batchId=${data.id}`
         );
+        clearInterval(interval);
         setLoad(100);
-        const outputArray = res.data.datas.gamalogic_discovery.map((obj) => {
-          let remarks = "";
-          if (obj.is_catchall == 1) {
-            remarks = "Catch all Address";
-          } else if (obj.is_catchall == 0 && obj.email_address != 0) {
-            remarks = "Valid Address";
-          } else {
-            remarks = "";
-          }
-          return {
-            FirstName: obj.firstname,
-            LastName: obj.lastname,
-            Domain: obj.domain,
-            Email_Address: obj.email_address,
-            Remarks: remarks,
-          };
+
+        const { headers, data: responseData, fileName } = res.data;
+
+        const outputArray = responseData.map((row) => {
+          const obj = {};
+          headers.forEach((header, index) => {
+            if (header === "") {
+              obj[`_${index}`] = ""; // Assigning a placeholder for empty headers
+            } else {
+              obj[header] = row[index];
+            }
+          });
+          return obj;
         });
-        const fileName = res.data.fileName;
+
+        // const fileName = res.data.fileName;
         const parts = fileName.split(".");
         const nameWithoutExtension = parts[0];
         const finalFileName = `${nameWithoutExtension}_finder`;
@@ -484,13 +486,21 @@ function FileEmailFinder() {
   };
 
   const downloadText = (data, fileName) => {
-    const textData = data
-      .map(
-        (item) =>
-          `${item.FirstName},${item.LastName},${item.Domain},${item.Email_Address},${item.Remarks}`
-      )
-      .join("\n");
-    const blob = new Blob([textData], { type: "text/plain;charset=utf-8" });
+
+    const header = Object.keys(data[0])[0];
+
+    const fileContent = data
+      .map((row) => {
+        const mainData = row[header]; 
+        const email = row.email;
+        const remarks = row.remarks;
+        return `${mainData} ${email} ${remarks}`;
+      })
+      .join("\n"); 
+
+    const fullContent = `${header} email remarks\n${fileContent}`;
+
+    const blob = new Blob([fullContent], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -619,24 +629,29 @@ function FileEmailFinder() {
 
   const handleMappingColumns = (data) => {
     setLoad(30);
-    const transformedData = JsonToServer.data.map((item) => ({
-      first_name: item[data.firstNameField],
-      last_name: item[data.lastNameField],
-      domain: item[data.domainField],
-    }));
-    setLoad(50);
+    const interval = setInterval(() => {
+      setLoad((prev) => (prev < 90 ? prev + 4 : prev));
+    }, 1000);
+    const transformedData = JsonToServer.data
+      .map((item) => ({
+        first_name: item[data.firstNameField[0]],
+        last_name: item[data.lastNameField[0]],
+        domain: item[data.domainField[0]],
+      }))
+      .filter((item) => item.first_name || item.last_name || item.domain);
+    // setLoad(50);
     let results = JsonToServer;
     results.data = transformedData;
-    setLoad(60);
-    if (creditBal >= JsonToServer.data.length * 10) {
-      
-    }
-    async function uploadRowFile() {
+    // results.fields = data;
+    // setLoad(60);
+    async function BatchFileFinder() {
       const formData = new FormData();
       formData.append("file", fileForClickUp);
+      formData.append("results", JSON.stringify(results));
+      formData.append("fields", JSON.stringify(data));
       try {
         const response = await axiosInstance.post(
-          `/batchFinderFileUpload`,
+          "/batchEmailFinder",
           formData,
           {
             headers: {
@@ -644,98 +659,91 @@ function FileEmailFinder() {
             },
           }
         );
+        clearInterval(interval);
 
-        console.log("File uploaded successfully:", response.data);
+        setLoad(100);
+        setCreditBal(creditBal - results.data.length * 10);
+        toast.success(response.data.message);
+        const formatDate = (dateTimeString, userTimeZone) => {
+          try {
+            const date =
+              typeof dateTimeString === "string"
+                ? new Date(dateTimeString)
+                : dateTimeString;
+            const timeZone = userTimeZone || "America/New_York";
+
+            const formatter = new Intl.DateTimeFormat("en-US", {
+              timeZone: timeZone,
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              hour12: false, // Set to true if you want AM/PM format
+            });
+
+            const formattedDate = formatter.format(date);
+
+            return formattedDate.replace(",", ""); // Remove the comma for cleaner output
+          } catch (error) {
+            console.error("Error formatting date:", error);
+            return null; // Return null or a default value on failure
+          }
+        };
+        setResultFile((prevResultFiles) => [
+          {
+            ...response.data.files,
+            processed: 0,
+            formattedDate: formatDate(
+              response.data.files.date_time,
+              userDetails.timeZone
+            ),
+          },
+          ...prevResultFiles,
+        ]);
+        setFilesStatus((prevResultFiles) => [
+          {
+            ...response.data.files,
+            processed: 0,
+            formattedDate: formatDate(
+              response.data.files.date_time,
+              userDetails.timeZone
+            ),
+          },
+          ...prevResultFiles,
+        ]);
       } catch (error) {
-        console.error("Error uploading file:", error);
+        if (error.response.status === 500) {
+          async function errorHandler() {
+            let res = await clickUpAttachment(
+              fileForClickUp,
+              error.response.data.errorREsponse.id
+            );
+          }
+          errorHandler();
+          setServerError(true);
+        } else if (
+          error.response.status === 400 &&
+          error.response.data.errorREsponse
+        ) {
+          async function errorHandler() {
+            let res = await clickUpAttachment(
+              fileForClickUp,
+              error.response.data.errorREsponse.id
+            );
+          }
+          errorHandler();
+        } else {
+          toast.error(error.response?.data?.error);
+        }
+        setLoading(false);
       }
     }
-    uploadRowFile();
-    // async function BatchFileFinder() {
-    //   try {
-    //     const response = await axiosInstance.post("/batchEmailFinder", results);
-    //     setLoad(100);
-    //     setCreditBal(creditBal - results.data.length * 10);
-    //     toast.success(response.data.message);
-    //     const formatDate = (dateTimeString, userTimeZone) => {
-    //       try {
-    //         const date =
-    //           typeof dateTimeString === "string"
-    //             ? new Date(dateTimeString)
-    //             : dateTimeString;
-    //         const timeZone = userTimeZone || "America/New_York";
-
-    //         const formatter = new Intl.DateTimeFormat("en-US", {
-    //           timeZone: timeZone,
-    //           year: "numeric",
-    //           month: "2-digit",
-    //           day: "2-digit",
-    //           hour: "2-digit",
-    //           minute: "2-digit",
-    //           second: "2-digit",
-    //           hour12: false, // Set to true if you want AM/PM format
-    //         });
-
-    //         const formattedDate = formatter.format(date);
-
-    //         return formattedDate.replace(",", ""); // Remove the comma for cleaner output
-    //       } catch (error) {
-    //         console.error("Error formatting date:", error);
-    //         return null; // Return null or a default value on failure
-    //       }
-    //     };
-    //     setResultFile((prevResultFiles) => [
-    //       {
-    //         ...response.data.files,
-    //         processed: 0,
-    //         formattedDate: formatDate(
-    //           response.data.files.date_time,
-    //           userDetails.timeZone
-    //         ),
-    //       },
-    //       ...prevResultFiles,
-    //     ]);
-    //     setFilesStatus((prevResultFiles) => [
-    //       {
-    //         ...response.data.files,
-    //         processed: 0,
-    //         formattedDate: formatDate(
-    //           response.data.files.date_time,
-    //           userDetails.timeZone
-    //         ),
-    //       },
-    //       ...prevResultFiles,
-    //     ]);
-    //   } catch (error) {
-    //     if (error.response.status === 500) {
-    //       async function errorHandler() {
-    //         let res = await clickUpAttachment(
-    //           fileForClickUp,
-    //           error.response.data.errorREsponse.id
-    //         );
-    //       }
-    //       errorHandler();
-    //       setServerError(true);
-    //     } else if (
-    //       error.response.status === 400 &&
-    //       error.response.data.errorREsponse
-    //     ) {
-    //       async function errorHandler() {
-    //         let res = await clickUpAttachment(
-    //           fileForClickUp,
-    //           error.response.data.errorREsponse.id
-    //         );
-    //       }
-    //       errorHandler();
-    //     } else {
-    //       toast.error(error.response?.data?.error);
-    //     }
-    //     setLoading(false);
-    //   }
-    // }
-    // BatchFileFinder();
+    BatchFileFinder();
     setSpreadSheet(false);
   };
+
 
   const handleMappingCancel = () => {
     setSpreadSheet(false);

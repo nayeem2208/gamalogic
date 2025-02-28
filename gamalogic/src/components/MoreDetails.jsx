@@ -136,7 +136,13 @@ function MoreDetails() {
       return false;
     }
     if (!/^\d{6,}$/.test(moreDetails.phone_number)) {
-      toast.error("Please add the details");
+      if (!moreDetails.phone_number) {
+        toast.error("Phone number is required.");
+      } else if (!/^\d+$/.test(moreDetails.phone_number)) {
+        toast.error("Phone number should contain only numbers, no special characters or spaces.");
+      } else {
+        toast.error("Phone number should have at least 6 digits.");
+      }
       return false;
     }
     if (

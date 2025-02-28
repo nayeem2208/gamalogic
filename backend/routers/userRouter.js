@@ -44,11 +44,11 @@ router.get('/validatoinfilesSearch',dbMiddleware,authcheck,APIControllers.search
 
 //file based email finder 
 router.get('/getAllUploadedEmailFinderFiles',dbMiddleware,authcheck,APIControllers.getAlreadyCheckedBatchEmailFinderFiles)
-router.post('/batchEmailFinder',dbMiddleware,authcheck,APIControllers.batchEmailFinder)
+router.post('/batchEmailFinder',upload.single('file'),dbMiddleware,authcheck,APIControllers.batchEmailFinder)
 router.get('/getBatchFinderStatus',dbMiddleware,APIDecode,APIControllers.batchEmailFinderStatus)
 router.get('/downloadEmailFinderFile',dbMiddleware,authcheck,APIControllers.downloadEmailFinderResultFile)
 router.get('/finderfilesSearch',dbMiddleware,authcheck,APIControllers.searchFinderFiles)
-router.post('/batchFinderFileUpload',upload.single('file'),dbMiddleware,authcheck,APIControllers.batchEmailFinderFileUpload)
+// router.post('/batchFinderFileUpload',upload.single('file'),dbMiddleware,authcheck,APIControllers.batchEmailFinderFileUpload)
 
 //api key related
 router.get('/getApiKey',APIDecode,APIControllers.getApi)

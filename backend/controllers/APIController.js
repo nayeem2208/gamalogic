@@ -480,6 +480,9 @@ let APIControllers = {
     try {
       const dbConnection = req.dbConnection;
       let apiKey
+      const columnFields = JSON.parse(req.body.fields);
+      const results = JSON.parse(req.body.results);
+      let batchId
       if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
         let [admin] = await dbConnection.query(`SELECT api_key,credits,credits_free,free_final FROM registration WHERE rowid = ${req.user[0][0].team_id}`);
         apiKey = admin[0].api_key;
@@ -487,17 +490,18 @@ let APIControllers = {
         let finalFreeDate = new Date(admin[0].free_final);
         let currentDate = new Date();
         //checking that we have enough credits to do this 
-        if ((admin[0].credits + admin[0].credits_free >= (req.body.data.length * 10) && finalFreeDate > currentDate) || (admin[0].credits >= req.body.data.length * 10)) {
+        if ((admin[0].credits + admin[0].credits_free >= (results.data.length * 10) && finalFreeDate > currentDate) || (admin[0].credits >= results.data.length * 10)) {
           const data = {
-            gamalogic_emailid_finder: req.body.data,
+            gamalogic_emailid_finder: results.data,
           };
           let response = await axios.post(
-            `https://gamalogic.com/batch-email-discovery/?apikey=${apiKey}&file_name=${req.body.fileName}&team_member_api_key=${memberKey}`,
+            `https://gamalogic.com/batch-email-discovery/?apikey=${apiKey}&file_name=${results.fileName}&team_member_api_key=${memberKey}&first_name_field=${columnFields.firstNameField[1]}&last_name_field=${columnFields.lastNameField[1]}&domain_name_field=${columnFields.domainField[1]}`,
             data
           );
+          batchId = response.data['batch id']
           if (response.data.error !== undefined && response.data.error == false) {
             let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
-            let content = `<p>This is to inform you that the batch email finder process for the file ${req.body.fileName} has been started.</p>
+            let content = `<p>This is to inform you that the batch email finder process for the file ${results.fileName} has been started.</p>
         <p>Please note that the finding process may take some time depending on the size of the file and the number of emails to be find.</p>
         <p>Thank you for using our service.</p>
         <div class="verify">
@@ -528,17 +532,18 @@ let APIControllers = {
         let finalFreeDate = new Date(req.user[0][0].free_final);
         let currentDate = new Date();
 
-        if ((req.user[0][0].credits + req.user[0][0].credits_free >= (req.body.data.length * 10) && finalFreeDate > currentDate) || (req.user[0][0].credits >= req.body.data.length * 10)) {
+        if ((req.user[0][0].credits + req.user[0][0].credits_free >= (results.data.length * 10) && finalFreeDate > currentDate) || (req.user[0][0].credits >= results.data.length * 10)) {
           const data = {
-            gamalogic_emailid_finder: req.body.data,
+            gamalogic_emailid_finder: results.data,
           };
           let response = await axios.post(
-            `https://gamalogic.com/batch-email-discovery/?apikey=${apiKey}&file_name=${req.body.fileName}`,
+            `https://gamalogic.com/batch-email-discovery/?apikey=${apiKey}&file_name=${results.fileName}&first_name_field=${columnFields.firstNameField[1]}&last_name_field=${columnFields.lastNameField[1]}&domain_name_field=${columnFields.domainField[1]}`,
             data
           );
+          batchId = response.data['batch id']
           if (response.data.error !== undefined && response.data.error == false) {
             let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
-            let content = `<p>This is to inform you that the batch email finder process for the file ${req.body.fileName} has been started.</p>
+            let content = `<p>This is to inform you that the batch email finder process for the file ${results.fileName} has been started.</p>
         <p>Please note that the finding process may take some time depending on the size of the file and the number of emails to be find.</p>
         <p>Thank you for using our service.</p>
         <div class="verify">
@@ -564,6 +569,23 @@ let APIControllers = {
           res.status(400).json({ error: 'You dont have enough to do this' });
         }
       }
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+      const formData = new FormData();
+      formData.append('file', streamifier.createReadStream(req.file.buffer), {
+        filename: req.file.originalname,
+        contentType: req.file.mimetype,
+      });
+      const response = await axios.post(
+        `http://service.gamalogic.com/dashboard-file-upload?is_dashboard=1&apikey=${req.user[0][0].api_key}&application=uploadfinder&batchId=${batchId}`,
+        formData,
+        {
+          headers: {
+            ...formData.getHeaders(),
+          },
+        }
+      );
     } catch (error) {
       console.log(error)
       let errorREsponse = await ErrorHandler("batchEmailFinder Controller", error, req);
@@ -635,7 +657,6 @@ let APIControllers = {
   },
   downloadEmailFinderResultFile: async (req, res) => {
     try {
-      // let apiKey = req.user[0][0].api_key;
       let dbConnection = req.dbConnection
 
       let apiKey
@@ -648,11 +669,91 @@ let APIControllers = {
       let download = await axios.get(
         `https://gamalogic.com/batch-email-discovery-result/?apikey=${apiKey}&batchid=${req.query.batchId}`
       );
-      let fileName = await req.dbConnection.query(`SELECT file_upload from useractivity_batch_finder_link where id='${req.query.batchId}'`)
-      res.status(200).json({ datas: download.data, fileName: fileName[0][0].file_upload });
+      let fileToDownload = await req.dbConnection.query(`SELECT file_upload,email_result_field from useractivity_batch_finder_link where id='${req.query.batchId}'`)
+      let fileName = fileToDownload[0][0].file_upload.split('.')[0] + '_' + req.query.batchId + '.' + fileToDownload[0][0].file_upload.split('.')[1]
+      let NewDownload = await axios.get(
+        `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&batchid=${req.query.batchId}&filename=${fileName}&application=uploadfinder`, { responseType: 'arraybuffer' }
+      );
+      let extention = fileToDownload[0][0].file_upload.split('.')[1]
+      const discoveryData = download.data.gamalogic_discovery;
+      let uploadedFileData = []
+      if (extention === 'csv' || extention === 'txt') {
+        const fileContent = NewDownload.data.toString('utf-8');
+        uploadedFileData = Papa.parse(fileContent, {
+          header: true,
+          skipEmptyLines: true
+        }).data;
+      } else if (extention === 'xls' || extention === 'xlsx') {
+        const workbook = XLSX.read(NewDownload.data, { type: 'buffer' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+
+        uploadedFileData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        // Separate headers and data
+        const [headers, ...dataRows] = uploadedFileData;
+        uploadedFileData = dataRows.map(row => {
+          const rowData = {};
+          headers.forEach((header, index) => {
+            rowData[header] = row[index] || '';
+          });
+          return rowData;
+        });
+      } else {
+        throw new Error('Unsupported file format');
+      }
+      const headers = Object.keys(uploadedFileData[0]);
+
+      const updatedData = uploadedFileData.map(record => {
+        let values
+        if (extention == 'txt') {
+          const recordValue = Object.values(record)[0];
+          values = recordValue
+        } else {
+          values = Object.values(record)
+        }
+        const matchedDomain = discoveryData.find(
+          item => values.includes(item.domain) && values.includes(item.firstname) && values.includes(item.lastname)
+        );
+
+        const email = matchedDomain ? matchedDomain.email_address : '0';
+        const isCatchall = matchedDomain ? matchedDomain.is_catchall : '0';
+        let remarks = "";
+        if (isCatchall == 1) {
+          remarks = "Catch all Address";
+        } else if (isCatchall == 0 && email != '0') {
+          remarks = "Valid Address";
+        } else {
+          remarks = "";
+        }
+
+        const row = headers.map(header => record[header] || '');
+        row.push(email)
+        row.push(remarks);
+
+        return row;
+      });
+      // const paddedHeaders = [...headers];
+      // while (paddedHeaders.length < columnIndex) {
+      //   paddedHeaders.push('');
+      // }
+
+      const resultHeaders = [
+        ...headers,
+        "email",
+        "remarks"
+      ];
+      const finalData = [...resultHeaders, ...updatedData];
+      // console.log(finalData, 'final data')
+
+      res.status(200).json({
+        headers: resultHeaders,
+        data: updatedData,
+        fileName: fileToDownload[0][0].file_upload
+      });
     } catch (error) {
       console.log(error);
-      ErrorHandler("downloadEmailVerificationFile Controller", error, req);
+      // ErrorHandler("downloadEmailVerificationFile Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
