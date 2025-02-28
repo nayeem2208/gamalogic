@@ -29,9 +29,11 @@
     "node-cache": "^5.1.2",
     "nodemailer": "^6.9.13",
     "nodemon": "^3.1.0",
+    "papaparse": "^5.5.2",
     "razorpay": "^2.9.4",
     "ssh2": "^1.15.0",
     "streamifier": "^0.1.1",
+    "xlsx": "^0.18.5",
     "zeptomail": "^6.0.0"
   }
 }
