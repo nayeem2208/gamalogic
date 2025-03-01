@@ -20,7 +20,14 @@ import streamifier from 'streamifier';
 import FormData from 'form-data'
 import Papa from 'papaparse'
 import XLSX from 'xlsx'
+import fs from 'fs'
+import path from "path";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 let APIControllers = {
   getCreditBalance: async (req, res) => {
@@ -660,7 +667,7 @@ let APIControllers = {
   downloadEmailFinderResultFile: async (req, res) => {
     try {
       let dbConnection = req.dbConnection
-
+      // console.log(verdheoruError)
       let apiKey
       if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
         let [admin] = await dbConnection.query(`SELECT api_key FROM registration WHERE rowid = ${req.user[0][0].team_id}`);
@@ -668,94 +675,142 @@ let APIControllers = {
       } else {
         apiKey = req.user[0][0].api_key;
       }
-      let download = await axios.get(
-        `https://gamalogic.com/batch-email-discovery-result/?apikey=${apiKey}&batchid=${req.query.batchId}`
-      );
+      console.log(req.query.alreadyDownloaded,typeof(req.query.alreadyDownloaded),'already downloaded')
       let fileToDownload = await req.dbConnection.query(`SELECT file_upload,email_result_field from useractivity_batch_finder_link where id='${req.query.batchId}'`)
-      let fileName = fileToDownload[0][0].file_upload.split('.')[0] + '_' + req.query.batchId + '.' + fileToDownload[0][0].file_upload.split('.')[1]
-      let NewDownload = await axios.get(
-        `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&batchid=${req.query.batchId}&filename=${fileName}&application=uploadfinder`, { responseType: 'arraybuffer' }
-      );
-      let extention = fileToDownload[0][0].file_upload.split('.')[1]
-      const discoveryData = download.data.gamalogic_discovery;
-      let uploadedFileData = []
-      if (extention === 'csv' || extention === 'txt') {
-        const fileContent = NewDownload.data.toString('utf-8');
-        uploadedFileData = Papa.parse(fileContent, {
-          header: true,
-          skipEmptyLines: true
-        }).data;
-      } else if (extention === 'xls' || extention === 'xlsx') {
-        const workbook = XLSX.read(NewDownload.data, { type: 'buffer' });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
+      if (req.query.alreadyDownloaded=='true') {
+        console.log('first part ')
+        let fileNameForDownloading = fileToDownload[0][0].file_upload.split('.')[0] + '_' + req.query.batchId + '.' + fileToDownload[0][0].file_upload.split('.')[1];
+        const fileUrl = `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&application=finder&batchId=${req.query.batchId}&filename=${fileNameForDownloading}`;
 
-        uploadedFileData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-        // Separate headers and data
-        const [headers, ...dataRows] = uploadedFileData;
-        uploadedFileData = dataRows.map(row => {
-          const rowData = {};
-          headers.forEach((header, index) => {
-            rowData[header] = row[index] || '';
-          });
-          return rowData;
+        res.status(200).json({
+          fileUrl: fileUrl, 
+          fileName: fileToDownload[0][0].file_upload,
         });
-      } else {
-        throw new Error('Unsupported file format');
       }
-      const headers = Object.keys(uploadedFileData[0]);
+      else {
+        console.log('second part ')
+        let download = await axios.get(
+          `https://gamalogic.com/batch-email-discovery-result/?apikey=${apiKey}&batchid=${req.query.batchId}`
+        );
+        let fileName = fileToDownload[0][0].file_upload.split('.')[0] + '_' + req.query.batchId + '.' + fileToDownload[0][0].file_upload.split('.')[1]
+        let NewDownload = await axios.get(
+          `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&batchid=${req.query.batchId}&filename=${fileName}&application=uploadfinder`, { responseType: 'arraybuffer' }
+        );
+        let extention = fileToDownload[0][0].file_upload.split('.')[1]
+        const discoveryData = download.data.gamalogic_discovery;
+        let uploadedFileData = []
+        if (extention === 'csv' || extention === 'txt') {
+          const fileContent = NewDownload.data.toString('utf-8');
+          uploadedFileData = Papa.parse(fileContent, {
+            header: true,
+            skipEmptyLines: true
+          }).data;
+        } else if (extention === 'xls' || extention === 'xlsx') {
+          const workbook = XLSX.read(NewDownload.data, { type: 'buffer' });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
 
-      const updatedData = uploadedFileData.map(record => {
-        let values
-        if (extention == 'txt') {
-          const recordValue = Object.values(record)[0];
-          values = recordValue
+          uploadedFileData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+          // Separate headers and data
+          const [headers, ...dataRows] = uploadedFileData;
+          uploadedFileData = dataRows.map(row => {
+            const rowData = {};
+            headers.forEach((header, index) => {
+              rowData[header] = row[index] || '';
+            });
+            return rowData;
+          });
         } else {
-          values = Object.values(record)
+          throw new Error('Unsupported file format');
         }
-        const matchedDomain = discoveryData.find(
-          item => values.includes(item.domain) && values.includes(item.firstname) && values.includes(item.lastname)
+        const headers = Object.keys(uploadedFileData[0]);
+
+        const updatedData = uploadedFileData.map(record => {
+          let values
+          if (extention == 'txt') {
+            const recordValue = Object.values(record)[0];
+            values = recordValue
+          } else {
+            values = Object.values(record)
+          }
+          const matchedDomain = discoveryData.find(
+            item => values.includes(item.domain) && values.includes(item.firstname) && values.includes(item.lastname)
+          );
+
+          const email = matchedDomain ? matchedDomain.email_address : '0';
+          const isCatchall = matchedDomain ? matchedDomain.is_catchall : '0';
+          let remarks = "";
+          if (isCatchall == 1) {
+            remarks = "Catch all Address";
+          } else if (isCatchall == 0 && email != '0') {
+            remarks = "Valid Address";
+          } else {
+            remarks = "";
+          }
+
+          const row = headers.map(header => record[header] || '');
+          row.push(email)
+          row.push(remarks);
+
+          return row;
+        });
+        const resultHeaders = [
+          ...headers,
+          "email",
+          "remarks"
+        ];
+        const finalData = [...resultHeaders, ...updatedData];
+        const DataForFileCreation = [resultHeaders, ...updatedData]
+
+        let newFileName = `${fileToDownload[0][0].file_upload}`;
+        let filePath = path.join(__dirname, '..', 'temp', newFileName);
+
+        if (!fs.existsSync(path.join(__dirname, '..', 'temp'))) {
+          fs.mkdirSync(path.join(__dirname, '..', 'temp'), { recursive: true });
+        }
+
+        // Create the file based on the extension
+        if (extention === 'csv' || extention === 'txt') {
+          const csvData = Papa.unparse(DataForFileCreation);
+          fs.writeFileSync(filePath, csvData);
+        } else if (extention === 'xls' || extention === 'xlsx') {
+          const worksheet = XLSX.utils.aoa_to_sheet(DataForFileCreation);
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+          XLSX.writeFile(workbook, filePath);
+        }
+
+        // Send the new file to another API
+        const fileStream = fs.createReadStream(filePath);
+        const formData = new FormData();
+        formData.append('file', fileStream, {
+          filename: newFileName,
+          contentType: `application/${extention}`,
+        });
+
+        const response = await axios.post(
+          `http://service.gamalogic.com/dashboard-file-upload?is_dashboard=1&apikey=${apiKey}&application=finder&batchId=${req.query.batchId}&filename=${fileToDownload[0][0].file_upload}`,
+          formData,
+          {
+            headers: {
+              ...formData.getHeaders(),
+            },
+          }
         );
 
-        const email = matchedDomain ? matchedDomain.email_address : '0';
-        const isCatchall = matchedDomain ? matchedDomain.is_catchall : '0';
-        let remarks = "";
-        if (isCatchall == 1) {
-          remarks = "Catch all Address";
-        } else if (isCatchall == 0 && email != '0') {
-          remarks = "Valid Address";
-        } else {
-          remarks = "";
+        if (response.data == 'True') {
+          await dbConnection.query(`UPDATE useractivity_batch_finder_link SET is_download = 1 WHERE id='${req.query.batchId}'`);
         }
-
-        const row = headers.map(header => record[header] || '');
-        row.push(email)
-        row.push(remarks);
-
-        return row;
-      });
-      // const paddedHeaders = [...headers];
-      // while (paddedHeaders.length < columnIndex) {
-      //   paddedHeaders.push('');
-      // }
-
-      const resultHeaders = [
-        ...headers,
-        "email",
-        "remarks"
-      ];
-      const finalData = [...resultHeaders, ...updatedData];
-      // console.log(finalData, 'final data')
-
-      res.status(200).json({
-        headers: resultHeaders,
-        data: updatedData,
-        fileName: fileToDownload[0][0].file_upload
-      });
+        res.status(200).json({
+          headers: resultHeaders,
+          data: updatedData,
+          fileName: fileToDownload[0][0].file_upload
+        });
+      }
     } catch (error) {
       console.log(error);
-      // ErrorHandler("downloadEmailVerificationFile Controller", error, req);
+      ErrorHandler("downloadEmailVerificationFile Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
