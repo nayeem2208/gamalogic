@@ -681,11 +681,11 @@ let APIControllers = {
         console.log('first part ')
         let fileNameForDownloading = fileToDownload[0][0].file_upload.split('.')[0] + '_' + req.query.batchId + '.' + fileToDownload[0][0].file_upload.split('.')[1];
         const fileUrl = `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&application=finder&batchId=${req.query.batchId}&filename=${fileNameForDownloading}`;
-
-        res.status(200).json({
-          fileUrl: fileUrl, 
-          fileName: fileToDownload[0][0].file_upload,
-        });
+        const response = await axios.get(fileUrl, { responseType: 'stream' });
+        let fileName=fileToDownload[0][0].file_upload.split('.')[0] + 'finder'+ '.' + fileToDownload[0][0].file_upload.split('.')[1];
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        res.setHeader('Content-Type', response.headers['content-type']);
+          response.data.pipe(res);
       }
       else {
         console.log('second part ')
@@ -810,7 +810,7 @@ let APIControllers = {
       }
     } catch (error) {
       console.log(error);
-      ErrorHandler("downloadEmailVerificationFile Controller", error, req);
+      // ErrorHandler("downloadEmailVerificationFile Controller", error, req);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       if (req.dbConnection) {
