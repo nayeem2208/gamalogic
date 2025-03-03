@@ -749,7 +749,7 @@ let APIControllers = {
               item => values.includes(item.domain) && values.includes(item.firstname) && values.includes(item.lastname)
             );
 
-            const email = matchedDomain ? matchedDomain.email_address : '0';
+            const email = matchedDomain && matchedDomain.email_address !== '0' ? matchedDomain.email_address : '';
             const isCatchall = matchedDomain ? matchedDomain.is_catchall : '0';
             let remarks = "";
             if (isCatchall == 1) {
