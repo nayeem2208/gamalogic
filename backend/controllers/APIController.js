@@ -587,7 +587,7 @@ let APIControllers = {
         contentType: req.file.mimetype,
       });
       const response = await axios.post(
-        `http://service.gamalogic.com/dashboard-file-upload?is_dashboard=1&apikey=${req.user[0][0].api_key}&application=uploadfinder&batchId=${batchId}`,
+        `http://service.gamalogic.com/dashboard-file-upload?is_dashboard=1&apikey=${apiKey}&application=uploadfinder&batchId=${batchId}`,
         formData,
         {
           headers: {
@@ -595,6 +595,10 @@ let APIControllers = {
           },
         }
       );
+      if(response.data){
+        console.log('inside response .data')
+      await dbConnection.query(`UPDATE useractivity_batch_finder_link SET save_file_upload='${response.data}' WHERE id='${batchId}'`);
+      }
     } catch (error) {
       console.log(error)
       let errorREsponse = await ErrorHandler("batchEmailFinder Controller", error, req);
@@ -676,13 +680,13 @@ let APIControllers = {
         apiKey = req.user[0][0].api_key;
       }
       console.log(req.query.alreadyDownloaded,typeof(req.query.alreadyDownloaded),'already downloaded')
-      let fileToDownload = await req.dbConnection.query(`SELECT file_upload,email_result_field from useractivity_batch_finder_link where id='${req.query.batchId}'`)
+      let fileToDownload = await req.dbConnection.query(`SELECT file_upload,save_file_upload from useractivity_batch_finder_link where id='${req.query.batchId}'`)
+      let fileUpload=fileToDownload[0][0].save_file_upload||fileToDownload[0][0].file_upload
       if (req.query.alreadyDownloaded=='true') {
         console.log('first part ')
-        let fileNameForDownloading = fileToDownload[0][0].file_upload.split('.')[0] + '_' + req.query.batchId + '.' + fileToDownload[0][0].file_upload.split('.')[1];
-        const fileUrl = `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&application=finder&batchId=${req.query.batchId}&filename=${fileNameForDownloading}`;
+        const fileUrl = `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&application=finder&batchid=${req.query.batchId}&filename=${fileUpload}`;
         const response = await axios.get(fileUrl, { responseType: 'stream' });
-        let fileName=fileToDownload[0][0].file_upload.split('.')[0] + 'finder'+ '.' + fileToDownload[0][0].file_upload.split('.')[1];
+        let fileName=fileUpload.split('.')[0] + 'finder'+ '.' + fileUpload.split('.')[1];
         res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
         res.setHeader('Content-Type', response.headers['content-type']);
           response.data.pipe(res);
@@ -692,11 +696,11 @@ let APIControllers = {
         let download = await axios.get(
           `https://gamalogic.com/batch-email-discovery-result/?apikey=${apiKey}&batchid=${req.query.batchId}`
         );
-        let fileName = fileToDownload[0][0].file_upload.split('.')[0] + '_' + req.query.batchId + '.' + fileToDownload[0][0].file_upload.split('.')[1]
+        let fileName = fileUpload.split('.')[0] + '_' + req.query.batchId + '.' + fileUpload.split('.')[1]
         let NewDownload = await axios.get(
-          `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&batchid=${req.query.batchId}&filename=${fileName}&application=uploadfinder`, { responseType: 'arraybuffer' }
+          `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&batchid=${req.query.batchId}&filename=${fileUpload}&application=uploadfinder`, { responseType: 'arraybuffer' }
         );
-        let extention = fileToDownload[0][0].file_upload.split('.')[1]
+        let extention = fileUpload.split('.')[1]
         const discoveryData = download.data.gamalogic_discovery;
         let uploadedFileData = []
         if (extention === 'csv' || extention === 'txt') {
@@ -763,7 +767,7 @@ let APIControllers = {
         const finalData = [...resultHeaders, ...updatedData];
         const DataForFileCreation = [resultHeaders, ...updatedData]
 
-        let newFileName = `${fileToDownload[0][0].file_upload}`;
+        let newFileName = `${fileUpload}`;
         let filePath = path.join(__dirname, '..', 'temp', newFileName);
 
         if (!fs.existsSync(path.join(__dirname, '..', 'temp'))) {
@@ -790,7 +794,7 @@ let APIControllers = {
         });
 
         const response = await axios.post(
-          `http://service.gamalogic.com/dashboard-file-upload?is_dashboard=1&apikey=${apiKey}&application=finder&batchId=${req.query.batchId}&filename=${fileToDownload[0][0].file_upload}`,
+          `http://service.gamalogic.com/dashboard-file-upload?is_dashboard=1&apikey=${apiKey}&application=finder&batchId=${req.query.batchId}&filename=${fileUpload}`,
           formData,
           {
             headers: {
@@ -798,14 +802,14 @@ let APIControllers = {
             },
           }
         );
-
-        if (response.data == 'True') {
+        console.log(response,'response from new file upload')
+        if (response.data) {
           await dbConnection.query(`UPDATE useractivity_batch_finder_link SET is_download = 1 WHERE id='${req.query.batchId}'`);
         }
         res.status(200).json({
           headers: resultHeaders,
           data: updatedData,
-          fileName: fileToDownload[0][0].file_upload
+          fileName: fileUpload
         });
       }
     } catch (error) {
