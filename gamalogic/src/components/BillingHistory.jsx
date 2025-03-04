@@ -52,7 +52,9 @@ function BillingHistory() {
     try {
       setLoading(true);
       setLoad(30);
-
+      const interval = setInterval(() => {
+        setLoad((prev) => (prev < 90 ? prev + 4 : prev));
+      }, 1000);
       const response = await axiosInstance.get(`downloadInvoice/${fileId}`);
       let invoiceHTML = response.data.invoiceHTML;
       if (!invoiceHTML) {
@@ -121,7 +123,7 @@ function BillingHistory() {
       //   /font-family: 'WebFont-Ubuntu'/g,
       //   "font-family: Arial, Helvetica, sans-serif"
       // );
-      setLoad(40);
+      // setLoad(40);
 
       const container = document.createElement("div");
       container.innerHTML = invoiceHTML;
@@ -145,14 +147,14 @@ function BillingHistory() {
           console.log("Cloned document:", documentClone);
         },
       });
-      setLoad(70);
+      // setLoad(70);
 
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-
+      clearInterval(interval);
       setLoad(100);
       const blob = pdf.output("blob");
       saveAs(blob, `invoice_${fileId}.pdf`);

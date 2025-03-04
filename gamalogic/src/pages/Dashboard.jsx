@@ -126,10 +126,14 @@ function Dashboard() {
           if (trimmedEmail.length > 0) {
             setLoading(true);
             setLoad(30);
+            const interval = setInterval(() => {
+              setLoad((prev) => (prev < 90 ? prev + 4 : prev));
+            }, 1000);
             let res = await axiosInstance.post("/singleEmailValidator", {
               email: emailAddress,
             });
             setCreditBal(creditBal - 1);
+            clearInterval(interval);
             setLoad(100);
             setEmailAddress("");
             const serializedValidationResults = encodeURIComponent(
@@ -175,7 +179,11 @@ function Dashboard() {
 
           setLoading(true);
           setLoad(30);
+          const interval = setInterval(() => {
+            setLoad((prev) => (prev < 90 ? prev + 4 : prev));
+          }, 1000);
           let res = await axiosInstance.post("/singleEmailFinder", data);
+          clearInterval(interval);
           setLoad(100);
           setCreditBal(creditBal - 10);
           setFinderDetails({ fullname: "", domain: "" });

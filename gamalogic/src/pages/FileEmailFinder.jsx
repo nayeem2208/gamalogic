@@ -94,18 +94,18 @@ function FileEmailFinder() {
         };
         const filesWithProcessedField = allFiles.data.map((file) => ({
           ...file,
-          processed: 0,
+          processed:  file.is_download == 1 ? 100 : 0,
           formattedDate: formatDate(file.date_time, userDetails.timeZone),
         }));
         const allProcessed = filesWithProcessedField.every(
           (file) => file.processed === 100
         );
-        if (!allProcessed) {
+        // if (!allProcessed) {
           setResultFile((prevResultFiles) => [
             ...prevResultFiles,
             ...filesWithProcessedField,
           ]);
-        }
+        // }
         setFilesStatus((prevResultFiles) => [
           ...prevResultFiles,
           ...filesWithProcessedField,
@@ -229,60 +229,46 @@ function FileEmailFinder() {
     reader.readAsArrayBuffer(file);
   };
 
-
   const handleTXTFile = async (file) => {
     setFileForClickUp(file);
-
+  
     const reader = new FileReader();
     reader.onload = async (e) => {
       const text = e.target.result;
       const lines = text.split("\n");
       let err = false;
-
-      // Generate column names A, B, C, ... Z, AA, AB, ...
-      const generateColumnNames = (num) => {
-        const columnNames = [];
-        let charCode = 65; // 'A'
-        while (columnNames.length < num) {
-          let columnName = "";
-          let tempNum = columnNames.length;
-          do {
-            columnName =
-              String.fromCharCode(charCode + (tempNum % 26)) + columnName;
-            tempNum = Math.floor(tempNum / 26) - 1;
-          } while (tempNum >= 0);
-          columnNames.push(columnName);
-        }
-        return columnNames;
-      };
-
+  
+      // Extract headers from the first line
+      const headers = lines[0]
+        .split(/\s+/) // Split the first line by whitespace
+        .map((header) => header.trim()); // Trim each header
+  
+      // Process the rest of the lines (skip the first line)
       const contacts = lines
-        .filter((line) => line.trim() !== "")
-        .map((line) => line.split(/[,\s]+/).map((item) => item.trim()));
-
-      // Get the maximum number of columns in any row
-      const maxColumns = Math.max(...contacts.map((row) => row.length));
-      const columnNames = generateColumnNames(maxColumns);
-
-      // Convert each row to an object with columns A, B, C, ...
-      const contactsWithColumns = contacts.map((row) => {
-        const contact = {};
-        row.forEach((item, index) => {
-          contact[columnNames[index]] = item;
+        .slice(1) // Skip the first line (headers)
+        .filter((line) => line.trim() !== "") // Remove empty lines
+        .map((line) => {
+          const values = line.split(/\s+/).map((item) => item.trim()); // Split each line by whitespace
+          const contact = {};
+  
+          // Map values to headers (keys)
+          headers.forEach((header, index) => {
+            contact[header] = values[index] || ""; // Use empty string if value is missing
+          });
+  
+          return contact;
         });
-        return contact;
-      });
-
+  
       if (err) {
         toast.error(
           "Please upload a file with consistent column headers and values."
         );
         return;
       }
-
+  
       const fileName = file.name;
-      if (contactsWithColumns.length <= 100000) {
-        setJsonToServer({ data: contactsWithColumns, fileName: fileName });
+      if (contacts.length <= 100000) {
+        setJsonToServer({ data: contacts, fileName: fileName }); // Pass data as array of objects (key-value pairs)
         setShowAlert(true);
       } else {
         toast.error(
@@ -398,54 +384,87 @@ function FileEmailFinder() {
 
   const DownloadFile = async (data) => {
     try {
+      console.log(data, "data is here");
       if (data.processed == 100) {
         setLoading(true);
+        let alreadyDownloaded = data.is_download == 1 ? true : false;
         setLoad(30);
         const interval = setInterval(() => {
           setLoad((prev) => (prev < 90 ? prev + 4 : prev));
         }, 1000);
-        let res = await axiosInstance.get(
-          `/downloadEmailFinderFile?batchId=${data.id}`
-        );
-        clearInterval(interval);
-        setLoad(100);
+        if (alreadyDownloaded) {
+          console.log('first part ')
+          let res = await axiosInstance.get(
+            `/downloadEmailFinderFile?batchId=${data.id}&alreadyDownloaded=${alreadyDownloaded}`,
+            { responseType: "blob" }
+          );
 
-        const { headers, data: responseData, fileName } = res.data;
+          clearInterval(interval);
+          setLoad(100);
 
-        const outputArray = responseData.map((row) => {
-          const obj = {};
-          headers.forEach((header, index) => {
-            if (header === "") {
-              obj[`_${index}`] = ""; // Assigning a placeholder for empty headers
-            } else {
-              obj[header] = row[index];
-            }
+          // Handle the file download
+          const blob = new Blob([res.data], {
+            type: res.headers["content-type"],
           });
-          return obj;
-        });
+          const url = window.URL.createObjectURL(blob);
 
-        // const fileName = res.data.fileName;
-        const parts = fileName.split(".");
-        const nameWithoutExtension = parts[0];
-        const finalFileName = `${nameWithoutExtension}_finder`;
-        const fileExtension = parts[parts.length - 1].toLowerCase();
+          // Create a link element to trigger the download
+          let fileName=data.file_upload.split('.')[0]+'_Gamalogic Finder Results'+'.'+data.file_upload.split('.')[1]
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download",fileName); // Use the file name from the backend
+          document.body.appendChild(link);
+          link.click();
 
-        switch (fileExtension) {
-          case "csv":
-            downloadCSV(outputArray, finalFileName);
-            break;
-          case "xlsx":
-            downloadExcel(outputArray, finalFileName, fileExtension);
-            break;
-          case "xls":
-            downloadExcel(outputArray, finalFileName, fileExtension);
-            break;
-          case "txt":
-            downloadText(outputArray, finalFileName);
-            break;
-          default:
-            toast.error("Unsupported file format for download.");
-            break;
+          // Clean up
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        } else {
+          console.log('second part')
+          let res = await axiosInstance.get(
+            `/downloadEmailFinderFile?batchId=${data.id}&alreadyDownloaded=${alreadyDownloaded}`
+          );
+          clearInterval(interval);
+          setLoad(100);
+          const { headers, data: responseData, fileName } = res.data;
+          console.log(headers, "headers");
+
+          const outputArray = responseData.map((row) => {
+            const obj = {};
+            headers.forEach((header, index) => {
+              if (header === "") {
+                obj[`_${index}`] = "";
+              } else {
+                obj[header] = row[index];
+              }
+            });
+            return obj;
+          });
+
+          console.log(outputArray, "output array ");
+          // const fileName = res.data.fileName;
+          const parts = fileName.split(".");
+          const nameWithoutExtension = parts[0];
+          const finalFileName = `${nameWithoutExtension}_Gamalogic Finder Results`;
+          const fileExtension = parts[parts.length - 1].toLowerCase();
+
+          switch (fileExtension) {
+            case "csv":
+              downloadCSV(outputArray, finalFileName);
+              break;
+            case "xlsx":
+              downloadExcel(outputArray, finalFileName, fileExtension);
+              break;
+            case "xls":
+              downloadExcel(outputArray, finalFileName, fileExtension);
+              break;
+            case "txt":
+              downloadText(outputArray, finalFileName);
+              break;
+            default:
+              toast.error("Unsupported file format for download.");
+              break;
+          }
         }
       } else {
         toast.error(

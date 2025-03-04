@@ -60,10 +60,14 @@ function QuickValidation() {
           if (trimmedEmail.length > 0) {
             setLoading(true);
             setLoad(30);
+            const interval = setInterval(() => {
+              setLoad((prev) => (prev < 90 ? prev + 4 : prev));
+            }, 1000);
             let res = await axiosInstance.post("/singleEmailValidator", {
               email,
             });
             setCreditBal(creditBal - 1);
+            clearInterval(interval);
             setLoad(100);
             setResult(res.data);
             setEmail("");

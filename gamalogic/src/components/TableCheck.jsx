@@ -36,12 +36,13 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
       }));
 
       const rowData = rows.map((row) => headers.map((header) => row[header]));
+      const tableData = [headers, ...rowData];
       const screenHeight = window.innerHeight;
 
       let minRow = rowData.length + 1000;
       if (!tableInstance) {
         const table = jspreadsheet(spreadsheetRef.current, {
-          data: rowData,
+          data: tableData,
           columns: dynamicColumns,
           tableOverflow: true,
           license: "MIT",
@@ -300,19 +301,21 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
         </div> */}
 
         {/* Buttons */}
-        <div className="flex  gap-2 text-sm">
+        <div className="flex gap-2 text-sm">
           <button
             onClick={handleCancel}
-            className="font-semibold w-32 h-8 rounded bg-red-500 text-white relative overflow-hidden group z-10 hover:text-white duration-1000"
+            className="font-semibold w-32 h-8 rounded overflow-hidden bg-red-500 text-white relative group z-10 hover:text-white duration-1000"
+            style={{ clipPath: "inset(0 0 0 0)" }} // Add clip-path to contain the animation
           >
-            <span className="absolute bg-red-600 w-36 h-28 rounded-full group-hover:scale-100 scale-0 -z-10 -left-2 -top-10 group-hover:duration-500 duration-700 origin-center transform transition-all"></span>
-            <span className="absolute bg-red-800 w-36 h-28 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>
+            <span className="absolute bg-red-600 w-36 h-24 rounded-full group-hover:scale-100 scale-0 -z-10 -left-2 -top-10 group-hover:duration-500 duration-700 origin-center transform transition-all"></span>
+            <span className="absolute bg-red-800 w-36 h-24 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>
             Cancel
           </button>
 
           <button
             onClick={handleUpload}
-            className="font-semibold w-32 h-8 rounded bg-emerald-600 text-white relative overflow-hidden group z-10 hover:text-white duration-1000"
+            className="font-semibold w-32 h-8 rounded overflow-hidden bg-emerald-600 text-white relative group z-10 hover:text-white duration-1000"
+            style={{ clipPath: "inset(0 0 0 0)" }} // Add clip-path to contain the animation
           >
             <span className="absolute bg-emerald-700 w-36 h-36 rounded-full group-hover:scale-100 scale-0 -z-10 -left-2 -top-10 group-hover:duration-500 duration-700 origin-center transform transition-all"></span>
             <span className="absolute bg-emerald-900 w-36 h-36 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>

@@ -43,7 +43,11 @@ function MoreDetails() {
       try {
         setLoading(true);
         setLoad(30);
+        const interval = setInterval(() => {
+          setLoad((prev) => (prev < 90 ? prev + 4 : prev));
+        }, 1000);
         let res = await axiosInstance.get("/getMoreDetails");
+        clearInterval(interval);
         setLoad(100);
         const fetchedData = res.data;
 
@@ -62,7 +66,7 @@ function MoreDetails() {
           pincode: fetchedData.pincode || "",
           tax_id: fetchedData.tax_id || "",
         });
-        setAccountType(fetchedData.is_personal == 1 ? "Personal" : "Company")
+        setAccountType(fetchedData.is_personal == 1 ? "Personal" : "Company");
         setPhoneCode(fetchedData.phone_country_code);
         let country = getCountry(fetchedData.country || "");
         setCountryid(country.code || "");
@@ -131,7 +135,10 @@ function MoreDetails() {
       toast.error("Last name is required.");
       return false;
     }
-    if (!moreDetails.phone_country_code||moreDetails.phone_country_code=='Select' ) {
+    if (
+      !moreDetails.phone_country_code ||
+      moreDetails.phone_country_code == "Select"
+    ) {
       toast.error("Please add the details");
       return false;
     }
@@ -139,7 +146,9 @@ function MoreDetails() {
       if (!moreDetails.phone_number) {
         toast.error("Phone number is required.");
       } else if (!/^\d+$/.test(moreDetails.phone_number)) {
-        toast.error("Phone number should contain only numbers, no special characters or spaces.");
+        toast.error(
+          "Phone number should contain only numbers, no special characters or spaces."
+        );
       } else {
         toast.error("Phone number should have at least 6 digits.");
       }
@@ -198,10 +207,14 @@ function MoreDetails() {
       }
       setLoading(true);
       setLoad(30);
+      const interval = setInterval(() => {
+        setLoad((prev) => (prev < 90 ? prev + 4 : prev));
+      }, 1000);
       setEditWait(true);
       let res = await axiosInstance.post("/updateMoreDetails", dataToSend);
       toast.success("Profile Data updated");
       setEdit(false);
+      clearInterval(interval);
       setLoad(100);
       setEditWait(false);
       const storedToken = localStorage.getItem("Gamalogic_token");
@@ -212,7 +225,7 @@ function MoreDetails() {
         } catch (error) {
           token = storedToken;
         }
-        token.name = dataToSend.firstname +" "+ dataToSend.lastname;
+        token.name = dataToSend.firstname + " " + dataToSend.lastname;
         localStorage.setItem("Gamalogic_token", JSON.stringify(token));
         setUserDetails(token);
       }

@@ -63,7 +63,11 @@ function EmailFinder() {
           if (domain && fullname) {
             setLoading(true);
             setLoad(30);
+            const interval = setInterval(() => {
+              setLoad((prev) => (prev < 90 ? prev + 4 : prev));
+            }, 1000);
             let res = await axiosInstance.post("/singleEmailFinder", data);
+            clearInterval(interval);
             setLoad(100);
             setCreditBal(creditBal - 10);
             setResult(res.data);

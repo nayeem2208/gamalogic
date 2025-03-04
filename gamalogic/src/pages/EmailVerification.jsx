@@ -233,9 +233,13 @@ function EmailVerification() {
       if (data.processed == 100) {
         setLoading(true);
         setLoad(30);
+        const interval = setInterval(() => {
+          setLoad((prev) => (prev < 90 ? prev + 4 : prev));
+        }, 1000);
         let res = await axiosInstance.get(
           `/downloadEmailVerificationFile?batchId=${data.id}`
         );
+        clearInterval(interval);
         setLoad(100);
         const outputArray = res.data.datas.gamalogic_emailid_vrfy
           .filter((obj) => obj.emailid !== "emailid")
@@ -375,13 +379,17 @@ function EmailVerification() {
       if (JsonToServer.emails.length <= creditBal) {
         setLoading(true);
         setLoad(30);
+        const interval = setInterval(() => {
+          setLoad((prev) => (prev < 90 ? prev + 4 : prev));
+        }, 1000);
         setShowAlert(false);
         let results = JsonToServer;
         const response = await axiosInstance.post(
           "/batchEmailVerification",
           results
         );
-        if ((response.status, "response.statusssssssssssssss")) setLoad(100);
+        clearInterval(interval);
+        if ((response.status)) setLoad(100);
         setCreditBal(creditBal - JsonToServer.emails.length);
         setMessage(response.data.message);
         toast.success(response.data.message);

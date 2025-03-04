@@ -107,6 +107,9 @@ function AccountSettings() {
       }
       setLoading(true);
       setLoad(30);
+      const interval = setInterval(() => {
+        setLoad((prev) => (prev < 90 ? prev + 4 : prev));
+      }, 1000);
       let response = await axiosInstance.post("/changePassword", passwordData);
       if (response.data.googleUser == 1) {
         const storedToken = localStorage.getItem("Gamalogic_token");
@@ -122,6 +125,7 @@ function AccountSettings() {
           setUserDetails(token);
         }
       }
+      clearInterval(interval);
       setLoad(100);
       toast.success("Password succesfully updated");
       setPasswordData({
