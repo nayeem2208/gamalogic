@@ -595,9 +595,9 @@ let APIControllers = {
           },
         }
       );
-      if(response.data){
+      if (response.data) {
         console.log('inside response .data')
-      await dbConnection.query(`UPDATE useractivity_batch_finder_link SET save_file_upload='${response.data}' WHERE id='${batchId}'`);
+        await dbConnection.query(`UPDATE useractivity_batch_finder_link SET save_file_upload='${response.data}' WHERE id='${batchId}'`);
       }
     } catch (error) {
       console.log(error)
@@ -615,13 +615,13 @@ let APIControllers = {
       if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
       }
-      console.log(req.file.buffer,'reqqqqqqqqqqq')
+      console.log(req.file.buffer, 'reqqqqqqqqqqq')
       const formData = new FormData();
       formData.append('file', streamifier.createReadStream(req.file.buffer), {
         filename: req.file.originalname,
         contentType: req.file.mimetype,
       });
-      console.log(req.user[0][0].api_key,'req.userrrrrrrrrr')
+      console.log(req.user[0][0].api_key, 'req.userrrrrrrrrr')
       const response = await axios.post(
         `http://service.gamalogic.com/dashboard-file-upload?is_dashboard=1&apikey=${req.user[0][0].api_key}`,
         formData,
@@ -631,7 +631,7 @@ let APIControllers = {
           },
         }
       );
-      console.log(response,'response from api')
+      console.log(response, 'response from api')
       res.json(response.data);
     } catch (error) {
       console.log(error);
@@ -679,7 +679,7 @@ let APIControllers = {
       } else {
         apiKey = req.user[0][0].api_key;
       }
-      console.log(req.query.alreadyDownloaded,typeof(req.query.alreadyDownloaded),'already downloaded')
+      console.log(req.query.alreadyDownloaded, typeof (req.query.alreadyDownloaded), 'already downloaded')
       let fileToDownload = await req.dbConnection.query(`SELECT file_upload,save_file_upload from useractivity_batch_finder_link where id='${req.query.batchId}'`)
       let fileUpload = fileToDownload[0][0].save_file_upload || fileToDownload[0][0].file_upload
       if (req.query.alreadyDownloaded == 'true') {
@@ -754,7 +754,7 @@ let APIControllers = {
             let remarks = "";
             if (isCatchall == 1) {
               remarks = "Catch all Address";
-            } else if (isCatchall == 0 && email != '0') {
+            } else if (isCatchall == 0 && email != '') {
               remarks = "Valid Address";
             } else {
               remarks = "";
