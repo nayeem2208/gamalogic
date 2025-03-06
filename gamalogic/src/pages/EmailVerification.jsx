@@ -713,7 +713,7 @@ function EmailVerification() {
 
               <p className="mt-4 text-gray-600">
                 Generating the data might take some time due to its size (
-                {JsonToServer.emails.length} records). Are you sure you want to
+                {JsonToServer.data.length} records). Are you sure you want to
                 proceed?{" "}
               </p>
 

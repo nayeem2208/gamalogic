@@ -37,7 +37,7 @@ router.post('/singleEmailFinder',dbMiddleware,authcheck,APIControllers.FindSingl
 
 //file based email validation
 router.get('/getAllUploadedEmailValidationFiles',dbMiddleware,authcheck,APIControllers.getAlreadyCheckedBatchEmailFiles)
-router.post('/batchEmailVerification',dbMiddleware,authcheck,APIControllers.batchEmailValidation)
+router.post('/batchEmailVerification',upload.single('file'),dbMiddleware,authcheck,APIControllers.batchEmailValidation)
 router.get('/getBatchStatus',dbMiddleware,APIDecode,APIControllers.batchEmailStatus)
 router.get('/downloadEmailVerificationFile',dbMiddleware,authcheck,APIControllers.downloadEmailVerificationFile)
 router.get('/validatoinfilesSearch',dbMiddleware,authcheck,APIControllers.searchValidationFiles)
