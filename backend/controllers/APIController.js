@@ -517,6 +517,8 @@ let APIControllers = {
               status = "Valid Address";
             } else if (matchedDomain.message == 'Not Valid ID') {
               status = "Not Valid Address";
+            } else if (matchedDomain.message == 'Catch all ID') {
+              status = 'Catch All Address'
             } else {
               status = "Unknown";
             }
