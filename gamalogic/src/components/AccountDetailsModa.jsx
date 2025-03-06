@@ -62,7 +62,7 @@ function AccountDetailsModal({ isOpen }) {
           pincode: fetchedData.pincode || "",
           tax_id: fetchedData.tax_id || "",
         });
-        setAccountType(fetchedData.is_personal == 1 ? "Personal" : "Company")
+        setAccountType(fetchedData.is_personal == 1 ? "Personal" : "Company");
         setPhoneCode(fetchedData.phone_country_code);
         let country = getCountry(fetchedData.country || "");
         setCountryid(country.code || "");
@@ -95,7 +95,7 @@ function AccountDetailsModal({ isOpen }) {
     setCountryid(selectedCountryCode);
     const states = getStates(selectedCountryCode);
     setStateList(states);
-    setStateid(""); 
+    setStateid("");
   };
 
   const handleStateChange = (e) => {
@@ -120,27 +120,31 @@ function AccountDetailsModal({ isOpen }) {
     const trimmedAddress = moreDetails.address_line_1.trim();
 
     if (!moreDetails.title) {
-      toast.error("Please add the details");
+      toast.error("Please select a title.");
       return false;
     }
     if (!moreDetails.firstname || !trimmedfirstname) {
-      toast.error("Please add the details");
-
+      toast.error("Please enter your first name.");
       return false;
     }
     if (!moreDetails.lastname || !trimmedlastname) {
-      toast.error("Please add the details");
+      toast.error("Please enter your last name.");
       return false;
     }
-    if (!moreDetails.phone_country_code||moreDetails.phone_country_code=='Select' ) {
-      toast.error("Please add the details");
+    if (
+      !moreDetails.phone_country_code ||
+      moreDetails.phone_country_code === "Select"
+    ) {
+      toast.error("Please select a phone country code.");
       return false;
     }
     if (!/^\d{6,}$/.test(moreDetails.phone_number)) {
       if (!moreDetails.phone_number) {
         toast.error("Phone number is required.");
       } else if (!/^\d+$/.test(moreDetails.phone_number)) {
-        toast.error("Phone number should contain only numbers, no special characters or spaces.");
+        toast.error(
+          "Phone number should contain only numbers, no special characters or spaces."
+        );
       } else {
         toast.error("Phone number should have at least 6 digits.");
       }
@@ -150,33 +154,36 @@ function AccountDetailsModal({ isOpen }) {
       (accountType === "Company" && !moreDetails.company_name) ||
       (accountType === "Company" && !trimmdcompanyName)
     ) {
-      toast.error("Please add the details");
+      toast.error("Please enter your company name.");
       return false;
     }
     if (!moreDetails.address_line_1 || !trimmedAddress) {
-      toast.error("Please add the details");
+      toast.error("Please enter your address.");
       return false;
     }
     if (!moreDetails.city) {
-      toast.error("Please add the details");
+      toast.error("Please enter your city.");
       return false;
     }
     if (!moreDetails.pincode) {
-      toast.error("Please add the details");
+      toast.error(
+        countryid === "in"
+          ? "Please enter your pincode."
+          : " Please enter your Zip Code."
+      );
       return false;
     }
     if (!countryid) {
-      toast.error("Please add the details");
+      toast.error("Please select your country.");
       return false;
     }
     if (stateList.length > 0 && !stateid) {
-      toast.error("Please add the details");
+      toast.error("Please select your state.");
       return false;
     }
 
     return true;
   };
-
 
   const handleUpdateData = async (e) => {
     e.preventDefault();
@@ -207,9 +214,9 @@ function AccountDetailsModal({ isOpen }) {
         } catch (error) {
           token = storedToken;
         }
-        token.name = dataToSend.firstname +' '+ dataToSend.lastname;
+        token.name = dataToSend.firstname + " " + dataToSend.lastname;
         token.accountDetailsModal = false;
-        token.accountDetailsModalInBuyCredits=false
+        token.accountDetailsModalInBuyCredits = false;
         localStorage.setItem("Gamalogic_token", JSON.stringify(token));
         setUserDetails(token);
       }
@@ -257,7 +264,8 @@ function AccountDetailsModal({ isOpen }) {
               Please fill in your account details to ensure a smooth experience.
               This information will help us personalize your account and comply
               with relevant regulations. Fields marked with an asterisk (
-              <FaStarOfLife className="text-red-500 inline w-[6px] h-[6px] mb-1"/>) are mandatory.
+              <FaStarOfLife className="text-red-500 inline w-[6px] h-[6px] mb-1" />
+              ) are mandatory.
             </p>
             <div className="flex flex-wrap justify-center md:flex md:flex-nowrap  w-full md:w-full ">
               <div>
@@ -519,7 +527,7 @@ function AccountDetailsModal({ isOpen }) {
               type="submit"
               onClick={handleUpdateData}
             >
-               SAVE BILLING INFORMATION
+              SAVE BILLING INFORMATION
             </button>
           </div>
         </div>

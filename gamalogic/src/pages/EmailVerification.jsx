@@ -26,6 +26,7 @@ import AddFileForFirstTime from "../components/File/AddFileForFirstTime";
 import DragAndDropBackground from "../components/File/DragAndDropBackground";
 import AddFileInRowView from "../components/File/AddFileInRowView";
 import FileRowViewListing from "../components/File/FileRowView";
+import ValidationSpreadsheet from "../components/EmailVerificationTable";
 
 function EmailVerification() {
   let [message, setMessage] = useState("");
@@ -44,12 +45,12 @@ function EmailVerification() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [dragging, setDragging] = useState(false);
+  const [spreadSheet, setSpreadSheet] = useState(false);
 
   const isCheckingCompletion = useRef(false);
   let { userDetails, setCreditBal, creditBal } = useUserState();
   const location = useLocation();
   const navigate = useNavigate();
-
 
   useEffect(() => {
     if (APP == "beta") {
@@ -59,12 +60,11 @@ function EmailVerification() {
     }
     fetchAllFiles(pageIndex);
     const fileFromDashboard = location.state?.file;
-    if(fileFromDashboard){
+    if (fileFromDashboard) {
       const fakeEvent = { target: { files: [fileFromDashboard] } };
       handleFileChange(fakeEvent);
       navigate(location.pathname, { replace: true });
     }
-
   }, []);
 
   useEffect(() => {
@@ -232,55 +232,85 @@ function EmailVerification() {
     try {
       if (data.processed == 100) {
         setLoading(true);
+        let alreadyDownloaded = data.is_downloaded == 1 ? true : false;
         setLoad(30);
         const interval = setInterval(() => {
           setLoad((prev) => (prev < 90 ? prev + 4 : prev));
         }, 1000);
-        let res = await axiosInstance.get(
-          `/downloadEmailVerificationFile?batchId=${data.id}`
-        );
-        clearInterval(interval);
-        setLoad(100);
-        const outputArray = res.data.datas.gamalogic_emailid_vrfy
-          .filter((obj) => obj.emailid !== "emailid")
-          .map((obj) => {
-            let status = "";
-            if (obj.is_catchall) {
-              status = "Catchall";
-            } else if (obj.is_unknown) {
-              status = "Unknown";
-            } else if (obj.is_valid) {
-              status = "Valid Address";
-            } else {
-              status = "Not Valid Address";
-            }
+        if (alreadyDownloaded) {
+          console.log("first part ");
+          let res = await axiosInstance.get(
+            `/downloadEmailVerificationFile?batchId=${data.id}&alreadyDownloaded=${alreadyDownloaded}`,
+            { responseType: "blob" }
+          );
 
-            return {
-              emailid: obj.emailid,
-              status: status,
-            };
+          clearInterval(interval);
+          setLoad(100);
+
+          // Handle the file download
+          const blob = new Blob([res.data], {
+            type: res.headers["content-type"],
           });
-        const fileName = res.data.fileName;
-        const parts = fileName.split(".");
-        const nameWithoutExtension = parts[0];
-        const finalFileName = `${nameWithoutExtension}_verified`;
-        const fileExtension = parts[parts.length - 1].toLowerCase();
-        switch (fileExtension) {
-          case "csv":
-            downloadCSV(outputArray, finalFileName);
-            break;
-          case "xlsx":
-            downloadExcel(outputArray, finalFileName, fileExtension);
-            break;
-          case "xls":
-            downloadExcel(outputArray, finalFileName, fileExtension);
-            break;
-          case "txt":
-            downloadText(outputArray, finalFileName);
-            break;
-          default:
-            toast.error("Unsupported file format for download.");
-            break;
+          const url = window.URL.createObjectURL(blob);
+
+          // Create a link element to trigger the download
+          let fileName =
+            data.file_upload.split(".")[0] +
+            "Gamalogic validation results" +
+            "." +
+            data.file_upload.split(".")[1];
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", fileName); // Use the file name from the backend
+          document.body.appendChild(link);
+          link.click();
+
+          // Clean up
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        } else {
+          let res = await axiosInstance.get(
+            `/downloadEmailVerificationFile?batchId=${data.id}&alreadyDownloaded=${alreadyDownloaded}`
+          );
+          clearInterval(interval);
+          setLoad(100);
+          const { headers, data: responseData, fileName } = res.data;
+          console.log(headers, "headers");
+
+          const outputArray = responseData.map((row) => {
+            const obj = {};
+            headers.forEach((header, index) => {
+              if (header === "") {
+                obj[`_${index}`] = "";
+              } else {
+                obj[header] = row[index];
+              }
+            });
+            return obj;
+          });
+
+          console.log(outputArray, "output array ");
+          const parts = fileName.split(".");
+          const nameWithoutExtension = parts[0];
+          const finalFileName = `${nameWithoutExtension}_Gamalogic validation results`;
+          const fileExtension = parts[parts.length - 1].toLowerCase();
+          switch (fileExtension) {
+            case "csv":
+              downloadCSV(outputArray, finalFileName);
+              break;
+            case "xlsx":
+              downloadExcel(outputArray, finalFileName, fileExtension);
+              break;
+            case "xls":
+              downloadExcel(outputArray, finalFileName, fileExtension);
+              break;
+            case "txt":
+              downloadText(outputArray, finalFileName);
+              break;
+            default:
+              toast.error("Unsupported file format for download.");
+              break;
+          }
         }
       } else {
         toast.error(
@@ -375,107 +405,14 @@ function EmailVerification() {
 
   const handleAccept = async (e) => {
     e.preventDefault();
-    try {
-      if (JsonToServer.emails.length <= creditBal) {
-        setLoading(true);
-        setLoad(30);
-        const interval = setInterval(() => {
-          setLoad((prev) => (prev < 90 ? prev + 4 : prev));
-        }, 1000);
-        setShowAlert(false);
-        let results = JsonToServer;
-        const response = await axiosInstance.post(
-          "/batchEmailVerification",
-          results
-        );
-        clearInterval(interval);
-        if ((response.status)) setLoad(100);
-        setCreditBal(creditBal - JsonToServer.emails.length);
-        setMessage(response.data.message);
-        toast.success(response.data.message);
-        const formatDate = (dateTimeString, userTimeZone) => {
-          try {
-            const date =
-              typeof dateTimeString === "string"
-                ? new Date(dateTimeString)
-                : dateTimeString;
-
-            const timeZone = userTimeZone || "America/New_York";
-
-            const formatter = new Intl.DateTimeFormat("en-US", {
-              timeZone: timeZone,
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-              hour12: false,
-            });
-
-            const formattedDate = formatter.format(date);
-
-            return formattedDate.replace(",", "");
-          } catch (error) {
-            console.error("Error formatting date:", error);
-            return null;
-          }
-        };
-        setResultFile((prevResultFiles) => [
-          {
-            ...response.data.files,
-            processed: 0,
-            formattedDate: formatDate(
-              response.data.files.date_time,
-              userDetails.timeZone
-            ),
-          },
-          ...prevResultFiles,
-        ]);
-        setFilesStatus((prevResultFiles) => [
-          {
-            ...response.data.files,
-            processed: 0,
-            formattedDate: formatDate(
-              response.data.files.date_time,
-              userDetails.timeZone
-            ),
-          },
-          ...prevResultFiles,
-        ]);
-      } else {
-        setShowAlert(false);
-        toast.error("You dont have enough credits to do this");
-      }
-    } catch (error) {
-      console.log(error, "error");
-      if (error.response.status === 500) {
-        async function errorHandler() {
-          let res = await clickUpAttachment(
-            fileForClickUp,
-            realFile,
-            error.response.data.errorREsponse.id
-          );
-        }
-        errorHandler();
-        setServerError(true);
-      } else if (
-        error.response.status === 400 &&
-        error.response.data.errorREsponse
-      ) {
-        async function errorHandler() {
-          let res = await clickUpAttachment(
-            fileForClickUp,
-            realFile,
-            error.response.data.errorREsponse.id
-          );
-        }
-        errorHandler();
-        toast.error(error.response?.data?.error);
-      } else {
-        toast.error(error.response?.data?.error);
-      }
-      setLoading(false);
+    if (JsonToServer.data.length <= creditBal) {
+      setLoading(true);
+      // setLoad(30);
+      setShowAlert(false);
+      setSpreadSheet(true);
+    } else {
+      setShowAlert(false);
+      toast.error("You dont have enough credits to do this");
     }
   };
 
@@ -586,12 +523,143 @@ function EmailVerification() {
       handleFileChange(fakeEvent);
     }
   };
+
+  const handleMappingColumns = (data) => {
+    try {
+      setShowAlert(false);
+      setLoad(30);
+      const interval = setInterval(() => {
+        setLoad((prev) => (prev < 90 ? prev + 4 : prev));
+      }, 1000);
+      console.log(data, "data");
+      const transformedData = JsonToServer.data
+        .map((item) => ({
+          emailid: item[data.emailField[0]],
+        }))
+        .filter((item) => item.emailid);
+  
+      let results = JsonToServer;
+      results.data = transformedData;
+      console.log(results, fileForClickUp, "transformed Data");
+  
+      async function BatchEmailVerification() {
+        const formData = new FormData();
+        formData.append("file", fileForClickUp);
+        formData.append("results", JSON.stringify(results));
+        console.log(formData, "formData");
+        const response = await axiosInstance.post(
+          "/batchEmailVerification",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        clearInterval(interval);
+        setLoad(100);
+        setCreditBal(creditBal - JsonToServer.data.length);
+        setMessage(response.data.message);
+        toast.success(response.data.message);
+        const formatDate = (dateTimeString, userTimeZone) => {
+          try {
+            const date =
+              typeof dateTimeString === "string"
+                ? new Date(dateTimeString)
+                : dateTimeString;
+  
+            const timeZone = userTimeZone || "America/New_York";
+  
+            const formatter = new Intl.DateTimeFormat("en-US", {
+              timeZone: timeZone,
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              hour12: false,
+            });
+  
+            const formattedDate = formatter.format(date);
+  
+            return formattedDate.replace(",", "");
+          } catch (error) {
+            console.error("Error formatting date:", error);
+            return null;
+          }
+        };
+        setResultFile((prevResultFiles) => [
+          {
+            ...response.data.files,
+            processed: 0,
+            formattedDate: formatDate(
+              response.data.files.date_time,
+              userDetails.timeZone
+            ),
+          },
+          ...prevResultFiles,
+        ]);
+        setFilesStatus((prevResultFiles) => [
+          {
+            ...response.data.files,
+            processed: 0,
+            formattedDate: formatDate(
+              response.data.files.date_time,
+              userDetails.timeZone
+            ),
+          },
+          ...prevResultFiles,
+        ]);
+      }
+  
+      BatchEmailVerification();
+      setSpreadSheet(false);
+  
+    } catch (error) {
+      console.log(error, "error");
+      if (error.response.status === 500) {
+        async function errorHandler() {
+          let res = await clickUpAttachment(
+            fileForClickUp,
+            realFile,
+            error.response.data.errorREsponse.id
+          );
+        }
+        errorHandler();
+        setServerError(true);
+      } else if (
+        error.response.status === 400 &&
+        error.response.data.errorREsponse
+      ) {
+        async function errorHandler() {
+          let res = await clickUpAttachment(
+            fileForClickUp,
+            realFile,
+            error.response.data.errorREsponse.id
+          );
+        }
+        errorHandler();
+        toast.error(error.response?.data?.error);
+      } else {
+        toast.error(error.response?.data?.error);
+      }
+      setLoading(false);
+    }
+  };
+
+  const handleMappingCancel = () => {
+    setSpreadSheet(false);
+    setJsonToServer(null);
+    setLoad(100);
+    setLoading(false);
+  };
   if (serverError) {
     return <ServerError />;
   }
   return (
     <div
-      className="px-6 md:px-10 2xl:px-20  py-8 text-center sm:text-left h-screen overflow-auto"
+      className="text-center sm:text-left h-screen overflow-auto"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -612,9 +680,10 @@ function EmailVerification() {
           )
         }
         scrollableTarget="scrollableDiv"
+        className="px-6 md:px-10 2xl:px-20  pt-8 pb-3 "
       >
         <SubHeader SubHeader={"Upload your file"} />
-        <form className="mt-8 sm:mt-14 subHeading flex flex-col sm:flex-none justify-center items-center sm:justify-start sm:items-start">
+        <form className="mt-8 sm:mt-8 subHeading flex flex-col sm:flex-none justify-center items-center sm:justify-start sm:items-start">
           {showAlert && (
             <div
               role="alert"
@@ -665,6 +734,7 @@ function EmailVerification() {
               </div>
             </div>
           )}
+          {!spreadSheet && (
           <div className="flex flex-col md:flex-row items-center justify-between w-full">
             <h3>Upload Your File Here | Email Validation</h3>
 
@@ -687,7 +757,7 @@ function EmailVerification() {
                 </div>
               )}
             </div>
-          </div>
+          </div>)}
         </form>
         {loading && (
           <LoadingBar
@@ -696,8 +766,11 @@ function EmailVerification() {
             onLoaderFinished={() => {}}
           />
         )}
-        {(!tileView &&resultFile.length>0) && <AddFileInRowView onUpload={handleFileChange} />}
+        {!tileView && resultFile.length > 0 && !spreadSheet && (
+          <AddFileInRowView onUpload={handleFileChange} />
+        )}
         {resultFile.length > 0 &&
+        !spreadSheet && 
           (tileView ? (
             searchQuery.length > 0 ? (
               filteredFiles.length > 0 ? (
@@ -737,10 +810,17 @@ function EmailVerification() {
               onUpload={handleFileChange}
             />
           ))}
-        {resultFile.length == 0 && !loading && (
+        {resultFile.length == 0 && !loading && !spreadSheet && (
           <AddFileForFirstTime onUpload={handleFileChange} />
         )}
       </InfiniteScroll>
+      {spreadSheet && (
+        <ValidationSpreadsheet
+          jsonData={JsonToServer}
+          onUpload={handleMappingColumns}
+          onCancel={handleMappingCancel}
+        />
+      )}
     </div>
   );
 }

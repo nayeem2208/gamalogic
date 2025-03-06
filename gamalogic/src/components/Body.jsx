@@ -46,8 +46,9 @@ function Body() {
         window.ztUserData["signInPage"] = `${
           import.meta.env.VITE_FRONTEND_URL
         }/signin`;
-
+        console.log('ivda ethanind')
         if (!document.getElementById("thrive_script")) {
+          console.log('ivddeeeeem ethi')
           // window.reloadThriveWidget();
           const thriveScript = document.createElement("script");
           thriveScript.id = "thrive_script";

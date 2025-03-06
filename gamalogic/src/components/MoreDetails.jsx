@@ -128,18 +128,18 @@ function MoreDetails() {
       return false;
     }
     if (!moreDetails.firstname || !trimmedfirstname) {
-      toast.error("First name is required.");
+      toast.error("Please enter your first name.");
       return false;
     }
     if (!moreDetails.lastname || !trimmedlastname) {
-      toast.error("Last name is required.");
+      toast.error("Please enter your last name.");
       return false;
     }
     if (
       !moreDetails.phone_country_code ||
       moreDetails.phone_country_code == "Select"
     ) {
-      toast.error("Please add the details");
+      toast.error("Please select a phone country code.");
       return false;
     }
     if (!/^\d{6,}$/.test(moreDetails.phone_number)) {
@@ -158,29 +158,29 @@ function MoreDetails() {
       (accountType === "Company" && !moreDetails.company_name) ||
       (accountType === "Company" && !trimmdcompanyName)
     ) {
-      toast.error("Company name is required for Company account type.");
+      toast.error("Please enter your company name.");
       return false;
     }
     if (!moreDetails.address_line_1 || !trimmedAddress) {
-      toast.error("Address line 1 is required.");
+      toast.error("Please enter your address.");
       return false;
     }
     if (!moreDetails.city) {
-      toast.error("City is required.");
+      toast.error("Please enter your city.");
       return false;
     }
     if (!moreDetails.pincode) {
       toast.error(
-        countryid === "in" ? "Pincode is required." : "Zip Code is required."
+        countryid === "in" ? "Please enter your pincode." : " Please enter your Zip Code."
       );
       return false;
     }
     if (!countryid) {
-      toast.error("Country is required.");
+      toast.error("Please select your country.");
       return false;
     }
     if (stateList.length > 0 && !stateid) {
-      toast.error("State is required.");
+      toast.error("Please select your state.");
       return false;
     }
 

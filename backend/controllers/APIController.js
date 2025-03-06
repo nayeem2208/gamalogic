@@ -270,8 +270,17 @@ let APIControllers = {
   batchEmailValidation: async (req, res) => {
     try {
       const dbConnection = req.dbConnection;
-      const { emails, fileName } = req.body;
+
+      const results = JSON.parse(req.body.results);
+      console.log(results, 'resultsssss')
+      const { data, fileName } = results
+      let emails = data
+      console.log(emails, 'emails')
+      console.log(req.file, 'req.fileeeeeeeeeeeeeeeee')
       let apiKey
+      let batchId
+      let response
+      let files
       if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
         let [admin] = await dbConnection.query(`SELECT api_key,credits,credits_free,free_final FROM registration WHERE rowid = ${req.user[0][0].team_id}`);
         apiKey = admin[0].api_key;
@@ -279,15 +288,16 @@ let APIControllers = {
         let finalFreeDate = new Date(admin[0].free_final);
         let currentDate = new Date();
         if ((admin[0].credits + admin[0].credits_free >= emails.length && finalFreeDate > currentDate) || (admin[0].credits >= emails.length)) {
-          const data = {
+          const dataStructure = {
             gamalogic_emailid_vrfy: emails,
           };
-          let response = await axios.post(
+          response = await axios.post(
             `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}&team_member_api_key=${memberKey}`,
-            data
+            dataStructure
           );
+          batchId = response.data['batch id']
           if (response.data.error !== undefined && response.data.error == false) {
-            let files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
+            files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
             let content = `<p>This is to inform you that the batch email verification process for the file ${fileName} has been started.</p>
           <p>Please note that the verification process may take some time depending on the size of the file and the number of emails to be verified.</p>
           <p>Thank you for using our service.</p>
@@ -302,7 +312,7 @@ let APIControllers = {
               "Batch Email Verification Started",
               basicTemplate(req.user[0][0].username, content)
             );
-            res.status(200).json({ message: response.data.message, files: files[0][0] });
+            // res.status(200).json({ message: response.data.message, files: files[0][0] });
           } else {
             const errorMessage = Object.values(response.data)[0];
             let errorREsponse = await ErrorHandler("batchEmailValidation Controller", errorMessage, req);
@@ -316,15 +326,17 @@ let APIControllers = {
         let finalFreeDate = new Date(req.user[0][0].free_final);
         let currentDate = new Date();
         if ((req.user[0][0].credits + req.user[0][0].credits_free >= emails.length && finalFreeDate > currentDate) || (req.user[0][0].credits >= emails.length)) {
-          const data = {
+          const dataStructure = {
             gamalogic_emailid_vrfy: emails,
           };
-          let response = await axios.post(
+          response = await axios.post(
             `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}`,
-            data
+            dataStructure
           );
+          console.log(response, 'response from batch email')
+          batchId = response.data['batch id']
           if (response.data.error !== undefined && response.data.error == false) {
-            let files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
+            files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
             let content = `<p>This is to inform you that the batch email verification process for the file ${fileName} has been started.</p>
           <p>Please note that the verification process may take some time depending on the size of the file and the number of emails to be verified.</p>
           <p>Thank you for using our service.</p>
@@ -339,7 +351,7 @@ let APIControllers = {
               "Batch Email Verification Started",
               basicTemplate(req.user[0][0].username, content)
             );
-            res.status(200).json({ message: response.data.message, files: files[0][0] });
+            // res.status(200).json({ message: response.data.message, files: files[0][0] });
           } else {
             const errorMessage = Object.values(response.data)[0];
             let errorREsponse = await ErrorHandler("batchEmailValidation Controller", errorMessage, req);
@@ -349,6 +361,30 @@ let APIControllers = {
           res.status(400).json({ error: 'You dont have enough to do this' });
         }
       }
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+      const formData = new FormData();
+      formData.append('file', streamifier.createReadStream(req.file.buffer), {
+        filename: req.file.originalname,
+        contentType: req.file.mimetype,
+      });
+      const fileUpload = await axios.post(
+        `http://service.gamalogic.com/dashboard-file-upload?is_dashboard=1&apikey=${apiKey}&application=uploadverify&batchId=${batchId}`,
+        formData,
+        {
+          headers: {
+            ...formData.getHeaders(),
+          },
+        }
+      );
+      console.log('response from file upload of verification ', fileUpload)
+      if (fileUpload.data) {
+        console.log('inside response .data')
+        await dbConnection.query(`UPDATE useractivity_batch_link SET save_upload_file='${fileUpload.data}' WHERE id='${batchId}'`);
+      }
+      console.log(response, 'respone for uploading verification file')
+      res.status(200).json({ message: response.data.message, files: files[0][0] });
 
     } catch (error) {
       console.log(error);
@@ -400,11 +436,158 @@ let APIControllers = {
       } else {
         apiKey = req.user[0][0].api_key;
       }
-      let download = await axios.get(
-        `https://gamalogic.com/batchresult/?apikey=${apiKey}&batchid=${req.query.batchId}`
-      );
-      let fileName = await req.dbConnection.query(`SELECT file_upload from useractivity_batch_link where id='${req.query.batchId}'`)
-      res.status(200).json({ datas: download.data, fileName: fileName[0][0].file_upload });
+      let fileToDownload = await req.dbConnection.query(`SELECT file_upload,save_upload_file from useractivity_batch_link where id='${req.query.batchId}'`)
+      let fileUpload = fileToDownload[0][0].save_upload_file || fileToDownload[0][0].file_upload
+      if (req.query.alreadyDownloaded == 'true') {
+        try {
+          console.log('first part ')
+          // verdheoruError
+          const fileUrl = `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&application=verified&batchid=${req.query.batchId}&filename=${fileUpload}`;
+          const response = await axios.get(fileUrl, { responseType: 'stream' });
+          let fileName = fileUpload
+          res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+          res.setHeader('Content-Type', response.headers['content-type']);
+          response.data.pipe(res);
+        } catch (error) {
+          console.error('Error downloading file:', error);
+          ErrorHandler("downloadEmailValidation Already Download  Controller", error, req);
+          res.status(500).json({ error: 'Failed to download file' });
+        }
+      }
+      else {
+        try {
+          let download = await axios.get(
+            `https://gamalogic.com/batchresult/?apikey=${apiKey}&batchid=${req.query.batchId}`
+          );
+          console.log(download.data, 'downloadddddddddd')
+          let fileName = fileUpload.split('.')[0] + '_' + req.query.batchId + '.' + fileUpload.split('.')[1]
+          console.log(fileName, 'fileNamee')
+          let NewDownload = await axios.get(
+            `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&batchid=${req.query.batchId}&filename=${fileUpload}&application=uploadverify`, { responseType: 'arraybuffer' }
+          );
+          console.log(NewDownload, 'new Download')
+          let extention = fileUpload.split('.')[1]
+          const validationData = download.data.gamalogic_emailid_vrfy;
+          let uploadedFileData = []
+          if (extention === 'csv' || extention === 'txt') {
+            const fileContent = NewDownload.data.toString('utf-8');
+            uploadedFileData = Papa.parse(fileContent, {
+              header: true,
+              skipEmptyLines: true
+            }).data;
+          } else if (extention === 'xls' || extention === 'xlsx') {
+            const workbook = XLSX.read(NewDownload.data, { type: 'buffer' });
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+
+            uploadedFileData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            // Separate headers and data
+            const [headers, ...dataRows] = uploadedFileData;
+            uploadedFileData = dataRows.map(row => {
+              const rowData = {};
+              headers.forEach((header, index) => {
+                rowData[header] = row[index] || '';
+              });
+              return rowData;
+            });
+          } else {
+            throw new Error('Unsupported file format');
+          }
+          const headers = Object.keys(uploadedFileData[0]);
+
+          const updatedData = uploadedFileData.map(record => {
+            let values
+            if (extention == 'txt') {
+              const recordValue = Object.values(record)[0];
+              values = recordValue
+            } else {
+              values = Object.values(record)
+            }
+            // console.log(values,'validation and upload file data uploaded file Data')
+            const matchedDomain = validationData.find(
+              item => values.includes(item.emailid)
+            );
+
+            console.log(matchedDomain, 'matchDomain ')
+            // const email = matchedDomain && matchedDomain.email_address !== '0' ? matchedDomain.email_address : '';
+            // const isCatchall = matchedDomain ? matchedDomain.is_catchall : '0';
+            let status = "";
+            if (matchedDomain.message == 'Valid ID') {
+              status = "Valid Address";
+            } else if (matchedDomain.message == 'Not Valid ID') {
+              status = "Not Valid Address";
+            } else {
+              status = "Unknown";
+            }
+
+
+            const row = headers.map(header => record[header] || '');
+            // row.push(email)
+            row.push(status);
+
+            return row;
+          });
+          const resultHeaders = [
+            ...headers,
+            // "email",
+            "status"
+          ];
+          const finalData = [...resultHeaders, ...updatedData];
+          const DataForFileCreation = [resultHeaders, ...updatedData]
+          console.log(DataForFileCreation, 'data for file creation ')
+          let newFileName = `${fileUpload}`;
+          let filePath = path.join(__dirname, '..', 'temp', newFileName);
+
+          if (!fs.existsSync(path.join(__dirname, '..', 'temp'))) {
+            fs.mkdirSync(path.join(__dirname, '..', 'temp'), { recursive: true });
+          }
+
+          // Create the file based on the extension
+          if (extention === 'csv' || extention === 'txt') {
+            const csvData = Papa.unparse(DataForFileCreation);
+            fs.writeFileSync(filePath, csvData);
+          } else if (extention === 'xls' || extention === 'xlsx') {
+            const worksheet = XLSX.utils.aoa_to_sheet(DataForFileCreation);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+            XLSX.writeFile(workbook, filePath);
+          }
+
+          // Send the new file to another API
+          const fileStream = fs.createReadStream(filePath);
+          const formData = new FormData();
+          formData.append('file', fileStream, {
+            filename: newFileName,
+            contentType: `application/${extention}`,
+          });
+
+          const response = await axios.post(
+            `http://service.gamalogic.com/dashboard-file-upload?is_dashboard=1&apikey=${apiKey}&application=verified&batchId=${req.query.batchId}&filename=${fileUpload}`,
+            formData,
+            {
+              headers: {
+                ...formData.getHeaders(),
+              },
+            }
+          );
+          console.log(response, 'response from new file upload')
+          if (response.data) {
+            await dbConnection.query(`UPDATE useractivity_batch_link SET is_downloaded = 1 WHERE id='${req.query.batchId}'`);
+          }
+          res.status(200).json({
+            headers: resultHeaders,
+            data: updatedData,
+            fileName: fileUpload
+          });
+        } catch (error) {
+          console.error('Error processing file:', error);
+          ErrorHandler("downloadEmailValidation New Download  Controller", error, req);
+          res.status(500).json({ error: 'Failed to process file' });
+        }
+      }
+
+      // res.status(200).json({ datas: download.data, fileName: fileName[0][0].file_upload });
     } catch (error) {
       console.log(error);
       ErrorHandler("downloadEmailVerificationFile Controller", error, req);
@@ -492,6 +675,8 @@ let APIControllers = {
       const columnFields = JSON.parse(req.body.fields);
       const results = JSON.parse(req.body.results);
       let batchId
+      let response
+      let files
       if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
         let [admin] = await dbConnection.query(`SELECT api_key,credits,credits_free,free_final FROM registration WHERE rowid = ${req.user[0][0].team_id}`);
         apiKey = admin[0].api_key;
@@ -503,13 +688,14 @@ let APIControllers = {
           const data = {
             gamalogic_emailid_finder: results.data,
           };
-          let response = await axios.post(
+          response = await axios.post(
             `https://gamalogic.com/batch-email-discovery/?apikey=${apiKey}&file_name=${results.fileName}&team_member_api_key=${memberKey}&first_name_field=${columnFields.firstNameField[1]}&last_name_field=${columnFields.lastNameField[1]}&domain_name_field=${columnFields.domainField[1]}`,
             data
           );
           batchId = response.data['batch id']
+          console.log(response.data['batch id'], 'rsssssssssssssp')
           if (response.data.error !== undefined && response.data.error == false) {
-            let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
+            files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
             let content = `<p>This is to inform you that the batch email finder process for the file ${results.fileName} has been started.</p>
         <p>Please note that the finding process may take some time depending on the size of the file and the number of emails to be find.</p>
         <p>Thank you for using our service.</p>
@@ -525,7 +711,7 @@ let APIControllers = {
               "Batch Email Finder Started",
               basicTemplate(req.user[0][0].username, content)
             );
-            res.status(200).json({ message: response.data.message, files: files[0][0] });
+            // res.status(200).json({ message: response.data.message, files: files[0][0] });
           }
           else {
             const errorMessage = Object.values(response.data)[0];
@@ -545,13 +731,14 @@ let APIControllers = {
           const data = {
             gamalogic_emailid_finder: results.data,
           };
-          let response = await axios.post(
+          response = await axios.post(
             `https://gamalogic.com/batch-email-discovery/?apikey=${apiKey}&file_name=${results.fileName}&first_name_field=${columnFields.firstNameField[1]}&last_name_field=${columnFields.lastNameField[1]}&domain_name_field=${columnFields.domainField[1]}`,
             data
           );
           batchId = response.data['batch id']
+          console.log(response, 'rsssssssssssssp')
           if (response.data.error !== undefined && response.data.error == false) {
-            let files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
+            files = await dbConnection.query(`SELECT * FROM useractivity_batch_finder_link where id='${response.data["batch id"]}'`)
             let content = `<p>This is to inform you that the batch email finder process for the file ${results.fileName} has been started.</p>
         <p>Please note that the finding process may take some time depending on the size of the file and the number of emails to be find.</p>
         <p>Thank you for using our service.</p>
@@ -567,7 +754,7 @@ let APIControllers = {
               "Batch Email Finder Started",
               basicTemplate(req.user[0][0].username, content)
             );
-            res.status(200).json({ message: response.data.message, files: files[0][0] });
+            // res.status(200).json({ message: response.data.message, files: files[0][0] });
           }
           else {
             const errorMessage = Object.values(response.data)[0];
@@ -586,7 +773,7 @@ let APIControllers = {
         filename: req.file.originalname,
         contentType: req.file.mimetype,
       });
-      const response = await axios.post(
+      const FileUpload = await axios.post(
         `http://service.gamalogic.com/dashboard-file-upload?is_dashboard=1&apikey=${apiKey}&application=uploadfinder&batchId=${batchId}`,
         formData,
         {
@@ -595,10 +782,14 @@ let APIControllers = {
           },
         }
       );
-      if (response.data) {
+      console.log('')
+      if (FileUpload.data) {
         console.log('inside response .data')
-        await dbConnection.query(`UPDATE useractivity_batch_finder_link SET save_file_upload='${response.data}' WHERE id='${batchId}'`);
+        await dbConnection.query(`UPDATE useractivity_batch_finder_link SET save_file_upload='${FileUpload.data}' WHERE id='${batchId}'`);
       }
+
+      res.status(200).json({ message: response.data.message, files: files[0][0] });
+
     } catch (error) {
       console.log(error)
       let errorREsponse = await ErrorHandler("batchEmailFinder Controller", error, req);
