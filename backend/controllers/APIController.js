@@ -269,6 +269,7 @@ let APIControllers = {
 
   batchEmailValidation: async (req, res) => {
     try {
+      console.time('Total Execution Time');
       const dbConnection = req.dbConnection;
 
       const results = JSON.parse(req.body.results);
@@ -278,23 +279,29 @@ let APIControllers = {
       let batchId
       let response
       let files
+      console.time('Team Check & DB Query');
       if (req.user[0][0].team_id && req.user[0][0].team_id !== 'null' && req.user[0][0].team_id !== null) {
         let [admin] = await dbConnection.query(`SELECT api_key,credits,credits_free,free_final FROM registration WHERE rowid = ${req.user[0][0].team_id}`);
         apiKey = admin[0].api_key;
         let memberKey = req.user[0][0].api_key
         let finalFreeDate = new Date(admin[0].free_final);
         let currentDate = new Date();
+        console.timeEnd('Team Check & DB Query');
         if ((admin[0].credits + admin[0].credits_free >= emails.length && finalFreeDate > currentDate) || (admin[0].credits >= emails.length)) {
           const dataStructure = {
             gamalogic_emailid_vrfy: emails,
           };
+          console.time('API Call for Batch Email Verification');
           response = await axios.post(
             `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}&team_member_api_key=${memberKey}`,
             dataStructure
           );
+          console.timeEnd('API Call for Batch Email Verification');
           batchId = response.data['batch id']
           if (response.data.error !== undefined && response.data.error == false) {
+            console.time('DB Query for Batch Link');
             files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
+            console.timeEnd('DB Query for Batch Link');
             let content = `<p>This is to inform you that the batch email verification process for the file ${fileName} has been started.</p>
           <p>Please note that the verification process may take some time depending on the size of the file and the number of emails to be verified.</p>
           <p>Thank you for using our service.</p>
@@ -303,12 +310,14 @@ let APIControllers = {
                   class="verifyButton">Download</button></a>
   
           </div>`
+          console.time('Sending Email Notification');
             sendEmail(
               req.user[0][0].username,
               req.user[0][0].emailid,
               "Batch Email Verification Started",
               basicTemplate(req.user[0][0].username, content)
             );
+            console.timeEnd('Sending Email Notification');
             // res.status(200).json({ message: response.data.message, files: files[0][0] });
           } else {
             const errorMessage = Object.values(response.data)[0];
@@ -326,13 +335,17 @@ let APIControllers = {
           const dataStructure = {
             gamalogic_emailid_vrfy: emails,
           };
+          console.time('API Call for Batch Email Verification');
           response = await axios.post(
             `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}`,
             dataStructure
           );
+          console.timeEnd('API Call for Batch Email Verification');
           batchId = response.data['batch id']
           if (response.data.error !== undefined && response.data.error == false) {
+            console.time('DB Query for Batch Link file fetching');
             files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
+            console.timeEnd('DB Query for Batch Link file fetching');
             let content = `<p>This is to inform you that the batch email verification process for the file ${fileName} has been started.</p>
           <p>Please note that the verification process may take some time depending on the size of the file and the number of emails to be verified.</p>
           <p>Thank you for using our service.</p>
@@ -341,12 +354,14 @@ let APIControllers = {
                   class="verifyButton">Download</button></a>
   
           </div>`
+          console.time('Sending Email Notification');
             sendEmail(
               req.user[0][0].username,
               req.user[0][0].emailid,
               "Batch Email Verification Started",
               basicTemplate(req.user[0][0].username, content)
             );
+            console.timeEnd('Sending Email Notification');
             // res.status(200).json({ message: response.data.message, files: files[0][0] });
           } else {
             const errorMessage = Object.values(response.data)[0];
@@ -365,6 +380,7 @@ let APIControllers = {
         filename: req.file.originalname,
         contentType: req.file.mimetype,
       });
+      console.time('File Upload API Call');
       const fileUpload = await axios.post(
         `http://service.gamalogic.com/dashboard-file-upload?is_dashboard=1&apikey=${apiKey}&application=uploadverify&batchId=${batchId}`,
         formData,
@@ -374,8 +390,11 @@ let APIControllers = {
           },
         }
       );
+      console.timeEnd('File Upload API Call');
       if (fileUpload.data) {
+        console.time('DB Update for Uploaded File');
         await dbConnection.query(`UPDATE useractivity_batch_link SET save_upload_file='${fileUpload.data}' WHERE id='${batchId}'`);
+        console.timeEnd('DB Update for Uploaded File');
       }
       res.status(200).json({ message: response.data.message, files: files[0][0] });
 
@@ -387,6 +406,7 @@ let APIControllers = {
       if (req.dbConnection) {
         await req.dbConnection.release();
       }
+      console.timeEnd('Total Execution Time');
     }
 
   },
