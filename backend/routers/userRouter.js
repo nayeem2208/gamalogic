@@ -10,7 +10,12 @@ import loyalityProgramMiddleware from '../middlewares/LoyaltyMiddleware.js';
 import multer from 'multer'
 
 const router=express.Router()
-const upload = multer();
+const upload = multer({
+    limits: {
+      fieldSize: 10 * 1024 * 1024, 
+      fileSize: 25 * 1024 * 1024, 
+    },
+  });
 
 router.get('/sampleCheck',dbMiddleware,Authentication.sample)
 router.post('/sampleCheck1',Authentication.samplePost)
