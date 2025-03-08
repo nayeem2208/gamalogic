@@ -51,7 +51,6 @@ export const handleXLSXFile = async (file, setFileForClickUp, setJsonToServer, s
         });
 
         const fileName = file.name;
-        console.log(contacts, "contacts in xls");
         if (contacts.length <= 100000 && contacts.length > 0) {
             setJsonToServer({ data: contacts, fileName: fileName });
             setShowAlert(true);

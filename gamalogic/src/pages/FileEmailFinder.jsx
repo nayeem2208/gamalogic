@@ -211,7 +211,6 @@ function FileEmailFinder() {
       });
 
       const fileName = file.name;
-      console.log(contacts, "contacts in xls");
       if (contacts.length <= 100000 && contacts.length > 0) {
         setJsonToServer({ data: contacts, fileName: fileName });
         setShowAlert(true);
@@ -384,7 +383,6 @@ function FileEmailFinder() {
 
   const DownloadFile = async (data) => {
     try {
-      console.log(data, "data is here");
       if (data.processed == 100) {
         setLoading(true);
         let alreadyDownloaded = data.is_download == 1 ? true : false;
@@ -393,7 +391,6 @@ function FileEmailFinder() {
           setLoad((prev) => (prev < 90 ? prev + 4 : prev));
         }, 1000);
         if (alreadyDownloaded) {
-          console.log('first part ')
           let res = await axiosInstance.get(
             `/downloadEmailFinderFile?batchId=${data.id}&alreadyDownloaded=${alreadyDownloaded}`,
             { responseType: "blob" }
@@ -420,14 +417,12 @@ function FileEmailFinder() {
           document.body.removeChild(link);
           window.URL.revokeObjectURL(url);
         } else {
-          console.log('second part')
           let res = await axiosInstance.get(
             `/downloadEmailFinderFile?batchId=${data.id}&alreadyDownloaded=${alreadyDownloaded}`
           );
           clearInterval(interval);
           setLoad(100);
           const { headers, data: responseData, fileName } = res.data;
-          console.log(headers, "headers");
 
           const outputArray = responseData.map((row) => {
             const obj = {};
@@ -441,7 +436,6 @@ function FileEmailFinder() {
             return obj;
           });
 
-          console.log(outputArray, "output array ");
           // const fileName = res.data.fileName;
           const parts = fileName.split(".");
           const nameWithoutExtension = parts[0];

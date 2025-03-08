@@ -90,7 +90,6 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
       const handleScroll = (e) => {
         const container = spreadsheetRef.current;
         if (!container) return;
-        console.log(container, "containe");
         const {
           scrollLeft,
           scrollTop,
@@ -104,13 +103,7 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
         if (scrollLeft + clientWidth >= scrollWidth - 20) {
           tableInstance.insertColumn();
         }
-        console.log(
-          scrollTop,
-          clientHeight,
-          scrollHeight,
-          scrollTop + clientHeight,
-          "insert row"
-        );
+
         // Expand rows when scrolling down
         if (scrollTop + clientHeight >= scrollHeight - 20) {
           tableInstance.insertRow();
@@ -191,7 +184,6 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
       domainField: [originalHeaders[columns.indexOf(formData.domainField)],formData.domainField],
       // emailField:formData.emailField,
     };
-    console.log(newFormData, "new formdata for updload");
     if (onUpload) onUpload(newFormData);
   };
   const handleCancel = () => {

@@ -51,7 +51,6 @@ function ResetPassword() {
             email: email,
             password: resetPassword.password,
           });
-          console.log(reset,'reset')
           if(reset.status==200){
             toast.success(reset.data?.message)
             navigate('/signin')

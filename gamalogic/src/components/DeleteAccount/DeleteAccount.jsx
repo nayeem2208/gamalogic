@@ -16,7 +16,6 @@ function DeleteAccount({ handleDeleteAccount }) {
   }
 
   const handleAccept = async () => {
-    console.log("Cancelling subscription...");
     try {
       setShowAlert(false);
       try {

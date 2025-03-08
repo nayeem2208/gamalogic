@@ -14,7 +14,6 @@ const ValidationSpreadsheet = ({ jsonData, onUpload, onCancel }) => {
   const [originalHeaders, setOriginalHeaders] = useState([]);
   const [tableInstance, setTableInstance] = useState(null);
   const [selectedColumn, setSelectedColumn] = useState("");
-  console.log(jsonData,'jsonData to table')
   useEffect(() => {
     if (
       spreadsheetRef.current &&
@@ -41,6 +40,7 @@ const ValidationSpreadsheet = ({ jsonData, onUpload, onCancel }) => {
           columns: dynamicColumns,
           tableOverflow: true,
           license: "MIT",
+          lazyLoading:true,
           minDimensions: [25, minRow], // Minimum dimensions for the table
           tableHeight: `${screenHeight - 190}px`,
           onselection: (instance, x1, y1, x2, y2) => {
@@ -132,7 +132,6 @@ const ValidationSpreadsheet = ({ jsonData, onUpload, onCancel }) => {
       ],
     };
 
-    console.log(newFormData, "new form data for upload");
     if (onUpload) onUpload(newFormData);
   };
 

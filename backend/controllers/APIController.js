@@ -272,11 +272,8 @@ let APIControllers = {
       const dbConnection = req.dbConnection;
 
       const results = JSON.parse(req.body.results);
-      console.log(results, 'resultsssss')
       const { data, fileName } = results
       let emails = data
-      console.log(emails, 'emails')
-      console.log(req.file, 'req.fileeeeeeeeeeeeeeeee')
       let apiKey
       let batchId
       let response
@@ -333,7 +330,6 @@ let APIControllers = {
             `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}`,
             dataStructure
           );
-          console.log(response, 'response from batch email')
           batchId = response.data['batch id']
           if (response.data.error !== undefined && response.data.error == false) {
             files = await dbConnection.query(`SELECT * FROM useractivity_batch_link where id='${response.data["batch id"]}'`)
@@ -378,12 +374,9 @@ let APIControllers = {
           },
         }
       );
-      console.log('response from file upload of verification ', fileUpload)
       if (fileUpload.data) {
-        console.log('inside response .data')
         await dbConnection.query(`UPDATE useractivity_batch_link SET save_upload_file='${fileUpload.data}' WHERE id='${batchId}'`);
       }
-      console.log(response, 'respone for uploading verification file')
       res.status(200).json({ message: response.data.message, files: files[0][0] });
 
     } catch (error) {

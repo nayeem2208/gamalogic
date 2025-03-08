@@ -238,7 +238,6 @@ function EmailVerification() {
           setLoad((prev) => (prev < 90 ? prev + 4 : prev));
         }, 1000);
         if (alreadyDownloaded) {
-          console.log("first part ");
           let res = await axiosInstance.get(
             `/downloadEmailVerificationFile?batchId=${data.id}&alreadyDownloaded=${alreadyDownloaded}`,
             { responseType: "blob" }
@@ -275,7 +274,6 @@ function EmailVerification() {
           clearInterval(interval);
           setLoad(100);
           const { headers, data: responseData, fileName } = res.data;
-          console.log(headers, "headers");
 
           const outputArray = responseData.map((row) => {
             const obj = {};
@@ -289,7 +287,6 @@ function EmailVerification() {
             return obj;
           });
 
-          console.log(outputArray, "output array ");
           const parts = fileName.split(".");
           const nameWithoutExtension = parts[0];
           const finalFileName = `${nameWithoutExtension}_Gamalogic validation results`;
@@ -528,10 +525,14 @@ function EmailVerification() {
     try {
       setShowAlert(false);
       setLoad(30);
+      const dataSize = JsonToServer.data.length;
+      const increment = dataSize > 20000 ? 2 : 4; 
+      const intervalTime = dataSize > 20000 ? 2000 : 1000;
+  
       const interval = setInterval(() => {
-        setLoad((prev) => (prev < 90 ? prev + 4 : prev));
-      }, 1000);
-      console.log(data, "data");
+        setLoad((prev) => (prev < 90 ? prev + increment : prev));
+      }, intervalTime);
+  
       const transformedData = JsonToServer.data
         .map((item) => ({
           emailid: item[data.emailField[0]],
@@ -540,13 +541,11 @@ function EmailVerification() {
   
       let results = JsonToServer;
       results.data = transformedData;
-      console.log(results, fileForClickUp, "transformed Data");
   
       async function BatchEmailVerification() {
         const formData = new FormData();
         formData.append("file", fileForClickUp);
         formData.append("results", JSON.stringify(results));
-        console.log(formData, "formData");
         const response = await axiosInstance.post(
           "/batchEmailVerification",
           formData,
@@ -554,6 +553,7 @@ function EmailVerification() {
             headers: {
               "Content-Type": "multipart/form-data",
             },
+            timeout: 600000,
           }
         );
         clearInterval(interval);
