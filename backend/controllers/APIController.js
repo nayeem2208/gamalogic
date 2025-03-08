@@ -328,6 +328,8 @@ let APIControllers = {
           res.status(400).json({ error: 'You dont have enough to do this' });
         }
       } else {
+        console.timeEnd('Team Check & DB Query');
+
         apiKey = req.user[0][0].api_key;
         let finalFreeDate = new Date(req.user[0][0].free_final);
         let currentDate = new Date();
