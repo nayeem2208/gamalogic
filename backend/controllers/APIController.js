@@ -273,6 +273,7 @@ let APIControllers = {
       const dbConnection = req.dbConnection;
 
       const results = JSON.parse(req.body.results);
+      const columnFields = JSON.parse(req.body.fields);
       const { data, fileName } = results
       let emails = data
       let apiKey
@@ -293,7 +294,7 @@ let APIControllers = {
           };
           console.time('API Call for Batch Email Verification');
           response = await axios.post(
-            `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}&team_member_api_key=${memberKey}`,
+            `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}&team_member_api_key=${memberKey}&email_field=${columnFields.emailField[1]}`,
             dataStructure
           );
           console.timeEnd('API Call for Batch Email Verification');
@@ -339,7 +340,7 @@ let APIControllers = {
           };
           console.time('API Call for Batch Email Verification');
           response = await axios.post(
-            `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}`,
+            `https://gamalogic.com/batchemailvrf?apikey=${apiKey}&speed_rank=0&file_name=${fileName}&email_field=${columnFields.emailField[1]}`,
             dataStructure
           );
           console.timeEnd('API Call for Batch Email Verification');
