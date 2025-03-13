@@ -408,17 +408,16 @@ let APIControllers = {
         currentTime,
         0
       ])
-      const user = activeUsers.find((user) => user.userId === req.user[0][0].rowid);
+      const socketId = activeUsers.get(req.user[0][0].rowid); 
+      //  console.log(socketId, 'userrrrrrrrrrrrrrrrr')
 
-      let progressEmitted = false;
-
-      if (user && user.socketId && !progressEmitted) {
-        io.to(user.socketId).emit("progress", {
+      if (socketId) {
+        // console.log('inside progeresss')
+        io.to(socketId).emit("progress", {
           header: "Batch Email Verification Initiated",
           content: "Email verification has started for the file one_find_10_with_extra_Data.csv. Processing is underway, please wait for the results.",
           time: currentTime
         });
-        progressEmitted = true;
       }
       res.status(200).json({ message: response.data.message, files: files[0][0] });
 
