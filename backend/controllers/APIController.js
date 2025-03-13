@@ -404,7 +404,7 @@ let APIControllers = {
       await dbConnection.query(`INSERT INTO notification (userid, header, content, time, isRead) VALUES (?, ?, ?, ?, ?)`, [
         req.user[0][0].rowid,
         "Batch Email Verification Initiated",
-        "Email verification has started for the file one_find_10_with_extra_Data.csv. Processing is underway, please wait for the results.",
+        `Email verification has started for the file ${fileName}. Processing is underway, please wait for the results.`,
         currentTime,
         0
       ])
@@ -826,6 +826,26 @@ let APIControllers = {
         await dbConnection.query(`UPDATE useractivity_batch_finder_link SET save_file_upload='${FileUpload.data}' WHERE id='${batchId}'`);
       }
 
+      const currentTime = new Date().toLocaleString();
+
+      await dbConnection.query(`INSERT INTO notification (userid, header, content, time, isRead) VALUES (?, ?, ?, ?, ?)`, [
+        req.user[0][0].rowid,
+        "Batch Email Finder Initiated",
+        `Email Finder has started for the file ${results.fileName}. Processing is underway, please wait for the results.`,
+        currentTime,
+        0
+      ])
+      const socketId = activeUsers.get(req.user[0][0].rowid); 
+       console.log(socketId, 'userrrrrrrrrrrrrrrrr')
+
+      if (socketId) {
+        console.log('inside progeresss')
+        io.to(socketId).emit("progress", {
+          header: "Batch Email Verification Initiated",
+          content: "Email verification has started for the file one_find_10_with_extra_Data.csv. Processing is underway, please wait for the results.",
+          time: currentTime
+        });
+      }
       res.status(200).json({ message: response.data.message, files: files[0][0] });
 
     } catch (error) {
