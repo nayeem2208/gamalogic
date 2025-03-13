@@ -546,6 +546,7 @@ function EmailVerification() {
         const formData = new FormData();
         formData.append("file", fileForClickUp);
         formData.append("results", JSON.stringify(results));
+        formData.append("fields", JSON.stringify(data));
         const response = await axiosInstance.post(
           "/batchEmailVerification",
           formData,

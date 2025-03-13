@@ -7,12 +7,49 @@ import cors from "cors";
 import morgan from "morgan";
 import  mySqlPool from "./config/DB.js";
 import userRouter from "./routers/userRouter.js";
-
+import { Server } from "socket.io";
+import { createServer } from "http"; 
 
 
 const port = process.env.PORT || 3000;
 
 const app = express();
+
+const httpServer = createServer(app);
+
+
+export const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.FRONTEND_URL,
+    methods: ["GET", "POST"],
+  },
+});
+export let activeUsers=[]
+// Socket.IO connection handler
+
+io.on("connection", (socket) => {
+  console.log("A client connected:", socket.id);
+
+  socket.on("registerUser", (data) => {
+    console.log('hiiii')
+    const { userId } = data;
+    console.log(`User ${userId} connected with socket ID: ${socket.id}`);
+    !activeUsers.some((user) => user.userId === userId) &&
+    activeUsers.push({
+      userId,
+      socketId: socket.id,
+    });
+    console.log(activeUsers,'active users')
+  // io.emit("getActiveUsers", activeUsers);
+    // You can store the association between userId and socket.id in a map or database
+  });
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log("A client disconnected:", socket.id);
+    activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);
+  });
+});
+
 
 
 morgan.token('ip', req => {
@@ -85,7 +122,7 @@ mySqlPool
   .query("SELECT 1")
   .then(() => {
     console.log("MySQL DB connected ");
-    app.listen(port, () => {
+    httpServer.listen(port, () => {
       console.log(`Server started on port ${port}`);
     });
   })

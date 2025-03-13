@@ -25,12 +25,11 @@ import { useUserState } from "../context/userContext";
 import { TbBasketStar } from "react-icons/tb";
 import { MdIntegrationInstructions } from "react-icons/md";
 import { IoIosNotifications } from "react-icons/io";
-import Notification from "./Notifications";
-import MobileNotification from "./NotificationMobile";
+import MobileNotification from "./notification/NotificationMobile";
+// import MobileNotification from "./NotificationMobile";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { VscPreview } from "react-icons/vsc";
-
-
+import { Badge } from "@mui/material";
 
 function Header() {
   let [dropDown, setDropDown] = useState(false);
@@ -39,7 +38,15 @@ function Header() {
   let [settingDropDown, setSettingDropDown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  let { userDetails, setUserDetails, setLinkedinLoading } = useUserState();
+  let {
+    userDetails,
+    setUserDetails,
+    setLinkedinLoading,
+    notification,
+    setNotification,
+    newNotification,
+    setNewNotification,
+  } = useUserState();
   let navigate = useNavigate();
 
   const dropDownToggle = () => {
@@ -73,11 +80,10 @@ function Header() {
   }
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
+    setNewNotification(0);
   };
 
-  const [notifications, setNotifications] = useState([
-   
-  ]);
+  const [notifications, setNotifications] = useState([]);
 
   return (
     <div className="  items-center text-white lg:hidden ">
@@ -92,7 +98,9 @@ function Header() {
             className=" rounded-lg px-4 flex items-center mr-2 cursor-pointer"
             onClick={toggleNotifications}
           >
-            <IoIosNotifications className="w-6 h-6 text-white" />
+            <Badge badgeContent={newNotification} color="error">
+              <IoIosNotifications className="w-6 h-6 text-white" />
+            </Badge>{" "}
           </p>
           {dropDown ? (
             <IoCloseSharp onClick={dropDownToggle} className="text-3xl" />
@@ -104,7 +112,7 @@ function Header() {
       {showNotifications && (
         <div>
           <MobileNotification
-            notifications={notifications}
+            notifications={notification}
             onClose={() => setShowNotifications(false)}
           />
         </div>
@@ -115,7 +123,7 @@ function Header() {
           style={{ backgroundColor: "rgba(10, 14, 43,0.97)" }}
         >
           <ul className="mb-14 text-lg font-semibold text-left px-8">
-          <Link to="/dashboard/user-dashboard" onClick={dropDownToggle}>
+            <Link to="/dashboard/user-dashboard" onClick={dropDownToggle}>
               <li className="py-2 flex underlineLi">
                 <LuLayoutDashboard className="text-teal-800 mt-1 mx-2 text-lg" />{" "}
                 Dashboard

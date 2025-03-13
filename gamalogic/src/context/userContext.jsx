@@ -12,6 +12,8 @@ const UserDetailsProvider = ({ children }) => {
   let [paymentDetails,setPaymentDetails]=useState({cost:7,type:'Pay As You Go',period:'',credits:1000})
   let [accountDetailsModal,setAccountDetailsModal]=useState(false)
   let [appTour,setAppTour]=useState(null)
+  let [notification,setNotification]=useState([])
+  let [newNotification,setNewNotification]=useState(0)
 
   return (
     <userDetailsContext.Provider
@@ -31,7 +33,11 @@ const UserDetailsProvider = ({ children }) => {
         accountDetailsModal,
         setAccountDetailsModal,
         appTour,
-        setAppTour
+        setAppTour,
+        notification,
+        setNotification,
+        newNotification,
+        setNewNotification
       }}
     >
       {children}

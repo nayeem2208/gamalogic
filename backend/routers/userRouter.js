@@ -99,5 +99,8 @@ router.get('/affiliateUserId',dbMiddleware,authcheck,APIControllers.affilateUser
 router.post('/loyalityProgram',dbMiddleware,loyalityProgramMiddleware,APIControllers.loyalityWebhook)
 
 router.get('/appTourUpdation',dbMiddleware,authcheck,newControllers.updateAppTourStatus)
+router.get('/getNotifications',dbMiddleware,authcheck,newControllers.getAllNotifications)
+router.get('/notificationIsReadStatusChange',dbMiddleware,authcheck,newControllers.notificationIsRead)
+
 
 export default router;

@@ -7,40 +7,53 @@ import { SlInfo } from "react-icons/sl";
 import axiosInstance from "../axios/axiosInstance";
 import ServerError from "../pages/ServerError";
 import { IoIosNotifications } from "react-icons/io";
-import Notification from "./Notifications";
+import Notification from "./notification/Notifications";
+// import "../css/notification.css";
+import Badge from "@mui/material/Badge";
 
 function SubHeader(props) {
-  let { setUserDetails, userDetails, creditBal, setLinkedinLoading } =
-    useUserState();
+  let {
+    setUserDetails,
+    userDetails,
+    creditBal,
+    setLinkedinLoading,
+    notification,
+    setNotification,
+    newNotification,
+    setNewNotification,
+  } = useUserState();
+
   let [serverError, setServerError] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   let navigate = useNavigate();
 
-  const [notifications, setNotifications] = useState([
-  ]);
-  
+  // const [notifications, setNotifications] = useState([]);
+
   const notificationRef = useRef(null);
 
-  const toggleNotifications = () => { setShowNotifications((prevState) => !prevState); };
-
-  const handleClickOutside = (event) => {
-    if (
-      notificationRef.current &&
-      !notificationRef.current.contains(event.target)
-    ) {
-      setShowNotifications(false);
-    }
+  const toggleNotifications = () => {
+    setShowNotifications((prevState) => !prevState);
+    setNewNotification(0);
   };
-  useEffect(() => {
-    if (showNotifications) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showNotifications]);
+
+  // const handleClickOutside = (event) => {
+  //   if (
+  //     notificationRef.current &&
+  //     !notificationRef.current.contains(event.target)
+  //   ) {
+  //     setShowNotifications(false);
+  //   }
+  // };
+  // useEffect(() => {
+  //   if (showNotifications) {
+  //     document.addEventListener("mousedown", handleClickOutside);
+  //   } else {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   }
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, [showNotifications]);
   // const toggleNotifications = () => {
   //   setShowNotifications(!showNotifications);
   // };
@@ -81,12 +94,14 @@ function SubHeader(props) {
             onClick={toggleNotifications}
           >
             Notifications{" "}
-            <IoIosNotifications className="w-6 h-6 text-red-500" />
+            <Badge badgeContent={newNotification} color="error">
+              <IoIosNotifications className="w-6 h-6 text-gray-500" />
+            </Badge>{" "}
           </p>
           {showNotifications && (
             <div ref={notificationRef}>
               <Notification
-                notifications={notifications}
+                notifications={notification}
                 onClose={() => setShowNotifications(false)}
               />
             </div>
@@ -174,6 +189,5 @@ function SubHeader(props) {
     </div>
   );
 }
-
 
 export default SubHeader;

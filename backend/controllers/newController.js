@@ -726,6 +726,61 @@ const newControllers = {
                 await req.dbConnection.release();
             }
         }
+    },
+    getAllNotifications: async (req, res) => {
+        try {
+            const dbConnection = req.dbConnection;
+            const userId = req.user[0][0].rowid; // Assuming user ID is stored in req.user
+            const query = `SELECT * FROM notification WHERE userid = ? order by id desc`;
+            const [notifications] = await dbConnection.query(query, [userId]);
+
+            console.log(notifications, 'notificationsssssssss');
+
+            res.status(200).json({ notifications: notifications || [] });
+        } catch (error) {
+            console.error('Error in fetch notifications:', error);
+            ErrorHandler("getAllNotifications Controller", error, req);
+            res.status(500).json({ error: error.message || 'Internal Server Error' });
+        } finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
+    },
+    notificationIsRead: async (req, res) => {
+        try {
+            const dbConnection = req.dbConnection;
+            const { id } = req.query;
+            console.log(id,'idddddddddddddddddd')
+        if (!id) {
+            return res.status(400).json({ error: "Notification ID is required" });
+        }
+        
+        const query = `
+            UPDATE notification
+            SET isRead = 1
+            WHERE id = ?
+        `;
+
+        // Execute the query
+        const [result] = await dbConnection.execute(query, [id]);
+
+        // Check if the update was successful
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "Notification not found" });
+        }
+
+        // Send success response
+        res.status(200).json({ message: "Notification marked as read" });
+        } catch (error) {
+            console.error('Error in notificationIsRead:', error);
+            ErrorHandler("notificationIsRead Controller", error, req);
+            res.status(500).json({ error: error.message || 'Internal Server Error' });
+        } finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
     }
 
 

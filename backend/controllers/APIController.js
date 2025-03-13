@@ -24,7 +24,7 @@ import fs from 'fs'
 import path from "path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-
+import { io, activeUsers } from "../index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -398,6 +398,27 @@ let APIControllers = {
         console.time('DB Update for Uploaded File');
         await dbConnection.query(`UPDATE useractivity_batch_link SET save_upload_file='${fileUpload.data}' WHERE id='${batchId}'`);
         console.timeEnd('DB Update for Uploaded File');
+      }
+      const currentTime = new Date().toLocaleString();
+
+      await dbConnection.query(`INSERT INTO notification (userid, header, content, time, isRead) VALUES (?, ?, ?, ?, ?)`, [
+        req.user[0][0].rowid,
+        "Batch Email Verification Initiated",
+        "Email verification has started for the file one_find_10_with_extra_Data.csv. Processing is underway, please wait for the results.",
+        currentTime,
+        0
+      ])
+      const user = activeUsers.find((user) => user.userId === req.user[0][0].rowid);
+
+      let progressEmitted = false;
+
+      if (!progressEmitted) {
+        io.to(user.socketId).emit("progress", {
+          header: "Batch Email Verification Initiated",
+          content: "Email verification has started for the file one_find_10_with_extra_Data.csv. Processing is underway, please wait for the results.",
+          time: currentTime
+        });
+        progressEmitted = true; 
       }
       res.status(200).json({ message: response.data.message, files: files[0][0] });
 
