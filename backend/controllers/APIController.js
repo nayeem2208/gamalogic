@@ -412,13 +412,13 @@ let APIControllers = {
 
       let progressEmitted = false;
 
-      if (!progressEmitted) {
+      if (user && user.socketId && !progressEmitted) {
         io.to(user.socketId).emit("progress", {
           header: "Batch Email Verification Initiated",
           content: "Email verification has started for the file one_find_10_with_extra_Data.csv. Processing is underway, please wait for the results.",
           time: currentTime
         });
-        progressEmitted = true; 
+        progressEmitted = true;
       }
       res.status(200).json({ message: response.data.message, files: files[0][0] });
 
