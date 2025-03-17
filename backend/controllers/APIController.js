@@ -311,7 +311,7 @@ let APIControllers = {
                   class="verifyButton">Download</button></a>
   
           </div>`
-          console.time('Sending Email Notification');
+            console.time('Sending Email Notification');
             sendEmail(
               req.user[0][0].username,
               req.user[0][0].emailid,
@@ -357,7 +357,7 @@ let APIControllers = {
                   class="verifyButton">Download</button></a>
   
           </div>`
-          console.time('Sending Email Notification');
+            console.time('Sending Email Notification');
             sendEmail(
               req.user[0][0].username,
               req.user[0][0].emailid,
@@ -409,7 +409,7 @@ let APIControllers = {
         0,
         'validation'
       ])
-      const socketId = activeUsers.get(req.user[0][0].rowid); 
+      const socketId = activeUsers.get(req.user[0][0].rowid);
       //  console.log(socketId, 'userrrrrrrrrrrrrrrrr')
 
       if (socketId) {
@@ -848,8 +848,8 @@ let APIControllers = {
         0,
         'finder'
       ])
-      const socketId = activeUsers.get(req.user[0][0].rowid); 
-       console.log(socketId, 'userrrrrrrrrrrrrrrrr')
+      const socketId = activeUsers.get(req.user[0][0].rowid);
+      console.log(socketId, 'userrrrrrrrrrrrrrrrr')
 
       if (socketId) {
         console.log('inside progeresss')
@@ -1261,6 +1261,34 @@ let APIControllers = {
           ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
         }
       }
+
+      const currentTime = new Date().toISOString();
+      await dbConnection.query(
+        `INSERT INTO notification (userid, header, content, time, isRead, type) VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          req.user[0][0].rowid,
+          "Payment Successful",
+          `Your payment for $${Number(req.body.cost).toLocaleString()} for ${Number(
+            req.body.credits
+          ).toLocaleString()} credits has been successfully processed.`,
+          currentTime,
+          0,
+          "payment",
+        ]
+      );
+
+      const socketId = activeUsers.get(req.user[0][0].rowid);
+
+      if (socketId) {
+        console.log('inside progeresss')
+        io.to(socketId).emit("progress", {
+          header: "Payment Successful",
+          content: `Your payment for $${Number(req.body.cost).toLocaleString()} for ${Number(
+            req.body.credits
+          ).toLocaleString()} credits has been successfully processed.`,
+          time: currentTime
+        });
+      }
       res.status(200).json('Successfull')
     } catch (error) {
       console.log(error);
@@ -1465,6 +1493,30 @@ let APIControllers = {
         }
       }
       await dbConnection.query(query, values);
+
+      const currentTime = new Date().toISOString();
+      await dbConnection.query(
+        `INSERT INTO notification (userid, header, content, time, isRead, type) VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          user.rowid,
+          "Subscription Payment Successful",
+          `Your ${paymentDetails.period} subscription payment of $${Number(Math.round(paymentDetails.cost)).toLocaleString()} for ${Number(paymentDetails.credits).toLocaleString()} credits has been successfully processed.`,
+          currentTime,
+          0,
+          "subscription",
+        ]
+      );
+      const socketId = activeUsers.get(req.user[0][0].rowid);
+
+      if (socketId) {
+        console.log('inside progeresss')
+        io.to(socketId).emit("progress", {
+          header: "Subscription Payment Successful",
+          content: `Your ${paymentDetails.period} subscription payment of $${Number(Math.round(paymentDetails.cost)).toLocaleString()} for ${Number(paymentDetails.credits).toLocaleString()} credits has been successfully processed.`,
+          time: currentTime
+        });
+      }
+
       res.status(200).json('Successfull')
       dbConnection.release()
     } catch (error) {
@@ -1625,6 +1677,29 @@ let APIControllers = {
                   sub,
                   basicTemplate(user[0][0].username, content)
                 );
+
+                const currentTime = new Date().toISOString();
+                await dbConnection.query(
+                  `INSERT INTO notification (userid, header, content, time, isRead, type) VALUES (?, ?, ?, ?, ?, ?)`,
+                  [
+                    user[0][0].rowid,
+                    "Subscription Payment Successful",
+                    `Your ${paymentDetails[2]} subscription payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed.`,
+                    currentTime,
+                    0,
+                    "subscription",
+                  ]
+                );
+
+                const socketId = activeUsers.get(user[0][0].rowid);
+                if (socketId) {
+                  console.log('inside progress');
+                  io.to(socketId).emit("progress", {
+                    header: "Subscription Payment Successful",
+                    content: `Your ${paymentDetails[2]} subscription payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed.`,
+                    time: currentTime
+                  });
+                }
               }
             } else {
               // ErrorHandler("update paypal webhook checker step 2", req.body, req);
@@ -1672,6 +1747,28 @@ let APIControllers = {
             sub,
             basicTemplate(user[0][0].username, content)
           );
+          const currentTime = new Date().toISOString();
+          await dbConnection.query(
+            `INSERT INTO notification (userid, header, content, time, isRead, type) VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+              user[0][0].rowid,
+              "Subscription Cancelled",
+              `Your ${isMonthlyInEmail} subscription has been successfully cancelled.`,
+              currentTime,
+              0,
+              "subscription",
+            ]
+          );
+
+          const socketId = activeUsers.get(user[0][0].rowid);
+          if (socketId) {
+            console.log('inside progress');
+            io.to(socketId).emit("progress", {
+              header: "Subscription Cancelled",
+              content: `Your ${isMonthlyInEmail} subscription has been successfully cancelled.`,
+              time: currentTime
+            });
+          }
 
         }
         else {
@@ -1845,6 +1942,32 @@ let APIControllers = {
         } catch (error) {
           ErrorHandler("PayPalUpdateCredit Controller Thrive purchase push section", error, req);
         }
+      }
+      const currentTime = new Date().toISOString();
+      await dbConnection.query(
+        `INSERT INTO notification (userid, header, content, time, isRead, type) VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          req.user[0][0].rowid, // userid
+          "Payment Successful", // header
+          `Your payment for ${Math.floor(req.body.cost)} for ${Number(
+            req.body.credits
+          ).toLocaleString()} credits has been successfully processed.`,
+          currentTime,
+          0,
+          "payment",
+        ]
+      );
+
+      const socketId = activeUsers.get(req.user[0][0].rowid,);
+      if (socketId) {
+        console.log('inside progress');
+        io.to(socketId).emit("progress", {
+          header: "Payment Successful",
+          content: `Your payment for ₹${Math.floor(req.body.cost)} for ${Number(
+            req.body.credits
+          ).toLocaleString()} credits has been successfully processed.`,
+          time: currentTime
+        });
       }
       dbConnection.release()
       res.status(200).json('Successfull')
@@ -2027,7 +2150,28 @@ let APIControllers = {
    WHERE emailid='${req.user[0][0].emailid}'`)
 
       }
+      const currentTime = new Date().toISOString();
+      await dbConnection.query(
+        `INSERT INTO notification (userid, header, content, time, isRead, type) VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          req.user[0][0].rowid,
+          "Subscription Payment Successful",
+          `Your ${req.body.paymentDetails.period == 'monthly' ? 'monthly' : 'annual'} subscription payment of ${Number(Math.round(amount)).toLocaleString()} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.`,
+          currentTime,
+          0,
+          "subscription",
+        ]
+      );
 
+      const socketId = activeUsers.get(req.user[0][0].rowid);
+      if (socketId) {
+        console.log('inside progress');
+        io.to(socketId).emit("progress", {
+          header: "Subscription Payment Successful",
+          content: `Your ${req.body.paymentDetails.period == 'monthly' ? 'monthly' : 'annual'} subscription payment of $${Number(Math.round(amount)).toLocaleString()} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.`,
+          time: currentTime
+        });
+      }
       res.status(200).json('Successfull')
     } catch (error) {
       console.log(error);
@@ -2195,6 +2339,29 @@ let APIControllers = {
               basicTemplate(userDetails[0][0].username, content)
             );
 
+            const currentTime = new Date().toISOString();
+            await dbConnection.query(
+              `INSERT INTO notification (userid, header, content, time, isRead, type) VALUES (?, ?, ?, ?, ?, ?)`,
+              [
+                userDetails[0][0].rowid,
+                "Subscription Payment Successful",
+                `Your ${planDetails[2] == 'monthly' ? 'monthly' : 'annual'} subscription payment of ₹${Number(Math.round(amount)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.`,
+                currentTime,
+                0,
+                "subscription",
+              ]
+            );
+
+            const socketId = activeUsers.get(userDetails[0][0].rowid);
+            if (socketId) {
+              console.log('inside progress');
+              io.to(socketId).emit("progress", {
+                header: "Subscription Payment Successful",
+                content: `Your ${planDetails[2] == 'monthly' ? 'monthly' : 'annual'} subscription payment of ₹${Number(Math.round(amount)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.`,
+                time: currentTime,
+              });
+            }
+
           }
           else {
             console.log('date is match so updation is not needed')
@@ -2235,6 +2402,29 @@ let APIControllers = {
             `UPDATE registration SET is_active=0, subscription_stop_time = ? WHERE rowid = ?`,
             [stopTime, userDetails[0][0].rowid]
           );
+
+          const currentTime = new Date().toISOString();
+          await dbConnection.query(
+            `INSERT INTO notification (userid, header, content, time, isRead, type) VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+              userDetails[0][0].rowid,
+              "Subscription Cancelled",
+              `Your ${isMonthlyInEmail} subscription has been successfully cancelled.`,
+              currentTime,
+              0,
+              "subscription",
+            ]
+          );
+
+          const socketId = activeUsers.get(userDetails[0][0].rowid);
+          if (socketId) {
+            console.log('inside progress');
+            io.to(socketId).emit("progress", {
+              header: "Subscription Cancelled",
+              content: `Your ${isMonthlyInEmail} subscription has been successfully cancelled.`,
+              time: currentTime,
+            });
+          }
           console.log('subscription cancelled succesfully.............')
         }
       }
