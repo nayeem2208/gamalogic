@@ -401,12 +401,13 @@ let APIControllers = {
       }
       const currentTime = new Date().toLocaleString();
 
-      await dbConnection.query(`INSERT INTO notification (userid, header, content, time, isRead) VALUES (?, ?, ?, ?, ?)`, [
+      await dbConnection.query(`INSERT INTO notification (userid, header, content, time, isRead,type) VALUES (?, ?, ?, ?, ?,?)`, [
         req.user[0][0].rowid,
         "Batch Email Verification Initiated",
         `Email verification has started for the file ${fileName}. Processing is underway, please wait for the results.`,
         currentTime,
-        0
+        0,
+        'validation'
       ])
       const socketId = activeUsers.get(req.user[0][0].rowid); 
       //  console.log(socketId, 'userrrrrrrrrrrrrrrrr')
@@ -496,13 +497,24 @@ let APIControllers = {
             `https://gamalogic.com/batchresult/?apikey=${apiKey}&batchid=${req.query.batchId}`
           );
           console.log(download.data, 'downloadddddddddd')
-          let fileName = fileUpload.split('.')[0] + '_' + req.query.batchId + '.' + fileUpload.split('.')[1]
+          const lastDotIndex = fileUpload.lastIndexOf('.');
+
+          let fileName;
+          let extention
+          if (lastDotIndex === -1) {
+            fileName = `${fileUpload}_${batchId}`;
+          } else {
+            const baseName = fileUpload.slice(0, lastDotIndex);
+            extention = fileUpload.slice(lastDotIndex + 1);
+            fileName = `${baseName}_${req.query.batchId}.${extention}`;
+          }
+          // let fileName = fileUpload.split('.')[0] + '_' + req.query.batchId + '.' + fileUpload.split('.')[1]
           console.log(fileName, 'fileNamee')
           let NewDownload = await axios.get(
             `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&batchid=${req.query.batchId}&filename=${fileUpload}&application=uploadverify`, { responseType: 'arraybuffer' }
           );
           console.log(NewDownload, 'new Download')
-          let extention = fileUpload.split('.')[1]
+          // let extention = fileUpload.split('.')[1]
           const validationData = download.data.gamalogic_emailid_vrfy;
           let uploadedFileData = []
           if (extention === 'csv' || extention === 'txt') {
@@ -936,7 +948,17 @@ let APIControllers = {
           console.log('first part ')
           const fileUrl = `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&application=finder&batchid=${req.query.batchId}&filename=${fileUpload}`;
           const response = await axios.get(fileUrl, { responseType: 'stream' });
-          let fileName = fileUpload.split('.')[0] + 'finder' + '.' + fileUpload.split('.')[1];
+          const lastDotIndex = fileUpload.lastIndexOf('.');
+          let fileName;
+          let extention
+          if (lastDotIndex === -1) {
+            fileName = `${fileUpload}_${batchId}`;
+          } else {
+            const baseName = fileUpload.slice(0, lastDotIndex);
+            extention = fileUpload.slice(lastDotIndex + 1);
+            fileName = `${baseName}_finder.${extention}`;
+          }
+          // let fileName = fileUpload.split('.')[0] + 'finder' + '.' + fileUpload.split('.')[1];
           res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
           res.setHeader('Content-Type', response.headers['content-type']);
           response.data.pipe(res);
@@ -952,11 +974,22 @@ let APIControllers = {
           let download = await axios.get(
             `https://gamalogic.com/batch-email-discovery-result/?apikey=${apiKey}&batchid=${req.query.batchId}`
           );
-          let fileName = fileUpload.split('.')[0] + '_' + req.query.batchId + '.' + fileUpload.split('.')[1]
+          const lastDotIndex = fileUpload.lastIndexOf('.');
+
+          let fileName;
+          let extention
+          if (lastDotIndex === -1) {
+            fileName = `${fileUpload}_${batchId}`;
+          } else {
+            const baseName = fileUpload.slice(0, lastDotIndex);
+            extention = fileUpload.slice(lastDotIndex + 1);
+            fileName = `${baseName}_${req.query.batchId}.${extention}`;
+          }
+          // let fileName = fileUpload.split('.')[0] + '_' + req.query.batchId + '.' + fileUpload.split('.')[1]
           let NewDownload = await axios.get(
             `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&batchid=${req.query.batchId}&filename=${fileUpload}&application=uploadfinder`, { responseType: 'arraybuffer' }
           );
-          let extention = fileUpload.split('.')[1]
+          // let extention = fileUpload.split('.')[1]
           const discoveryData = download.data.gamalogic_discovery;
           let uploadedFileData = []
           if (extention === 'csv' || extention === 'txt') {
