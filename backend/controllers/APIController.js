@@ -840,12 +840,13 @@ let APIControllers = {
 
       const currentTime = new Date().toLocaleString();
 
-      await dbConnection.query(`INSERT INTO notification (userid, header, content, time, isRead) VALUES (?, ?, ?, ?, ?)`, [
+      await dbConnection.query(`INSERT INTO notification (userid, header, content, time, isRead,type) VALUES (?, ?, ?, ?, ?,?)`, [
         req.user[0][0].rowid,
         "Batch Email Finder Initiated",
         `Email Finder has started for the file ${results.fileName}. Processing is underway, please wait for the results.`,
         currentTime,
-        0
+        0,
+        'finder'
       ])
       const socketId = activeUsers.get(req.user[0][0].rowid); 
        console.log(socketId, 'userrrrrrrrrrrrrrrrr')
