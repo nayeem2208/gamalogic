@@ -513,7 +513,6 @@ let APIControllers = {
           let NewDownload = await axios.get(
             `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&batchid=${req.query.batchId}&filename=${fileUpload}&application=uploadverify`, { responseType: 'arraybuffer' }
           );
-          console.log(NewDownload, 'new Download')
           // let extention = fileUpload.split('.')[1]
           const validationData = download.data.gamalogic_emailid_vrfy;
           let uploadedFileData = []
@@ -530,9 +529,28 @@ let APIControllers = {
 
             uploadedFileData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
+            const isValidEmail = (email) => {
+              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              return emailRegex.test(email);
+            }
+
+            const firstRow = uploadedFileData[0];
+            const isFirstRowData = firstRow.some(cell => isValidEmail(cell));
             // Separate headers and data
-            const [headers, ...dataRows] = uploadedFileData;
-            uploadedFileData = dataRows.map(row => {
+            let headers;
+            if (isFirstRowData) {
+              // If the first row contains valid emails, it is data, so add numeric headers
+              const numColumns = firstRow.length;
+              headers = Array.from({ length: numColumns }, (_, i) => i.toString()); // ["0", "1", "2", ...]
+              uploadedFileData = [headers, ...uploadedFileData];
+              uploadedFileData.splice(0, 1)
+            } else {
+              // If the first row does not contain valid emails, treat it as headers
+              headers = firstRow.map(header => header.trim()); // Use the first row as headers
+              uploadedFileData = uploadedFileData.slice(1); // Remove the first row (headers) from the data
+            }
+            // const [headers, ...dataRows] = uploadedFileData;
+            uploadedFileData = uploadedFileData.map(row => {
               const rowData = {};
               headers.forEach((header, index) => {
                 rowData[header] = row[index] || '';
@@ -542,6 +560,7 @@ let APIControllers = {
           } else {
             throw new Error('Unsupported file format');
           }
+
           const headers = Object.keys(uploadedFileData[0]);
 
           const updatedData = uploadedFileData.map(record => {
@@ -561,14 +580,29 @@ let APIControllers = {
             // const email = matchedDomain && matchedDomain.email_address !== '0' ? matchedDomain.email_address : '';
             // const isCatchall = matchedDomain ? matchedDomain.is_catchall : '0';
             let status = "";
-            if (matchedDomain.message == 'Valid ID') {
-              status = "Valid Address";
-            } else if (matchedDomain.message == 'Not Valid ID') {
-              status = "Not Valid Address";
-            } else if (matchedDomain.message == 'Catch all ID') {
-              status = 'Catch All Address'
-            } else {
-              status = "Unknown";
+            if (matchedDomain) {
+              if (matchedDomain.is_catchall == true) {
+                status = 'Catch All Address'
+              }
+              else if (matchedDomain.is_unknown == true) {
+                status = "Unknown";
+              }
+              else if (matchedDomain.is_valid == true && matchedDomain.is_catchall == false) {
+                status = "Valid Address";
+              }
+              else {
+                status = "Not Valid Address";
+              }
+              // if (matchedDomain.message == 'Valid ID') {
+              //   status = "Valid Address";
+              // } else if (matchedDomain.message == 'Not Valid ID') {
+              //   status = "Not Valid Address";
+              // }
+              // else if (matchedDomain.message == 'Catch all ID') {
+              //   status = 'Catch All Address'
+              // } else {
+              //   status = "Unknown";
+              // }
             }
 
 
@@ -621,7 +655,7 @@ let APIControllers = {
               },
             }
           );
-          console.log(response, 'response from new file upload')
+          // console.log(response, 'response from new file upload')
           if (response.data) {
             await dbConnection.query(`UPDATE useractivity_batch_link SET is_downloaded = 1 WHERE id='${req.query.batchId}'`);
           }
@@ -1949,7 +1983,7 @@ let APIControllers = {
         [
           req.user[0][0].rowid, // userid
           "Payment Successful", // header
-          `Your payment for ${Math.floor(req.body.cost)} for ${Number(
+          `Your payment for ₹${Math.floor(req.body.cost)} for ${Number(
             req.body.credits
           ).toLocaleString()} credits has been successfully processed.`,
           currentTime,
@@ -2156,7 +2190,7 @@ let APIControllers = {
         [
           req.user[0][0].rowid,
           "Subscription Payment Successful",
-          `Your ${req.body.paymentDetails.period == 'monthly' ? 'monthly' : 'annual'} subscription payment of ${Number(Math.round(amount)).toLocaleString()} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.`,
+          `Your ${req.body.paymentDetails.period == 'monthly' ? 'monthly' : 'annual'} subscription payment of ₹${Number(Math.round(amount)).toLocaleString()} for ${Number(req.body.credits).toLocaleString()} credits has been successfully processed.`,
           currentTime,
           0,
           "subscription",
