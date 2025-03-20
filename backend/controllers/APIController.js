@@ -496,7 +496,6 @@ let APIControllers = {
           let download = await axios.get(
             `https://gamalogic.com/batchresult/?apikey=${apiKey}&batchid=${req.query.batchId}`
           );
-          console.log(download.data, 'downloadddddddddd')
           const lastDotIndex = fileUpload.lastIndexOf('.');
 
           let fileName;
@@ -509,11 +508,9 @@ let APIControllers = {
             fileName = `${baseName}_${req.query.batchId}.${extention}`;
           }
           // let fileName = fileUpload.split('.')[0] + '_' + req.query.batchId + '.' + fileUpload.split('.')[1]
-          console.log(fileName, 'fileNamee')
           let NewDownload = await axios.get(
             `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&batchid=${req.query.batchId}&filename=${fileUpload}&application=uploadverify`, { responseType: 'arraybuffer' }
           );
-          console.log(NewDownload.data, 'new Download')
           // let extention = fileUpload.split('.')[1]
           const validationData = download.data.gamalogic_emailid_vrfy;
           let uploadedFileData = []
@@ -524,7 +521,6 @@ let APIControllers = {
               header: false, // Do not treat the first row as headers
               skipEmptyLines: true
             }).data;
-            console.log(parsedData, 'parsedData')
             // Check if the first row contains valid email addresses
             const isValidEmail = (email) => {
               const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -533,7 +529,6 @@ let APIControllers = {
 
             const firstRow = parsedData[0];
             const isFirstRowData = firstRow.some(cell => isValidEmail(cell));
-            console.log(isFirstRowData, 'isfirstRowData')
             let headers;
             // uploadedFileData;
 
@@ -559,14 +554,12 @@ let APIControllers = {
               });
               return rowData;
             });
-            console.log(uploadedFileData, 'upload file data')
           } else if (extention === 'xls' || extention === 'xlsx') {
             const workbook = XLSX.read(NewDownload.data, { type: 'buffer' });
             const sheetName = workbook.SheetNames[0];
             const sheet = workbook.Sheets[sheetName];
 
             uploadedFileData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-            console.log(uploadedFileData, 'upload file data 11')
 
             const isValidEmail = (email) => {
               const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -575,26 +568,20 @@ let APIControllers = {
 
             const firstRow = uploadedFileData[0];
             const isFirstRowData = firstRow.some(cell => isValidEmail(cell));
-            console.log(isFirstRowData, 'is firstRow')
             // Separate headers and data
             let headers;
             if (isFirstRowData) {
-              // headerAvailable=false
+              headerAvailable = false
               // If the first row contains valid emails, it is data, so add numeric headers
               const numColumns = firstRow.length;
-              console.log(numColumns, 'num columns')
-              headers = Array.from({ length: numColumns }, (_, i) => String.fromCharCode(65 + i))
-              // headers = Array.from({ length: numColumns }, (_, i) => i.toString()); // ["0", "1", "2", ...]
-              console.log(headers, 'headerssss')
+              headers = Array.from({ length: numColumns }, (_, i) => i.toString()); // ["0", "1", "2", ...]
               uploadedFileData = [headers, ...uploadedFileData];
               uploadedFileData.splice(0, 1)
-              console.log(uploadedFileData, 'uploaded file dataaaaaaa')
             } else {
               // If the first row does not contain valid emails, treat it as headers
               headers = firstRow.map(header => header.trim()); // Use the first row as headers
               uploadedFileData = uploadedFileData.slice(1); // Remove the first row (headers) from the data
             }
-            console.log(headers, uploadedFileData, 'headersssss')
             // const [headers, ...dataRows] = uploadedFileData;
             uploadedFileData = uploadedFileData.map(row => {
               const rowData = {};
@@ -606,7 +593,6 @@ let APIControllers = {
           } else {
             throw new Error('Unsupported file format');
           }
-          console.log(uploadedFileData, 'upload file data 222')
 
           const headers = Object.keys(uploadedFileData[0]);
 
@@ -617,13 +603,11 @@ let APIControllers = {
             } else {
               values = Object.values(record)
             }
-            console.log(values, 'values Dataaaaaa')
             // console.log(values,'validation and upload file data uploaded file Data')
             const matchedDomain = validationData.find(
               item => values.includes(item.emailid)
             );
 
-            console.log(matchedDomain, 'matchDomain ')
             // const email = matchedDomain && matchedDomain.email_address !== '0' ? matchedDomain.email_address : '';
             // const isCatchall = matchedDomain ? matchedDomain.is_catchall : '0';
             let status = "";
@@ -665,14 +649,14 @@ let APIControllers = {
             "status"
           ];
           const finalData = [...resultHeaders, ...updatedData];
-          const DataForFileCreation = [resultHeaders, ...updatedData]
-          console.log(DataForFileCreation, 'data for file creation ')
+          const DataForFileCreation = headerAvailable
+            ? [resultHeaders, ...updatedData] // Include headers
+            : updatedData; 
 
           const sanitizedDataForFileCreation = DataForFileCreation.filter(row => {
             return row.some(cell => cell.trim() !== ''); // Keep rows with at least one non-empty cell
           });
 
-          console.log(sanitizedDataForFileCreation, 'sanitized DataForFileCreation');
           let newFileName = `${fileUpload}`;
           let filePath = path.join(__dirname, '..', 'temp', newFileName);
 
@@ -740,7 +724,8 @@ let APIControllers = {
           res.status(200).json({
             headers: resultHeaders,
             data: updatedData,
-            fileName: fileUpload
+            fileName: fileUpload,
+            headerAvailable
           });
         } catch (error) {
           console.error('Error processing file:', error);
