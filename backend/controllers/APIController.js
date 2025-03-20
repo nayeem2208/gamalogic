@@ -513,21 +513,60 @@ let APIControllers = {
           let NewDownload = await axios.get(
             `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&batchid=${req.query.batchId}&filename=${fileUpload}&application=uploadverify`, { responseType: 'arraybuffer' }
           );
+          console.log(NewDownload.data, 'new Download')
           // let extention = fileUpload.split('.')[1]
           const validationData = download.data.gamalogic_emailid_vrfy;
           let uploadedFileData = []
+          let headerAvailable = true
           if (extention === 'csv' || extention === 'txt') {
             const fileContent = NewDownload.data.toString('utf-8');
-            uploadedFileData = Papa.parse(fileContent, {
-              header: true,
+            const parsedData = Papa.parse(fileContent, {
+              header: false, // Do not treat the first row as headers
               skipEmptyLines: true
             }).data;
+            console.log(parsedData, 'parsedData')
+            // Check if the first row contains valid email addresses
+            const isValidEmail = (email) => {
+              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              return emailRegex.test(email);
+            };
+
+            const firstRow = parsedData[0];
+            const isFirstRowData = firstRow.some(cell => isValidEmail(cell));
+            console.log(isFirstRowData, 'isfirstRowData')
+            let headers;
+            // uploadedFileData;
+
+            if (isFirstRowData) {
+              headerAvailable = false
+              // If the first row contains valid emails, it is data, so add numeric headers
+              const numColumns = firstRow.length;
+              headers = Array.from({ length: numColumns }, (_, i) => String.fromCharCode(65 + i))
+              uploadedFileData = [headers, ...parsedData];
+              uploadedFileData.splice(0, 1)
+            } else {
+              // If the first row does not contain valid emails, treat it as headers
+              headers = firstRow.map(header => header.trim()); // Use the first row as headers
+              uploadedFileData = parsedData.slice(1);
+              // Remove the first row (headers) from the data
+            }
+
+            // Convert the data into an array of objects with headers as keys
+            uploadedFileData = uploadedFileData.map(row => {
+              const rowData = {};
+              headers.forEach((header, index) => {
+                rowData[header] = row[index] || '';
+              });
+              return rowData;
+            });
+            console.log(uploadedFileData, 'upload file data')
           } else if (extention === 'xls' || extention === 'xlsx') {
             const workbook = XLSX.read(NewDownload.data, { type: 'buffer' });
             const sheetName = workbook.SheetNames[0];
             const sheet = workbook.Sheets[sheetName];
 
             uploadedFileData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            console.log(uploadedFileData, 'upload file data 11')
 
             const isValidEmail = (email) => {
               const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -536,19 +575,25 @@ let APIControllers = {
 
             const firstRow = uploadedFileData[0];
             const isFirstRowData = firstRow.some(cell => isValidEmail(cell));
+            console.log(isFirstRowData, 'is firstRow')
             // Separate headers and data
             let headers;
             if (isFirstRowData) {
+              // headerAvailable=false
               // If the first row contains valid emails, it is data, so add numeric headers
               const numColumns = firstRow.length;
+              console.log(numColumns, 'num columns')
               headers = Array.from({ length: numColumns }, (_, i) => i.toString()); // ["0", "1", "2", ...]
+              console.log(headers, 'headerssss')
               uploadedFileData = [headers, ...uploadedFileData];
               uploadedFileData.splice(0, 1)
+              console.log(uploadedFileData, 'uploaded file dataaaaaaa')
             } else {
               // If the first row does not contain valid emails, treat it as headers
               headers = firstRow.map(header => header.trim()); // Use the first row as headers
               uploadedFileData = uploadedFileData.slice(1); // Remove the first row (headers) from the data
             }
+            console.log(headers, uploadedFileData, 'headersssss')
             // const [headers, ...dataRows] = uploadedFileData;
             uploadedFileData = uploadedFileData.map(row => {
               const rowData = {};
@@ -560,17 +605,18 @@ let APIControllers = {
           } else {
             throw new Error('Unsupported file format');
           }
+          console.log(uploadedFileData, 'upload file data 222')
 
           const headers = Object.keys(uploadedFileData[0]);
 
           const updatedData = uploadedFileData.map(record => {
             let values
             if (extention == 'txt') {
-              const recordValue = Object.values(record)[0];
-              values = recordValue
+              values = Object.values(record)[0];
             } else {
               values = Object.values(record)
             }
+            console.log(values, 'values Dataaaaaa')
             // console.log(values,'validation and upload file data uploaded file Data')
             const matchedDomain = validationData.find(
               item => values.includes(item.emailid)
@@ -620,6 +666,12 @@ let APIControllers = {
           const finalData = [...resultHeaders, ...updatedData];
           const DataForFileCreation = [resultHeaders, ...updatedData]
           console.log(DataForFileCreation, 'data for file creation ')
+
+          const sanitizedDataForFileCreation = DataForFileCreation.filter(row => {
+            return row.some(cell => cell.trim() !== ''); // Keep rows with at least one non-empty cell
+          });
+
+          console.log(sanitizedDataForFileCreation, 'sanitized DataForFileCreation');
           let newFileName = `${fileUpload}`;
           let filePath = path.join(__dirname, '..', 'temp', newFileName);
 
@@ -629,8 +681,33 @@ let APIControllers = {
 
           // Create the file based on the extension
           if (extention === 'csv' || extention === 'txt') {
-            const csvData = Papa.unparse(DataForFileCreation);
-            fs.writeFileSync(filePath, csvData);
+            let fileContent;
+
+            if (extention === 'csv') {
+              // Use Papa.unparse for CSV files
+              fileContent = Papa.unparse(DataForFileCreation);
+              fs.writeFileSync(filePath, '\ufeff' + fileContent, { encoding: 'utf8' });
+
+            } else if (extention === 'txt') {
+              let fileContent;
+              // Include all rows if headers are available
+              fileContent = sanitizedDataForFileCreation.map(row => row.join(',')).join('\n');
+
+
+              try {
+                // Ensure the directory exists
+                const dir = path.dirname(filePath);
+                if (!fs.existsSync(dir)) {
+                  fs.mkdirSync(dir, { recursive: true });
+                }
+
+                // Write the file with utf-8 encoding
+                fs.writeFileSync(filePath, fileContent, 'utf-8');
+              } catch (error) {
+                console.error('Error writing file:', error);
+                throw new Error('Failed to write file');
+              }
+            }
           } else if (extention === 'xls' || extention === 'xlsx') {
             const worksheet = XLSX.utils.aoa_to_sheet(DataForFileCreation);
             const workbook = XLSX.utils.book_new();
