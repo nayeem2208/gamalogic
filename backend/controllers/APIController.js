@@ -25,6 +25,7 @@ import path from "path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { io, activeUsers } from "../index.js";
+import retryWithDelay from "../utils/validationRetryFunction.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -493,9 +494,26 @@ let APIControllers = {
       }
       else {
         try {
-          let download = await axios.get(
-            `https://gamalogic.com/batchresult/?apikey=${apiKey}&batchid=${req.query.batchId}`
-          );
+          let download;
+          let validationData;
+
+          // Retry the API call if validationData is undefined
+          await retryWithDelay(async () => {
+            download = await axios.get(
+              `https://gamalogic.com/batchresult/?apikey=${apiKey}&batchid=${req.query.batchId}`
+            );
+            validationData = download.data.gamalogic_emailid_vrfy;
+
+            // Throw an error if validationData is still undefined after retries
+            if (!validationData) {
+              throw new Error("Validation data is not available yet. Please try again later.");
+            }
+
+            return download;
+          });
+
+          // console.log(download.data, 'downloadddddddddd');
+          // console.log(validationData, 'validation dataaaaaa');
           const lastDotIndex = fileUpload.lastIndexOf('.');
 
           let fileName;
@@ -512,7 +530,10 @@ let APIControllers = {
             `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&batchid=${req.query.batchId}&filename=${fileUpload}&application=uploadverify`, { responseType: 'arraybuffer' }
           );
           // let extention = fileUpload.split('.')[1]
-          const validationData = download.data.gamalogic_emailid_vrfy;
+          // const validationData = download.data.gamalogic_emailid_vrfy;
+          if (!Array.isArray(validationData)) {
+            throw new Error("Validation data is missing or invalid.");
+          }
           let uploadedFileData = []
           let headerAvailable = true
           if (extention === 'csv' || extention === 'txt') {
@@ -604,9 +625,13 @@ let APIControllers = {
               values = Object.values(record)
             }
             // console.log(values,'validation and upload file data uploaded file Data')
-            const matchedDomain = validationData.find(
-              item => values.includes(item.emailid)
-            );
+            // const matchedDomain = validationData.find(
+            //   item => values.includes(item.emailid)
+            // );
+
+            const matchedDomain = Array.isArray(validationData)
+            ? validationData.find(item => values.includes(item.emailid))
+            : null;
 
             // const email = matchedDomain && matchedDomain.email_address !== '0' ? matchedDomain.email_address : '';
             // const isCatchall = matchedDomain ? matchedDomain.is_catchall : '0';
