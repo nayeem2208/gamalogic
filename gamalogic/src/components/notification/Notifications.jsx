@@ -21,8 +21,9 @@ function Notification({ notifications, onClose }) {
     setSingleNotification(notif);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = (data) => {
     setSingleNotification(null);
+    onClose()
   };
   console.log(singleNotification, "single notificatoin");
   return (

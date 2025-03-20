@@ -2,20 +2,19 @@ import { useState } from "react";
 import SingleNotificationMobile from "./SingleNotificationMobile";
 
 function MobileNotification({ notifications, onClose }) {
-    const [singleNotification, setSingleNotification] = useState(null);
-    console.log(notifications, "notifications");
-  
-    const formatTime = (time) => {
-      const notifDate = new Date(time);
-      const today = new Date();
-  
-      const isSameDay = notifDate.toDateString() === today.toDateString();
-  
-      return isSameDay
-        ? notifDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-        : notifDate.toLocaleDateString();
-    };
+  const [singleNotification, setSingleNotification] = useState(null);
+  console.log(notifications, "notifications");
 
+  const formatTime = (time) => {
+    const notifDate = new Date(time);
+    const today = new Date();
+
+    const isSameDay = notifDate.toDateString() === today.toDateString();
+
+    return isSameDay
+      ? notifDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      : notifDate.toLocaleDateString();
+  };
 
   const handleNotificationClick = (notif) => {
     setSingleNotification(notif);
@@ -24,22 +23,22 @@ function MobileNotification({ notifications, onClose }) {
   const handleCloseModal = () => {
     setSingleNotification(null);
   };
-    return (
-      <div className="fixed top-0 left-0 right-0 w-full h-full bg-white z-50 sm:w-72 sm:right-64 sm:left-auto sm:top-24 sm:h-auto sm:rounded-lg shadow-lg border">
-        <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center z-10">
-          <h4 className="font-semibold text-gray-700">Notifications</h4>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            ✕
-          </button>
-        </div>
-        {singleNotification && (
+  return (
+    <div className="fixed top-0 left-0 right-0 w-full h-full  bg-white z-50 sm:w-72 sm:right-64 sm:left-auto sm:top-24 sm:h-auto sm:rounded-lg shadow-lg border">
+      <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center z-10">
+        <h4 className="font-semibold text-gray-700">Notifications</h4>
+        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          ✕
+        </button>
+      </div>
+      {singleNotification && (
         <SingleNotificationMobile
           isOpen={!!singleNotification}
           onClose={handleCloseModal}
           singleNotification={singleNotification}
         />
       )}
-              <ul className="p-0 max-h-96 overflow-y-auto mb-4">
+      <ul className="pb-5 h-screen overflow-y-auto mb-10">
         {notifications.length > 0 ? (
           notifications.map((notif, index) => (
             <li
@@ -66,9 +65,8 @@ function MobileNotification({ notifications, onClose }) {
           <li className="text-sm text-gray-500 p-3">No new notifications.</li>
         )}
       </ul>
-      </div>
-    );
-  }
-  
-  export default MobileNotification;
-  
+    </div>
+  );
+}
+
+export default MobileNotification;

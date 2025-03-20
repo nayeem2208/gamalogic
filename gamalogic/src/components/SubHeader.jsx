@@ -22,41 +22,38 @@ function SubHeader(props) {
     newNotification,
     setNewNotification,
   } = useUserState();
-
   let [serverError, setServerError] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   let navigate = useNavigate();
 
-  // const [notifications, setNotifications] = useState([]);
+  const notificationRef = useRef(null); // Ref for the notification container
+  const buttonRef = useRef(null); // Ref for the notification button
 
-  const notificationRef = useRef(null);
-
+  // Toggle notifications
   const toggleNotifications = () => {
     setShowNotifications((prevState) => !prevState);
-    setNewNotification(0);
+    setNewNotification(0); // Reset new notification count
   };
 
-  // const handleClickOutside = (event) => {
-  //   if (
-  //     notificationRef.current &&
-  //     !notificationRef.current.contains(event.target)
-  //   ) {
-  //     setShowNotifications(false);
-  //   }
-  // };
-  // useEffect(() => {
-  //   if (showNotifications) {
-  //     document.addEventListener("mousedown", handleClickOutside);
-  //   } else {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   }
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, [showNotifications]);
-  // const toggleNotifications = () => {
-  //   setShowNotifications(!showNotifications);
-  // };
+  // Handle click outside the notification div
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target) &&
+        !event.target.closest(".ReactModal__Content") // Exclude clicks inside the modal
+      ) {
+        setShowNotifications(false); // Close the notification
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   function logoutHandler() {
     setLinkedinLoading(true);
@@ -66,6 +63,7 @@ function SubHeader(props) {
     setLinkedinLoading(false);
     window.reloadThriveWidget();
   }
+
   const HandleSendVerifyLink = async (e) => {
     try {
       e.preventDefault();
@@ -84,20 +82,25 @@ function SubHeader(props) {
   if (serverError) {
     return <ServerError />;
   }
+
   return (
     <div>
-      <div className="hidden sm:flex  justify-between mt-1 ">
-        <p className="orangeUnderline ">{props.SubHeader}</p>
+      <div className="hidden sm:flex justify-between mt-1">
+        <p className="orangeUnderline">{props.SubHeader}</p>
         <div className="flex justify-end subHeaderCredits mt-6 md:mt-0">
+          {/* Notification Button */}
           <p
-            className="bg-gray-100 hidden  rounded-lg px-4 lg:flex items-center mr-2 cursor-pointer"
+            ref={buttonRef} // Attach ref to the button
+            className="bg-gray-100 hidden rounded-lg px-4 lg:flex items-center mr-2 cursor-pointer"
             onClick={toggleNotifications}
           >
             Notifications{" "}
             <Badge badgeContent={newNotification} color="error">
               <IoIosNotifications className="w-6 h-6 text-gray-500" />
-            </Badge>{" "}
+            </Badge>
           </p>
+
+          {/* Notification Popup */}
           {showNotifications && (
             <div ref={notificationRef}>
               <Notification
@@ -106,26 +109,24 @@ function SubHeader(props) {
               />
             </div>
           )}
-          <p className="bg-gray-100 rounded-lg px-4 flex items-center ">
+
+          <p className="bg-gray-100 rounded-lg px-4 flex items-center">
             {creditBal.toLocaleString("en-US")} Credits Left
           </p>{" "}
-          <p className="ml-6 mr-2 flex items-center ">{userDetails.name}</p>
+          <p className="ml-6 mr-2 flex items-center">{userDetails.name}</p>
           <button onClick={logoutHandler}>
-            <IoLogOutOutline className="  text-2xl" />
+            <IoLogOutOutline className="text-2xl" />
           </button>
         </div>
       </div>
-      <div className="sm:hidden justify-between mt-1 ">
+      <div className="sm:hidden justify-between mt-1">
         <div className="flex flex-wrap justify-center subHeaderCredits mb-4 md:mt-0">
-          {/* <p className="bg-gray-100 rounded-lg px-2 flex items-center mr-2">
-           <IoIosNotifications className="w-4 h-4 text-red-500"/>
-          </p> */}
           <p className="bg-gray-100 rounded-lg px-4 flex items-center mt-3">
             {creditBal.toLocaleString("en-US")} Credits Left
           </p>{" "}
           <p className="ml-6 mr-2 flex items-center mt-3">{userDetails.name}</p>
           <button onClick={logoutHandler}>
-            <IoLogOutOutline className="  text-2xl mt-3" />
+            <IoLogOutOutline className="text-2xl mt-3" />
           </button>
         </div>
         <p className="orangeUnderline text-center">{props.SubHeader}</p>

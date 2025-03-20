@@ -1,5 +1,7 @@
 import  { createContext, useContext, useState } from "react";
 import PropTypes from 'prop-types';
+import { io } from "socket.io-client";
+
 
 const userDetailsContext = createContext();
 
@@ -14,6 +16,7 @@ const UserDetailsProvider = ({ children }) => {
   let [appTour,setAppTour]=useState(null)
   let [notification,setNotification]=useState([])
   let [newNotification,setNewNotification]=useState(0)
+  const socket = io(import.meta.env.VITE_FRONTEND_URL);
 
   return (
     <userDetailsContext.Provider
@@ -37,7 +40,8 @@ const UserDetailsProvider = ({ children }) => {
         notification,
         setNotification,
         newNotification,
-        setNewNotification
+        setNewNotification,
+        socket
       }}
     >
       {children}

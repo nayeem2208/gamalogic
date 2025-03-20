@@ -46,11 +46,16 @@ function EmailVerification() {
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [dragging, setDragging] = useState(false);
   const [spreadSheet, setSpreadSheet] = useState(false);
+  const [matchingFile, setMatchingFile] = useState(null);
 
   const isCheckingCompletion = useRef(false);
   let { userDetails, setCreditBal, creditBal } = useUserState();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const queryParams = new URLSearchParams(location.search);
+  const fileUpload = queryParams.get("file_upload");
+  const dateTime = queryParams.get("date_time");
 
   useEffect(() => {
     if (APP == "beta") {
@@ -66,6 +71,43 @@ function EmailVerification() {
       navigate(location.pathname, { replace: true });
     }
   }, []);
+
+  useEffect(() => {
+    if (fileUpload && dateTime) {
+      const removeFileExtension = (fileName) => {
+        return fileName.split('.').slice(0, -1).join('.').trim();
+      };
+  
+      const convertToISODate = (localizedDate) => {
+        const date = new Date(localizedDate);
+        return date.toISOString();
+      };
+  
+      const matchedFile = resultFile.find((file) => {
+        const fileUploadMatch =
+          removeFileExtension(file.file_upload) === fileUpload;
+          const normalizedDateTime = convertToISODate(dateTime);
+          const fileDateTime = convertToISODate(file.date_time);
+          const fileDateTimeAfterSplit =
+            fileDateTime.split(":")[0] + fileDateTime.split(":")[1];
+          const normalizedDateTimeSplit =
+            normalizedDateTime.split(":")[0] + normalizedDateTime.split(":")[1];
+          const dateTimeMatch =
+            fileDateTimeAfterSplit === normalizedDateTimeSplit;
+        return fileUploadMatch && dateTimeMatch;
+      });
+  
+      if (matchedFile) {
+        setMatchingFile(matchedFile);
+  
+        // Clear the URL parameters after matching
+        const newSearchParams = new URLSearchParams(location.search);
+        newSearchParams.delete("file_upload");
+        newSearchParams.delete("date_time");
+        navigate({ search: newSearchParams.toString() }, { replace: true });
+      }
+    }
+  }, [fileUpload, dateTime, resultFile, location.search, navigate]);
 
   useEffect(() => {
     const filteredFilesFinder = resultFile.filter((file) =>
@@ -273,7 +315,7 @@ function EmailVerification() {
           );
           clearInterval(interval);
           setLoad(100);
-          const { headers, data: responseData, fileName } = res.data;
+          const { headers, data: responseData, fileName,headerAvailable } = res.data;
 
           const outputArray = responseData.map((row) => {
             const obj = {};
@@ -293,16 +335,16 @@ function EmailVerification() {
           const fileExtension = parts[parts.length - 1].toLowerCase();
           switch (fileExtension) {
             case "csv":
-              downloadCSV(outputArray, finalFileName);
+              downloadCSV(outputArray, finalFileName,headerAvailable);
               break;
             case "xlsx":
-              downloadExcel(outputArray, finalFileName, fileExtension);
+              downloadExcel(outputArray, finalFileName, fileExtension,headerAvailable);
               break;
             case "xls":
-              downloadExcel(outputArray, finalFileName, fileExtension);
+              downloadExcel(outputArray, finalFileName, fileExtension,headerAvailable);
               break;
             case "txt":
-              downloadText(outputArray, finalFileName);
+              downloadText(outputArray, finalFileName,headerAvailable);
               break;
             default:
               toast.error("Unsupported file format for download.");
@@ -322,17 +364,51 @@ function EmailVerification() {
       }
     }
   };
-
-  const downloadCSV = (data, fileName) => {
-    const exportType = exportFromJSON.types.csv;
-    exportFromJSON({ data, fileName, exportType });
+  const downloadCSV = (data, fileName, headerAvailable) => {
+    console.log(data, "data inside downloadCSV");
+  
+    if (!Array.isArray(data) || data.length === 0) {
+      console.error("Invalid or empty data provided.");
+      return;
+    }
+  
+    // Extract all unique keys from data
+    const allKeys = [...new Set(data.flatMap(Object.keys))];
+  
+    // Create header row (if headers are available)
+    const headerRow = headerAvailable ? allKeys.join(",") : "";
+  
+    // Create rows dynamically
+    const csvData = data
+      .map((item) =>
+        allKeys.map((key) => (item[key] !== undefined ? item[key] : "")).join(",")
+      )
+      .join("\n");
+  
+    // Combine header and data (if headers are available)
+    const finalCSV = headerAvailable ? `${headerRow}\n${csvData}` : csvData;
+    console.log(finalCSV, "final CSV data");
+  
+    const blob = new Blob([finalCSV], { type: "text/csv;charset=utf-8;" });
+  
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName + ".csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
+  
 
-  const downloadExcel = (data, fileName, fileType) => {
+  const downloadExcel = (data, fileName, fileType, headerAvailable) => {
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(data);
+    const ws = headerAvailable
+      ? XLSX.utils.json_to_sheet(data) // Include headers
+      : XLSX.utils.json_to_sheet(data, { skipHeader: true }); // Skip headers
+  
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-
+  
     let extension = "";
     if (fileType === "xlsx") {
       extension = ".xlsx";
@@ -341,22 +417,47 @@ function EmailVerification() {
     } else {
       throw new Error(`Unsupported file type: ${fileType}`);
     }
-
+  
     XLSX.writeFile(wb, `${fileName}${extension}`);
   };
+  
 
-  const downloadText = (data, fileName) => {
+  const downloadText = (data, fileName, headerAvailable) => {
+    console.log(data, "data inside downloadText");
+  
+    if (!Array.isArray(data) || data.length === 0) {
+      console.error("Invalid or empty data provided.");
+      return;
+    }
+  
+    // Extract all unique keys from data
+    const allKeys = [...new Set(data.flatMap(Object.keys))];
+  
+    // Create header row (if headers are available)
+    const headerRow = headerAvailable ? allKeys.join(",") : "";
+  
+    // Create rows dynamically
     const textData = data
-      .map((item) => `${item.emailid},${item.status}`)
+      .map((item) =>
+        allKeys.map((key) => (item[key] !== undefined ? item[key] : "")).join(",")
+      )
       .join("\n");
-    const blob = new Blob([textData], { type: "text/plain;charset=utf-8" });
+  
+    // Combine header and data (if headers are available)
+    const finalText = headerAvailable ? `${headerRow}\n${textData}` : textData;
+    console.log(finalText, "final text data");
+  
+    const blob = new Blob([finalText], { type: "text/plain;charset=utf-8" });
+  
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
     link.setAttribute("download", fileName + ".txt");
     document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   };
+
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -809,6 +910,7 @@ function EmailVerification() {
               data={resultFile}
               onDownloadFile={DownloadFile}
               onUpload={handleFileChange}
+              matchingFile={matchingFile}
             />
           ))}
         {resultFile.length == 0 && !loading && !spreadSheet && (

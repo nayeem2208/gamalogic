@@ -21,6 +21,7 @@ import DragAndDropBackground from "../components/File/DragAndDropBackground";
 import AddFileInRowView from "../components/File/AddFileInRowView";
 import FileRowViewListing from "../components/File/FileRowView";
 import Spreadsheet from "../components/TableCheck";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function FileEmailFinder() {
   let [message, setMessage] = useState("");
@@ -42,8 +43,14 @@ function FileEmailFinder() {
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [dragging, setDragging] = useState(false);
   const [spreadSheet, setSpreadSheet] = useState(false);
+  const [matchingFile, setMatchingFile] = useState(null);
+  const [resultFileReady, setResultFileReady] = useState(false);
+  const [fileUpload, setFileUpload] = useState(null);
+  const [dateTime, setDateTime] = useState(null);
 
   let { creditBal, setCreditBal, userDetails } = useUserState();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (APP == "beta") {
@@ -53,6 +60,71 @@ function FileEmailFinder() {
     }
     fetchAllFiles(pageIndex);
   }, []);
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    setFileUpload(queryParams.get("file_upload"));
+    setDateTime(queryParams.get("date_time"));
+  }, []);
+
+  useEffect(() => {
+    console.log("how many time renderin");
+    console.log(fileUpload, dateTime, "file upload and date time ");
+
+    if (fileUpload && dateTime) {
+      console.log("inside thissssss");
+
+      const removeFileExtension = (fileName) => {
+        return fileName.split(".").slice(0, -1).join(".").trim();
+      };
+
+      const convertToISODate = (localizedDate) => {
+        const date = new Date(localizedDate);
+        return date.toISOString();
+      };
+
+      console.log(resultFile, "resultFile");
+
+      const matchedFile = resultFile.find((file) => {
+        console.log("inside thissssssssss");
+        console.log(removeFileExtension(file.file_upload), "file.file_upload");
+        console.log(fileUpload, "fileUpload");
+        console.log(convertToISODate(dateTime), "convertToISODate(dateTime)");
+        console.log(convertToISODate(file.date_time), "file.date_time");
+
+        const fileUploadMatch =
+          removeFileExtension(file.file_upload) == fileUpload;
+        const normalizedDateTime = convertToISODate(dateTime);
+        const fileDateTime = convertToISODate(file.date_time);
+        const fileDateTimeAfterSplit =
+          fileDateTime.split(":")[0] + fileDateTime.split(":")[1];
+        const normalizedDateTimeSplit =
+          normalizedDateTime.split(":")[0] + normalizedDateTime.split(":")[1];
+        const dateTimeMatch = fileDateTimeAfterSplit === normalizedDateTimeSplit;
+
+
+        return fileUploadMatch && dateTimeMatch;
+      });
+
+      if (matchedFile) {
+        setMatchingFile(matchedFile);
+        console.log(matchedFile, "matched fileeeeeeeeeee");
+
+        // Clear the URL parameters after matching
+        const newSearchParams = new URLSearchParams(location.search);
+        newSearchParams.delete("file_upload");
+        newSearchParams.delete("date_time");
+        navigate({ search: newSearchParams.toString() }, { replace: true });
+      }
+    }
+  }, [
+    fileUpload,
+    dateTime,
+    resultFile,
+    resultFileReady,
+    loading.search,
+    navigate,
+  ]);
 
   const fetchAllFiles = async (newPageIndex) => {
     try {
@@ -878,6 +950,7 @@ function FileEmailFinder() {
               data={resultFile}
               onDownloadFile={DownloadFile}
               onUpload={handleFileChange}
+              matchingFile={matchingFile}
             />
           ))}
 

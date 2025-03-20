@@ -5,6 +5,7 @@ import axiosInstance from "../axios/axiosInstance";
 import { toast } from "react-toastify";
 import AppTour from "./AppTour";
 
+
 function Body() {
   let navigate = useNavigate();
   let {
@@ -14,9 +15,73 @@ function Body() {
     creditBal,
     appTour,
     setAppTour,
+    notification,
+    setNotification,
+    newNotification,
+    setNewNotification,
+    socket
   } = useUserState();
 
   const [showTourWithDelay, setShowTourWithDelay] = useState(false);
+  useEffect(() => {
+    const fetchNotification = async () => {
+      try {
+        const response = await axiosInstance.get('/getNotifications');
+        if (response.data.notifications) {
+          console.log('hi ivide ethi');
+          setNotification(response.data.notifications);
+        }
+        console.log(response, 'notifications');
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+      }
+    };
+
+    fetchNotification();
+  }, [newNotification]); 
+  
+  useEffect(() => {
+    const handleProgress = () => {
+      console.log("New progress received");
+      setNewNotification((prev) => prev + 1);
+    };
+
+    const handleComplete = (data) => {
+      console.log("Completion:", data.message);
+      console.log("Files:", data.files);
+      toast.success(data.message);
+    };
+
+    const handleConnectError = (error) => {
+      console.error("Socket connection error:", error);
+    };
+
+    socket.on("progress", handleProgress);
+    socket.on("complete", handleComplete);
+    socket.on("connect_error", handleConnectError);
+
+    return () => {
+      socket.off("progress", handleProgress);
+      socket.off("complete", handleComplete);
+      socket.off("connect_error", handleConnectError);
+    };
+  }, [socket]);
+  console.log(socket.id,'socket id out')
+  useEffect(() => {
+    const handleConnect = () => {
+      console.log("Socket connected with ID:", socket.id)
+      if (userDetails && userDetails.id ) {
+        console.log("Registering user with socket:", userDetails.id);
+        socket.emit("registerUser", { userId: userDetails.id });
+      }
+    };
+  
+    socket.on("connect", handleConnect);
+  
+    return () => {
+      socket.off("connect", handleConnect);
+    };
+  }, [userDetails, socket]);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("Gamalogic_token");

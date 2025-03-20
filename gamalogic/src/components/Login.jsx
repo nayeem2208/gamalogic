@@ -20,6 +20,7 @@ function Login() {
     linkedinLoading,
     setLinkedinLoading,
     setAppTour,
+    socket
   } = useUserState();
   let [passwordVisible, setPasswordVisible] = useState(false);
   let [loading, setLoading] = useState(false);
@@ -66,6 +67,23 @@ function Login() {
       window.reloadThriveWidget();
     }
   }, []);
+
+  useEffect(() => {
+    // Disconnect the socket when the user reaches the Login page
+    if (socket) {
+      console.log("Disconnecting socket...");
+      socket.disconnect(); 
+      socket.off(); 
+    }
+
+    return () => {
+      if (socket) {
+        console.log("Cleaning up socket...");
+        socket.disconnect();
+        socket.off();
+      }
+    };
+  }, [socket]);
 
   useEffect(() => {
     let windowUrl = window.location.href;
