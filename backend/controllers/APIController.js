@@ -583,7 +583,8 @@ let APIControllers = {
               // If the first row contains valid emails, it is data, so add numeric headers
               const numColumns = firstRow.length;
               console.log(numColumns, 'num columns')
-              headers = Array.from({ length: numColumns }, (_, i) => i.toString()); // ["0", "1", "2", ...]
+              headers = Array.from({ length: numColumns }, (_, i) => String.fromCharCode(65 + i))
+              // headers = Array.from({ length: numColumns }, (_, i) => i.toString()); // ["0", "1", "2", ...]
               console.log(headers, 'headerssss')
               uploadedFileData = [headers, ...uploadedFileData];
               uploadedFileData.splice(0, 1)
