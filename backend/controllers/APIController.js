@@ -1094,10 +1094,28 @@ let APIControllers = {
       }
       else {
         try {
+
+          let download;
+          let validationData;
+
+          // Retry the API call if validationData is undefined
+          await retryWithDelay(async () => {
+            download = await axios.get(
+              `https://gamalogic.com/batch-email-discovery-result/?apikey=${apiKey}&batchid=${req.query.batchId}`
+            );
+            validationData = download.data.gamalogic_emailid_vrfy;
+
+            // Throw an error if validationData is still undefined after retries
+            if (!validationData) {
+              throw new Error("Validation data is not available yet. Please try again later.");
+            }
+
+            return download;
+          });
           console.log('second part ')
-          let download = await axios.get(
-            `https://gamalogic.com/batch-email-discovery-result/?apikey=${apiKey}&batchid=${req.query.batchId}`
-          );
+          // let download = await axios.get(
+          //   `https://gamalogic.com/batch-email-discovery-result/?apikey=${apiKey}&batchid=${req.query.batchId}`
+          // );
           const lastDotIndex = fileUpload.lastIndexOf('.');
 
           let fileName;
@@ -1116,6 +1134,7 @@ let APIControllers = {
           );
           // let extention = fileUpload.split('.')[1]
           const discoveryData = download.data.gamalogic_discovery;
+          
           let uploadedFileData = []
           if (extention === 'csv' || extention === 'txt') {
             const fileContent = NewDownload.data.toString('utf-8');
