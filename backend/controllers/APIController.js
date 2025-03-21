@@ -1096,18 +1096,18 @@ let APIControllers = {
         try {
 
           let download;
-          let validationData;
+          let finderData;
 
           // Retry the API call if validationData is undefined
           await retryWithDelay(async () => {
             download = await axios.get(
               `https://gamalogic.com/batch-email-discovery-result/?apikey=${apiKey}&batchid=${req.query.batchId}`
             );
-            validationData = download.data.gamalogic_emailid_vrfy;
-
-            // Throw an error if validationData is still undefined after retries
-            if (!validationData) {
-              throw new Error("Validation data is not available yet. Please try again later.");
+            finderData = download.data.gamalogic_discovery;  
+            
+            // Throw an error if finderData is still undefined after retries
+            if (!finderData) {
+              throw new Error("finder data is not available yet. Please try again later.");
             }
 
             return download;
