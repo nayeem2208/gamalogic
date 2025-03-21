@@ -1069,6 +1069,7 @@ let APIControllers = {
       if (req.query.alreadyDownloaded == 'true') {
         try {
           console.log('first part ')
+          // verdheoruError
           const fileUrl = `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&application=finder&batchid=${req.query.batchId}&filename=${fileUpload}`;
           const response = await axios.get(fileUrl, { responseType: 'stream' });
           const lastDotIndex = fileUpload.lastIndexOf('.');
@@ -1109,6 +1110,7 @@ let APIControllers = {
             fileName = `${baseName}_${req.query.batchId}.${extention}`;
           }
           // let fileName = fileUpload.split('.')[0] + '_' + req.query.batchId + '.' + fileUpload.split('.')[1]
+          console.log(fileName, 'fileNamee')
           let NewDownload = await axios.get(
             `http://service.gamalogic.com/dashboard-file-download?apikey=${apiKey}&batchid=${req.query.batchId}&filename=${fileUpload}&application=uploadfinder`, { responseType: 'arraybuffer' }
           );
@@ -1118,7 +1120,7 @@ let APIControllers = {
           if (extention === 'csv' || extention === 'txt') {
             const fileContent = NewDownload.data.toString('utf-8');
             uploadedFileData = Papa.parse(fileContent, {
-              header: true,
+              header: false,
               skipEmptyLines: true
             }).data;
           } else if (extention === 'xls' || extention === 'xlsx') {
@@ -1128,32 +1130,33 @@ let APIControllers = {
 
             uploadedFileData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-            // Separate headers and data
-            const [headers, ...dataRows] = uploadedFileData;
-            uploadedFileData = dataRows.map(row => {
-              const rowData = {};
-              headers.forEach((header, index) => {
-                rowData[header] = row[index] || '';
-              });
-              return rowData;
-            });
+            // // Separate headers and data
+            // const [headers, ...dataRows] = uploadedFileData;
+            // uploadedFileData = dataRows.map(row => {
+            //   const rowData = {};
+            //   headers.forEach((header, index) => {
+            //     rowData[header] = row[index] || '';
+            //   });
+            //   return rowData;
+            // });
           } else {
             throw new Error('Unsupported file format');
           }
+          console.log(uploadedFileData, 'uploadedFileData')
           const headers = Object.keys(uploadedFileData[0]);
 
-          const updatedData = uploadedFileData.map(record => {
+          const updatedData = uploadedFileData.map((record, index) => {
             let values
             if (extention == 'txt') {
-              const recordValue = Object.values(record)[0];
-              values = recordValue
+              values = record.join(",");
             } else {
-              values = Object.values(record)
+              values = record
             }
+            console.log(values,'valuesssssss')
             const matchedDomain = discoveryData.find(
               item => values.includes(item.domain) && values.includes(item.firstname) && values.includes(item.lastname)
             );
-
+            console.log(matchedDomain, 'matchDomain ')
             const email = matchedDomain && matchedDomain.email_address !== '0' ? matchedDomain.email_address : '';
             const isCatchall = matchedDomain ? matchedDomain.is_catchall : '0';
             let remarks = "";
@@ -1177,8 +1180,8 @@ let APIControllers = {
             "remarks"
           ];
           const finalData = [...resultHeaders, ...updatedData];
-          const DataForFileCreation = [resultHeaders, ...updatedData]
-
+          const DataForFileCreation = [...updatedData]
+          console.log(DataForFileCreation,'data for file creaetion')
           let newFileName = `${fileUpload}`;
           let filePath = path.join(__dirname, '..', 'temp', newFileName);
 
