@@ -39,7 +39,6 @@ function SingleNotification({ isOpen, onClose, singleNotification }) {
   }, [singleNotification?.id]);
 
   const handleGoToFilePage = () => {
-    console.log("Button clicked!"); // Debugging line
     let filePageUrl;
     if (singleNotification.type == "validation") {
       const fileNameMatch =

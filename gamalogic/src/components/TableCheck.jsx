@@ -28,18 +28,17 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
       jsonData.data.length > 0
     ) {
       // Extract rows and headers
-      const rows = jsonData.data; // Access the `data` field in the jsonData
-      const headers = Object.keys(rows[0]); // Get column headers dynamically
+      const headers =  jsonData.data[0]; // Get column headers dynamically
+      const rows = jsonData.data.slice(1)   ; // Access the `data` field in the jsonData
       const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       const dynamicColumns = headers.map((header) => ({
         width: 200, // Adjust column width as needed
       }));
 
-      const rowData = rows.map((row) => headers.map((header) => row[header]));
-      const tableData = [headers, ...rowData];
+      const tableData = [headers, ...rows];
       const screenHeight = window.innerHeight;
 
-      let minRow = rowData.length + 1000;
+      let minRow = rows.length + 1000;
       if (!tableInstance) {
         const table = jspreadsheet(spreadsheetRef.current, {
           data: tableData,
@@ -156,41 +155,51 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
     };
   }, []);
 
+
   const handleColumnSelect = (field) => {
     if (!selectedColumn) {
       toast.error("Please select a column to choose");
+      return;
     }
+      // Update the form data with the selected key
     setFormData((prev) => ({
       ...prev,
       [field]: selectedColumn,
     }));
+  
     setSelectedColumn("");
   };
 
   const handleUpload = () => {
-    // Pass the form data to the parent via the `onUpload` callback
+    // Validate if all required fields are selected
     if (
       !formData.firstNameField ||
       !formData.lastNameField ||
       !formData.domainField
-      // !formData.emailField
     ) {
       toast.error("Please select the columns");
       return;
     }
+
+    // Prepare the data to be sent to the parent component
     const newFormData = {
       firstNameField: [originalHeaders[columns.indexOf(formData.firstNameField)],formData.firstNameField],
       lastNameField: [originalHeaders[columns.indexOf(formData.lastNameField)],formData.lastNameField],
       domainField: [originalHeaders[columns.indexOf(formData.domainField)],formData.domainField],
       // emailField:formData.emailField,
     };
+
+
+    console.log(newFormData, "new formdata for upload");
+
+    // Notify the parent component using the `onUpload` callback
     if (onUpload) onUpload(newFormData);
   };
   const handleCancel = () => {
     setFormData({
       firstNameField: "",
       lastNameField: "",
-      domainField: ""
+      domainField: "",
       // emailField:""
     });
     // Notify the parent component using the `onCancel` callback

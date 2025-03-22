@@ -3,7 +3,6 @@ import SingleNotificationMobile from "./SingleNotificationMobile";
 
 function MobileNotification({ notifications, onClose }) {
   const [singleNotification, setSingleNotification] = useState(null);
-  console.log(notifications, "notifications");
 
   const formatTime = (time) => {
     const notifDate = new Date(time);

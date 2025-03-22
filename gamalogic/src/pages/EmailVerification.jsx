@@ -315,15 +315,15 @@ function EmailVerification() {
           );
           clearInterval(interval);
           setLoad(100);
-          const { headers, data: responseData, fileName,headerAvailable } = res.data;
+          const { headers, data: responseData, fileName } = res.data;
 
           const outputArray = responseData.map((row) => {
-            const obj = {};
+            const obj = [];
             headers.forEach((header, index) => {
               if (header === "") {
                 obj[`_${index}`] = "";
               } else {
-                obj[header] = row[index];
+                obj[index] = row[index];
               }
             });
             return obj;
@@ -335,16 +335,16 @@ function EmailVerification() {
           const fileExtension = parts[parts.length - 1].toLowerCase();
           switch (fileExtension) {
             case "csv":
-              downloadCSV(outputArray, finalFileName,headerAvailable);
+              downloadCSV(outputArray, finalFileName);
               break;
             case "xlsx":
-              downloadExcel(outputArray, finalFileName, fileExtension,headerAvailable);
+              downloadExcel(outputArray, finalFileName, fileExtension);
               break;
             case "xls":
-              downloadExcel(outputArray, finalFileName, fileExtension,headerAvailable);
+              downloadExcel(outputArray, finalFileName, fileExtension);
               break;
             case "txt":
-              downloadText(outputArray, finalFileName,headerAvailable);
+              downloadText(outputArray, finalFileName);
               break;
             default:
               toast.error("Unsupported file format for download.");
@@ -364,99 +364,80 @@ function EmailVerification() {
       }
     }
   };
-  const downloadCSV = (data, fileName, headerAvailable) => {
-    console.log(data, "data inside downloadCSV");
+  const downloadCSV = (data, fileName) => {
+    const csvContent = data
+      .map((row) => {
+        return Object.values(row).join(","); // Join values with a comma
+      })
+      .join("\n"); // Join rows with a newline
   
-    if (!Array.isArray(data) || data.length === 0) {
-      console.error("Invalid or empty data provided.");
-      return;
-    }
-  
-    // Extract all unique keys from data
-    const allKeys = [...new Set(data.flatMap(Object.keys))];
-  
-    // Create header row (if headers are available)
-    const headerRow = headerAvailable ? allKeys.join(",") : "";
-  
-    // Create rows dynamically
-    const csvData = data
-      .map((item) =>
-        allKeys.map((key) => (item[key] !== undefined ? item[key] : "")).join(",")
-      )
-      .join("\n");
-  
-    // Combine header and data (if headers are available)
-    const finalCSV = headerAvailable ? `${headerRow}\n${csvData}` : csvData;
-    console.log(finalCSV, "final CSV data");
-  
-    const blob = new Blob([finalCSV], { type: "text/csv;charset=utf-8;" });
-  
+    // Create a Blob with the CSV content
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
+  
+    // Create a download link and trigger the download
     const link = document.createElement("a");
     link.href = url;
     link.setAttribute("download", fileName + ".csv");
     document.body.appendChild(link);
     link.click();
+  
+    // Clean up
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
   
 
-  const downloadExcel = (data, fileName, fileType, headerAvailable) => {
-    const wb = XLSX.utils.book_new();
-    const ws = headerAvailable
-      ? XLSX.utils.json_to_sheet(data) // Include headers
-      : XLSX.utils.json_to_sheet(data, { skipHeader: true }); // Skip headers
-  
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-  
-    let extension = "";
-    if (fileType === "xlsx") {
-      extension = ".xlsx";
-    } else if (fileType === "xls") {
-      extension = ".xls";
-    } else {
-      throw new Error(`Unsupported file type: ${fileType}`);
-    }
-  
-    XLSX.writeFile(wb, `${fileName}${extension}`);
+  const downloadExcel = (data, fileName, fileType) => {
+     const rows = data.map((row) => {
+         return Object.values(row); // Extract values from each row object
+       });
+     
+       // Create a new workbook and worksheet
+       const wb = XLSX.utils.book_new();
+       const ws = XLSX.utils.aoa_to_sheet(rows); // Use aoa_to_sheet for array of arrays
+       XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+     
+       // Determine the file extension
+       let extension = "";
+       if (fileType === "xlsx") {
+         extension = ".xlsx";
+       } else if (fileType === "xls") {
+         extension = ".xls";
+       } else {
+         throw new Error(`Unsupported file type: ${fileType}`);
+       }
+     
+       // Write the file and trigger the download
+       XLSX.writeFile(wb, `${fileName}${extension}`);
   };
   
 
-  const downloadText = (data, fileName, headerAvailable) => {
-    console.log(data, "data inside downloadText");
-  
-    if (!Array.isArray(data) || data.length === 0) {
-      console.error("Invalid or empty data provided.");
-      return;
-    }
-  
-    // Extract all unique keys from data
-    const allKeys = [...new Set(data.flatMap(Object.keys))];
-  
-    // Create header row (if headers are available)
-    const headerRow = headerAvailable ? allKeys.join(",") : "";
-  
-    // Create rows dynamically
-    const textData = data
-      .map((item) =>
-        allKeys.map((key) => (item[key] !== undefined ? item[key] : "")).join(",")
-      )
-      .join("\n");
-  
-    // Combine header and data (if headers are available)
-    const finalText = headerAvailable ? `${headerRow}\n${textData}` : textData;
-    console.log(finalText, "final text data");
-  
-    const blob = new Blob([finalText], { type: "text/plain;charset=utf-8" });
-  
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", fileName + ".txt");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const downloadText = (data, fileName) => {
+    const fileContent = data
+    .map((row) => {
+      // Extract all values from the row object
+      const values = Object.values(row).join(" "); // Join all values with a space
+      return values;
+    })
+    .join("\n"); // Join all rows with a newline
+
+  // Create a Blob with the file content
+  const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  // Create a download link and trigger the download
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", fileName + ".txt");
+  document.body.appendChild(link);
+  link.click();
+
+  // Clean up
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
   };
+
 
 
   const handleFileChange = async (event) => {
@@ -634,9 +615,11 @@ function EmailVerification() {
         setLoad((prev) => (prev < 90 ? prev + increment : prev));
       }, intervalTime);
   
+      let EmailFieldIndex = JsonToServer.data[0].indexOf(data.emailField[0]);
+
       const transformedData = JsonToServer.data
         .map((item) => ({
-          emailid: item[data.emailField[0]],
+          emailid: item[EmailFieldIndex],
         }))
         .filter((item) => item.emailid);
   

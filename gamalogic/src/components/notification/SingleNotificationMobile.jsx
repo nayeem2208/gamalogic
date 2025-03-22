@@ -10,7 +10,6 @@ function SingleNotificationMobile({ isOpen, onClose, singleNotification }) {
   useEffect(() => {
     setModalIsOpen(isOpen);
   }, [isOpen]);
-  console.log(singleNotification,'single notificationssssssssssssssss')
   useEffect(() => {
     const notificationIsRead = async () => {
       try {
@@ -19,7 +18,6 @@ function SingleNotificationMobile({ isOpen, onClose, singleNotification }) {
           let res = await axiosInstance.get(
             `/notificationIsReadStatusChange?id=${singleNotification.id}`
           );
-          console.log(res.data);
 
           // Update the local state to reflect the change
           if (res.data.message === "Notification marked as read") {

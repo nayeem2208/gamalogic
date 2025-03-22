@@ -71,14 +71,12 @@ function Login() {
   useEffect(() => {
     // Disconnect the socket when the user reaches the Login page
     if (socket) {
-      console.log("Disconnecting socket...");
       socket.disconnect(); 
       socket.off(); 
     }
 
     return () => {
       if (socket) {
-        console.log("Cleaning up socket...");
         socket.disconnect();
         socket.off();
       }

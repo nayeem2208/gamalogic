@@ -28,10 +28,8 @@ function Body() {
       try {
         const response = await axiosInstance.get('/getNotifications');
         if (response.data.notifications) {
-          console.log('hi ivide ethi');
           setNotification(response.data.notifications);
         }
-        console.log(response, 'notifications');
       } catch (error) {
         console.error('Error fetching notifications:', error);
       }
@@ -42,13 +40,10 @@ function Body() {
   
   useEffect(() => {
     const handleProgress = () => {
-      console.log("New progress received");
       setNewNotification((prev) => prev + 1);
     };
 
     const handleComplete = (data) => {
-      console.log("Completion:", data.message);
-      console.log("Files:", data.files);
       toast.success(data.message);
     };
 
@@ -66,12 +61,9 @@ function Body() {
       socket.off("connect_error", handleConnectError);
     };
   }, [socket]);
-  console.log(socket.id,'socket id out')
   useEffect(() => {
     const handleConnect = () => {
-      console.log("Socket connected with ID:", socket.id)
       if (userDetails && userDetails.id ) {
-        console.log("Registering user with socket:", userDetails.id);
         socket.emit("registerUser", { userId: userDetails.id });
       }
     };

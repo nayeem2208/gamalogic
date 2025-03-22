@@ -3,7 +3,6 @@ import SingleNotification from "./SingleNotification";
 
 function Notification({ notifications, onClose }) {
   const [singleNotification, setSingleNotification] = useState(null);
-  console.log(notifications, "notifications");
 
   const formatTime = (time) => {
     const notifDate = new Date(time);
@@ -25,7 +24,6 @@ function Notification({ notifications, onClose }) {
     setSingleNotification(null);
     onClose()
   };
-  console.log(singleNotification, "single notificatoin");
   return (
     <div className="fixed top-24 right-64  min-w-96 max-w-[500px]  bg-white border rounded-lg shadow-lg z-50" >
       <div className="p-4 border-b flex justify-between items-center">

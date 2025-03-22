@@ -68,12 +68,7 @@ function FileEmailFinder() {
   }, []);
 
   useEffect(() => {
-    console.log("how many time renderin");
-    console.log(fileUpload, dateTime, "file upload and date time ");
-
     if (fileUpload && dateTime) {
-      console.log("inside thissssss");
-
       const removeFileExtension = (fileName) => {
         return fileName.split(".").slice(0, -1).join(".").trim();
       };
@@ -83,15 +78,7 @@ function FileEmailFinder() {
         return date.toISOString();
       };
 
-      console.log(resultFile, "resultFile");
-
       const matchedFile = resultFile.find((file) => {
-        console.log("inside thissssssssss");
-        console.log(removeFileExtension(file.file_upload), "file.file_upload");
-        console.log(fileUpload, "fileUpload");
-        console.log(convertToISODate(dateTime), "convertToISODate(dateTime)");
-        console.log(convertToISODate(file.date_time), "file.date_time");
-
         const fileUploadMatch =
           removeFileExtension(file.file_upload) == fileUpload;
         const normalizedDateTime = convertToISODate(dateTime);
@@ -100,15 +87,14 @@ function FileEmailFinder() {
           fileDateTime.split(":")[0] + fileDateTime.split(":")[1];
         const normalizedDateTimeSplit =
           normalizedDateTime.split(":")[0] + normalizedDateTime.split(":")[1];
-        const dateTimeMatch = fileDateTimeAfterSplit === normalizedDateTimeSplit;
-
+        const dateTimeMatch =
+          fileDateTimeAfterSplit === normalizedDateTimeSplit;
 
         return fileUploadMatch && dateTimeMatch;
       });
 
       if (matchedFile) {
         setMatchingFile(matchedFile);
-        console.log(matchedFile, "matched fileeeeeeeeeee");
 
         // Clear the URL parameters after matching
         const newSearchParams = new URLSearchParams(location.search);
@@ -166,17 +152,17 @@ function FileEmailFinder() {
         };
         const filesWithProcessedField = allFiles.data.map((file) => ({
           ...file,
-          processed:  file.is_download == 1 ? 100 : 0,
+          processed: file.is_download == 1 ? 100 : 0,
           formattedDate: formatDate(file.date_time, userDetails.timeZone),
         }));
         const allProcessed = filesWithProcessedField.every(
           (file) => file.processed === 100
         );
         // if (!allProcessed) {
-          setResultFile((prevResultFiles) => [
-            ...prevResultFiles,
-            ...filesWithProcessedField,
-          ]);
+        setResultFile((prevResultFiles) => [
+          ...prevResultFiles,
+          ...filesWithProcessedField,
+        ]);
         // }
         setFilesStatus((prevResultFiles) => [
           ...prevResultFiles,
@@ -232,8 +218,15 @@ function FileEmailFinder() {
     try {
       setFileForClickUp(file);
       Papa.parse(file, {
-        header: true,
+        header: false,
         complete: async function (results) {
+          // Filter out empty rows
+          const filteredData = results.data.filter((row) => {
+            // Check if any cell in the row has a non-empty value
+            return row.some((cell) => cell && cell.trim() !== "");
+          });
+
+          results.data = filteredData; // Update the results with filtered data
           results.fileName = file.name;
 
           if (results.data.length <= 100000 && results.data.length > 0) {
@@ -244,9 +237,7 @@ function FileEmailFinder() {
               "Please upload a file with columns first name, last name and domain"
             );
           } else {
-            toast.error(
-              "Please select a file with not more than 100,000 email address"
-            );
+            toast.error("Please select a file with not more than 100,000 rows");
           }
         },
       });
@@ -271,18 +262,20 @@ function FileEmailFinder() {
       }
 
       // Extract and clean headers
-      const headers = rows[0].map((header) => header.trim());
-
+      // const headers = rows[0].map((header) => header.trim());
+      console.log(rows, "rows from xcel");
       // Map the rows to objects using the cleaned headers
-      const contacts = rows.slice(1).map((row) => {
-        const contact = {};
-        row.forEach((value, index) => {
-          contact[headers[index]] = value;
-        });
-        return contact;
-      });
+      // const contacts = rows.slice(1).map((row) => {
+      //   const contact = {};
+      //   row.forEach((value, index) => {
+      //     contact[headers[index]] = value;
+      //   });
+      //   return contact;
+      // });
+      const contacts = rows;
 
       const fileName = file.name;
+      console.log(contacts, "contacts in xls");
       if (contacts.length <= 100000 && contacts.length > 0) {
         setJsonToServer({ data: contacts, fileName: fileName });
         setShowAlert(true);
@@ -302,44 +295,29 @@ function FileEmailFinder() {
 
   const handleTXTFile = async (file) => {
     setFileForClickUp(file);
-  
+
     const reader = new FileReader();
     reader.onload = async (e) => {
       const text = e.target.result;
       const lines = text.split("\n");
       let err = false;
-  
-      // Extract headers from the first line
-      const headers = lines[0]
-        .split(/\s+/) // Split the first line by whitespace
-        .map((header) => header.trim()); // Trim each header
-  
-      // Process the rest of the lines (skip the first line)
+      // Process all lines (no need to skip headers or map to headers)
       const contacts = lines
-        .slice(1) // Skip the first line (headers)
         .filter((line) => line.trim() !== "") // Remove empty lines
         .map((line) => {
-          const values = line.split(/\s+/).map((item) => item.trim()); // Split each line by whitespace
-          const contact = {};
-  
-          // Map values to headers (keys)
-          headers.forEach((header, index) => {
-            contact[header] = values[index] || ""; // Use empty string if value is missing
-          });
-  
-          return contact;
+          return line.split(",").map((item) => item.trim()); // Split each line by commas and trim
         });
-  
+
       if (err) {
         toast.error(
           "Please upload a file with consistent column headers and values."
         );
         return;
       }
-  
+
       const fileName = file.name;
       if (contacts.length <= 100000) {
-        setJsonToServer({ data: contacts, fileName: fileName }); // Pass data as array of objects (key-value pairs)
+        setJsonToServer({ data: contacts, fileName: fileName }); // Pass data as array of arrays
         setShowAlert(true);
       } else {
         toast.error(
@@ -478,10 +456,14 @@ function FileEmailFinder() {
           const url = window.URL.createObjectURL(blob);
 
           // Create a link element to trigger the download
-          let fileName=data.file_upload.split('.')[0]+'_Gamalogic Finder Results'+'.'+data.file_upload.split('.')[1]
+          let fileName =
+            data.file_upload.split(".")[0] +
+            "Gamalogic Finder Results" +
+            "." +
+            data.file_upload.split(".")[1];
           const link = document.createElement("a");
           link.href = url;
-          link.setAttribute("download",fileName); // Use the file name from the backend
+          link.setAttribute("download", fileName); // Use the file name from the backend
           document.body.appendChild(link);
           link.click();
 
@@ -495,19 +477,21 @@ function FileEmailFinder() {
           clearInterval(interval);
           setLoad(100);
           const { headers, data: responseData, fileName } = res.data;
-
+          console.log(headers, "headers");
+          console.log(responseData, "data to downloaddddd");
           const outputArray = responseData.map((row) => {
-            const obj = {};
+            const obj = [];
             headers.forEach((header, index) => {
               if (header === "") {
                 obj[`_${index}`] = "";
               } else {
-                obj[header] = row[index];
+                obj[index] = row[index];
               }
             });
             return obj;
           });
 
+          console.log(outputArray, "output array ");
           // const fileName = res.data.fileName;
           const parts = fileName.split(".");
           const nameWithoutExtension = parts[0];
@@ -549,15 +533,43 @@ function FileEmailFinder() {
   };
 
   const downloadCSV = (data, fileName) => {
-    const exportType = exportFromJSON.types.csv;
-    exportFromJSON({ data, fileName, exportType });
+    // Convert data to CSV format without headers
+    const csvContent = data
+      .map((row) => {
+        return Object.values(row).join(","); // Join values with a comma
+      })
+      .join("\n"); // Join rows with a newline
+
+    // Create a Blob with the CSV content
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    // Create a download link and trigger the download
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName + ".csv");
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const downloadExcel = (data, fileName, fileType) => {
+    console.log(data, "data in excel download");
+
+    // Convert data to an array of arrays (if it's not already)
+    const rows = data.map((row) => {
+      return Object.values(row); // Extract values from each row object
+    });
+
+    // Create a new workbook and worksheet
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(data);
+    const ws = XLSX.utils.aoa_to_sheet(rows); // Use aoa_to_sheet for array of arrays
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
+    // Determine the file extension
     let extension = "";
     if (fileType === "xlsx") {
       extension = ".xlsx";
@@ -567,31 +579,36 @@ function FileEmailFinder() {
       throw new Error(`Unsupported file type: ${fileType}`);
     }
 
+    // Write the file and trigger the download
     XLSX.writeFile(wb, `${fileName}${extension}`);
   };
 
   const downloadText = (data, fileName) => {
+    console.log(data, "dataaaaaaaaaaa of txt");
 
-    const header = Object.keys(data[0])[0];
-
+    // Convert the data to a string format
     const fileContent = data
       .map((row) => {
-        const mainData = row[header]; 
-        const email = row.email;
-        const remarks = row.remarks;
-        return `${mainData} ${email} ${remarks}`;
+        // Extract all values from the row object
+        const values = Object.values(row).join(" "); // Join all values with a space
+        return values;
       })
-      .join("\n"); 
+      .join("\n"); // Join all rows with a newline
 
-    const fullContent = `${header} email remarks\n${fileContent}`;
-
-    const blob = new Blob([fullContent], { type: "text/plain;charset=utf-8" });
+    // Create a Blob with the file content
+    const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
+
+    // Create a download link and trigger the download
     const link = document.createElement("a");
     link.href = url;
     link.setAttribute("download", fileName + ".txt");
     document.body.appendChild(link);
     link.click();
+
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleAccept = (value) => {
@@ -717,16 +734,23 @@ function FileEmailFinder() {
     const interval = setInterval(() => {
       setLoad((prev) => (prev < 90 ? prev + 4 : prev));
     }, 1000);
-    const transformedData = JsonToServer.data
+    
+    let firstNameIndex = JsonToServer.data[0].indexOf(data.firstNameField[0]);
+    let lastNameIndex = JsonToServer.data[0].indexOf(data.lastNameField[0]);
+    let domainIndex = JsonToServer.data[0].indexOf(data.domainField[0]);
+
+
+    const transformedData = JsonToServer.data // Excluding header row
       .map((item) => ({
-        first_name: item[data.firstNameField[0]],
-        last_name: item[data.lastNameField[0]],
-        domain: item[data.domainField[0]],
+        first_name: item[firstNameIndex],
+        last_name: item[lastNameIndex],
+        domain: item[domainIndex],
       }))
       .filter((item) => item.first_name || item.last_name || item.domain);
     // setLoad(50);
-    let results = JsonToServer;
-    results.data = transformedData;
+    // let results = JsonToServer;
+    // results.data = transformedData;
+    let results = { ...JsonToServer, data: transformedData };
     // results.fields = data;
     // setLoad(60);
     async function BatchFileFinder() {
@@ -829,7 +853,6 @@ function FileEmailFinder() {
     setSpreadSheet(false);
   };
 
-
   const handleMappingCancel = () => {
     setSpreadSheet(false);
     setJsonToServer(null);
@@ -874,32 +897,32 @@ function FileEmailFinder() {
             onDismiss={() => SetSelection(false)} // Update selection on dismiss
           />
         )}
-          {!spreadSheet && (
-        <div className="mt-8 sm:mt-14 subHeading flex flex-col sm:flex-none justify-center items-center sm:justify-start sm:items-start">
-          <div className="flex flex-col md:flex-row items-center justify-between w-full">
-            <h3>Upload Your File Here | Email Finder</h3>
+        {!spreadSheet && (
+          <div className="mt-8 sm:mt-14 subHeading flex flex-col sm:flex-none justify-center items-center sm:justify-start sm:items-start">
+            <div className="flex flex-col md:flex-row items-center justify-between w-full">
+              <h3>Upload Your File Here | Email Finder</h3>
 
-            <div className="md:flex justify-center items-center  lg:w-3/6  2xl:w-2/5">
-              {resultFile.length > 0 && (
-                <input
-                  type="text"
-                  placeholder="Search files by name..."
-                  value={searchQuery}
-                  onChange={onSearchInputChange}
-                  className="w-full my-2 md:my-0 md:mx-4 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              )}
-              {resultFile.length > 0 && (
-                <div className="w-full flex justify-center items-center md:w-2/5">
-                  <ViewSelector
-                    tileView={tileView}
-                    onViewChange={handleViewChanger}
+              <div className="md:flex justify-center items-center  lg:w-3/6  2xl:w-2/5">
+                {resultFile.length > 0 && (
+                  <input
+                    type="text"
+                    placeholder="Search files by name..."
+                    value={searchQuery}
+                    onChange={onSearchInputChange}
+                    className="w-full my-2 md:my-0 md:mx-4 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                </div>
-              )}
+                )}
+                {resultFile.length > 0 && (
+                  <div className="w-full flex justify-center items-center md:w-2/5">
+                    <ViewSelector
+                      tileView={tileView}
+                      onViewChange={handleViewChanger}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
         )}
         {!tileView && resultFile.length > 0 && !spreadSheet && (
           <AddFileInRowView onUpload={handleFileChange} />
@@ -958,13 +981,13 @@ function FileEmailFinder() {
           <AddFileForFirstTime onUpload={handleFileChange} />
         )}
       </InfiniteScroll>
-        {spreadSheet && (
-          <Spreadsheet
-            jsonData={JsonToServer}
-            onUpload={handleMappingColumns}
-            onCancel={handleMappingCancel}
-          />
-        )}
+      {spreadSheet && (
+        <Spreadsheet
+          jsonData={JsonToServer}
+          onUpload={handleMappingColumns}
+          onCancel={handleMappingCancel}
+        />
+      )}
     </div>
   );
 }
