@@ -28,6 +28,10 @@ function Body() {
       try {
         const response = await axiosInstance.get('/getNotifications');
         if (response.data.notifications) {
+          const unreadCount = response.data.notifications.filter(not => not.isRead === '0').length;
+          setNotification(response.data.notifications);
+          setNewNotification(unreadCount)
+
           setNotification(response.data.notifications);
         }
       } catch (error) {

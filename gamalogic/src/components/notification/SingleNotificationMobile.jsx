@@ -5,7 +5,7 @@ import axiosInstance from "../../axios/axiosInstance";
 
 function SingleNotificationMobile({ isOpen, onClose, singleNotification }) {
   const [modalIsOpen, setModalIsOpen] = useState(isOpen);
-  let { notification, setNotification } = useUserState();
+  let { notification, setNotification,setNewNotification } = useUserState();
 
   useEffect(() => {
     setModalIsOpen(isOpen);
@@ -14,6 +14,9 @@ function SingleNotificationMobile({ isOpen, onClose, singleNotification }) {
     const notificationIsRead = async () => {
       try {
         if (singleNotification?.id) {
+          if(singleNotification.isRead=='0'){
+            setNewNotification((prev)=>prev-1)
+          }
           // Call the API to update the isRead status
           let res = await axiosInstance.get(
             `/notificationIsReadStatusChange?id=${singleNotification.id}`

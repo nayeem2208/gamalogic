@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 function SingleNotification({ isOpen, onClose, singleNotification }) {
   const [modalIsOpen, setModalIsOpen] = useState(isOpen);
-  let { notification, setNotification } = useUserState();
+  let { notification, setNotification,setNewNotification } = useUserState();
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -17,6 +17,9 @@ function SingleNotification({ isOpen, onClose, singleNotification }) {
     const notificationIsRead = async () => {
       try {
         if (singleNotification?.id) {
+          if(singleNotification.isRead=='0'){
+            setNewNotification((prev)=>prev-1)
+          }
           let res = await axiosInstance.get(
             `/notificationIsReadStatusChange?id=${singleNotification.id}`
           );

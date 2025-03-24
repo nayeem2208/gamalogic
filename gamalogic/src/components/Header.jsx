@@ -80,7 +80,7 @@ function Header() {
   }
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
-    setNewNotification(0);
+    // setNewNotification(0);
   };
 
   const [notifications, setNotifications] = useState([]);

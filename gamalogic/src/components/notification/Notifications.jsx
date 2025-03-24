@@ -21,8 +21,14 @@ function Notification({ notifications, onClose }) {
   };
 
   const handleCloseModal = (data) => {
+    let closeAll = true;
+    if (singleNotification) {
+      closeAll = false;
+    }
     setSingleNotification(null);
-    onClose()
+    if (closeAll) {
+      onClose();
+    }
   };
   return (
     <div className="fixed top-24 right-64  min-w-96 max-w-[500px]  bg-white border rounded-lg shadow-lg z-50" >

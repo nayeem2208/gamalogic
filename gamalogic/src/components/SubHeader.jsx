@@ -32,7 +32,7 @@ function SubHeader(props) {
   // Toggle notifications
   const toggleNotifications = () => {
     setShowNotifications((prevState) => !prevState);
-    setNewNotification(0); // Reset new notification count
+    // setNewNotification(0); // Reset new notification count
   };
 
   // Handle click outside the notification div

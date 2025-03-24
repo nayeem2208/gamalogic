@@ -28,25 +28,30 @@ export const io = new Server(httpServer, {
 export let activeUsers= new Map()
 // Socket.IO connection handler
 io.on("connection", (socket) => {
-  console.log("A client connected:", socket.id,'acitve useres',activeUsers);
+  // console.log("A client connected:", socket.id,'acitve useres',activeUsers);
 
   socket.on("registerUser", (data) => {
     const { userId } = data;
-    activeUsers.set(userId, socket.id); // Update or add the user
-    console.log("Updated active users:", [...activeUsers]);
+    if (activeUsers.has(userId)) {
+      activeUsers.get(userId).push(socket.id);
+    } else {
+      // Otherwise, create a new entry with an array containing the socket ID
+      activeUsers.set(userId, [socket.id]);
+    }
+    // console.log("Updated active users:", [...activeUsers]);
   // io.emit("getActiveUsers", activeUsers);
     // You can store the association between userId and socket.id in a map or database
   });
   // Handle disconnection
   socket.on("disconnect", () => {
-    console.log("A client disconnected:", socket.id);
+    // console.log("A client disconnected:", socket.id);
     for (const [userId, socketId] of activeUsers.entries()) {
       if (socketId === socket.id) {
         activeUsers.delete(userId); // Remove the user
         break;
       }
     }
-    console.log("Active users after disconnect:", [...activeUsers]);
+    // console.log("Active users after disconnect:", [...activeUsers]);
   });
 });
 

@@ -22,25 +22,25 @@ const ValidationSpreadsheet = ({ jsonData, onUpload, onCancel }) => {
       jsonData.data.length > 0
     ) {
       // Extract rows and headers
-      const rows = jsonData.data; // Access the `data` field in the jsonData
-      const headers = Object.keys(rows[0]); // Get column headers dynamically
+      const headers = jsonData.data[0]; // Get column headers dynamically
+      const rows = jsonData.data.slice(1); // Access the `data` field in the jsonData
       const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       const dynamicColumns = headers.map((header) => ({
         width: 200, // Adjust column width as needed
       }));
 
-      const rowData = rows.map((row) => headers.map((header) => row[header]));
-      const tableData = [headers, ...rowData];
+      // const rowData = rows.map((row) => headers.map((header) => row[header]));
+      const tableData = [headers, ...rows];
       const screenHeight = window.innerHeight;
-
-      let minRow = rowData.length + 1000;
+      // console.log('second stage in excel')
+      let minRow = rows.length + 1000;
       if (!tableInstance) {
         const table = jspreadsheet(spreadsheetRef.current, {
           data: tableData,
           columns: dynamicColumns,
           tableOverflow: true,
           license: "MIT",
-          lazyLoading:true,
+          lazyLoading: true,
           minDimensions: [25, minRow], // Minimum dimensions for the table
           tableHeight: `${screenHeight - 190}px`,
           onselection: (instance, x1, y1, x2, y2) => {
@@ -62,7 +62,7 @@ const ValidationSpreadsheet = ({ jsonData, onUpload, onCancel }) => {
         setColumns(alphabetHeaders);
         setOriginalHeaders(headers);
 
-        spreadsheetRef.current.style.width = "calc(100% - 25%)"; 
+        spreadsheetRef.current.style.width = "calc(100% - 25%)";
         spreadsheetRef.current.style.overflowX = "auto";
       }
     }
