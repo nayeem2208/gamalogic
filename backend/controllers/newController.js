@@ -734,7 +734,7 @@ const newControllers = {
             const query = `SELECT * FROM notification WHERE userid = ? order by id desc`;
             const [notifications] = await dbConnection.query(query, [userId]);
 
-            console.log(notifications, 'notificationsssssssss');
+            // console.log(notifications, 'notificationsssssssss');
 
             res.status(200).json({ notifications: notifications || [] });
         } catch (error) {
@@ -751,7 +751,7 @@ const newControllers = {
         try {
             const dbConnection = req.dbConnection;
             const { id } = req.query;
-            console.log(id,'idddddddddddddddddd')
+            // console.log(id,'idddddddddddddddddd')
         if (!id) {
             return res.status(400).json({ error: "Notification ID is required" });
         }
