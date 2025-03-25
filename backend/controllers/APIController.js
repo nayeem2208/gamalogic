@@ -535,7 +535,7 @@ let APIControllers = {
           let headerAvailable = true
           if (extention === 'csv' || extention === 'txt') {
             const fileContent = NewDownload.data.toString('utf-8');
-             uploadedFileData = Papa.parse(fileContent, {
+            uploadedFileData = Papa.parse(fileContent, {
               header: false, // Do not treat the first row as headers
               skipEmptyLines: true
             }).data;
@@ -676,8 +676,8 @@ let APIControllers = {
             "status"
           ];
           const finalData = [...resultHeaders, ...updatedData];
-          const DataForFileCreation =[...updatedData]
-          
+          const DataForFileCreation = [...updatedData]
+
           let newFileName = `${fileUpload}`;
           let filePath = path.join(__dirname, '..', 'temp', newFileName);
 
@@ -1074,8 +1074,8 @@ let APIControllers = {
             download = await axios.get(
               `https://gamalogic.com/batch-email-discovery-result/?apikey=${apiKey}&batchid=${req.query.batchId}`
             );
-            finderData = download.data.gamalogic_discovery;  
-            
+            finderData = download.data.gamalogic_discovery;
+
             // Throw an error if finderData is still undefined after retries
             if (!finderData) {
               throw new Error("finder data is not available yet. Please try again later.");
@@ -1105,7 +1105,7 @@ let APIControllers = {
           );
           // let extention = fileUpload.split('.')[1]
           const discoveryData = download.data.gamalogic_discovery;
-          
+
           let uploadedFileData = []
           if (extention === 'csv' || extention === 'txt') {
             const fileContent = NewDownload.data.toString('utf-8');
@@ -1142,7 +1142,7 @@ let APIControllers = {
             } else {
               values = record
             }
-            console.log(values,'valuesssssss')
+            console.log(values, 'valuesssssss')
             const matchedDomain = discoveryData.find(
               item => values.includes(item.domain) && values.includes(item.firstname) && values.includes(item.lastname)
             );
@@ -1171,7 +1171,7 @@ let APIControllers = {
           ];
           const finalData = [...resultHeaders, ...updatedData];
           const DataForFileCreation = [...updatedData]
-          console.log(DataForFileCreation,'data for file creaetion')
+          console.log(DataForFileCreation, 'data for file creaetion')
           let newFileName = `${fileUpload}`;
           let filePath = path.join(__dirname, '..', 'temp', newFileName);
 
@@ -1806,13 +1806,25 @@ let APIControllers = {
                   ]
                 );
 
-                const socketId = activeUsers.get(user[0][0].rowid);
-                if (socketId) {
+                // const socketId = activeUsers.get(user[0][0].rowid);
+                // if (socketId) {
+                //   console.log('inside progress');
+                //   io.to(socketId).emit("progress", {
+                //     header: "Subscription Payment Successful",
+                //     content: `Your ${paymentDetails[2]} subscription payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed.`,
+                //     time: currentTime
+                //   });
+                // }
+
+                const socketIds = activeUsers.get(user[0][0].rowid);
+                if (socketIds && socketIds.length > 0) {
                   console.log('inside progress');
-                  io.to(socketId).emit("progress", {
-                    header: "Subscription Payment Successful",
-                    content: `Your ${paymentDetails[2]} subscription payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed.`,
-                    time: currentTime
+                  socketIds.forEach(socketId => {
+                    io.to(socketId).emit("progress", {
+                      header: "Subscription Payment Successful",
+                      content: `Your ${paymentDetails[2]} subscription payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed.`,
+                      time: currentTime
+                    });
                   });
                 }
               }
@@ -1875,16 +1887,26 @@ let APIControllers = {
             ]
           );
 
-          const socketId = activeUsers.get(user[0][0].rowid);
-          if (socketId) {
+          // const socketId = activeUsers.get(user[0][0].rowid);
+          // if (socketId) {
+          //   console.log('inside progress');
+          //   io.to(socketId).emit("progress", {
+          //     header: "Subscription Cancelled",
+          //     content: `Your ${isMonthlyInEmail} subscription has been successfully cancelled.`,
+          //     time: currentTime
+          //   });
+          // }
+          const socketIds = activeUsers.get(user[0][0].rowid);
+          if (socketIds && socketIds.length > 0) {
             console.log('inside progress');
-            io.to(socketId).emit("progress", {
-              header: "Subscription Cancelled",
-              content: `Your ${isMonthlyInEmail} subscription has been successfully cancelled.`,
-              time: currentTime
+            socketIds.forEach(socketId => {
+              io.to(socketId).emit("progress", {
+                header: "Subscription Payment Successful",
+                content: `Your ${paymentDetails[2]} subscription payment of $${Number(Math.round(resource.amount.total)).toLocaleString()} for ${Number(credit).toLocaleString()} credits has been successfully processed.`,
+                time: currentTime
+              });
             });
           }
-
         }
         else {
           console.log('inside else part not cancellation or updation')
@@ -2467,13 +2489,25 @@ let APIControllers = {
               ]
             );
 
-            const socketId = activeUsers.get(userDetails[0][0].rowid);
-            if (socketId) {
+            // const socketId = activeUsers.get(userDetails[0][0].rowid);
+            // if (socketId) {
+            //   console.log('inside progress');
+            //   io.to(socketId).emit("progress", {
+            //     header: "Subscription Payment Successful",
+            //     content: `Your ${planDetails[2] == 'monthly' ? 'monthly' : 'annual'} subscription payment of ₹${Number(Math.round(amount)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.`,
+            //     time: currentTime,
+            //   });
+            // }
+
+            const socketIds = activeUsers.get(userDetails[0][0].rowid);
+            if (socketIds && socketIds.length > 0) {
               console.log('inside progress');
-              io.to(socketId).emit("progress", {
-                header: "Subscription Payment Successful",
-                content: `Your ${planDetails[2] == 'monthly' ? 'monthly' : 'annual'} subscription payment of ₹${Number(Math.round(amount)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.`,
-                time: currentTime,
+              socketIds.forEach(socketId => {
+                io.to(socketId).emit("progress", {
+                  header: "Subscription Payment Successful",
+                  content: `Your ${planDetails[2] == 'monthly' ? 'monthly' : 'annual'} subscription payment of ₹${Number(Math.round(amount)).toLocaleString()} for ${Number(planDetails[0]).toLocaleString()} credits has been successfully processed.`,
+                  time: currentTime,
+                });
               });
             }
 
@@ -2531,13 +2565,15 @@ let APIControllers = {
             ]
           );
 
-          const socketId = activeUsers.get(userDetails[0][0].rowid);
-          if (socketId) {
+          const socketIds = activeUsers.get(userDetails[0][0].rowid);
+          if (socketIds && socketIds.length > 0) {
             console.log('inside progress');
-            io.to(socketId).emit("progress", {
-              header: "Subscription Cancelled",
-              content: `Your ${isMonthlyInEmail} subscription has been successfully cancelled.`,
-              time: currentTime,
+            socketIds.forEach(socketId => {
+              io.to(socketId).emit("progress", {
+                header: "Subscription Cancelled",
+                content: `Your ${isMonthlyInEmail} subscription has been successfully cancelled.`,
+                time: currentTime,
+              });
             });
           }
           console.log('subscription cancelled succesfully.............')
