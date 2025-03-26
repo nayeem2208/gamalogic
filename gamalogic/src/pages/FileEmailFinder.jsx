@@ -857,6 +857,8 @@ function FileEmailFinder() {
     setSpreadSheet(false);
     setJsonToServer(null);
     setLoad(100);
+    setLoading(false)
+
   };
 
   if (serverError) {

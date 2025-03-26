@@ -397,7 +397,7 @@ let APIControllers = {
       console.timeEnd('File Upload API Call');
       if (fileUpload.data) {
         console.time('DB Update for Uploaded File');
-        await dbConnection.query(`UPDATE useractivity_batch_link SET save_upload_file='${fileUpload.data}' WHERE id='${batchId}'`);
+        await dbConnection.query(`UPDATE useractivity_batch_link SET save_upload_file='${fileUpload.data}', default_email_feild='${columnFields.initialField[1]}' WHERE id='${batchId}'`);
         console.timeEnd('DB Update for Uploaded File');
       }
       const currentTime = new Date().toLocaleString();
@@ -928,7 +928,7 @@ let APIControllers = {
       console.log('')
       if (FileUpload.data) {
         console.log('inside response .data')
-        await dbConnection.query(`UPDATE useractivity_batch_finder_link SET save_file_upload='${FileUpload.data}' WHERE id='${batchId}'`);
+        await dbConnection.query(`UPDATE useractivity_batch_finder_link SET save_file_upload='${FileUpload.data}',default_first_name ='${columnFields.firstNameField[2] || null}',default_last_name='${columnFields.lastNameField[2] || null}',default_domain='${columnFields.domainField[2] || null}' WHERE id='${batchId}'`);
       }
 
       const currentTime = new Date().toLocaleString();

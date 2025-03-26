@@ -9,11 +9,53 @@ const ValidationSpreadsheet = ({ jsonData, onUpload, onCancel }) => {
   const spreadsheetRef = useRef(null);
   const [columns, setColumns] = useState([]); // Store column names dynamically
   const [formData, setFormData] = useState({
-    emailField: "", // Only email field is needed
+    initialField: "",
+    emailField: "",
   });
   const [originalHeaders, setOriginalHeaders] = useState([]);
   const [tableInstance, setTableInstance] = useState(null);
   const [selectedColumn, setSelectedColumn] = useState("");
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Function to detect email column
+  const detectEmailColumn = (tableData, headers) => {
+    if (!tableData || tableData.length < 2) return null;
+
+    // Take first 10 rows (excluding header)
+    const sampleRows = tableData.slice(1, Math.min(11, tableData.length));
+
+    // Count email matches per column
+    const columnMatches = headers.map((_, colIndex) => {
+      let matchCount = 0;
+      sampleRows.forEach((row) => {
+        const cellValue = row[colIndex]?.toString().trim();
+        if (cellValue && emailRegex.test(cellValue)) {
+          matchCount++;
+        }
+      });
+      return matchCount;
+    });
+
+    // Find column with highest match count
+    const maxMatches = Math.max(...columnMatches);
+    if (maxMatches === 0) return null; // No email columns found
+
+    // Get all columns with max matches (in case of tie)
+    const candidateColumns = columnMatches
+      .map((count, index) => ({ count, index }))
+      .filter((item) => item.count === maxMatches)
+      .map((item) => item.index);
+
+    // If only one candidate, return it
+    if (candidateColumns.length === 1) {
+      return candidateColumns[0];
+    }
+
+    // If multiple candidates with same match count, pick the first one
+    return candidateColumns[0];
+  };
+
   useEffect(() => {
     if (
       spreadsheetRef.current &&
@@ -61,6 +103,17 @@ const ValidationSpreadsheet = ({ jsonData, onUpload, onCancel }) => {
         );
         setColumns(alphabetHeaders);
         setOriginalHeaders(headers);
+
+        const emailColumnIndex = detectEmailColumn(tableData, headers);
+        if (emailColumnIndex !== null) {
+          const emailColumnLetter =
+            alphabet[emailColumnIndex] || `Column ${emailColumnIndex + 1}`;
+          setFormData({
+            initialField: emailColumnLetter,
+            emailField: emailColumnLetter,
+          });
+          setSelectedColumn(emailColumnLetter);
+        }
 
         spreadsheetRef.current.style.width = "calc(100% - 25%)";
         spreadsheetRef.current.style.overflowX = "auto";
@@ -126,6 +179,10 @@ const ValidationSpreadsheet = ({ jsonData, onUpload, onCancel }) => {
 
     // Prepare the data to be sent to the parent component
     const newFormData = {
+      initialField: [
+        originalHeaders[columns.indexOf(formData.initialField)],
+        formData.initialField,
+      ],
       emailField: [
         originalHeaders[columns.indexOf(formData.emailField)],
         formData.emailField,

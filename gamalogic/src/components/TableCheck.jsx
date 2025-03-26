@@ -13,13 +13,91 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
     firstNameField: "",
     lastNameField: "",
     domainField: "",
-    // emailField:""
+    defaultFirstNameField: "", // Store auto-detected default
+    defaultLastNameField: "", // Store auto-detected default
+    defaultDomainField: "", // Store auto-detected default
   });
   const [originalHeaders, setOriginalHeaders] = useState([]);
   const [tableInstance, setTableInstance] = useState(null);
   const [isSelectingColumn, setIsSelectingColumn] = useState(false);
   const [currentField, setCurrentField] = useState("");
   const [selectedColumn, setSelectedColumn] = useState("");
+  const fieldPatterns = {
+    firstNameField: [
+      "firstname",
+      "first_name",
+      "firstName",
+      "first name",
+      "fname",
+      "givenname",
+      "given name",
+      "given_name",
+      "first",
+      "f_name",
+      "first-name",
+      "firstname1",
+    ],
+    lastNameField: [
+      "lastname",
+      "last_name",
+      "lastName",
+      "last name",
+      "lname",
+      "surname",
+      "familyname",
+      "family name",
+      "family_name",
+      "last",
+      "l_name",
+      "last-name",
+    ],
+    domainField: [
+      "domain",
+      "website",
+      "companydomain",
+      "company domain",
+      "company_domain",
+      "domainname",
+      "domain name",
+      "domain_name",
+      "url",
+      "web",
+      "websiteurl",
+      "website url",
+      "website_url",
+    ],
+  };
+
+  // Function to find the best matching column for a field type
+  const findBestColumnMatch = (headers, fieldType) => {
+    const patterns = fieldPatterns[fieldType];
+    let bestMatch = null;
+    let bestScore = 0;
+
+    headers.forEach((header, index) => {
+      const normalizedHeader = header.toString().toLowerCase().trim();
+
+      // Check for exact matches first
+      if (patterns.includes(normalizedHeader)) {
+        bestMatch = index;
+        bestScore = Infinity; // Highest possible score
+        return;
+      }
+
+      // Check for partial matches
+      patterns.forEach((pattern) => {
+        if (normalizedHeader.includes(pattern)) {
+          const score = pattern.length; // Longer patterns get higher score
+          if (score > bestScore) {
+            bestScore = score;
+            bestMatch = index;
+          }
+        }
+      });
+    });
+
+    return bestMatch;
+  };
   useEffect(() => {
     if (
       spreadsheetRef.current &&
@@ -28,8 +106,8 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
       jsonData.data.length > 0
     ) {
       // Extract rows and headers
-      const headers =  jsonData.data[0]; // Get column headers dynamically
-      const rows = jsonData.data.slice(1)   ; // Access the `data` field in the jsonData
+      const headers = jsonData.data[0]; // Get column headers dynamically
+      const rows = jsonData.data.slice(1); // Access the `data` field in the jsonData
       const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       const dynamicColumns = headers.map((header) => ({
         width: 200, // Adjust column width as needed
@@ -69,17 +147,20 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
         setColumns(alphabetHeaders);
         setOriginalHeaders(headers);
 
+        const detectedFields = {};
+        Object.keys(fieldPatterns).forEach(fieldType => {
+          const columnIndex = findBestColumnMatch(headers, fieldType);
+          if (columnIndex !== null) {
+            const columnLetter = alphabet[columnIndex] || `Column ${columnIndex + 1}`;
+            detectedFields[fieldType] = columnLetter;
+            detectedFields[`default${fieldType.charAt(0).toUpperCase() + fieldType.slice(1)}`] = columnLetter;
+          }
+        });
+
+        setFormData((prev) => ({ ...prev, ...detectedFields }));
         // Ensure the spreadsheet container takes full width and height
         spreadsheetRef.current.style.width = "calc(100% - 25%)"; // Ensure it takes up remaining space
         spreadsheetRef.current.style.overflowX = "auto"; // Add horizontal scroll
-
-        // Ensure the table inside the spreadsheet takes full width and height
-        // const tableElement = spreadsheetRef.current.querySelector("table");
-        // if (tableElement) {
-        //   tableElement.style.width = "100%";
-        //   tableElement.style.height = "100%";
-        //   tableElement.style.tableLayout = "fixed"; // Ensures columns respect the width
-        // }
       }
     }
   }, [jsonData, tableInstance, isSelectingColumn, currentField]);
@@ -171,28 +252,30 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
   };
 
   const handleUpload = () => {
-    // Validate if all required fields are selected
-    if (
-      !formData.firstNameField ||
-      !formData.lastNameField ||
-      !formData.domainField
-    ) {
-      toast.error("Please select the columns");
+    if (!formData.firstNameField || !formData.lastNameField || !formData.domainField) {
+      toast.error("Please select all required columns");
       return;
     }
 
-    // Prepare the data to be sent to the parent component
     const newFormData = {
-      firstNameField: [originalHeaders[columns.indexOf(formData.firstNameField)],formData.firstNameField],
-      lastNameField: [originalHeaders[columns.indexOf(formData.lastNameField)],formData.lastNameField],
-      domainField: [originalHeaders[columns.indexOf(formData.domainField)],formData.domainField],
-      // emailField:formData.emailField,
+      firstNameField: [
+        originalHeaders[columns.indexOf(formData.firstNameField)],
+        formData.firstNameField,
+        formData.defaultFirstNameField // Include default value
+      ],
+      lastNameField: [
+        originalHeaders[columns.indexOf(formData.lastNameField)],
+        formData.lastNameField,
+        formData.defaultLastNameField // Include default value
+      ],
+      domainField: [
+        originalHeaders[columns.indexOf(formData.domainField)],
+        formData.domainField,
+        formData.defaultDomainField // Include default value
+      ],
     };
 
-
-    console.log(newFormData, "new formdata for upload");
-
-    // Notify the parent component using the `onUpload` callback
+    console.log("Uploading data:", newFormData);
     if (onUpload) onUpload(newFormData);
   };
   const handleCancel = () => {
