@@ -18,21 +18,49 @@ function ViewMoreDetails({ data, onDownloadFile }) {
         }}
       >
         <div className="flex  justify-evenly items-center    my-2">
-          <div className="flex flex-col justify-center h-full text-xs md:text-[13px] items-start w-full gap-3 my-3  lg:w-5/6 max-h-72 overflow-y-auto">
-            <p className="text-base md:text-lg font-semibold ">{data.file_upload}</p>
-
+          <div className="flex flex-col  justify-center h-full text-xs md:text-[13px] items-center sm:items-start w-full gap-3 my-3  lg:w-5/6 max-h-72 overflow-y-auto">
+          <div className="w-4/5 overflow-hidden  block sm:hidden">
+            <div
+              className={`singleTileHeading  text-center text-sm 2xl:text-lg font-semibold   ${
+                data.file_upload.length > 25 ? "scroll-animation" : ""
+              }`}
+              title={data.file_upload}
+              style={{
+                color: "rgba(24, 32, 91)",
+                whiteSpace: "nowrap",
+                zIndex: "10",
+              }}
+            >
+              {data.file_upload}
+            </div>
+            </div>
+            <p className="text-base md:text-lg font-semibold hidden sm:block ">
+              {data.file_upload}
+            </p>
+            <div className="w-24  flex flex-col sm:hidden   justify-center items-center   ">
+              <CircularProgressbar
+                value={data.processed}
+                text={`${data.processed}%`}
+                styles={buildStyles({
+                  textSize: "14px",
+                  textColor: "#4A4A4A",
+                  pathColor: `rgba(24, 32, 91)`,
+                  trailColor: "#d6d6d6",
+                })}
+              />
+            </div>
             {/* <p>
               <strong>Status:</strong> Complete
             </p> */}
-            <p>
+            <p className=" text-left ">
               <strong>Date:</strong>{" "}
               {data.formattedDate?.includes(",")
-                ? data.formattedDate.split(",")[0].trim()
-                : data.formattedDate.split(" ")[0].trim()}
+                ? data.formattedDate?.split(",")[0].trim()
+                : data.formattedDate?.split(" ")[0].trim()}
               <strong className="ml-4">Time:</strong>{" "}
-              {data.formattedDate.includes(",")
-                ? data.formattedDate.split(",")[1]?.trim()
-                : data.formattedDate.split(" ")[1]?.trim()}
+              {data.formattedDate?.includes(",")
+                ? data.formattedDate?.split(",")[1]?.trim()
+                : data.formattedDate?.split(" ")[1]?.trim()}
             </p>
             {userDetails.isTeam == 1 && (
               <p>
@@ -43,11 +71,13 @@ function ViewMoreDetails({ data, onDownloadFile }) {
             <p>
               <strong>Count:</strong> {data.count}
             </p>
-           {data.resolved_time&& <p>
-              <strong>Resolved Time:</strong> {data.resolved_time}
-            </p>}
+            {data.resolved_time && (
+              <p>
+                <strong>Resolved Time:</strong> {data.resolved_time}
+              </p>
+            )}
             <div
-              className="SingleTileDownload w-full flex   items-center  "
+              className="SingleTileDownload w-full flex justify-center sm:justify-normal   items-center  "
               onClick={() => onDownloadFile(data)}
             >
               <button className="w-56 flex justify-center items-center">
@@ -60,7 +90,7 @@ function ViewMoreDetails({ data, onDownloadFile }) {
               </button>
             </div>
           </div>
-          <div className="w-28 lg:w-32  flex flex-col  justify-center items-center   ">
+          <div className="w-28 lg:w-32 hidden sm:flex flex-col   justify-center items-center   ">
             <CircularProgressbar
               value={data.processed}
               text={`${data.processed}%`}

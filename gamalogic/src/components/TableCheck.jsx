@@ -22,6 +22,24 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
   const [isSelectingColumn, setIsSelectingColumn] = useState(false);
   const [currentField, setCurrentField] = useState("");
   const [selectedColumn, setSelectedColumn] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 768); // Common mobile breakpoint
+    };
+
+    // Initial check
+    checkIfMobile();
+
+    // Add event listener for window resize
+    window.addEventListener("resize", checkIfMobile);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkIfMobile);
+  }, []);
+
   const fieldPatterns = {
     firstNameField: [
       "firstname",
@@ -148,12 +166,15 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
         setOriginalHeaders(headers);
 
         const detectedFields = {};
-        Object.keys(fieldPatterns).forEach(fieldType => {
+        Object.keys(fieldPatterns).forEach((fieldType) => {
           const columnIndex = findBestColumnMatch(headers, fieldType);
           if (columnIndex !== null) {
-            const columnLetter = alphabet[columnIndex] || `Column ${columnIndex + 1}`;
+            const columnLetter =
+              alphabet[columnIndex] || `Column ${columnIndex + 1}`;
             detectedFields[fieldType] = columnLetter;
-            detectedFields[`default${fieldType.charAt(0).toUpperCase() + fieldType.slice(1)}`] = columnLetter;
+            detectedFields[
+              `default${fieldType.charAt(0).toUpperCase() + fieldType.slice(1)}`
+            ] = columnLetter;
           }
         });
 
@@ -164,6 +185,13 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
       }
     }
   }, [jsonData, tableInstance, isSelectingColumn, currentField]);
+
+  useEffect(() => {
+    const container = spreadsheetRef.current;
+    if (isMobile) {
+      container.style.width = "calc(100%)";
+    }
+  }, [isMobile]);
 
   useEffect(() => {
     if (tableInstance) {
@@ -252,7 +280,11 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
   };
 
   const handleUpload = () => {
-    if (!formData.firstNameField || !formData.lastNameField || !formData.domainField) {
+    if (
+      !formData.firstNameField ||
+      !formData.lastNameField ||
+      !formData.domainField
+    ) {
       toast.error("Please select all required columns");
       return;
     }
@@ -261,17 +293,17 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
       firstNameField: [
         originalHeaders[columns.indexOf(formData.firstNameField)],
         formData.firstNameField,
-        formData.defaultFirstNameField // Include default value
+        formData.defaultFirstNameField, // Include default value
       ],
       lastNameField: [
         originalHeaders[columns.indexOf(formData.lastNameField)],
         formData.lastNameField,
-        formData.defaultLastNameField // Include default value
+        formData.defaultLastNameField, // Include default value
       ],
       domainField: [
         originalHeaders[columns.indexOf(formData.domainField)],
         formData.domainField,
-        formData.defaultDomainField // Include default value
+        formData.defaultDomainField, // Include default value
       ],
     };
 
@@ -293,7 +325,133 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
   };
 
   return (
-    <div className="mt-8 flex justify-between ">
+    <div className="sm:mt-8 sm:flex justify-between ">
+      {/* Mapping in mobile screeen */}
+      <div
+        className="w-full p-1 sm:hidden border border-gray-300 shadow-md"
+        style={{
+          background:
+            "linear-gradient(0deg, rgba(255,255,255,0.7) 0%, rgba(225,227,240,0.7) 100%)",
+        }}
+      >
+        <h3
+          className="UploadYourFile text-md mt-1 font-medium text-red-600 mb-2"
+          style={{ fontFamily: "Ubuntu, sans-serif" }}
+        >
+          Map Your Field
+        </h3>
+
+        {/* Dropdowns for Field Selection */}
+        <div className="w-full  flex">
+          <div className="mb-3">
+            <label className="block mb-2  font-medium text-xs ">
+              First Name Field:
+            </label>
+            <div className="flex  items-center justify-center ">
+              <input
+                type="text"
+                className="w-3/6 h-6 text-sm  border rounded px-2"
+                value={formData.firstNameField}
+                readOnly
+              />
+              <LuTable
+                className="w-4 h-4 cursor-pointer ml-3"
+                onClick={() => handleColumnSelect("firstNameField")}
+              />
+            </div>
+          </div>
+
+          <div className="mb-3">
+            <label className="block mb-2 font-medium text-xs">
+              Last Name Field:
+            </label>
+
+            <div className="flex  items-center justify-center ">
+              <input
+                type="text"
+                className="w-3/6 h-6 text-sm  border rounded px-2"
+                value={formData.lastNameField}
+                readOnly
+              />
+              <LuTable
+                className="w-4 h-4 cursor-pointer ml-3"
+                onClick={() => handleColumnSelect("lastNameField")}
+              />
+            </div>
+          </div>
+
+          <div className="mb-3">
+            <label className="block mb-2 font-medium text-xs">
+              Domain Field:
+            </label>
+
+            <div className="flex  items-center justify-center ">
+              <input
+                type="text"
+                className="w-3/6 h-6 text-sm  border rounded px-2"
+                value={formData.domainField}
+                readOnly
+              />
+              <LuTable
+                className="w-4 h-4 cursor-pointer ml-3 "
+                onClick={() => handleColumnSelect("domainField")}
+              />
+            </div>
+          </div>
+        </div>
+        {/* <div className="mb-4">
+          <label className="block mb-2 font-medium">
+            Email Field (Output Location):
+          </label>
+          <div className="flex items-center">
+            <input
+              type="text"
+              className="w-3/6 h-8 border rounded px-2"
+              value={formData.emailField} 
+              readOnly
+            />
+            <LuTable
+              className="w-6 h-6 cursor-pointer ml-3"
+              onClick={() => handleColumnSelect("emailField")} 
+            />
+          </div>
+        </div> */}
+
+        {/* Buttons */}
+        <div className="flex gap-2 text-xs justify-center">
+          <button
+            onClick={handleCancel}
+            className="font-semibold w-28 h-6 rounded overflow-hidden bg-red-500 text-white relative group z-10 hover:text-white duration-1000"
+            style={{ clipPath: "inset(0 0 0 0)" }} // Add clip-path to contain the animation
+          >
+            <span className="absolute bg-red-600 w-36 h-24 rounded-full group-hover:scale-100 scale-0 -z-10 -left-2 -top-10 group-hover:duration-500 duration-700 origin-center transform transition-all"></span>
+            <span className="absolute bg-red-800 w-36 h-24 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>
+            Cancel
+          </button>
+
+          <button
+            onClick={handleUpload}
+            className="font-semibold w-28 h-6 rounded overflow-hidden bg-emerald-600 text-white relative group z-10 hover:text-white duration-1000"
+            style={{ clipPath: "inset(0 0 0 0)" }} // Add clip-path to contain the animation
+          >
+            <span className="absolute bg-emerald-700 w-36 h-36 rounded-full group-hover:scale-100 scale-0 -z-10 -left-2 -top-10 group-hover:duration-500 duration-700 origin-center transform transition-all"></span>
+            <span className="absolute bg-emerald-900 w-36 h-36 -left-2 -top-10 rounded-full group-hover:scale-100 scale-0 -z-10 group-hover:duration-700 duration-500 origin-center transform transition-all"></span>
+            Upload
+          </button>
+        </div>
+        <div
+          style={{
+            backgroundColor: "rgba(247, 76, 65 , 0.05)",
+            color: "rgba(247, 76, 65 , 0.6)",
+          }}
+          className="mt-4 p-3 text-xs  border border-orange-300 rounded-lg "
+        >
+          <p className="items-center">
+            First, select the respective header from the spreadsheet, then click
+            the <strong>table icon</strong> next to a field.
+          </p>
+        </div>
+      </div>
       {/* Spreadsheet Container */}
       <div
         ref={spreadsheetRef}
@@ -303,7 +461,7 @@ const Spreadsheet = ({ jsonData, onUpload, onCancel }) => {
 
       {/* Field Mapping Form */}
       <div
-        className="w-1/4 p-4 border border-gray-300  shadow-md "
+        className="w-1/4 p-4 hidden sm:block border border-gray-300  shadow-md "
         style={{
           background:
             "linear-gradient(0deg, rgba(255,255,255,0.7) 0%, rgba(225,227,240,0.7) 100%)",

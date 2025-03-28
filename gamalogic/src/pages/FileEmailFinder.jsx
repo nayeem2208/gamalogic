@@ -915,7 +915,7 @@ function FileEmailFinder() {
                   />
                 )}
                 {resultFile.length > 0 && (
-                  <div className="w-full flex justify-center items-center md:w-2/5">
+                  <div className="w-full  justify-center items-center md:w-2/5 hidden sm:flex">
                     <ViewSelector
                       tileView={tileView}
                       onViewChange={handleViewChanger}

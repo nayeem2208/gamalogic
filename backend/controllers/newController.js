@@ -781,6 +781,21 @@ const newControllers = {
                 await req.dbConnection.release();
             }
         }
+    },
+    FileUploadCompletionNotification:async(req,res)=>{
+        try {
+            const dbConnection = req.dbConnection;
+            console.log(req,'reqqqqqqqq')
+            
+        } catch (error) {
+            console.error('Error in FileUploadCompletionNotification:', error);
+            ErrorHandler("FileUploadCompletionNotification Controller", error, req);
+            res.status(500).json({ error: error.message || 'Internal Server Error' });
+        } finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
     }
 
 

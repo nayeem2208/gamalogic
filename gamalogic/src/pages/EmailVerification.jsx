@@ -75,31 +75,31 @@ function EmailVerification() {
   useEffect(() => {
     if (fileUpload && dateTime) {
       const removeFileExtension = (fileName) => {
-        return fileName.split('.').slice(0, -1).join('.').trim();
+        return fileName.split(".").slice(0, -1).join(".").trim();
       };
-  
+
       const convertToISODate = (localizedDate) => {
         const date = new Date(localizedDate);
         return date.toISOString();
       };
-  
+
       const matchedFile = resultFile.find((file) => {
         const fileUploadMatch =
           removeFileExtension(file.file_upload) === fileUpload;
-          const normalizedDateTime = convertToISODate(dateTime);
-          const fileDateTime = convertToISODate(file.date_time);
-          const fileDateTimeAfterSplit =
-            fileDateTime.split(":")[0] + fileDateTime.split(":")[1];
-          const normalizedDateTimeSplit =
-            normalizedDateTime.split(":")[0] + normalizedDateTime.split(":")[1];
-          const dateTimeMatch =
-            fileDateTimeAfterSplit === normalizedDateTimeSplit;
+        const normalizedDateTime = convertToISODate(dateTime);
+        const fileDateTime = convertToISODate(file.date_time);
+        const fileDateTimeAfterSplit =
+          fileDateTime.split(":")[0] + fileDateTime.split(":")[1];
+        const normalizedDateTimeSplit =
+          normalizedDateTime.split(":")[0] + normalizedDateTime.split(":")[1];
+        const dateTimeMatch =
+          fileDateTimeAfterSplit === normalizedDateTimeSplit;
         return fileUploadMatch && dateTimeMatch;
       });
-  
+
       if (matchedFile) {
         setMatchingFile(matchedFile);
-  
+
         // Clear the URL parameters after matching
         const newSearchParams = new URLSearchParams(location.search);
         newSearchParams.delete("file_upload");
@@ -370,75 +370,71 @@ function EmailVerification() {
         return Object.values(row).join(","); // Join values with a comma
       })
       .join("\n"); // Join rows with a newline
-  
+
     // Create a Blob with the CSV content
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-  
+
     // Create a download link and trigger the download
     const link = document.createElement("a");
     link.href = url;
     link.setAttribute("download", fileName + ".csv");
     document.body.appendChild(link);
     link.click();
-  
+
     // Clean up
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
-  
 
   const downloadExcel = (data, fileName, fileType) => {
-     const rows = data.map((row) => {
-         return Object.values(row); // Extract values from each row object
-       });
-     
-       // Create a new workbook and worksheet
-       const wb = XLSX.utils.book_new();
-       const ws = XLSX.utils.aoa_to_sheet(rows); // Use aoa_to_sheet for array of arrays
-       XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-     
-       // Determine the file extension
-       let extension = "";
-       if (fileType === "xlsx") {
-         extension = ".xlsx";
-       } else if (fileType === "xls") {
-         extension = ".xls";
-       } else {
-         throw new Error(`Unsupported file type: ${fileType}`);
-       }
-     
-       // Write the file and trigger the download
-       XLSX.writeFile(wb, `${fileName}${extension}`);
+    const rows = data.map((row) => {
+      return Object.values(row); // Extract values from each row object
+    });
+
+    // Create a new workbook and worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(rows); // Use aoa_to_sheet for array of arrays
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    // Determine the file extension
+    let extension = "";
+    if (fileType === "xlsx") {
+      extension = ".xlsx";
+    } else if (fileType === "xls") {
+      extension = ".xls";
+    } else {
+      throw new Error(`Unsupported file type: ${fileType}`);
+    }
+
+    // Write the file and trigger the download
+    XLSX.writeFile(wb, `${fileName}${extension}`);
   };
-  
 
   const downloadText = (data, fileName) => {
     const fileContent = data
-    .map((row) => {
-      // Extract all values from the row object
-      const values = Object.values(row).join(" "); // Join all values with a space
-      return values;
-    })
-    .join("\n"); // Join all rows with a newline
+      .map((row) => {
+        // Extract all values from the row object
+        const values = Object.values(row).join(" "); // Join all values with a space
+        return values;
+      })
+      .join("\n"); // Join all rows with a newline
 
-  // Create a Blob with the file content
-  const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
+    // Create a Blob with the file content
+    const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
 
-  // Create a download link and trigger the download
-  const link = document.createElement("a");
-  link.href = url;
-  link.setAttribute("download", fileName + ".txt");
-  document.body.appendChild(link);
-  link.click();
+    // Create a download link and trigger the download
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName + ".txt");
+    document.body.appendChild(link);
+    link.click();
 
-  // Clean up
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
-
-
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -608,13 +604,13 @@ function EmailVerification() {
       setShowAlert(false);
       setLoad(30);
       const dataSize = JsonToServer.data.length;
-      const increment = dataSize > 20000 ? 2 : 4; 
+      const increment = dataSize > 20000 ? 2 : 4;
       const intervalTime = dataSize > 20000 ? 2000 : 1000;
-  
+
       const interval = setInterval(() => {
         setLoad((prev) => (prev < 90 ? prev + increment : prev));
       }, intervalTime);
-  
+
       let EmailFieldIndex = JsonToServer.data[0].indexOf(data.emailField[0]);
 
       const transformedData = JsonToServer.data
@@ -622,10 +618,10 @@ function EmailVerification() {
           emailid: item[EmailFieldIndex],
         }))
         .filter((item) => item.emailid);
-  
+
       let results = JsonToServer;
       results.data = transformedData;
-  
+
       async function BatchEmailVerification() {
         const formData = new FormData();
         formData.append("file", fileForClickUp);
@@ -652,9 +648,9 @@ function EmailVerification() {
               typeof dateTimeString === "string"
                 ? new Date(dateTimeString)
                 : dateTimeString;
-  
+
             const timeZone = userTimeZone || "America/New_York";
-  
+
             const formatter = new Intl.DateTimeFormat("en-US", {
               timeZone: timeZone,
               year: "numeric",
@@ -665,9 +661,9 @@ function EmailVerification() {
               second: "2-digit",
               hour12: false,
             });
-  
+
             const formattedDate = formatter.format(date);
-  
+
             return formattedDate.replace(",", "");
           } catch (error) {
             console.error("Error formatting date:", error);
@@ -697,10 +693,9 @@ function EmailVerification() {
           ...prevResultFiles,
         ]);
       }
-  
+
       BatchEmailVerification();
       setSpreadSheet(false);
-  
     } catch (error) {
       console.log(error, "error");
       if (error.response.status === 500) {
@@ -820,29 +815,30 @@ function EmailVerification() {
             </div>
           )}
           {!spreadSheet && (
-          <div className="flex flex-col md:flex-row items-center justify-between w-full">
-            <h3>Upload Your File Here | Email Validation</h3>
+            <div className="flex flex-col md:flex-row items-center justify-between w-full">
+              <h3>Upload Your File Here | Email Validation</h3>
 
-            <div className="md:flex justify-center items-center  lg:w-3/6  2xl:w-2/5">
-              {resultFile.length > 0 && (
-                <input
-                  type="text"
-                  placeholder="Search files by name..."
-                  value={searchQuery}
-                  onChange={onSearchInputChange}
-                  className="w-full my-2 md:my-0 md:mx-4 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              )}
-              {resultFile.length > 0 && (
-                <div className="w-full flex justify-center items-center md:w-2/5">
-                  <ViewSelector
-                    tileView={tileView}
-                    onViewChange={handleViewChanger}
+              <div className="md:flex justify-center items-center  lg:w-3/6  2xl:w-2/5">
+                {resultFile.length > 0 && (
+                  <input
+                    type="text"
+                    placeholder="Search files by name..."
+                    value={searchQuery}
+                    onChange={onSearchInputChange}
+                    className="w-full my-2 md:my-0 md:mx-4 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                </div>
-              )}
+                )}
+                {resultFile.length > 0 && (
+                  <div className="w-full justify-center items-center md:w-2/5 hidden sm:flex">
+                    <ViewSelector
+                      tileView={tileView}
+                      onViewChange={handleViewChanger}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>)}
+          )}
         </form>
         {loading && (
           <LoadingBar
@@ -855,7 +851,7 @@ function EmailVerification() {
           <AddFileInRowView onUpload={handleFileChange} />
         )}
         {resultFile.length > 0 &&
-        !spreadSheet && 
+          !spreadSheet &&
           (tileView ? (
             searchQuery.length > 0 ? (
               filteredFiles.length > 0 ? (

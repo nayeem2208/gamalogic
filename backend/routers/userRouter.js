@@ -46,6 +46,7 @@ router.post('/batchEmailVerification',upload.single('file'),dbMiddleware,authche
 router.get('/getBatchStatus',dbMiddleware,APIDecode,APIControllers.batchEmailStatus)
 router.get('/downloadEmailVerificationFile',dbMiddleware,authcheck,APIControllers.downloadEmailVerificationFile)
 router.get('/validatoinfilesSearch',dbMiddleware,authcheck,APIControllers.searchValidationFiles)
+router.get("/fileUploadCompletion",dbMiddleware,newControllers.FileUploadCompletionNotification)
 
 //file based email finder 
 router.get('/getAllUploadedEmailFinderFiles',dbMiddleware,authcheck,APIControllers.getAlreadyCheckedBatchEmailFinderFiles)
