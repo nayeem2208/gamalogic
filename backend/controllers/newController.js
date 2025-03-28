@@ -786,7 +786,6 @@ const newControllers = {
         try {
             const dbConnection = req.dbConnection;
             const { batchid: batchId, application } = req.query;
-            const io = req.app.get('socketio'); // Socket.IO instance
 
             // 1. Validate input
             if (!batchId || !application) {
@@ -824,19 +823,20 @@ const newControllers = {
             const socketIds = activeUsers.get(file[0].userid);
             console.log(socketIds, 'userrrrrrrrrrrrrrrrr')
 
-            if (socketIds) {
-                console.log('inside progeresss')
-                if (socketIds && socketIds.length > 0) {
-                    console.log('inside progress');
-                    socketIds.forEach(socketId => {
+            if (socketIds && socketIds.length > 0 && io) {
+                socketIds.forEach(socketId => {
+                    try {
                         io.to(socketId).emit("progress", {
                             header: `Batch Email ${notificationType} completed`,
                             content: `Email ${notificationType} has completed for ${fileName}.`,
                             time: currentTime
                         });
-                    });
-                }
+                    } catch (socketError) {
+                        console.error('Socket emit error:', socketError);
+                    }
+                });
             }
+
             res.json({
                 success: true,
                 notificationId: result.insertId,
