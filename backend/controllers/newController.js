@@ -822,7 +822,7 @@ const newControllers = {
                 ]
             );
             const socketIds = activeUsers.get(file[0].userid);
-            // console.log(socketId, 'userrrrrrrrrrrrrrrrr')
+            console.log(socketIds, 'userrrrrrrrrrrrrrrrr')
 
             if (socketIds) {
                 console.log('inside progeresss')
