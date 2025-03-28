@@ -821,16 +821,21 @@ const newControllers = {
                     notificationType
                 ]
             );
-            const socketId = activeUsers.get(file[0].userid);
-            console.log(socketId, 'userrrrrrrrrrrrrrrrr')
+            const socketIds = activeUsers.get(file[0].userid);
+            // console.log(socketId, 'userrrrrrrrrrrrrrrrr')
 
-            if (socketId) {
+            if (socketIds) {
                 console.log('inside progeresss')
-                io.to(socketId).emit("progress", {
-                    header:   `Batch Email ${notificationType} completed`,
-                    content:   `Email ${notificationType} has completed for ${fileName}.`,
-                    time: currentTime
-                });
+                if (socketIds && socketIds.length > 0) {
+                    console.log('inside progress');
+                    socketIds.forEach(socketId => {
+                        io.to(socketId).emit("progress", {
+                            header: `Batch Email ${notificationType} completed`,
+                            content: `Email ${notificationType} has completed for ${fileName}.`,
+                            time: currentTime
+                        });
+                    });
+                }
             }
             res.json({
                 success: true,
