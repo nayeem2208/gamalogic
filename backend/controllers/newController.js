@@ -507,7 +507,7 @@ const newControllers = {
     },
     deleteAccount: async (req, res) => {
         try {
-            if (req.user[0][0].is_premium == 1 && (req.user[0][0].is_monthly == 1 || req.user[0][0].is_annual == 1)&&req.user[0][0].is_active == 1) {
+            if (req.user[0][0].is_premium == 1 && (req.user[0][0].is_monthly == 1 || req.user[0][0].is_annual == 1) && req.user[0][0].is_active == 1) {
 
                 return res.status(200).json({
                     error: "You must cancel your subscription before deleting your account."
@@ -752,26 +752,26 @@ const newControllers = {
             const dbConnection = req.dbConnection;
             const { id } = req.query;
             // console.log(id,'idddddddddddddddddd')
-        if (!id) {
-            return res.status(400).json({ error: "Notification ID is required" });
-        }
-        
-        const query = `
+            if (!id) {
+                return res.status(400).json({ error: "Notification ID is required" });
+            }
+
+            const query = `
             UPDATE notification
             SET isRead = 1
             WHERE id = ?
         `;
 
-        // Execute the query
-        const [result] = await dbConnection.execute(query, [id]);
+            // Execute the query
+            const [result] = await dbConnection.execute(query, [id]);
 
-        // Check if the update was successful
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Notification not found" });
-        }
+            // Check if the update was successful
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: "Notification not found" });
+            }
 
-        // Send success response
-        res.status(200).json({ message: "Notification marked as read" });
+            // Send success response
+            res.status(200).json({ message: "Notification marked as read" });
         } catch (error) {
             console.error('Error in notificationIsRead:', error);
             ErrorHandler("notificationIsRead Controller", error, req);
@@ -782,11 +782,50 @@ const newControllers = {
             }
         }
     },
-    FileUploadCompletionNotification:async(req,res)=>{
+    FileUploadCompletionNotification: async (req, res) => {
         try {
             const dbConnection = req.dbConnection;
-            console.log(req,'reqqqqqqqq')
-            
+            const { batchid: batchId, application } = req.query;
+            const io = req.app.get('socketio'); // Socket.IO instance
+
+            // 1. Validate input
+            if (!batchId || !application) {
+                return res.status(400).json({ error: "batchid and application are required" });
+            }
+
+            // 2. Fetch file details
+            const table = application === 'validation' ? 'save_upload_file' : 'save_file_upload';
+            const [file] = await dbConnection.query(
+                `SELECT userid, ${table} as filename FROM useractivity_batch_${application === 'validation' ? 'link' : 'finder_link'} WHERE id = ?`,
+                [batchId]
+            );
+
+            if (!file || file.length === 0) {
+                return res.status(404).json({ error: "Batch not found" });
+            }
+
+            const currentTime = new Date().toISOString();
+            const notificationType = application === 'validation' ? 'validation' : 'finder';
+            const fileName = file[0].file_upload || 'Unknown file';
+
+            // 3. Insert notification into DB
+            const [result] = await dbConnection.query(
+                `INSERT INTO notification (userid, header, content, time, isRead, type) 
+             VALUES (?, ?, ?, ?, ?, ?)`,
+                [
+                    file[0].userid,
+                    `Batch Email ${notificationType} completed`,
+                    `Email ${notificationType} has completed for ${fileName}.`,
+                    currentTime,
+                    0,
+                    notificationType
+                ]
+            );
+            res.json({
+                success: true,
+                notificationId: result.insertId,
+                message: "Notification sent successfully"
+            });
         } catch (error) {
             console.error('Error in FileUploadCompletionNotification:', error);
             ErrorHandler("FileUploadCompletionNotification Controller", error, req);
