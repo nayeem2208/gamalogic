@@ -806,7 +806,8 @@ const newControllers = {
 
             const currentTime = new Date().toISOString();
             const notificationType = application === 'validation' ? 'validation' : 'finder';
-            const fileName = file[0].file_upload || 'Unknown file';
+            console.log(file[0],table,'file and table')
+            const fileName = file[0].table || 'Unknown file';
 
             // 3. Insert notification into DB
             const [result] = await dbConnection.query(
