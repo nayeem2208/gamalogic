@@ -12,7 +12,7 @@ import inviteTeamMemberToken from "../utils/inviteTeamMemberToken.js";
 import childTeamMemberInvite from "../EmailTemplates/childAccountInviteEmail.js";
 import deleteAccountVerify from "../EmailTemplates/deleteAccountVerifyLink.js";
 import { downloadSalesInvoice, listSalesOrders } from "../utils/zohoBooks.js";
-
+import { io, activeUsers } from "../index.js";
 
 
 const newControllers = {
@@ -821,6 +821,17 @@ const newControllers = {
                     notificationType
                 ]
             );
+            const socketId = activeUsers.get(file[0].userid);
+            console.log(socketId, 'userrrrrrrrrrrrrrrrr')
+
+            if (socketId) {
+                console.log('inside progeresss')
+                io.to(socketId).emit("progress", {
+                    header:   `Batch Email ${notificationType} completed`,
+                    content:   `Email ${notificationType} has completed for ${fileName}.`,
+                    time: currentTime
+                });
+            }
             res.json({
                 success: true,
                 notificationId: result.insertId,
