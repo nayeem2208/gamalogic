@@ -795,7 +795,7 @@ const newControllers = {
             // 2. Fetch file details
             const table = application === 'validation' ? 'save_upload_file' : 'save_file_upload';
             const [file] = await dbConnection.query(
-                `SELECT userid, ${table} as filename FROM useractivity_batch_${application === 'validation' ? 'link' : 'finder_link'} WHERE id = ?`,
+                `SELECT userid, file_upload as filename FROM useractivity_batch_${application === 'validation' ? 'link' : 'finder_link'} WHERE id = ?`,
                 [batchId]
             );
 

@@ -66,7 +66,7 @@ function MobileNotification({ notifications, onClose }) {
           singleNotification={singleNotification}
         />
       )}
-      <ul className="pb-5 h-screen overflow-y-auto mb-10">
+      <ul className="pb-5 h-5/6 overflow-y-auto mb-10">
         {notifications.length > 0 ? (
           notifications.map((notif, index) => (
             <li
