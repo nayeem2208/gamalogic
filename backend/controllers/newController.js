@@ -874,6 +874,41 @@ const newControllers = {
                 await req.dbConnection.release();
             }
         }
+    },
+    markAllasRead: async (req, res) => {
+        try {
+            const dbConnection = req.dbConnection;
+            const userId = req.user[0][0].rowid; // Assuming user ID is available in req.user
+
+            // 1. Validate user ID
+            if (!userId) {
+                return res.status(400).json({ error: "User ID is required" });
+            }
+
+            // 2. Update all unread notifications for this user
+            const [result] = await dbConnection.query(
+                `UPDATE notification 
+             SET isRead = 1 
+             WHERE userid = ? AND isRead = 0`,
+                [userId]
+            );
+
+            res.json({
+                success: true,
+                message: `Marked ${result.affectedRows} notifications as read`,
+                clearedCount: result.affectedRows
+            });
+
+
+        } catch (error) {
+            console.error('Error in markAllasRead:', error);
+            ErrorHandler("markAllasRead Controller", error, req);
+            res.status(500).json({ error: error.message || 'Internal Server Error' });
+        } finally {
+            if (req.dbConnection) {
+                await req.dbConnection.release();
+            }
+        }
     }
 
 

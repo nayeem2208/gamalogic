@@ -1,8 +1,15 @@
 import { useState } from "react";
 import SingleNotificationMobile from "./SingleNotificationMobile";
+import { useUserState } from "../../context/userContext";
+import axiosInstance from "../../axios/axiosInstance";
 
 function MobileNotification({ notifications, onClose }) {
   const [singleNotification, setSingleNotification] = useState(null);
+    let {notification,
+      setNotification,
+      newNotification,
+      setNewNotification}=useUserState()
+  console.log(notifications, "notifications");
 
   const formatTime = (time) => {
     const notifDate = new Date(time);
@@ -22,6 +29,28 @@ function MobileNotification({ notifications, onClose }) {
   const handleCloseModal = () => {
     setSingleNotification(null);
   };
+
+  const handleMarkAllRead = async () => {
+    try {
+      let response= await axiosInstance.post("/markAllasRead");
+      if (response.data.success) {
+        // Update local state to reflect all notifications are read
+        setNotification((prevNotifications) =>
+          prevNotifications.map((notif) => ({
+            ...notif,
+            isRead: 1,
+          }))
+        );
+        setNewNotification(0)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  const hasUnread = notifications.some((notif) => notif.isRead == 0);
+
   return (
     <div className="fixed top-0 left-0 right-0 w-full h-full  bg-white z-50 sm:w-72 sm:right-64 sm:left-auto sm:top-24 sm:h-auto sm:rounded-lg shadow-lg border">
       <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center z-10">
@@ -64,6 +93,16 @@ function MobileNotification({ notifications, onClose }) {
           <li className="text-sm text-gray-500 p-3">No new notifications.</li>
         )}
       </ul>
+      {hasUnread && (
+        <div className="p-2 border-t flex justify-center">
+          <button
+            onClick={handleMarkAllRead}
+            className=" text-xs text-gray-500"
+          >
+            Mark All as Read
+          </button>
+        </div>
+      )}
     </div>
   );
 }

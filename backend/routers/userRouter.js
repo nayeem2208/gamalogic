@@ -102,6 +102,7 @@ router.post('/loyalityProgram',dbMiddleware,loyalityProgramMiddleware,APIControl
 router.get('/appTourUpdation',dbMiddleware,authcheck,newControllers.updateAppTourStatus)
 router.get('/getNotifications',dbMiddleware,authcheck,newControllers.getAllNotifications)
 router.get('/notificationIsReadStatusChange',dbMiddleware,authcheck,newControllers.notificationIsRead)
+router.post('/markAllasRead',dbMiddleware,authcheck,newControllers.markAllasRead)
 
 
 export default router;

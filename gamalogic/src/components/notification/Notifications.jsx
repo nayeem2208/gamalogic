@@ -1,8 +1,15 @@
 import { useState } from "react";
 import SingleNotification from "./SingleNotification";
+import axiosInstance from "../../axios/axiosInstance";
+import { useUserState } from "../../context/userContext";
 
 function Notification({ notifications, onClose }) {
   const [singleNotification, setSingleNotification] = useState(null);
+  let {notification,
+    setNotification,
+    newNotification,
+    setNewNotification}=useUserState()
+  // console.log(notifications, "notifications");
 
   const formatTime = (time) => {
     const notifDate = new Date(time);
@@ -14,7 +21,6 @@ function Notification({ notifications, onClose }) {
       ? notifDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
       : notifDate.toLocaleDateString();
   };
-  
 
   const handleNotificationClick = (notif) => {
     setSingleNotification(notif);
@@ -30,8 +36,29 @@ function Notification({ notifications, onClose }) {
       onClose();
     }
   };
+
+  const handleMarkAllRead = async () => {
+    try {
+      let response= await axiosInstance.post("/markAllasRead");
+      if (response.data.success) {
+        // Update local state to reflect all notifications are read
+        setNotification((prevNotifications) =>
+          prevNotifications.map((notif) => ({
+            ...notif,
+            isRead: 1,
+          }))
+        );
+        setNewNotification(0)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const hasUnread = notifications.some((notif) => notif.isRead == 0);
+  console.log(singleNotification, "single notificatoin");
   return (
-    <div className="fixed top-24 right-64  min-w-96 max-w-[500px]  bg-white border rounded-lg shadow-lg z-50" >
+    <div className="fixed top-24 right-64  min-w-96 max-w-[500px]  bg-white border rounded-lg shadow-lg z-50">
       <div className="p-4 border-b flex justify-between items-center">
         <h4 className="font-semibold text-gray-700">Notifications</h4>
         <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -72,6 +99,16 @@ function Notification({ notifications, onClose }) {
           <li className="text-sm text-gray-500 p-3">No new notifications.</li>
         )}
       </ul>
+      {hasUnread && (
+        <div className="p-2 border-t flex justify-center">
+          <button
+            onClick={handleMarkAllRead}
+            className=" text-xs text-gray-500"
+          >
+            Mark All as Read
+          </button>
+        </div>
+      )}
     </div>
   );
 }
