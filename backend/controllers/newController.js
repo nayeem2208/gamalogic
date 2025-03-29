@@ -820,6 +820,29 @@ const newControllers = {
                     notificationType
                 ]
             );
+            const [user] = await dbConnection.query(
+                `SELECT username, emailid FROM registration WHERE rowid = ?`,
+                [file[0].userid]
+            );
+
+            if (!user?.length) {
+                console.warn(`User not found for ID: ${file[0].userid}`);
+            } else {
+                let content = `<p>We're pleased to inform you that your batch email ${notificationType} process for the file <strong>${fileName}</strong> has been successfully completed!</p>
+            <p>You can now download the results:</p>
+          <p>Thank you for using our service.</p>
+          <div class="verify">
+          <a href="${urls.frontendUrl}/dashboard/file-upload"><button
+                  class="verifyButton">Download</button></a>
+  
+          </div>`
+                sendEmail(
+                    user[0].username,
+                    user[0].emailid,
+                    `Batch Email ${notificationType.charAt(0).toUpperCase() + notificationType.slice(1)} Completed`,
+                    basicTemplate(user[0].username, content)
+                );
+            }
             const socketIds = activeUsers.get(file[0].userid);
             console.log(socketIds, 'userrrrrrrrrrrrrrrrr')
 
